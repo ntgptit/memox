@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:memox/core/constants/app_strings.dart';
+import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/settings/presentation/providers/settings_provider.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
@@ -23,26 +23,26 @@ class ThemeModeSelector extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            AppStrings.themeModeTitle,
-            style: Theme.of(context).textTheme.titleMedium,
+            context.l10n.themeModeTitle,
+            style: context.textTheme.titleMedium,
           ),
           const SizedBox(height: SpacingTokens.lg),
           SegmentedButton<ThemeMode>(
-            segments: const <ButtonSegment<ThemeMode>>[
+            segments: <ButtonSegment<ThemeMode>>[
               ButtonSegment<ThemeMode>(
                 value: ThemeMode.system,
-                label: Text(AppStrings.themeModeSystem),
-                icon: Icon(Icons.brightness_auto_outlined),
+                label: Text(context.l10n.themeModeSystem),
+                icon: const Icon(Icons.brightness_auto_outlined),
               ),
               ButtonSegment<ThemeMode>(
                 value: ThemeMode.light,
-                label: Text(AppStrings.themeModeLight),
-                icon: Icon(Icons.light_mode_outlined),
+                label: Text(context.l10n.themeModeLight),
+                icon: const Icon(Icons.light_mode_outlined),
               ),
               ButtonSegment<ThemeMode>(
                 value: ThemeMode.dark,
-                label: Text(AppStrings.themeModeDark),
-                icon: Icon(Icons.dark_mode_outlined),
+                label: Text(context.l10n.themeModeDark),
+                icon: const Icon(Icons.dark_mode_outlined),
               ),
             ],
             selected: <ThemeMode>{themeMode},

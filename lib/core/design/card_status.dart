@@ -1,4 +1,4 @@
-import 'package:memox/core/constants/app_strings.dart';
+import 'package:memox/l10n/generated/app_localizations.dart';
 
 enum CardStatus {
   newCard,
@@ -6,10 +6,10 @@ enum CardStatus {
   reviewing,
   mastered;
 
-  String get label => switch (this) {
-    CardStatus.newCard => AppStrings.statusNew,
-    CardStatus.learning => AppStrings.statusLearning,
-    CardStatus.reviewing => AppStrings.statusReviewing,
-    CardStatus.mastered => AppStrings.statusMastered,
+  String label(L10n l10n) => switch (this) {
+    CardStatus.newCard => l10n.statusNew,
+    CardStatus.learning => l10n.statusLearning,
+    CardStatus.reviewing => l10n.statusReviewing,
+    CardStatus.mastered => l10n.statusMastered,
   };
 }

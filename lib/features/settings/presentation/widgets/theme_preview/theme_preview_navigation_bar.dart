@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:memox/core/constants/app_strings.dart';
+import 'package:memox/core/extensions/context_extensions.dart';
 
 class ThemePreviewNavigationBar extends StatelessWidget {
   const ThemePreviewNavigationBar({super.key});
@@ -14,21 +14,21 @@ class ThemePreviewNavigationBar extends StatelessWidget {
       ),
       child: NavigationBar(
         selectedIndex: 1,
-        destinations: const [
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home_rounded),
-            label: AppStrings.themeNavHome,
+            icon: const Icon(Icons.home_outlined),
+            selectedIcon: const Icon(Icons.home_rounded),
+            label: context.l10n.themeNavHome,
           ),
           NavigationDestination(
-            icon: Icon(Icons.style_outlined),
-            selectedIcon: Icon(Icons.style_rounded),
-            label: AppStrings.themeNavStudy,
+            icon: const Icon(Icons.style_outlined),
+            selectedIcon: const Icon(Icons.style_rounded),
+            label: context.l10n.themeNavStudy,
           ),
           NavigationDestination(
-            icon: Icon(Icons.bar_chart_outlined),
-            selectedIcon: Icon(Icons.bar_chart_rounded),
-            label: AppStrings.themeNavStats,
+            icon: const Icon(Icons.bar_chart_outlined),
+            selectedIcon: const Icon(Icons.bar_chart_rounded),
+            label: context.l10n.themeNavStats,
           ),
         ],
       ),

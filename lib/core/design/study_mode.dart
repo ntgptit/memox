@@ -1,4 +1,4 @@
-import 'package:memox/core/constants/app_strings.dart';
+import 'package:memox/l10n/generated/app_localizations.dart';
 
 enum StudyMode {
   review,
@@ -7,12 +7,12 @@ enum StudyMode {
   recall,
   fill;
 
-  String get label => switch (this) {
-    StudyMode.review => AppStrings.modeReview,
-    StudyMode.match => AppStrings.modeMatch,
-    StudyMode.guess => AppStrings.modeGuess,
-    StudyMode.recall => AppStrings.modeRecall,
-    StudyMode.fill => AppStrings.modeFill,
+  String label(L10n l10n) => switch (this) {
+    StudyMode.review => l10n.modeReview,
+    StudyMode.match => l10n.modeMatch,
+    StudyMode.guess => l10n.modeGuess,
+    StudyMode.recall => l10n.modeRecall,
+    StudyMode.fill => l10n.modeFill,
   };
 
   String get emoji => switch (this) {

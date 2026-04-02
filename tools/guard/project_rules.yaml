@@ -45,6 +45,30 @@ color_palette:
     partial: "0xFFFFB74D"
     got_it: "0xFF4DB6AC"
 
+button_usage:
+  forbidden_buttons:
+    - "ElevatedButton"
+    - "FilledButton"
+    - "OutlinedButton"
+    - "TextButton"
+  whitelist_dirs:
+    - "lib/shared/widgets/buttons/"
+    - "test/"
+
+l10n_source:
+  path_patterns:
+    - "app.dart"
+    - "core/extensions/*.dart"
+    - "shared/widgets/**/*.dart"
+    - "features/*/presentation/**/*.dart"
+  forbidden_tokens:
+    - "AppStrings."
+    - "core/constants/app_strings.dart"
+
+freezed_json_model:
+  model_file_patterns:
+    - "features/*/domain/entities/*.dart"
+
 folder_structure:
   required_root_dirs:
     - "lib/core"
@@ -138,6 +162,19 @@ provider_naming:
   usecase_pattern: "^\\w+UseCaseProvider$"
   controller_pattern: "^\\w+ControllerProvider$"
 
+legacy_state_notifier:
+  forbidden_patterns:
+    - "StateNotifierProvider"
+    - "extends StateNotifier"
+    - "StateNotifier<"
+
+records_patterns:
+  pair_like_patterns:
+    - "Tuple2"
+    - "Tuple3"
+    - "Pair"
+  cast_window: 5
+
 riverpod_syntax:
   provider_file_patterns:
     - "core/providers/*.dart"
@@ -162,6 +199,24 @@ riverpod_syntax:
     - "StreamNotifierProvider"
     - "StateNotifierProvider"
     - "ChangeNotifierProvider"
+
+test_coverage:
+  screen_file_glob: "presentation/screens/*_screen.dart"
+  screen_test_glob: "presentation/screens/*_test.dart"
+  usecase_file_glob: "domain/usecases/*.dart"
+  usecase_test_glob: "domain/usecases/*_test.dart"
+
+text_style:
+  forbidden_patterns:
+    - "TextStyle\\("
+    - "fontWeight\\s*:\\s*FontWeight\\."
+    - "fontFamily\\s*:"
+    - "fontStyle\\s*:"
+    - "letterSpacing\\s*:\\s*\\d"
+    - "height\\s*:\\s*\\d"
+  whitelist_dirs:
+    - "lib/core/theme/"
+    - "test/"
 
 srs_fields:
   cards_table:

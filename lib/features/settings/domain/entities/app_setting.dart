@@ -1,21 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-class AppSettings {
-  const AppSettings({
-    this.themeMode = ThemeMode.system,
-    this.seedColorValue = 0xFF5C6BC0,
-    this.localeCode,
-    this.syncEnabled = false,
-    this.dailyGoal = 20,
-    this.sessionLimit = 20,
-  });
+part 'app_setting.freezed.dart';
+part 'app_setting.g.dart';
 
-  final ThemeMode themeMode;
-  final int seedColorValue;
-  final String? localeCode;
-  final bool syncEnabled;
-  final int dailyGoal;
-  final int sessionLimit;
+@freezed
+abstract class AppSettings with _$AppSettings {
+  const AppSettings._();
+
+  const factory AppSettings({
+    @Default(ThemeMode.system) ThemeMode themeMode,
+    @Default(0xFF5C6BC0) int seedColorValue,
+    String? localeCode,
+    @Default(false) bool syncEnabled,
+    @Default(20) int dailyGoal,
+    @Default(20) int sessionLimit,
+  }) = _AppSettings;
+
+  factory AppSettings.fromJson(Map<String, dynamic> json) =>
+      _$AppSettingsFromJson(json);
 
   Color get seedColor => Color(seedColorValue);
 
@@ -27,24 +30,6 @@ class AppSettings {
     }
 
     return Locale(code);
-  }
-
-  AppSettings copyWith({
-    ThemeMode? themeMode,
-    int? seedColorValue,
-    String? localeCode,
-    bool? syncEnabled,
-    int? dailyGoal,
-    int? sessionLimit,
-  }) {
-    return AppSettings(
-      themeMode: themeMode ?? this.themeMode,
-      seedColorValue: seedColorValue ?? this.seedColorValue,
-      localeCode: localeCode ?? this.localeCode,
-      syncEnabled: syncEnabled ?? this.syncEnabled,
-      dailyGoal: dailyGoal ?? this.dailyGoal,
-      sessionLimit: sessionLimit ?? this.sessionLimit,
-    );
   }
 
   static const AppSettings defaults = AppSettings();

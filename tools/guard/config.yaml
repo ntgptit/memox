@@ -32,6 +32,7 @@ global_guards:
   no_hardcoded_string: true
   shared_widget: true
   widget_length: true
+  widget_class_length: true
   const_constructor: true
   import_direction: true
   icon_style: true
@@ -40,19 +41,28 @@ global_guards:
   naming_convention: true
 
 local_guards:
+  button_usage: true
+  freezed_json_model: true
   folder_structure: true
+  legacy_state_notifier: true
+  l10n_source: true
   color_palette: true
   design_token_usage: true
   feature_completeness: true
   drift_table: true
   provider_naming: true
+  records_patterns: true
   riverpod_syntax: true
   shared_widget_mapping: true
   srs_field: true
+  test_coverage: true
+  text_style: true
 
 severity_overrides:
   widget_length: "warning"
+  widget_class_length: "warning"
   const_constructor: "warning"
   folder_structure: "info"
   icon_style: "warning"
   feature_completeness: "warning"
+  records_patterns: "warning"

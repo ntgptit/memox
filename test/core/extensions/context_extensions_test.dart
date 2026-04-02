@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/core/constants/app_strings.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
-import 'package:memox/core/theme/app_theme.dart';
+import '../../test_helpers/test_app.dart';
 
 void main() {
   testWidgets('context extensions expose responsive and feedback helpers', (
@@ -16,8 +16,7 @@ void main() {
           size: Size(700, 900),
           viewInsets: EdgeInsets.only(bottom: 12),
         ),
-        child: MaterialApp(
-          theme: AppTheme.light(),
+        child: buildTestApp(
           home: Builder(
             builder: (context) {
               capturedContext = context;

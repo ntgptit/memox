@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:memox/core/constants/app_strings.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
@@ -32,7 +31,7 @@ class ErrorView extends StatelessWidget {
           if (onRetry != null) ...[
             const SizedBox(height: SpacingTokens.lg),
             SecondaryButton(
-              label: AppStrings.retryAction,
+              label: context.l10n.retryAction,
               onPressed: onRetry,
               fullWidth: false,
             ),

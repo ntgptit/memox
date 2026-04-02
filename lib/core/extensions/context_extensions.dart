@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:memox/core/constants/app_strings.dart';
 import 'package:memox/core/responsive/screen_type.dart';
 import 'package:memox/core/theme/color_schemes/custom_colors.dart';
 import 'package:memox/core/theme/text_themes/custom_text_styles.dart';
@@ -60,14 +59,14 @@ extension BuildContextX on BuildContext {
   Future<bool?> showConfirmDialog({
     required String title,
     required String message,
-    String confirmText = AppStrings.confirmAction,
+    String? confirmText,
     bool isDestructive = false,
   }) => showDialog<bool>(
     context: this,
     builder: (_) => ConfirmDialog(
       title: title,
       message: message,
-      confirmText: confirmText,
+      confirmText: confirmText ?? l10n.confirmAction,
       isDestructive: isDestructive,
     ),
   );

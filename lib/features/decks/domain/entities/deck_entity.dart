@@ -1,47 +1,22 @@
-class DeckEntity {
-  const DeckEntity({
-    required this.id,
-    required this.name,
-    this.folderId = 0,
-    this.description = '',
-    this.colorValue = 0xFF5C6BC0,
-    this.tags = const <String>[],
-    this.createdAt,
-    this.updatedAt,
-    this.sortOrder = 0,
-  });
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  final int id;
-  final String name;
-  final int folderId;
-  final String description;
-  final int colorValue;
-  final List<String> tags;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
-  final int sortOrder;
+part 'deck_entity.freezed.dart';
+part 'deck_entity.g.dart';
 
-  DeckEntity copyWith({
-    int? id,
-    String? name,
-    int? folderId,
-    String? description,
-    int? colorValue,
-    List<String>? tags,
+@freezed
+abstract class DeckEntity with _$DeckEntity {
+  const factory DeckEntity({
+    required int id,
+    required String name,
+    @Default(0) int folderId,
+    @Default('') String description,
+    @Default(0xFF5C6BC0) int colorValue,
+    @Default(<String>[]) List<String> tags,
     DateTime? createdAt,
     DateTime? updatedAt,
-    int? sortOrder,
-  }) {
-    return DeckEntity(
-      id: id ?? this.id,
-      name: name ?? this.name,
-      folderId: folderId ?? this.folderId,
-      description: description ?? this.description,
-      colorValue: colorValue ?? this.colorValue,
-      tags: tags ?? this.tags,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-      sortOrder: sortOrder ?? this.sortOrder,
-    );
-  }
+    @Default(0) int sortOrder,
+  }) = _DeckEntity;
+
+  factory DeckEntity.fromJson(Map<String, dynamic> json) =>
+      _$DeckEntityFromJson(json);
 }

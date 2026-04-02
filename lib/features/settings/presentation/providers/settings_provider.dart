@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:memox/core/constants/app_strings.dart';
 import 'package:memox/core/providers/usecase_providers.dart';
 import 'package:memox/features/settings/domain/entities/app_setting.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -31,6 +30,3 @@ class Settings extends _$Settings {
     await future;
   }
 }
-
-@riverpod
-String settingsScreenTitle(Ref ref) => AppStrings.settingsTitle;

@@ -1,49 +1,23 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:memox/core/design/study_mode.dart';
 
-class StudySession {
-  const StudySession({
-    required this.id,
-    this.mode = StudyMode.review,
-    this.deckId = 0,
-    this.startedAt,
-    this.completedAt,
-    this.totalCards = 0,
-    this.correctCount = 0,
-    this.wrongCount = 0,
-    this.durationSeconds = 0,
-  });
+part 'study_session.freezed.dart';
+part 'study_session.g.dart';
 
-  final int id;
-  final StudyMode mode;
-  final int deckId;
-  final DateTime? startedAt;
-  final DateTime? completedAt;
-  final int totalCards;
-  final int correctCount;
-  final int wrongCount;
-  final int durationSeconds;
-
-  StudySession copyWith({
-    int? id,
-    StudyMode? mode,
-    int? deckId,
+@freezed
+abstract class StudySession with _$StudySession {
+  const factory StudySession({
+    required int id,
+    @Default(StudyMode.review) StudyMode mode,
+    @Default(0) int deckId,
     DateTime? startedAt,
     DateTime? completedAt,
-    int? totalCards,
-    int? correctCount,
-    int? wrongCount,
-    int? durationSeconds,
-  }) {
-    return StudySession(
-      id: id ?? this.id,
-      mode: mode ?? this.mode,
-      deckId: deckId ?? this.deckId,
-      startedAt: startedAt ?? this.startedAt,
-      completedAt: completedAt ?? this.completedAt,
-      totalCards: totalCards ?? this.totalCards,
-      correctCount: correctCount ?? this.correctCount,
-      wrongCount: wrongCount ?? this.wrongCount,
-      durationSeconds: durationSeconds ?? this.durationSeconds,
-    );
-  }
+    @Default(0) int totalCards,
+    @Default(0) int correctCount,
+    @Default(0) int wrongCount,
+    @Default(0) int durationSeconds,
+  }) = _StudySession;
+
+  factory StudySession.fromJson(Map<String, dynamic> json) =>
+      _$StudySessionFromJson(json);
 }

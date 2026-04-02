@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:memox/core/constants/app_strings.dart';
+import 'package:memox/core/extensions/context_extensions.dart';
+import 'package:memox/shared/widgets/buttons/primary_button.dart';
+import 'package:memox/shared/widgets/buttons/secondary_button.dart';
 
 class InputDialog extends StatefulWidget {
   const InputDialog({
@@ -57,13 +59,15 @@ class _InputDialogState extends State<InputDialog> {
       decoration: InputDecoration(hintText: widget.hint, errorText: _error),
     ),
     actions: [
-      TextButton(
+      SecondaryButton(
         onPressed: () => Navigator.of(context).pop(),
-        child: const Text(AppStrings.cancelAction),
+        label: context.l10n.cancelAction,
+        fullWidth: false,
       ),
-      TextButton(
+      PrimaryButton(
         onPressed: _submit,
-        child: const Text(AppStrings.submitAction),
+        label: context.l10n.submitAction,
+        fullWidth: false,
       ),
     ],
   );

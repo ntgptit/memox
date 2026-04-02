@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:memox/core/constants/app_strings.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/duration_tokens.dart';
 import 'package:memox/core/theme/tokens/opacity_tokens.dart';
@@ -33,7 +32,18 @@ class AppSlidableRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Dismissible(
     key: key ?? child.key ?? ValueKey<Object>(child),
-    confirmDismiss: (direction) => _handleDismiss(context, direction),
+    confirmDismiss: (direction) => _handleRowDismiss(
+      context: context,
+      direction: direction,
+      onDelete: onDelete,
+      deleteLabel: deleteLabel,
+      confirmDelete: confirmDelete,
+      deleteConfirmMessage: deleteConfirmMessage,
+      onEdit: onEdit,
+      onArchive: onArchive,
+      showUndoSnackbar: showUndoSnackbar,
+      undoDuration: undoDuration,
+    ),
     background: _ActionBackground(
       alignment: Alignment.centerLeft,
       color: context.colors.primary,
@@ -51,63 +61,79 @@ class AppSlidableRow extends StatelessWidget {
     },
     child: child,
   );
+}
 
-  Future<bool> _handleDismiss(
-    BuildContext context,
-    DismissDirection direction,
-  ) async {
-    if (direction == DismissDirection.startToEnd) {
-      if (onEdit != null) {
-        onEdit!();
-        return false;
-      }
-
-      onArchive?.call();
+Future<bool> _handleRowDismiss({
+  required BuildContext context,
+  required DismissDirection direction,
+  required VoidCallback? onDelete,
+  required String? deleteLabel,
+  required bool confirmDelete,
+  required String? deleteConfirmMessage,
+  required VoidCallback? onEdit,
+  required VoidCallback? onArchive,
+  required bool showUndoSnackbar,
+  required Duration undoDuration,
+}) async {
+  if (direction == DismissDirection.startToEnd) {
+    if (onEdit != null) {
+      onEdit();
       return false;
     }
 
-    if (onDelete == null) {
-      return false;
-    }
-
-    if (confirmDelete) {
-      final confirmed = await context.showConfirmDialog(
-        title: deleteLabel ?? AppStrings.deleteAction,
-        message: deleteConfirmMessage ?? AppStrings.confirmDeleteMessage,
-        confirmText: deleteLabel ?? AppStrings.deleteAction,
-        isDestructive: true,
-      );
-
-      if (confirmed != true) {
-        return false;
-      }
-    }
-
-    if (!context.mounted) {
-      return false;
-    }
-
-    if (!showUndoSnackbar) {
-      onDelete!();
-      return false;
-    }
-
-    final messenger = ScaffoldMessenger.of(context)..hideCurrentSnackBar();
-    final controller = messenger.showSnackBar(
-      SnackBar(
-        content: const Text(AppStrings.deletedMessage),
-        duration: undoDuration,
-        action: SnackBarAction(label: AppStrings.undoAction, onPressed: () {}),
-      ),
-    );
-    final reason = await controller.closed;
-
-    if (reason != SnackBarClosedReason.action) {
-      onDelete!();
-    }
-
+    onArchive?.call();
     return false;
   }
+
+  if (onDelete == null) {
+    return false;
+  }
+
+  if (confirmDelete) {
+    final confirmed = await context.showConfirmDialog(
+      title: deleteLabel ?? context.l10n.deleteAction,
+      message: deleteConfirmMessage ?? context.l10n.confirmDeleteMessage,
+      confirmText: deleteLabel ?? context.l10n.deleteAction,
+      isDestructive: true,
+    );
+
+    if (confirmed != true) {
+      return false;
+    }
+  }
+
+  if (!context.mounted) {
+    return false;
+  }
+
+  if (!showUndoSnackbar) {
+    onDelete();
+    return false;
+  }
+
+  final reason = await _showUndoDeleteSnackBar(context, undoDuration);
+
+  if (reason != SnackBarClosedReason.action) {
+    onDelete();
+  }
+
+  return false;
+}
+
+Future<SnackBarClosedReason> _showUndoDeleteSnackBar(
+  BuildContext context,
+  Duration duration,
+) {
+  final messenger = ScaffoldMessenger.of(context)..hideCurrentSnackBar();
+  final controller = messenger.showSnackBar(
+    SnackBar(
+      content: Text(context.l10n.deletedMessage),
+      duration: duration,
+      action: SnackBarAction(label: context.l10n.undoAction, onPressed: () {}),
+    ),
+  );
+
+  return controller.closed;
 }
 
 class _ActionBackground extends StatelessWidget {

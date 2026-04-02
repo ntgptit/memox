@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:memox/core/constants/app_strings.dart';
+import 'package:memox/core/extensions/context_extensions.dart';
+import 'package:memox/shared/widgets/buttons/primary_button.dart';
+import 'package:memox/shared/widgets/buttons/secondary_button.dart';
 
 class ConfirmDialog extends StatelessWidget {
   const ConfirmDialog({
@@ -25,14 +27,19 @@ class ConfirmDialog extends StatelessWidget {
       title: Text(title),
       content: Text(message),
       actions: [
-        TextButton(
+        SecondaryButton(
           onPressed: () => Navigator.of(context).pop(false),
-          child: const Text(AppStrings.cancelAction),
+          label: context.l10n.cancelAction,
+          fullWidth: false,
         ),
-        TextButton(
+        PrimaryButton(
           onPressed: () => Navigator.of(context).pop(true),
-          style: TextButton.styleFrom(foregroundColor: confirmColor),
-          child: Text(confirmText),
+          label: confirmText,
+          fullWidth: false,
+          backgroundColor: confirmColor,
+          foregroundColor: isDestructive
+              ? Theme.of(context).colorScheme.onError
+              : null,
         ),
       ],
     );

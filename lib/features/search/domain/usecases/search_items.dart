@@ -7,7 +7,7 @@ final class SearchItemsUseCase {
   final SearchRepository _repository;
 
   Future<List<String>> call(String value) {
-    final query = SearchQuery(value.trim());
+    final query = SearchQuery(value: value.trim());
 
     if (query.isEmpty) {
       return Future.value(const <String>[]);

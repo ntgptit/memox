@@ -39,7 +39,7 @@ class StatusChip extends StatelessWidget {
             ),
             const SizedBox(width: SpacingTokens.xs),
             Text(
-              status.label,
+              status.label(context.l10n),
               style: context.appTextStyles.tagText.copyWith(color: color),
             ),
           ],

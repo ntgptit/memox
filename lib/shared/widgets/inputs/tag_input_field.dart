@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:memox/core/constants/app_strings.dart';
+import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/core/utils/string_utils.dart';
 import 'package:memox/shared/widgets/chips/tag_chip.dart';
@@ -101,7 +101,7 @@ class _TagInputFieldState extends State<TagInputField> {
         enabled: !_isAtLimit,
         onChanged: (_) => setState(() {}),
         onSubmitted: _addTag,
-        decoration: const InputDecoration(hintText: AppStrings.addTagHint),
+        decoration: InputDecoration(hintText: context.l10n.addTagHint),
       ),
       if (_filteredSuggestions.isNotEmpty) ...[
         const SizedBox(height: SpacingTokens.sm),

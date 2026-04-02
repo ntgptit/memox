@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/core/design/card_status.dart';
 import 'package:memox/core/design/study_mode.dart';
-import 'package:memox/core/theme/app_theme.dart';
 import 'package:memox/shared/widgets/animations/flip_card_widget.dart';
 import 'package:memox/shared/widgets/animations/pulse_widget.dart';
 import 'package:memox/shared/widgets/animations/shake_widget.dart';
@@ -15,12 +14,12 @@ import 'package:memox/shared/widgets/inputs/stepper_input.dart';
 import 'package:memox/shared/widgets/inputs/tag_input_field.dart';
 import 'package:memox/shared/widgets/navigation/app_bottom_nav.dart';
 import 'package:memox/shared/widgets/navigation/breadcrumb_bar.dart';
+import '../../test_helpers/test_app.dart';
 
 void main() {
   testWidgets('compact widgets render with app theme', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
-        theme: AppTheme.light(),
+      buildTestApp(
         home: Scaffold(
           bottomNavigationBar: AppBottomNav(currentIndex: 0, onTap: (_) {}),
           body: ListView(
@@ -58,8 +57,7 @@ void main() {
     final values = <String>[];
 
     await tester.pumpWidget(
-      MaterialApp(
-        theme: AppTheme.light(),
+      buildTestApp(
         home: Scaffold(body: AppSearchBar(onChanged: values.add)),
       ),
     );
@@ -82,8 +80,7 @@ void main() {
     var tags = <String>['Core'];
 
     await tester.pumpWidget(
-      MaterialApp(
-        theme: AppTheme.light(),
+      buildTestApp(
         home: StatefulBuilder(
           builder: (context, setState) => Scaffold(
             body: Column(
@@ -123,8 +120,7 @@ void main() {
     String? result;
 
     await tester.pumpWidget(
-      MaterialApp(
-        theme: AppTheme.light(),
+      buildTestApp(
         home: Scaffold(
           body: Builder(
             builder: (context) => TextButton(

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:memox/core/constants/app_strings.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/duration_tokens.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
@@ -36,7 +35,7 @@ class SessionCompleteView extends StatelessWidget {
                 const SuccessIndicator(),
                 const SizedBox(height: SpacingTokens.lg),
                 Text(
-                  AppStrings.sessionCompleteTitle,
+                  context.l10n.sessionCompleteTitle,
                   style: context.appTextStyles.statNumberSm,
                   textAlign: TextAlign.center,
                 ),

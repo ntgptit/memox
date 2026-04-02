@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:memox/core/constants/app_strings.dart';
+import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/router/app_router.dart';
 import 'package:memox/core/theme/app_theme.dart';
 import 'package:memox/core/theme/tokens/duration_tokens.dart';
@@ -34,7 +34,7 @@ class MemoxApp extends ConsumerWidget {
     }
 
     return MaterialApp.router(
-      title: AppStrings.appName,
+      onGenerateTitle: (context) => context.l10n.appName,
       debugShowCheckedModeBanner: false,
       locale: settings.locale,
       localizationsDelegates: L10n.localizationsDelegates,

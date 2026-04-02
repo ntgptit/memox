@@ -1,13 +1,15 @@
-class StatisticsSnapshot {
-  const StatisticsSnapshot({required this.id, required this.totalReviews});
+import 'package:freezed_annotation/freezed_annotation.dart';
 
-  final int id;
-  final int totalReviews;
+part 'statistics_snapshot.freezed.dart';
+part 'statistics_snapshot.g.dart';
 
-  StatisticsSnapshot copyWith({int? id, int? totalReviews}) {
-    return StatisticsSnapshot(
-      id: id ?? this.id,
-      totalReviews: totalReviews ?? this.totalReviews,
-    );
-  }
+@freezed
+abstract class StatisticsSnapshot with _$StatisticsSnapshot {
+  const factory StatisticsSnapshot({
+    required int id,
+    required int totalReviews,
+  }) = _StatisticsSnapshot;
+
+  factory StatisticsSnapshot.fromJson(Map<String, dynamic> json) =>
+      _$StatisticsSnapshotFromJson(json);
 }

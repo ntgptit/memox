@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:memox/core/constants/app_strings.dart';
+import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
 
@@ -8,21 +8,22 @@ class ThemeTypographySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
+    final l10n = context.l10n;
+    final textTheme = context.textTheme;
 
     return AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(AppStrings.themeTypographyTitle, style: textTheme.titleMedium),
+          Text(l10n.themeTypographyTitle, style: textTheme.titleMedium),
           const SizedBox(height: SpacingTokens.lg),
-          Text(AppStrings.themeDisplayLabel, style: textTheme.displaySmall),
+          Text(l10n.themeDisplayLabel, style: textTheme.displaySmall),
           const SizedBox(height: SpacingTokens.sm),
-          Text(AppStrings.themeHeadlineLabel, style: textTheme.headlineSmall),
+          Text(l10n.themeHeadlineLabel, style: textTheme.headlineSmall),
           const SizedBox(height: SpacingTokens.sm),
-          Text(AppStrings.themeBodyCopy, style: textTheme.bodyLarge),
+          Text(l10n.themeBodyCopy, style: textTheme.bodyLarge),
           const SizedBox(height: SpacingTokens.sm),
-          Text(AppStrings.themeCaptionCopy, style: textTheme.labelSmall),
+          Text(l10n.themeCaptionCopy, style: textTheme.labelSmall),
         ],
       ),
     );

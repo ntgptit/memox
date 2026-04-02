@@ -12,6 +12,8 @@ class PrimaryButton extends StatelessWidget {
     this.icon,
     this.fullWidth = true,
     this.height = SizeTokens.buttonHeightLg,
+    this.backgroundColor,
+    this.foregroundColor,
     super.key,
   });
 
@@ -21,13 +23,19 @@ class PrimaryButton extends StatelessWidget {
   final IconData? icon;
   final bool fullWidth;
   final double height;
+  final Color? backgroundColor;
+  final Color? foregroundColor;
 
   @override
   Widget build(BuildContext context) {
+    final progressColor =
+        foregroundColor ?? Theme.of(context).colorScheme.onPrimary;
     final child = FilledButton(
       onPressed: isLoading ? null : onPressed,
       style: FilledButton.styleFrom(
         minimumSize: Size(0, height),
+        backgroundColor: backgroundColor,
+        foregroundColor: foregroundColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(RadiusTokens.button),
         ),
@@ -36,7 +44,7 @@ class PrimaryButton extends StatelessWidget {
         label: label,
         icon: icon,
         isLoading: isLoading,
-        progressColor: Theme.of(context).colorScheme.onPrimary,
+        progressColor: progressColor,
       ),
     );
     final wrapped = ScaleTap(

@@ -43,7 +43,7 @@ class ModeChip extends StatelessWidget {
           ),
         ),
         const SizedBox(width: SpacingTokens.xs),
-        Text(mode.label, style: context.appTextStyles.tagText),
+        Text(mode.label(context.l10n), style: context.appTextStyles.tagText),
       ],
     ),
   );
