@@ -1,8 +1,5 @@
-import 'dart:async';
-
 import 'package:memox/core/logging/app_logger.dart';
 import 'package:memox/features/folders/data/datasources/folder_local_datasource.dart';
-import 'package:memox/features/folders/data/datasources/folder_remote_datasource.dart';
 import 'package:memox/features/folders/data/mappers/folder_mapper.dart';
 import 'package:memox/features/folders/domain/entities/folder_entity.dart';
 import 'package:memox/features/folders/domain/repositories/folder_repository.dart';
@@ -10,14 +7,11 @@ import 'package:memox/features/folders/domain/repositories/folder_repository.dar
 final class FolderRepositoryImpl implements FolderRepository {
   const FolderRepositoryImpl({
     required FolderLocalDataSource localDataSource,
-    required FolderRemoteDataSource? remoteDataSource,
     required AppLogger logger,
-  })  : _localDataSource = localDataSource,
-        _remoteDataSource = remoteDataSource,
-        _logger = logger;
+  }) : _localDataSource = localDataSource,
+       _logger = logger;
 
   final FolderLocalDataSource _localDataSource;
-  final FolderRemoteDataSource? _remoteDataSource;
   final AppLogger _logger;
 
   @override
@@ -39,20 +33,16 @@ final class FolderRepositoryImpl implements FolderRepository {
 
   @override
   Future<List<FolderEntity>> getRootFolders() async {
-    final models = await _localDataSource.getAll();
-    return models.map(FolderMapper.toEntity).toList();
+    final rows = await _localDataSource.getAll();
+    return rows.map(FolderMapper.toEntity).toList();
   }
 
   @override
   Future<FolderEntity> save(FolderEntity entity) async {
-    final savedModel = await _localDataSource.save(FolderMapper.toModel(entity));
-    final savedEntity = FolderMapper.toEntity(savedModel);
-    final remoteDataSource = _remoteDataSource;
-
-    if (remoteDataSource != null) {
-      unawaited(remoteDataSource.pushChanges([FolderMapper.toDto(savedEntity)]));
-    }
-
+    final savedRow = await _localDataSource.save(
+      FolderMapper.toCompanion(entity),
+    );
+    final savedEntity = FolderMapper.toEntity(savedRow);
     _logger.info('Saved folder ${savedEntity.id}');
     return savedEntity;
   }
@@ -60,7 +50,7 @@ final class FolderRepositoryImpl implements FolderRepository {
   @override
   Stream<List<FolderEntity>> watchRootFolders() {
     return _localDataSource.watchAll().map(
-      (models) => models.map(FolderMapper.toEntity).toList(),
+      (rows) => rows.map(FolderMapper.toEntity).toList(),
     );
   }
 }

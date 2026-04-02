@@ -23,7 +23,9 @@ class AppScaffold extends StatelessWidget {
     final content = Align(
       alignment: Alignment.topCenter,
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxWidth: context.screenType.maxContentWidth),
+        constraints: BoxConstraints(
+          maxWidth: context.screenType.maxContentWidth,
+        ),
         child: Padding(
           padding: ResponsivePadding.horizontal(context),
           child: body,

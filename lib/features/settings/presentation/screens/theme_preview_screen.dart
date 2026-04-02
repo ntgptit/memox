@@ -17,7 +17,7 @@ class ThemePreviewScreen extends StatelessWidget {
     appBar: AppBar(title: const Text(AppStrings.themePreviewTitle)),
     floatingActionButton: FloatingActionButton.extended(
       onPressed: () {},
-      icon: const Icon(Icons.add_rounded),
+      icon: const Icon(Icons.add),
       label: const Text(AppStrings.themeFabLabel),
     ),
     bottomNavigationBar: const ThemePreviewNavigationBar(),

@@ -7,10 +7,7 @@ import 'package:memox/core/theme/tokens/radius_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 
 class StreakChip extends StatelessWidget {
-  const StreakChip({
-    required this.count,
-    super.key,
-  });
+  const StreakChip({required this.count, super.key});
 
   final int count;
 
@@ -22,7 +19,9 @@ class StreakChip extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: context.customColors.mastery.withValues(alpha: OpacityTokens.press),
+        color: context.customColors.mastery.withValues(
+          alpha: OpacityTokens.press,
+        ),
         borderRadius: BorderRadius.circular(RadiusTokens.chip),
       ),
       child: Padding(
@@ -30,7 +29,14 @@ class StreakChip extends StatelessWidget {
           horizontal: SpacingTokens.md,
           vertical: SpacingTokens.xs,
         ),
-        child: Text('🔥 $count', style: context.appTextStyles.tagText),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.local_fire_department_outlined),
+            const SizedBox(width: SpacingTokens.xs),
+            Text(count.toString(), style: context.appTextStyles.tagText),
+          ],
+        ),
       ),
     ).animate().scale(duration: DurationTokens.normal);
   }

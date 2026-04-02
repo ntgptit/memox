@@ -33,5 +33,4 @@ class Settings extends _$Settings {
 }
 
 @riverpod
-String settingsScreenTitle(SettingsScreenTitleRef ref) =>
-    AppStrings.settingsTitle;
+String settingsScreenTitle(Ref ref) => AppStrings.settingsTitle;

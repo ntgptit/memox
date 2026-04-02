@@ -70,7 +70,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 1));
     expect(values.single, 'deck');
 
-    await tester.tap(find.byIcon(Icons.close_rounded));
+    await tester.tap(find.byIcon(Icons.close));
     await tester.pump();
     expect(values.last, '');
   });
@@ -108,7 +108,7 @@ void main() {
       ),
     );
 
-    await tester.tap(find.byIcon(Icons.add_rounded));
+    await tester.tap(find.byIcon(Icons.add));
     await tester.pumpAndSettle();
     expect(find.text('2'), findsOneWidget);
 

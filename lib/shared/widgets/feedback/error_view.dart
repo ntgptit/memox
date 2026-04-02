@@ -6,11 +6,7 @@ import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/shared/widgets/buttons/secondary_button.dart';
 
 class ErrorView extends StatelessWidget {
-  const ErrorView({
-    required this.message,
-    this.onRetry,
-    super.key,
-  });
+  const ErrorView({required this.message, this.onRetry, super.key});
 
   final String message;
   final VoidCallback? onRetry;

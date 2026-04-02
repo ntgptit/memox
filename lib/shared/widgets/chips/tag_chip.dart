@@ -4,12 +4,7 @@ import 'package:memox/core/theme/tokens/radius_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 
 class TagChip extends StatelessWidget {
-  const TagChip({
-    required this.label,
-    this.onTap,
-    this.onDelete,
-    super.key,
-  });
+  const TagChip({required this.label, this.onTap, this.onDelete, super.key});
 
   final String label;
   final VoidCallback? onTap;

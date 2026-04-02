@@ -4,4 +4,4 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'study_provider.g.dart';
 
 @riverpod
-String studyScreenTitle(StudyScreenTitleRef ref) => AppStrings.studyTitle;
+String studyScreenTitle(Ref ref) => AppStrings.studyTitle;

@@ -139,14 +139,12 @@ class CustomColors extends ThemeExtension<CustomColors> {
       surfaceDim: Color.lerp(surfaceDim, other.surfaceDim, t) ?? surfaceDim,
       statusNew: Color.lerp(statusNew, other.statusNew, t) ?? statusNew,
       statusLearning:
-          Color.lerp(statusLearning, other.statusLearning, t) ??
-          statusLearning,
+          Color.lerp(statusLearning, other.statusLearning, t) ?? statusLearning,
       statusReviewing:
           Color.lerp(statusReviewing, other.statusReviewing, t) ??
           statusReviewing,
       statusMastered:
-          Color.lerp(statusMastered, other.statusMastered, t) ??
-          statusMastered,
+          Color.lerp(statusMastered, other.statusMastered, t) ?? statusMastered,
       ratingAgain: Color.lerp(ratingAgain, other.ratingAgain, t) ?? ratingAgain,
       ratingHard: Color.lerp(ratingHard, other.ratingHard, t) ?? ratingHard,
       ratingGood: Color.lerp(ratingGood, other.ratingGood, t) ?? ratingGood,

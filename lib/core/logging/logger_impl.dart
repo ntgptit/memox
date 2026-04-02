@@ -12,18 +12,12 @@ final class LoggerImpl implements AppLogger {
   void info(String message) => log(LogLevel.info, message);
 
   @override
-  void warning(
-    String message, {
-    Object? error,
-    StackTrace? stackTrace,
-  }) => log(LogLevel.warning, message, error: error, stackTrace: stackTrace);
+  void warning(String message, {Object? error, StackTrace? stackTrace}) =>
+      log(LogLevel.warning, message, error: error, stackTrace: stackTrace);
 
   @override
-  void error(
-    String message, {
-    Object? error,
-    StackTrace? stackTrace,
-  }) => log(LogLevel.error, message, error: error, stackTrace: stackTrace);
+  void error(String message, {Object? error, StackTrace? stackTrace}) =>
+      log(LogLevel.error, message, error: error, stackTrace: stackTrace);
 
   @override
   void log(

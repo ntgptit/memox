@@ -5,6 +5,7 @@ import 'package:memox/core/theme/color_schemes/custom_colors.dart';
 import 'package:memox/core/theme/text_themes/custom_text_styles.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/shared/widgets/dialogs/confirm_dialog.dart';
+import 'package:memox/shared/widgets/feedback/toast.dart';
 
 extension BuildContextX on BuildContext {
   ThemeData get theme => Theme.of(this);
@@ -43,15 +44,11 @@ extension BuildContextX on BuildContext {
 
   void pop<T>([T? result]) => Navigator.of(this).pop(result);
 
-  void showSnackBar(String message, {bool isError = false}) {
-    ScaffoldMessenger.of(this).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: isError ? customColors.ratingAgain : null,
-      ),
-    );
-  }
+  void showSnackBar(String message, {bool isError = false}) => Toast.show(
+    this,
+    message,
+    type: isError ? ToastType.error : ToastType.info,
+  );
 
   Future<T?> showAppBottomSheet<T>(Widget child) => showModalBottomSheet<T>(
     context: this,

@@ -9,8 +9,8 @@ final class CreateFolderUseCase {
   const CreateFolderUseCase({
     required FolderRepository folderRepo,
     required AppLogger logger,
-  })  : _folderRepo = folderRepo,
-        _logger = logger;
+  }) : _folderRepo = folderRepo,
+       _logger = logger;
 
   final FolderRepository _folderRepo;
   final AppLogger _logger;

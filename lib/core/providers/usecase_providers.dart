@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/core/providers/repository_providers.dart';
 import 'package:memox/core/providers/service_providers.dart';
 import 'package:memox/features/cards/domain/usecases/get_due_cards.dart';

@@ -4,5 +4,4 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'statistics_provider.g.dart';
 
 @riverpod
-String statisticsScreenTitle(StatisticsScreenTitleRef ref) =>
-    AppStrings.statisticsTitle;
+String statisticsScreenTitle(Ref ref) => AppStrings.statisticsTitle;

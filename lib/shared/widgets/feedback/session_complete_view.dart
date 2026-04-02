@@ -28,44 +28,48 @@ class SessionCompleteView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => SingleChildScrollView(
-      padding: const EdgeInsets.all(SpacingTokens.xl),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const SuccessIndicator(),
-          const SizedBox(height: SpacingTokens.lg),
-          Text(
-            AppStrings.sessionCompleteTitle,
-            style: context.appTextStyles.statNumberSm,
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: SpacingTokens.xl),
-          ...stats.map((stat) => _SessionStatRow(stat: stat)),
-          if (extraContent != null) ...[
-            const SizedBox(height: SpacingTokens.xl),
-            extraContent!,
-          ],
-          const SizedBox(height: SpacingTokens.xl),
-          PrimaryButton(
-            label: primaryAction.label,
-            onPressed: primaryAction.onTap,
-          ),
-          if (secondaryAction != null) ...[
-            const SizedBox(height: SpacingTokens.lg),
-            Center(
-              child: TextLinkButton(
-                label: secondaryAction!.label,
-                onTap: secondaryAction!.onTap,
-              ),
+    padding: const EdgeInsets.all(SpacingTokens.xl),
+    child:
+        Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SuccessIndicator(),
+                const SizedBox(height: SpacingTokens.lg),
+                Text(
+                  AppStrings.sessionCompleteTitle,
+                  style: context.appTextStyles.statNumberSm,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: SpacingTokens.xl),
+                ...stats.map((stat) => _SessionStatRow(stat: stat)),
+                if (extraContent != null) ...[
+                  const SizedBox(height: SpacingTokens.xl),
+                  extraContent!,
+                ],
+                const SizedBox(height: SpacingTokens.xl),
+                PrimaryButton(
+                  label: primaryAction.label,
+                  onPressed: primaryAction.onTap,
+                ),
+                if (secondaryAction != null) ...[
+                  const SizedBox(height: SpacingTokens.lg),
+                  Center(
+                    child: TextLinkButton(
+                      label: secondaryAction!.label,
+                      onTap: secondaryAction!.onTap,
+                    ),
+                  ),
+                ],
+              ],
+            )
+            .animate()
+            .fadeIn(duration: DurationTokens.slow)
+            .scale(
+              begin: const Offset(0.95, 0.95),
+              end: const Offset(1, 1),
+              duration: DurationTokens.slow,
             ),
-          ],
-        ],
-      ).animate().fadeIn(duration: DurationTokens.slow).scale(
-        begin: const Offset(0.95, 0.95),
-        end: const Offset(1, 1),
-        duration: DurationTokens.slow,
-      ),
-    );
+  );
 }
 
 class _SessionStatRow extends StatelessWidget {
@@ -75,26 +79,26 @@ class _SessionStatRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-      padding: const EdgeInsets.only(bottom: SpacingTokens.md),
-      child: Row(
-        children: [
-          Icon(stat.icon, size: SizeTokens.iconXs, color: stat.valueColor),
-          const SizedBox(width: SpacingTokens.sm),
-          Expanded(
-            child: Text(
-              stat.label,
-              style: context.textTheme.bodyMedium?.copyWith(
-                color: stat.valueColor ?? context.colors.onSurface,
-              ),
+    padding: const EdgeInsets.only(bottom: SpacingTokens.md),
+    child: Row(
+      children: [
+        Icon(stat.icon, size: SizeTokens.iconXs, color: stat.valueColor),
+        const SizedBox(width: SpacingTokens.sm),
+        Expanded(
+          child: Text(
+            stat.label,
+            style: context.textTheme.bodyMedium?.copyWith(
+              color: stat.valueColor ?? context.colors.onSurface,
             ),
           ),
-        ],
-      ),
-    );
+        ),
+      ],
+    ),
+  );
 }
 
 @freezed
-class SessionStat with _$SessionStat {
+abstract class SessionStat with _$SessionStat {
   const factory SessionStat({
     required String label,
     required IconData icon,
@@ -103,7 +107,7 @@ class SessionStat with _$SessionStat {
 }
 
 @freezed
-class SessionAction with _$SessionAction {
+abstract class SessionAction with _$SessionAction {
   const factory SessionAction({
     required String label,
     required VoidCallback onTap,

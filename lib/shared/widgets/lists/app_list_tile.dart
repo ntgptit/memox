@@ -45,7 +45,9 @@ class AppListTile extends StatelessWidget {
                   ),
                   const SizedBox(width: SpacingTokens.lg),
                 ],
-                Expanded(child: _TitleBlock(title: title, subtitle: subtitle)),
+                Expanded(
+                  child: _TitleBlock(title: title, subtitle: subtitle),
+                ),
                 if (trailing != null) ...[
                   const SizedBox(width: SpacingTokens.md),
                   trailing!,
@@ -68,7 +70,9 @@ class AppListTile extends StatelessWidget {
         Divider(
           height: SizeTokens.dividerThickness,
           indent: leading == null ? 0 : SpacingTokens.dividerIndent,
-          color: context.colors.outline.withValues(alpha: OpacityTokens.divider),
+          color: context.colors.outline.withValues(
+            alpha: OpacityTokens.divider,
+          ),
         ),
       ],
     );
@@ -76,10 +80,7 @@ class AppListTile extends StatelessWidget {
 }
 
 class _TitleBlock extends StatelessWidget {
-  const _TitleBlock({
-    required this.title,
-    required this.subtitle,
-  });
+  const _TitleBlock({required this.title, required this.subtitle});
 
   final String title;
   final String? subtitle;
@@ -90,8 +91,7 @@ class _TitleBlock extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(title, style: context.textTheme.titleMedium),
-      if (subtitle != null)
-        Text(subtitle!, style: context.textTheme.bodySmall),
+      if (subtitle != null) Text(subtitle!, style: context.textTheme.bodySmall),
     ],
   );
 }

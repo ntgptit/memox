@@ -24,8 +24,9 @@ class StudyTopBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onClose;
 
   @override
-  Size get preferredSize =>
-      const Size.fromHeight(SizeTokens.appBarHeight + SizeTokens.progressBarHeight);
+  Size get preferredSize => const Size.fromHeight(
+    SizeTokens.appBarHeight + SizeTokens.progressBarHeight,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +43,9 @@ class StudyTopBar extends StatelessWidget implements PreferredSizeWidget {
             SizedBox(
               height: SizeTokens.appBarHeight,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: SpacingTokens.sm),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: SpacingTokens.sm,
+                ),
                 child: Row(
                   children: [
                     IconButton(

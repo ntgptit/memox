@@ -1,0 +1,148 @@
+color_palette:
+  seed_colors:
+    - name: "indigo"
+      hex: "0xFF5C6BC0"
+    - name: "teal"
+      hex: "0xFF4DB6AC"
+    - name: "rose"
+      hex: "0xFFE57373"
+    - name: "amber"
+      hex: "0xFFFFB74D"
+    - name: "slate"
+      hex: "0xFF78909C"
+    - name: "sage"
+      hex: "0xFF81C784"
+  semantic_colors:
+    success_light: "0xFF4DB6AC"
+    success_dark: "0xFF80CBC4"
+    warning_light: "0xFFFFB74D"
+    warning_dark: "0xFFFFCC80"
+    error_light: "0xFFE57373"
+    error_dark: "0xFFEF9A9A"
+    mastery_light: "0xFF66BB6A"
+    mastery_dark: "0xFF81C784"
+  surface_colors:
+    light_surface: "0xFFFAFAFA"
+    dark_surface: "0xFF1C1C1E"
+    light_surface_dim: "0xFFF5F5F5"
+    dark_surface_dim: "0xFF2C2C2E"
+    light_on_surface: "0xFF1D1D1F"
+    dark_on_surface: "0xFFE5E5E7"
+    light_on_surface_variant: "0xFF6A6A6F"
+    dark_on_surface_variant: "0xFFC2C2C8"
+  status_colors:
+    new: "0xFF9E9E9E"
+    learning: "0xFFFFB74D"
+    reviewing: "0xFF5C6BC0"
+    mastered: "0xFF4DB6AC"
+  rating_colors:
+    again: "0xFFE57373"
+    hard: "0xFFFFB74D"
+    good: "0xFF5C6BC0"
+    easy: "0xFF4DB6AC"
+  self_assessment_colors:
+    missed: "0xFFE57373"
+    partial: "0xFFFFB74D"
+    got_it: "0xFF4DB6AC"
+
+folder_structure:
+  required_root_dirs:
+    - "lib/core"
+    - "lib/shared"
+    - "lib/features"
+  required_features:
+    - "folders"
+    - "decks"
+    - "cards"
+    - "study"
+    - "statistics"
+    - "settings"
+    - "search"
+  feature_layers:
+    - "data"
+    - "domain"
+    - "presentation"
+  data_subdirs:
+    - "tables"
+    - "daos"
+    - "mappers"
+    - "repositories"
+  domain_subdirs:
+    - "entities"
+    - "repositories"
+    - "usecases"
+  presentation_subdirs:
+    - "screens"
+    - "widgets"
+    - "providers"
+  core_required_dirs:
+    - "lib/core/theme/tokens"
+    - "lib/core/theme/color_schemes"
+    - "lib/core/theme/component_themes"
+    - "lib/core/theme/text_themes"
+    - "lib/core/responsive"
+    - "lib/core/router"
+    - "lib/core/constants"
+    - "lib/core/utils"
+    - "lib/core/extensions"
+    - "lib/core/mixins"
+    - "lib/core/errors"
+    - "lib/core/database"
+    - "lib/core/database/tables"
+    - "lib/core/database/daos"
+    - "lib/core/backup"
+    - "lib/core/services"
+    - "lib/core/providers"
+    - "lib/core/types"
+
+drift_tables:
+  folders_table:
+    required_columns: ["id", "name", "parentId", "colorValue", "createdAt", "updatedAt", "sortOrder"]
+  decks_table:
+    required_columns: ["id", "name", "folderId", "colorValue", "tags", "createdAt", "updatedAt"]
+  cards_table:
+    required_columns: ["id", "deckId", "front", "back", "status", "easeFactor", "interval", "repetitions", "nextReviewDate"]
+  study_sessions_table:
+    required_columns: ["id", "deckId", "mode", "startedAt", "totalCards", "correctCount", "wrongCount"]
+  card_reviews_table:
+    required_columns: ["id", "cardId", "sessionId", "mode", "isCorrect", "reviewedAt"]
+
+design_tokens:
+  "ColorTokens": "lib/core/theme/tokens/color_tokens.dart"
+  "TypographyTokens": "lib/core/theme/tokens/typography_tokens.dart"
+  "SpacingTokens": "lib/core/theme/tokens/spacing_tokens.dart"
+  "SizeTokens": "lib/core/theme/tokens/size_tokens.dart"
+  "RadiusTokens": "lib/core/theme/tokens/radius_tokens.dart"
+  "ElevationTokens": "lib/core/theme/tokens/elevation_tokens.dart"
+  "DurationTokens": "lib/core/theme/tokens/duration_tokens.dart"
+  "EasingTokens": "lib/core/theme/tokens/easing_tokens.dart"
+  "OpacityTokens": "lib/core/theme/tokens/opacity_tokens.dart"
+
+shared_widget_mapping:
+  study_screens:
+    path_pattern: "features/study/presentation/screens/*_mode_screen.dart"
+    required_widgets:
+      - "StudyTopBar"
+      - "SessionCompleteView"
+    forbidden_widgets:
+      - "AppBar("
+      - "Scaffold(appBar:"
+  list_screens:
+    path_pattern: "features/*/presentation/screens/*_screen.dart"
+    required_widgets: []
+    forbidden_in_list_context:
+      - "Dismissible("
+
+provider_naming:
+  repository_pattern: "^\\w+RepositoryProvider$"
+  usecase_pattern: "^\\w+UseCaseProvider$"
+  controller_pattern: "^\\w+ControllerProvider$"
+
+srs_fields:
+  cards_table:
+    required_columns:
+      - "status"
+      - "easeFactor"
+      - "interval"
+      - "repetitions"
+      - "nextReviewDate"

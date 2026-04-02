@@ -30,11 +30,7 @@ class TextLinkButton extends StatelessWidget {
             label,
             style: context.appTextStyles.tagText.copyWith(color: accentColor),
           ),
-          if (showTrailingArrow)
-            Icon(
-              Icons.arrow_right_alt_rounded,
-              color: accentColor,
-            ),
+          if (showTrailingArrow) Icon(Icons.arrow_forward, color: accentColor),
         ],
       ),
     );

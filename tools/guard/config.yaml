@@ -1,0 +1,57 @@
+project_name: "MemoX"
+language: "dart"
+source_root: "lib"
+test_root: "test"
+
+paths:
+  core_dir: "lib/core"
+  shared_dir: "lib/shared"
+  features_dir: "lib/features"
+  exclude_patterns:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/*.config.dart"
+    - "**/l10n/generated/**"
+    - "**/gen/**"
+    - "**/build/**"
+    - "**/.dart_tool/**"
+
+thresholds:
+  max_widget_lines: 80
+  max_file_lines: 300
+  max_file_lines_hard: 500
+  min_const_ratio: 0.7
+
+global_guards:
+  no_else: true
+  no_hardcoded_color: true
+  no_hardcoded_duration: true
+  no_hardcoded_radius: true
+  no_hardcoded_size: true
+  no_hardcoded_font_size: true
+  no_hardcoded_string: true
+  shared_widget: true
+  widget_length: true
+  const_constructor: true
+  import_direction: true
+  icon_style: true
+  async_builder: true
+  l10n: true
+  naming_convention: true
+
+local_guards:
+  folder_structure: true
+  color_palette: true
+  design_token_usage: true
+  feature_completeness: true
+  drift_table: true
+  provider_naming: true
+  shared_widget_mapping: true
+  srs_field: true
+
+severity_overrides:
+  widget_length: "warning"
+  const_constructor: "warning"
+  folder_structure: "info"
+  icon_style: "warning"
+  feature_completeness: "warning"

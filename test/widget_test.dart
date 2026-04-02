@@ -1,24 +1,29 @@
+import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/app.dart';
 import 'package:memox/core/constants/app_strings.dart';
+import 'package:memox/core/database/app_database.dart';
 import 'package:memox/core/providers/database_providers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  late AppDatabase database;
+
   setUp(() async {
     SharedPreferences.setMockInitialValues(<String, Object>{});
+    database = AppDatabase(NativeDatabase.memory());
+  });
+
+  tearDown(() async {
+    await database.close();
   });
 
   testWidgets('renders folders placeholder screen', (tester) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: <Override>[
-          isarProvider.overrideWith(
-            (ref) async => throw UnsupportedError('Widget test DB override'),
-          ),
-        ],
+        overrides: [appDatabaseProvider.overrideWith((ref) => database)],
         child: const MemoxApp(),
       ),
     );
@@ -32,11 +37,7 @@ void main() {
   ) async {
     await tester.pumpWidget(
       ProviderScope(
-        overrides: <Override>[
-          isarProvider.overrideWith(
-            (ref) async => throw UnsupportedError('Widget test DB override'),
-          ),
-        ],
+        overrides: [appDatabaseProvider.overrideWith((ref) => database)],
         child: const MemoxApp(),
       ),
     );

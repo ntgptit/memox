@@ -29,7 +29,9 @@ class ProgressBar extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            ColoredBox(color: trackColor ?? context.colors.surfaceContainerHighest),
+            ColoredBox(
+              color: trackColor ?? context.colors.surfaceContainerHighest,
+            ),
             AnimatedFractionallySizedBox(
               alignment: Alignment.centerLeft,
               widthFactor: safeProgress,

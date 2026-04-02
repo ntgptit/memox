@@ -28,15 +28,19 @@ class StepperInput extends StatelessWidget {
     children: [
       Expanded(child: Text(label, style: context.textTheme.titleSmall)),
       IconActionButton(
-        icon: Icons.remove_rounded,
-        onTap: value <= min ? null : () => onChanged(math.max(min, value - step)),
+        icon: Icons.remove,
+        onTap: value <= min
+            ? null
+            : () => onChanged(math.max(min, value - step)),
       ),
       const SizedBox(width: SpacingTokens.md),
-      Text('$value', style: context.appTextStyles.statNumberSm),
+      Text(value.toString(), style: context.appTextStyles.statNumberSm),
       const SizedBox(width: SpacingTokens.md),
       IconActionButton(
-        icon: Icons.add_rounded,
-        onTap: value >= max ? null : () => onChanged(math.min(max, value + step)),
+        icon: Icons.add,
+        onTap: value >= max
+            ? null
+            : () => onChanged(math.min(max, value + step)),
       ),
     ],
   );

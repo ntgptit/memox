@@ -11,36 +11,43 @@ mixin Toast {
     ToastType type = ToastType.info,
   }) {
     final (backgroundColor, icon) = switch (type) {
-      ToastType.success => (context.customColors.success, Icons.check_circle),
-      ToastType.error => (context.customColors.ratingAgain, Icons.error_outline),
+      ToastType.success => (
+        context.customColors.success,
+        Icons.check_circle_outline,
+      ),
+      ToastType.error => (
+        context.customColors.ratingAgain,
+        Icons.error_outline,
+      ),
       ToastType.info => (context.colors.inverseSurface, Icons.info_outline),
     };
     final foregroundColor = _foregroundColor(context, backgroundColor);
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
-      SnackBar(
-        backgroundColor: backgroundColor,
-        content: Row(
-          children: [
-            Icon(icon, color: foregroundColor),
-            const SizedBox(width: SpacingTokens.sm),
-            Expanded(
-              child: Text(
-                message,
-                style: context.textTheme.bodyMedium?.copyWith(
-                  color: foregroundColor,
+        SnackBar(
+          backgroundColor: backgroundColor,
+          content: Row(
+            children: [
+              Icon(icon, color: foregroundColor),
+              const SizedBox(width: SpacingTokens.sm),
+              Expanded(
+                child: Text(
+                  message,
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    color: foregroundColor,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-    );
+      );
   }
 
   static Color _foregroundColor(BuildContext context, Color backgroundColor) {
-    if (ThemeData.estimateBrightnessForColor(backgroundColor) == Brightness.dark) {
+    if (ThemeData.estimateBrightnessForColor(backgroundColor) ==
+        Brightness.dark) {
       return context.colors.surface;
     }
 

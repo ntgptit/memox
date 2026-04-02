@@ -8,8 +8,8 @@ final class DeckRepositoryImpl implements DeckRepository {
   const DeckRepositoryImpl({
     required DeckLocalDataSource localDataSource,
     required AppLogger logger,
-  })  : _localDataSource = localDataSource,
-        _logger = logger;
+  }) : _localDataSource = localDataSource,
+       _logger = logger;
 
   final DeckLocalDataSource _localDataSource;
   final AppLogger _logger;
@@ -22,20 +22,22 @@ final class DeckRepositoryImpl implements DeckRepository {
 
   @override
   Future<List<DeckEntity>> getAll() async {
-    final models = await _localDataSource.getAll();
-    return models.map(DeckMapper.toEntity).toList();
+    final rows = await _localDataSource.getAll();
+    return rows.map(DeckMapper.toEntity).toList();
   }
 
   @override
   Future<DeckEntity> save(DeckEntity entity) async {
-    final savedModel = await _localDataSource.save(DeckMapper.toModel(entity));
-    return DeckMapper.toEntity(savedModel);
+    final savedRow = await _localDataSource.save(
+      DeckMapper.toCompanion(entity),
+    );
+    return DeckMapper.toEntity(savedRow);
   }
 
   @override
   Stream<List<DeckEntity>> watchAll() {
     return _localDataSource.watchAll().map(
-      (models) => models.map(DeckMapper.toEntity).toList(),
+      (rows) => rows.map(DeckMapper.toEntity).toList(),
     );
   }
 }

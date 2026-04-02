@@ -6,10 +6,7 @@ import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 
 class StatusChip extends StatelessWidget {
-  const StatusChip({
-    required this.status,
-    super.key,
-  });
+  const StatusChip({required this.status, super.key});
 
   final CardStatus status;
 

@@ -22,14 +22,14 @@ class AnimatedListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ListView.builder(
-      padding: padding,
-      controller: controller,
-      shrinkWrap: shrinkWrap,
-      itemCount: children.length,
-      itemBuilder: (context, index) => FadeInWidget(
-        delay: Duration(milliseconds: staggerDelay.inMilliseconds * index),
-        duration: itemDuration,
-        child: children[index],
-      ),
-    );
+    padding: padding,
+    controller: controller,
+    shrinkWrap: shrinkWrap,
+    itemCount: children.length,
+    itemBuilder: (context, index) => FadeInWidget(
+      delay: Duration(milliseconds: staggerDelay.inMilliseconds * index),
+      duration: itemDuration,
+      child: children[index],
+    ),
+  );
 }

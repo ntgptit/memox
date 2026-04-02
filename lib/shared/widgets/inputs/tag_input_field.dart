@@ -64,7 +64,9 @@ class _TagInputFieldState extends State<TagInputField> {
       return;
     }
 
-    if (widget.tags.any((item) => AppStringUtils.normalized(item) == normalized)) {
+    if (widget.tags.any(
+      (item) => AppStringUtils.normalized(item) == normalized,
+    )) {
       _controller.clear();
       setState(() {});
       return;
@@ -103,20 +105,14 @@ class _TagInputFieldState extends State<TagInputField> {
       ),
       if (_filteredSuggestions.isNotEmpty) ...[
         const SizedBox(height: SpacingTokens.sm),
-        _SuggestionList(
-          suggestions: _filteredSuggestions,
-          onSelected: _addTag,
-        ),
+        _SuggestionList(suggestions: _filteredSuggestions, onSelected: _addTag),
       ],
     ],
   );
 }
 
 class _SuggestionList extends StatelessWidget {
-  const _SuggestionList({
-    required this.suggestions,
-    required this.onSelected,
-  });
+  const _SuggestionList({required this.suggestions, required this.onSelected});
 
   final List<String> suggestions;
   final ValueChanged<String> onSelected;

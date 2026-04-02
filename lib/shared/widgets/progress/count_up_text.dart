@@ -22,10 +22,10 @@ class CountUpText extends StatelessWidget {
   Widget build(BuildContext context) => CountUpAnimation(
     end: endValue.toDouble(),
     duration: duration,
-    builder: (context, value) => Text(
-      '$prefix${_formatValue(value)}$suffix',
-      style: style,
-    ),
+    builder: (context, value) {
+      final label = [prefix, _formatValue(value), suffix].join();
+      return Text(label, style: style);
+    },
   );
 
   String _formatValue(double value) {

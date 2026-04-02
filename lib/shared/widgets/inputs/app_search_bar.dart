@@ -67,10 +67,7 @@ class _AppSearchBarState extends State<AppSearchBar> {
         prefixIcon: const Icon(Icons.search_outlined),
         suffixIcon: _controller.text.isEmpty
             ? null
-            : IconButton(
-                onPressed: _clear,
-                icon: const Icon(Icons.close_rounded),
-              ),
+            : IconButton(onPressed: _clear, icon: const Icon(Icons.close)),
       ),
     ),
   );

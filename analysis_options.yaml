@@ -16,9 +16,6 @@ analyzer:
     - '**/*.mocks.dart'
     - '**/*.config.dart'
     - 'lib/l10n/generated/**'
-  plugins:
-    - custom_lint
-
 linter:
   rules:
     - always_use_package_imports

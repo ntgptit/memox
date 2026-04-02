@@ -8,8 +8,8 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
   const FlashcardRepositoryImpl({
     required FlashcardLocalDataSource localDataSource,
     required AppLogger logger,
-  })  : _localDataSource = localDataSource,
-        _logger = logger;
+  }) : _localDataSource = localDataSource,
+       _logger = logger;
 
   final FlashcardLocalDataSource _localDataSource;
   final AppLogger _logger;
@@ -22,26 +22,28 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
 
   @override
   Future<List<FlashcardEntity>> getAll() async {
-    final models = await _localDataSource.getAll();
-    return models.map(FlashcardMapper.toEntity).toList();
+    final rows = await _localDataSource.getAll();
+    return rows.map(FlashcardMapper.toEntity).toList();
   }
 
   @override
-  Future<List<FlashcardEntity>> getDueCards() {
-    return getAll();
+  Future<List<FlashcardEntity>> getDueCards() async {
+    final rows = await _localDataSource.getDueCards();
+    return rows.map(FlashcardMapper.toEntity).toList();
   }
 
   @override
   Future<FlashcardEntity> save(FlashcardEntity entity) async {
-    final savedModel =
-        await _localDataSource.save(FlashcardMapper.toModel(entity));
-    return FlashcardMapper.toEntity(savedModel);
+    final savedRow = await _localDataSource.save(
+      FlashcardMapper.toCompanion(entity),
+    );
+    return FlashcardMapper.toEntity(savedRow);
   }
 
   @override
   Stream<List<FlashcardEntity>> watchAll() {
     return _localDataSource.watchAll().map(
-      (models) => models.map(FlashcardMapper.toEntity).toList(),
+      (rows) => rows.map(FlashcardMapper.toEntity).toList(),
     );
   }
 }

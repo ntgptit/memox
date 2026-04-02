@@ -18,17 +18,20 @@ void main() {
     expect(result.dataOrNull?.name, 'Inbox');
   });
 
-  test('create folder use case returns validation failure for empty name', () async {
-    final useCase = CreateFolderUseCase(
-      folderRepo: _InMemoryFolderRepository(),
-      logger: const LoggerImpl(),
-    );
+  test(
+    'create folder use case returns validation failure for empty name',
+    () async {
+      final useCase = CreateFolderUseCase(
+        folderRepo: _InMemoryFolderRepository(),
+        logger: const LoggerImpl(),
+      );
 
-    final result = await useCase.call('   ');
+      final result = await useCase.call('   ');
 
-    expect(result.isFailure, isTrue);
-    expect(result.failureOrNull?.message, contains('must not be empty'));
-  });
+      expect(result.isFailure, isTrue);
+      expect(result.failureOrNull?.message, contains('must not be empty'));
+    },
+  );
 }
 
 final class _InMemoryFolderRepository implements FolderRepository {

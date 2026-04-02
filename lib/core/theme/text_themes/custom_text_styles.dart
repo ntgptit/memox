@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:memox/core/theme/tokens/color_tokens.dart';
 import 'package:memox/core/theme/tokens/opacity_tokens.dart';
 import 'package:memox/core/theme/tokens/typography_tokens.dart';
 
@@ -27,7 +28,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
   });
 
   factory AppTextStyles.fromTextTheme(TextTheme textTheme) {
-    final bodyColor = textTheme.bodyLarge?.color ?? Colors.black;
+    final bodyColor = textTheme.bodyLarge?.color ?? ColorTokens.onSurfaceLight;
     final mutedColor = textTheme.bodySmall?.color ?? bodyColor;
 
     TextStyle themed({
@@ -258,13 +259,11 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
           flashcardExample,
       questionText:
           TextStyle.lerp(questionText, other.questionText, t) ?? questionText,
-      recallTerm:
-          TextStyle.lerp(recallTerm, other.recallTerm, t) ?? recallTerm,
+      recallTerm: TextStyle.lerp(recallTerm, other.recallTerm, t) ?? recallTerm,
       answerCorrect:
           TextStyle.lerp(answerCorrect, other.answerCorrect, t) ??
           answerCorrect,
-      statNumber:
-          TextStyle.lerp(statNumber, other.statNumber, t) ?? statNumber,
+      statNumber: TextStyle.lerp(statNumber, other.statNumber, t) ?? statNumber,
       statNumberMd:
           TextStyle.lerp(statNumberMd, other.statNumberMd, t) ?? statNumberMd,
       statNumberSm:
@@ -273,8 +272,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
       appTitle: TextStyle.lerp(appTitle, other.appTitle, t) ?? appTitle,
       sectionLabel:
           TextStyle.lerp(sectionLabel, other.sectionLabel, t) ?? sectionLabel,
-      breadcrumb:
-          TextStyle.lerp(breadcrumb, other.breadcrumb, t) ?? breadcrumb,
+      breadcrumb: TextStyle.lerp(breadcrumb, other.breadcrumb, t) ?? breadcrumb,
       progressCount:
           TextStyle.lerp(progressCount, other.progressCount, t) ??
           progressCount,

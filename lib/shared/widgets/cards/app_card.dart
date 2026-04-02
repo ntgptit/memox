@@ -34,9 +34,9 @@ class AppCard extends StatelessWidget {
     final radius = borderRadius ?? RadiusTokens.card;
     final outlineColor =
         borderColor ??
-        Theme.of(context).colorScheme.outline.withValues(
-          alpha: OpacityTokens.borderSubtle,
-        );
+        Theme.of(
+          context,
+        ).colorScheme.outline.withValues(alpha: OpacityTokens.borderSubtle);
     final decoration = BoxDecoration(
       color: backgroundColor ?? Theme.of(context).colorScheme.surface,
       borderRadius: BorderRadius.circular(radius),

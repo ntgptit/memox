@@ -32,7 +32,7 @@ class ReorderableListWidget<T extends Object> extends StatelessWidget {
               index: index,
               child: const Padding(
                 padding: EdgeInsets.only(right: SpacingTokens.md),
-                child: Icon(Icons.drag_handle_rounded),
+                child: Icon(Icons.drag_handle),
               ),
             ),
           ),

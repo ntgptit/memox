@@ -11,7 +11,6 @@ mixin AppDurationUtils {
     return '${duration.inSeconds}s';
   }
 
-  static Duration scale(Duration duration, double factor) => Duration(
-    microseconds: (duration.inMicroseconds * factor).round(),
-  );
+  static Duration scale(Duration duration, double factor) =>
+      Duration(microseconds: (duration.inMicroseconds * factor).round());
 }

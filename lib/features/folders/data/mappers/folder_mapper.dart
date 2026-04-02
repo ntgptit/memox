@@ -1,34 +1,38 @@
-import 'package:isar/isar.dart';
-import 'package:memox/core/network/dto/folder_dto.dart';
-import 'package:memox/features/folders/data/models/folder_model.dart';
+import 'package:drift/drift.dart';
+import 'package:memox/core/database/app_database.dart';
 import 'package:memox/features/folders/domain/entities/folder_entity.dart';
 
 abstract final class FolderMapper {
-  static FolderEntity toEntity(FolderModel model) {
+  static FolderEntity toEntity(FoldersTableData row) {
     return FolderEntity(
-      id: model.id,
-      name: model.name,
+      id: row.id,
+      name: row.name,
+      parentId: row.parentId,
+      colorValue: row.colorValue,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+      sortOrder: row.sortOrder,
     );
   }
 
-  static FolderModel toModel(FolderEntity entity) {
-    return FolderModel(
-      id: entity.id > 0 ? entity.id : Isar.autoIncrement,
-      name: entity.name,
-    );
-  }
-
-  static FolderDto toDto(FolderEntity entity) {
-    return FolderDto(
-      id: entity.id,
-      name: entity.name,
-    );
-  }
-
-  static FolderEntity fromDto(FolderDto dto) {
-    return FolderEntity(
-      id: dto.id,
-      name: dto.name,
+  static FoldersTableCompanion toCompanion(FolderEntity entity) {
+    final id = entity.id > 0
+        ? Value<int>(entity.id)
+        : const Value<int>.absent();
+    final createdAt = entity.createdAt == null
+        ? const Value<DateTime>.absent()
+        : Value<DateTime>(entity.createdAt!);
+    final updatedAt = entity.updatedAt == null
+        ? const Value<DateTime>.absent()
+        : Value<DateTime>(entity.updatedAt!);
+    return FoldersTableCompanion(
+      id: id,
+      name: Value<String>(entity.name),
+      parentId: Value<int?>(entity.parentId),
+      colorValue: Value<int>(entity.colorValue),
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      sortOrder: Value<int>(entity.sortOrder),
     );
   }
 }

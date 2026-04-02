@@ -1,51 +1,39 @@
-import 'package:isar/isar.dart';
-import 'package:memox/features/folders/data/models/folder_model.dart';
+import 'package:memox/core/database/app_database.dart';
 
 abstract interface class FolderLocalDataSource {
-  Stream<List<FolderModel>> watchAll();
+  Stream<List<FoldersTableData>> watchAll();
 
-  Future<List<FolderModel>> getAll();
+  Future<List<FoldersTableData>> getAll();
 
-  Future<FolderModel?> getById(int id);
+  Future<FoldersTableData?> getById(int id);
 
-  Future<FolderModel> save(FolderModel model);
+  Future<FoldersTableData> save(FoldersTableCompanion companion);
 
   Future<void> delete(int id);
 }
 
 final class FolderLocalDataSourceImpl implements FolderLocalDataSource {
-  const FolderLocalDataSourceImpl(this._isar);
+  const FolderLocalDataSourceImpl(this._folderDao);
 
-  final Isar _isar;
+  final FolderDao _folderDao;
 
   @override
-  Future<void> delete(int id) async {
-    await _isar.writeTxn(() async {
-      await _isar.folderModels.delete(id);
-    });
+  Future<void> delete(int id) => _folderDao.deleteById(id);
+
+  @override
+  Future<List<FoldersTableData>> getAll() => _folderDao.getAll();
+
+  @override
+  Future<FoldersTableData?> getById(int id) => _folderDao.getById(id);
+
+  @override
+  Future<FoldersTableData> save(FoldersTableCompanion companion) async {
+    final insertedId = await _folderDao.insertFolder(companion);
+    final targetId = companion.id.present ? companion.id.value : insertedId;
+    final saved = await _folderDao.getById(targetId);
+    return saved!;
   }
 
   @override
-  Future<List<FolderModel>> getAll() {
-    return _isar.folderModels.where().findAll();
-  }
-
-  @override
-  Future<FolderModel?> getById(int id) {
-    return _isar.folderModels.get(id);
-  }
-
-  @override
-  Future<FolderModel> save(FolderModel model) async {
-    return _isar.writeTxn(() async {
-      final savedId = await _isar.folderModels.put(model);
-      model.id = savedId;
-      return model;
-    });
-  }
-
-  @override
-  Stream<List<FolderModel>> watchAll() {
-    return _isar.folderModels.where().watch(fireImmediately: true);
-  }
+  Stream<List<FoldersTableData>> watchAll() => _folderDao.watchRootFolders();
 }

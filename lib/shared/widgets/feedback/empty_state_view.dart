@@ -24,44 +24,50 @@ class EmptyStateView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Center(
-    child: ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: SizeTokens.emptyStateTextWidth),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            size: SizeTokens.iconXl,
-            color: context.colors.onSurfaceVariant,
-          ),
-          const SizedBox(height: SpacingTokens.lg),
-          Text(
-            title,
-            style: context.textTheme.titleMedium,
-            textAlign: TextAlign.center,
-          ),
-          if (subtitle != null) ...[
-            const SizedBox(height: SpacingTokens.sm),
-            Text(
-              subtitle!,
-              style: context.textTheme.bodySmall,
-              textAlign: TextAlign.center,
+    child:
+        ConstrainedBox(
+              constraints: const BoxConstraints(
+                maxWidth: SizeTokens.emptyStateTextWidth,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    icon,
+                    size: SizeTokens.iconXl,
+                    color: context.colors.onSurfaceVariant,
+                  ),
+                  const SizedBox(height: SpacingTokens.lg),
+                  Text(
+                    title,
+                    style: context.textTheme.titleMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                  if (subtitle != null) ...[
+                    const SizedBox(height: SpacingTokens.sm),
+                    Text(
+                      subtitle!,
+                      style: context.textTheme.bodySmall,
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                  if (actionLabel != null && onAction != null) ...[
+                    const SizedBox(height: SpacingTokens.lg),
+                    SecondaryButton(
+                      label: actionLabel!,
+                      onPressed: onAction,
+                      fullWidth: false,
+                    ),
+                  ],
+                ],
+              ),
+            )
+            .animate()
+            .fadeIn(duration: DurationTokens.slow)
+            .scale(
+              begin: const Offset(0.9, 0.9),
+              end: const Offset(1, 1),
+              duration: DurationTokens.slow,
             ),
-          ],
-          if (actionLabel != null && onAction != null) ...[
-            const SizedBox(height: SpacingTokens.lg),
-            SecondaryButton(
-              label: actionLabel!,
-              onPressed: onAction,
-              fullWidth: false,
-            ),
-          ],
-        ],
-      ),
-    ).animate().fadeIn(duration: DurationTokens.slow).scale(
-      begin: const Offset(0.9, 0.9),
-      end: const Offset(1, 1),
-      duration: DurationTokens.slow,
-    ),
   );
 }

@@ -8,11 +8,7 @@ import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 
 class ModeChip extends StatelessWidget {
-  const ModeChip({
-    required this.mode,
-    this.isSelected = false,
-    super.key,
-  });
+  const ModeChip({required this.mode, this.isSelected = false, super.key});
 
   final StudyMode mode;
   final bool isSelected;
@@ -27,7 +23,7 @@ class ModeChip extends StatelessWidget {
     decoration: BoxDecoration(
       color: isSelected
           ? context.colors.primary.withValues(alpha: OpacityTokens.selected)
-          : Colors.transparent,
+          : context.colors.surface.withValues(alpha: 0),
       border: Border.all(
         color: isSelected ? context.colors.primary : context.colors.outline,
       ),

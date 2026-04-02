@@ -26,10 +26,8 @@ void main() {
                 body: Column(
                   children: [
                     TextButton(
-                      onPressed: () => context.showSnackBar(
-                        'Theme error',
-                        isError: true,
-                      ),
+                      onPressed: () =>
+                          context.showSnackBar('Theme error', isError: true),
                       child: const Text('snackbar'),
                     ),
                     TextButton(

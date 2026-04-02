@@ -38,6 +38,10 @@ migrate_working_dir/
 *.freezed.dart
 *.mocks.dart
 /lib/l10n/generated/
+/web/drift_worker.dart.js
+/web/drift_worker.dart.js.deps
+/web/drift_worker.dart.js.map
+/web/sqlite3.wasm
 
 # Symbolication related
 app.*.symbols

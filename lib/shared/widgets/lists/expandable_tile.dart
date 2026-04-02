@@ -32,7 +32,7 @@ class _ExpandableTileState extends State<ExpandableTile> {
             AnimatedRotation(
               turns: _expanded ? 0.5 : 0,
               duration: DurationTokens.normal,
-              child: const Icon(Icons.expand_more_rounded),
+              child: const Icon(Icons.expand_more),
             ),
           ],
         ),

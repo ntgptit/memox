@@ -1,24 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:memox/core/logging/logger_impl.dart';
-import 'package:memox/features/settings/data/repositories/settings_repository_impl.dart';
+import 'package:memox/features/settings/domain/entities/app_setting.dart';
+import 'package:memox/features/settings/domain/repositories/settings_repository.dart';
 import 'package:memox/features/settings/domain/usecases/get_settings.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  test('get settings use case reads persisted app preferences', () async {
-    SharedPreferences.setMockInitialValues(<String, Object>{
-      'settings.theme_mode': 'dark',
-      'settings.seed_color': 0xFF4DB6AC,
-      'settings.locale_code': 'vi',
-      'settings.sync_enabled': true,
-      'settings.daily_goal': 30,
-      'settings.session_limit': 15,
-    });
-
-    final repository = SettingsRepositoryImpl(
-      sharedPreferencesLoader: SharedPreferences.getInstance,
-      logger: const LoggerImpl(),
+  test('get settings use case returns settings from repository', () async {
+    final repository = _FakeSettingsRepository(
+      const AppSettings(
+        themeMode: ThemeMode.dark,
+        seedColorValue: 0xFF4DB6AC,
+        localeCode: 'vi',
+        syncEnabled: true,
+        dailyGoal: 30,
+        sessionLimit: 15,
+      ),
     );
     final useCase = GetSettingsUseCase(repository);
 
@@ -31,4 +27,25 @@ void main() {
     expect(settings.dailyGoal, 30);
     expect(settings.sessionLimit, 15);
   });
+}
+
+final class _FakeSettingsRepository implements SettingsRepository {
+  const _FakeSettingsRepository(this._settings);
+
+  final AppSettings _settings;
+
+  @override
+  Future<AppSettings> getSettings() async => _settings;
+
+  @override
+  Future<void> saveSettings(AppSettings settings) async {}
+
+  @override
+  Future<void> updateLocaleCode(String? localeCode) async {}
+
+  @override
+  Future<void> updateSeedColorValue(int seedColorValue) async {}
+
+  @override
+  Future<void> updateThemeMode(ThemeMode themeMode) async {}
 }

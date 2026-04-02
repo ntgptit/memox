@@ -13,10 +13,7 @@ void main() {
       MaterialApp(
         home: SizedBox(
           height: 200,
-          child: _ScrollHarness(
-            key: key,
-            onScrollEnd: () => called++,
-          ),
+          child: _ScrollHarness(key: key, onScrollEnd: () => called++),
         ),
       ),
     );
@@ -42,10 +39,7 @@ void main() {
       MaterialApp(
         home: SizedBox(
           height: 200,
-          child: _ScrollHarness(
-            key: key,
-            onScrollEnd: () {},
-          ),
+          child: _ScrollHarness(key: key, onScrollEnd: () {}),
         ),
       ),
     );
@@ -75,10 +69,7 @@ void main() {
 }
 
 class _ScrollHarness extends StatefulWidget {
-  const _ScrollHarness({
-    required this.onScrollEnd,
-    super.key,
-  });
+  const _ScrollHarness({required this.onScrollEnd, super.key});
 
   final VoidCallback onScrollEnd;
 

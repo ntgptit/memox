@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/core/providers/datasource_providers.dart';
 import 'package:memox/core/providers/service_providers.dart';
 import 'package:memox/core/providers/storage_providers.dart';
@@ -30,7 +29,6 @@ SettingsRepository settingsRepository(Ref ref) {
 FolderRepository folderRepository(Ref ref) {
   return FolderRepositoryImpl(
     localDataSource: ref.watch(folderLocalDataSourceProvider),
-    remoteDataSource: ref.watch(folderRemoteDataSourceProvider),
     logger: ref.watch(appLoggerProvider),
   );
 }

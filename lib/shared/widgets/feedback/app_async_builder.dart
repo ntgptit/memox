@@ -37,7 +37,8 @@ class AppAsyncBuilder<T> extends StatelessWidget {
     return value.when(
       data: (data) => _animatedChild(onData(data)),
       loading: () => onLoading?.call() ?? const LoadingIndicator(),
-      error: (error, _) => onError?.call(error) ??
+      error: (error, _) =>
+          onError?.call(error) ??
           ErrorView(message: error.toString(), onRetry: onRetry),
     );
   }

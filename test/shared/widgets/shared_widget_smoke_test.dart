@@ -24,11 +24,7 @@ void main() {
               ),
               SuccessIndicator(),
               StreakChip(count: 3),
-              CountUpText(
-                endValue: 12,
-                style: TextStyle(),
-                suffix: '%',
-              ),
+              CountUpText(endValue: 12, style: TextStyle(), suffix: '%'),
             ],
           ),
         ),

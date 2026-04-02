@@ -11,7 +11,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'app_router.g.dart';
 
 @Riverpod(keepAlive: true)
-GoRouter appRouter(AppRouterRef ref) => GoRouter(
+GoRouter appRouter(Ref ref) => GoRouter(
   initialLocation: FoldersScreen.routePath,
   routes: [
     GoRoute(

@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/core/errors/global_error_handler.dart';
 import 'package:memox/core/logging/app_logger.dart';
 import 'package:memox/core/logging/logger_impl.dart';

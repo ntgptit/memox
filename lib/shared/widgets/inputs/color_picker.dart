@@ -21,11 +21,13 @@ class ColorPicker extends StatelessWidget {
     spacing: SpacingTokens.chipGap,
     runSpacing: SpacingTokens.chipGap,
     children: colors
-        .map((color) => _ColorChoice(
-              color: color,
-              isSelected: color == selectedColor,
-              onTap: () => onChanged(color),
-            ))
+        .map(
+          (color) => _ColorChoice(
+            color: color,
+            isSelected: color == selectedColor,
+            onTap: () => onChanged(color),
+          ),
+        )
         .toList(),
   );
 }
@@ -56,7 +58,7 @@ class _ColorChoice extends StatelessWidget {
         child: DecoratedBox(
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           child: isSelected
-              ? Icon(Icons.check_rounded, color: iconColor)
+              ? Icon(Icons.check, color: iconColor)
               : const SizedBox.shrink(),
         ),
       ),

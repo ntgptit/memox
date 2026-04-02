@@ -6,10 +6,7 @@ import 'package:memox/core/theme/tokens/radius_tokens.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
 
 class SuccessIndicator extends StatelessWidget {
-  const SuccessIndicator({
-    this.size = SizeTokens.iconXl,
-    super.key,
-  });
+  const SuccessIndicator({this.size = SizeTokens.iconXl, super.key});
 
   final double size;
 
@@ -20,17 +17,21 @@ class SuccessIndicator extends StatelessWidget {
     return Align(
       child: SizedBox.square(
         dimension: size,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            border: Border.all(color: color),
-            borderRadius: BorderRadius.circular(RadiusTokens.full),
-          ),
-          child: Icon(Icons.check_rounded, color: color, size: size / 2),
-        ).animate().fadeIn(duration: DurationTokens.slow).scale(
-          begin: const Offset(0.9, 0.9),
-          end: const Offset(1, 1),
-          duration: DurationTokens.slow,
-        ),
+        child:
+            DecoratedBox(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: color),
+                    borderRadius: BorderRadius.circular(RadiusTokens.full),
+                  ),
+                  child: Icon(Icons.check, color: color, size: size / 2),
+                )
+                .animate()
+                .fadeIn(duration: DurationTokens.slow)
+                .scale(
+                  begin: const Offset(0.9, 0.9),
+                  end: const Offset(1, 1),
+                  duration: DurationTokens.slow,
+                ),
       ),
     );
   }

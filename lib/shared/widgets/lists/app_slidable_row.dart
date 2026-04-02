@@ -4,6 +4,7 @@ import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/duration_tokens.dart';
 import 'package:memox/core/theme/tokens/opacity_tokens.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
+import 'package:memox/core/utils/color_utils.dart';
 
 class AppSlidableRow extends StatelessWidget {
   const AppSlidableRow({
@@ -96,10 +97,7 @@ class AppSlidableRow extends StatelessWidget {
       SnackBar(
         content: const Text(AppStrings.deletedMessage),
         duration: undoDuration,
-        action: SnackBarAction(
-          label: AppStrings.undoAction,
-          onPressed: () {},
-        ),
+        action: SnackBarAction(label: AppStrings.undoAction, onPressed: () {}),
       ),
     );
     final reason = await controller.closed;
@@ -130,7 +128,7 @@ class _ActionBackground extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: SizeTokens.touchTarget),
       child: Align(
         alignment: alignment,
-        child: Icon(icon, color: Colors.white),
+        child: Icon(icon, color: AppColorUtils.foregroundOn(color)),
       ),
     ),
   );

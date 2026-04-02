@@ -22,10 +22,9 @@ mixin AppTheme {
     final textTheme = AppTextTheme.build(colorScheme);
     final appTextStyles = AppTextStyles.fromTextTheme(textTheme);
     final border = BorderSide(color: colorScheme.outline);
+    final transparentSurface = colorScheme.surface.withValues(alpha: 0);
     final inputBorder = OutlineInputBorder(
-      borderRadius: const BorderRadius.all(
-        Radius.circular(RadiusTokens.input),
-      ),
+      borderRadius: const BorderRadius.all(Radius.circular(RadiusTokens.input)),
       borderSide: border,
     );
 
@@ -36,12 +35,12 @@ mixin AppTheme {
       scaffoldBackgroundColor: colorScheme.surface,
       extensions: <ThemeExtension<dynamic>>[customColors, appTextStyles],
       appBarTheme: AppBarTheme(
-        backgroundColor: Colors.transparent,
+        backgroundColor: transparentSurface,
         foregroundColor: colorScheme.onSurface,
         elevation: 0,
         scrolledUnderElevation: 0,
-        shadowColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
+        shadowColor: transparentSurface,
+        surfaceTintColor: transparentSurface,
         titleTextStyle: textTheme.titleLarge,
         systemOverlayStyle: _overlayStyle(colorScheme),
       ),
@@ -49,8 +48,8 @@ mixin AppTheme {
         color: colorScheme.surface,
         elevation: ElevationTokens.level0,
         margin: EdgeInsets.zero,
-        shadowColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
+        shadowColor: transparentSurface,
+        surfaceTintColor: transparentSurface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(RadiusTokens.card),
           side: border,
@@ -61,10 +60,8 @@ mixin AppTheme {
           elevation: const WidgetStatePropertyAll<double>(
             ElevationTokens.level0,
           ),
-          shadowColor: const WidgetStatePropertyAll<Color>(Colors.transparent),
-          surfaceTintColor: const WidgetStatePropertyAll<Color>(
-            Colors.transparent,
-          ),
+          shadowColor: WidgetStatePropertyAll<Color>(transparentSurface),
+          surfaceTintColor: WidgetStatePropertyAll<Color>(transparentSurface),
           minimumSize: const WidgetStatePropertyAll<Size>(
             Size(0, SizeTokens.touchTarget),
           ),
@@ -107,9 +104,7 @@ mixin AppTheme {
         secondarySelectedColor: customColors.mastery.withValues(
           alpha: OpacityTokens.selected,
         ),
-        padding: const EdgeInsets.symmetric(
-          horizontal: SpacingTokens.sm,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: SpacingTokens.sm),
         labelStyle: textTheme.labelMedium,
         secondaryLabelStyle: textTheme.labelMedium,
         side: border,
@@ -121,10 +116,12 @@ mixin AppTheme {
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: colorScheme.surface,
         elevation: ElevationTokens.level0,
-        shadowColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
+        shadowColor: transparentSurface,
+        surfaceTintColor: transparentSurface,
         height: SizeTokens.bottomNavHeight,
-        indicatorColor: colorScheme.primary.withValues(alpha: OpacityTokens.focus),
+        indicatorColor: colorScheme.primary.withValues(
+          alpha: OpacityTokens.focus,
+        ),
         labelTextStyle: WidgetStateProperty.resolveWith<TextStyle?>(
           (states) => textTheme.labelSmall?.copyWith(
             color: states.contains(WidgetState.selected)
@@ -159,7 +156,7 @@ mixin AppTheme {
 
     return (isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark)
         .copyWith(
-          statusBarColor: Colors.transparent,
+          statusBarColor: colorScheme.surface.withValues(alpha: 0),
           systemNavigationBarColor: colorScheme.surface,
           systemNavigationBarDividerColor: colorScheme.outline,
         );

@@ -1,28 +1,30 @@
-import 'package:isar/isar.dart';
-import 'package:memox/features/study/data/models/study_session_model.dart';
+import 'package:memox/core/database/app_database.dart';
 
 abstract interface class StudyLocalDataSource {
-  Stream<List<StudySessionModel>> watchAll();
+  Stream<List<StudySessionsTableData>> watchAll();
 
-  Future<StudySessionModel> save(StudySessionModel model);
+  Future<StudySessionsTableData> save(StudySessionsTableCompanion companion);
 }
 
 final class StudyLocalDataSourceImpl implements StudyLocalDataSource {
-  const StudyLocalDataSourceImpl(this._isar);
+  const StudyLocalDataSourceImpl(this._studySessionDao);
 
-  final Isar _isar;
+  final StudySessionDao _studySessionDao;
 
   @override
-  Future<StudySessionModel> save(StudySessionModel model) async {
-    return _isar.writeTxn(() async {
-      final savedId = await _isar.studySessionModels.put(model);
-      model.id = savedId;
-      return model;
-    });
+  Future<StudySessionsTableData> save(
+    StudySessionsTableCompanion companion,
+  ) async {
+    final insertedId = await _studySessionDao.insertSession(companion);
+    final targetId = companion.id.present ? companion.id.value : insertedId;
+    final saved = await _studySessionDao.getById(targetId);
+    if (saved != null) {
+      return saved;
+    }
+    throw StateError('Unable to read saved study session $targetId');
   }
 
   @override
-  Stream<List<StudySessionModel>> watchAll() {
-    return _isar.studySessionModels.where().watch(fireImmediately: true);
-  }
+  Stream<List<StudySessionsTableData>> watchAll() =>
+      _studySessionDao.watchAll();
 }

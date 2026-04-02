@@ -6,9 +6,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'folders_provider.g.dart';
 
 @riverpod
-String foldersScreenTitle(FoldersScreenTitleRef ref) => AppStrings.foldersTitle;
+String foldersScreenTitle(Ref ref) => AppStrings.foldersTitle;
 
 @riverpod
-Stream<List<FolderEntity>> rootFolders(RootFoldersRef ref) {
+Stream<List<FolderEntity>> rootFolders(Ref ref) {
   return ref.watch(getFoldersUseCaseProvider).call();
 }
