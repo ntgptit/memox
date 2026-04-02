@@ -1,4 +1,7 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final Provider<Locale?> localeProvider = Provider<Locale?>((ref) => null);
+part 'locale_provider.g.dart';
+
+@Riverpod(keepAlive: true)
+Locale? locale(Ref ref) => null;

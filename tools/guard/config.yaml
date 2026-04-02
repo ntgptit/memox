@@ -46,6 +46,7 @@ local_guards:
   feature_completeness: true
   drift_table: true
   provider_naming: true
+  riverpod_syntax: true
   shared_widget_mapping: true
   srs_field: true
 

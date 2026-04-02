@@ -22,6 +22,6 @@ BackupService backupService(Ref ref) => BackupService(
   ref.watch(appLoggerProvider),
 );
 
-@riverpod
+@Riverpod(keepAlive: true)
 Future<GoogleSignInAccount?> currentGoogleUser(Ref ref) async =>
     ref.watch(googleSignInServiceProvider).signInSilently();

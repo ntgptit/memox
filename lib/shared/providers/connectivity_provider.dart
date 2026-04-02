@@ -1,3 +1,6 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final Provider<bool> connectivityProvider = Provider<bool>((ref) => true);
+part 'connectivity_provider.g.dart';
+
+@Riverpod(keepAlive: true)
+bool connectivity(Ref ref) => true;

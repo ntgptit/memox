@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-final Provider<ThemeMode> themeModeProvider = Provider<ThemeMode>(
-  (ref) => ThemeMode.system,
-);
+part 'theme_mode_provider.g.dart';
+
+@Riverpod(keepAlive: true)
+ThemeMode themeMode(Ref ref) => ThemeMode.system;

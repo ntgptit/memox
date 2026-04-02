@@ -138,6 +138,31 @@ provider_naming:
   usecase_pattern: "^\\w+UseCaseProvider$"
   controller_pattern: "^\\w+ControllerProvider$"
 
+riverpod_syntax:
+  provider_file_patterns:
+    - "core/providers/*.dart"
+    - "core/router/*.dart"
+    - "shared/providers/*.dart"
+    - "features/*/presentation/providers/*.dart"
+  infrastructure_provider_files:
+    - "core/providers/backup_providers.dart"
+    - "core/providers/database_providers.dart"
+    - "core/providers/datasource_providers.dart"
+    - "core/providers/repository_providers.dart"
+    - "core/providers/service_providers.dart"
+    - "core/providers/storage_providers.dart"
+    - "core/router/app_router.dart"
+  forbidden_legacy_providers:
+    - "Provider"
+    - "StateProvider"
+    - "FutureProvider"
+    - "StreamProvider"
+    - "NotifierProvider"
+    - "AsyncNotifierProvider"
+    - "StreamNotifierProvider"
+    - "StateNotifierProvider"
+    - "ChangeNotifierProvider"
+
 srs_fields:
   cards_table:
     required_columns:
