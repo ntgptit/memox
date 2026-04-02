@@ -1,0 +1,85 @@
+{
+  "@@locale": "en",
+  "appName": "MemoX",
+  "confirmAction": "Confirm",
+  "cancelAction": "Cancel",
+  "retryAction": "Try again",
+  "deleteAction": "Delete",
+  "undoAction": "Undo",
+  "submitAction": "Submit",
+  "exitAction": "Exit",
+  "exitSessionTitle": "Exit study session?",
+  "exitSessionMessage": "Progress won't be saved.",
+  "navHome": "Home",
+  "navLibrary": "Library",
+  "navProgress": "Progress",
+  "navSettings": "Settings",
+  "statusNew": "New",
+  "statusLearning": "Learning",
+  "statusReviewing": "Reviewing",
+  "statusMastered": "Mastered",
+  "modeReview": "Review",
+  "modeMatch": "Match",
+  "modeGuess": "Guess",
+  "modeRecall": "Recall",
+  "modeFill": "Fill",
+  "addTagHint": "Add tag",
+  "deletedMessage": "Item deleted",
+  "confirmDeleteMessage": "Are you sure you want to delete this item?",
+  "sessionCompleteTitle": "Session complete",
+  "themePreviewTitle": "Theme Preview",
+  "themePreviewAction": "Theme preview",
+  "themeTypographyTitle": "Typography",
+  "themeComponentsTitle": "Components",
+  "themeDisplayLabel": "Display",
+  "themeHeadlineLabel": "Headline",
+  "themeModeTitle": "Appearance",
+  "themeModeSystem": "System",
+  "themeModeLight": "Light",
+  "themeModeDark": "Dark",
+  "themeNavHome": "Home",
+  "themeNavStudy": "Study",
+  "themeNavStats": "Stats",
+  "themeBodyCopy": "MemoX keeps spacing calm, surfaces soft, and interactions readable.",
+  "themeCaptionCopy": "Caption text uses a quieter tone for metadata and helper content.",
+  "themeInputLabel": "Search decks",
+  "themeInputHint": "Start typing to explore the theme",
+  "themeAssistChip": "Soft Surface",
+  "themeFilterChip": "Mastery",
+  "themeCardTitle": "Daily Review",
+  "themeCardSubtitle": "Cards, inputs, chips, and navigation inherit the same Material 3 language.",
+  "themePrimaryAction": "Start Session",
+  "themeSecondaryAction": "View Stats",
+  "themeFabLabel": "Add Card",
+  "foldersTitle": "Folders",
+  "foldersSubtitle": "Folder feature scaffold is ready for implementation.",
+  "decksTitle": "Decks",
+  "decksSubtitle": "Deck feature scaffold is ready for implementation.",
+  "cardsTitle": "Cards",
+  "cardsSubtitle": "Card feature scaffold is ready for implementation.",
+  "studyTitle": "Study",
+  "studySubtitle": "Study feature scaffold is ready for implementation.",
+  "statisticsTitle": "Statistics",
+  "statisticsSubtitle": "Statistics feature scaffold is ready for implementation.",
+  "settingsTitle": "Settings",
+  "settingsSubtitle": "Settings feature scaffold is ready for implementation.",
+  "homeGreeting": "Good {timeOfDay}, {name}",
+  "@homeGreeting": {
+    "placeholders": {
+      "timeOfDay": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "homeDueCards": "{count, plural, =0{All caught up!} =1{You have 1 card due today} other{You have {count} cards due today}}",
+  "@homeDueCards": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
+}

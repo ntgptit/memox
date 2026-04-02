@@ -1,0 +1,85 @@
+{
+  "@@locale": "ko",
+  "appName": "MemoX",
+  "confirmAction": "확인",
+  "cancelAction": "취소",
+  "retryAction": "다시 시도",
+  "deleteAction": "삭제",
+  "undoAction": "실행 취소",
+  "submitAction": "제출",
+  "exitAction": "종료",
+  "exitSessionTitle": "학습 세션을 종료할까요?",
+  "exitSessionMessage": "진행 상황은 저장되지 않습니다.",
+  "navHome": "홈",
+  "navLibrary": "라이브러리",
+  "navProgress": "진행도",
+  "navSettings": "설정",
+  "statusNew": "새 카드",
+  "statusLearning": "학습 중",
+  "statusReviewing": "복습 중",
+  "statusMastered": "숙달",
+  "modeReview": "리뷰",
+  "modeMatch": "매치",
+  "modeGuess": "추측",
+  "modeRecall": "회상",
+  "modeFill": "빈칸 채우기",
+  "addTagHint": "태그 추가",
+  "deletedMessage": "항목이 삭제되었습니다",
+  "confirmDeleteMessage": "이 항목을 삭제하시겠습니까?",
+  "sessionCompleteTitle": "세션 완료",
+  "themePreviewTitle": "테마 미리보기",
+  "themePreviewAction": "테마 미리보기",
+  "themeTypographyTitle": "타이포그래피",
+  "themeComponentsTitle": "컴포넌트",
+  "themeDisplayLabel": "Display",
+  "themeHeadlineLabel": "Headline",
+  "themeModeTitle": "모양",
+  "themeModeSystem": "시스템",
+  "themeModeLight": "라이트",
+  "themeModeDark": "다크",
+  "themeNavHome": "홈",
+  "themeNavStudy": "학습",
+  "themeNavStats": "통계",
+  "themeBodyCopy": "MemoX는 차분한 간격, 부드러운 표면, 읽기 쉬운 상호작용을 유지합니다.",
+  "themeCaptionCopy": "캡션 텍스트는 메타데이터와 보조 정보에 더 조용한 톤을 사용합니다.",
+  "themeInputLabel": "덱 검색",
+  "themeInputHint": "테마를 살펴보려면 입력하세요",
+  "themeAssistChip": "소프트 서피스",
+  "themeFilterChip": "숙달",
+  "themeCardTitle": "오늘의 리뷰",
+  "themeCardSubtitle": "카드, 입력, 칩, 내비게이션은 같은 Material 3 언어를 따릅니다.",
+  "themePrimaryAction": "세션 시작",
+  "themeSecondaryAction": "통계 보기",
+  "themeFabLabel": "카드 추가",
+  "foldersTitle": "폴더",
+  "foldersSubtitle": "폴더 기능 스캐폴드가 구현 준비를 마쳤습니다.",
+  "decksTitle": "덱",
+  "decksSubtitle": "덱 기능 스캐폴드가 구현 준비를 마쳤습니다.",
+  "cardsTitle": "카드",
+  "cardsSubtitle": "카드 기능 스캐폴드가 구현 준비를 마쳤습니다.",
+  "studyTitle": "학습",
+  "studySubtitle": "학습 기능 스캐폴드가 구현 준비를 마쳤습니다.",
+  "statisticsTitle": "통계",
+  "statisticsSubtitle": "통계 기능 스캐폴드가 구현 준비를 마쳤습니다.",
+  "settingsTitle": "설정",
+  "settingsSubtitle": "설정 기능 스캐폴드가 구현 준비를 마쳤습니다.",
+  "homeGreeting": "{timeOfDay}, {name}님 안녕하세요",
+  "@homeGreeting": {
+    "placeholders": {
+      "timeOfDay": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "homeDueCards": "{count, plural, =0{오늘 복습할 카드가 없습니다!} =1{오늘 복습할 카드가 1장 있습니다} other{오늘 복습할 카드가 {count}장 있습니다}}",
+  "@homeDueCards": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
+}

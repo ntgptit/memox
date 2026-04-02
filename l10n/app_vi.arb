@@ -1,0 +1,85 @@
+{
+  "@@locale": "vi",
+  "appName": "MemoX",
+  "confirmAction": "Xác nhận",
+  "cancelAction": "Huỷ",
+  "retryAction": "Thử lại",
+  "deleteAction": "Xoá",
+  "undoAction": "Hoàn tác",
+  "submitAction": "Gửi",
+  "exitAction": "Thoát",
+  "exitSessionTitle": "Thoát phiên học?",
+  "exitSessionMessage": "Tiến trình sẽ không được lưu.",
+  "navHome": "Trang chủ",
+  "navLibrary": "Thư viện",
+  "navProgress": "Tiến độ",
+  "navSettings": "Cài đặt",
+  "statusNew": "Mới",
+  "statusLearning": "Đang học",
+  "statusReviewing": "Đang ôn",
+  "statusMastered": "Thành thạo",
+  "modeReview": "Ôn tập",
+  "modeMatch": "Ghép cặp",
+  "modeGuess": "Đoán",
+  "modeRecall": "Nhớ lại",
+  "modeFill": "Điền từ",
+  "addTagHint": "Thêm thẻ",
+  "deletedMessage": "Đã xoá mục",
+  "confirmDeleteMessage": "Bạn có chắc muốn xoá mục này không?",
+  "sessionCompleteTitle": "Hoàn thành phiên học",
+  "themePreviewTitle": "Xem trước giao diện",
+  "themePreviewAction": "Xem trước giao diện",
+  "themeTypographyTitle": "Typography",
+  "themeComponentsTitle": "Thành phần",
+  "themeDisplayLabel": "Display",
+  "themeHeadlineLabel": "Headline",
+  "themeModeTitle": "Giao diện",
+  "themeModeSystem": "Hệ thống",
+  "themeModeLight": "Sáng",
+  "themeModeDark": "Tối",
+  "themeNavHome": "Trang chủ",
+  "themeNavStudy": "Học",
+  "themeNavStats": "Thống kê",
+  "themeBodyCopy": "MemoX giữ khoảng cách nhẹ nhàng, bề mặt mềm và tương tác dễ đọc.",
+  "themeCaptionCopy": "Caption dùng tông yên hơn cho metadata và nội dung trợ giúp.",
+  "themeInputLabel": "Tìm bộ thẻ",
+  "themeInputHint": "Bắt đầu nhập để khám phá giao diện",
+  "themeAssistChip": "Bề mặt mềm",
+  "themeFilterChip": "Thành thạo",
+  "themeCardTitle": "Ôn tập hôm nay",
+  "themeCardSubtitle": "Cards, inputs, chips và navigation cùng chia sẻ một ngôn ngữ Material 3.",
+  "themePrimaryAction": "Bắt đầu phiên",
+  "themeSecondaryAction": "Xem thống kê",
+  "themeFabLabel": "Thêm thẻ",
+  "foldersTitle": "Thư mục",
+  "foldersSubtitle": "Khung tính năng thư mục đã sẵn sàng để triển khai.",
+  "decksTitle": "Bộ thẻ",
+  "decksSubtitle": "Khung tính năng bộ thẻ đã sẵn sàng để triển khai.",
+  "cardsTitle": "Thẻ",
+  "cardsSubtitle": "Khung tính năng thẻ đã sẵn sàng để triển khai.",
+  "studyTitle": "Học",
+  "studySubtitle": "Khung tính năng học đã sẵn sàng để triển khai.",
+  "statisticsTitle": "Thống kê",
+  "statisticsSubtitle": "Khung tính năng thống kê đã sẵn sàng để triển khai.",
+  "settingsTitle": "Cài đặt",
+  "settingsSubtitle": "Khung tính năng cài đặt đã sẵn sàng để triển khai.",
+  "homeGreeting": "Chào {timeOfDay}, {name}",
+  "@homeGreeting": {
+    "placeholders": {
+      "timeOfDay": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "homeDueCards": "{count, plural, =0{Không còn thẻ đến hạn!} =1{Bạn có 1 thẻ đến hạn hôm nay} other{Bạn có {count} thẻ đến hạn hôm nay}}",
+  "@homeDueCards": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
+}
