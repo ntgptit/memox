@@ -3,6 +3,8 @@ import 'package:memox/core/database/app_database.dart';
 abstract interface class DeckLocalDataSource {
   Stream<List<DecksTableData>> watchAll();
 
+  Stream<List<DecksTableData>> watchByFolder(int folderId);
+
   Future<List<DecksTableData>> getAll();
 
   Future<List<DecksTableData>> getByFolder(int folderId);
@@ -71,4 +73,9 @@ final class DeckLocalDataSourceImpl implements DeckLocalDataSource {
 
   @override
   Stream<List<DecksTableData>> watchAll() => _deckDao.watchAll();
+
+  @override
+  Stream<List<DecksTableData>> watchByFolder(int folderId) {
+    return _deckDao.watchByFolder(folderId);
+  }
 }

@@ -14,6 +14,9 @@ class FakeDeckRepository implements DeckRepository {
   }
 
   @override
+  Future<void> deleteCascade(int id) => delete(id);
+
+  @override
   Future<List<DeckEntity>> getAll() async => [..._decks];
 
   @override
@@ -38,18 +41,28 @@ class FakeDeckRepository implements DeckRepository {
   }
 
   @override
-  Future<void> reorder({required int folderId, required List<int> deckIds}) async {
+  Future<void> reorder({
+    required int folderId,
+    required List<int> deckIds,
+  }) async {
     reorderedFolderId = folderId;
     reorderedDeckIds = [...deckIds];
   }
 
   @override
   Future<DeckEntity> save(DeckEntity entity) async {
-    final nextId = _decks.fold<int>(0, (maxId, deck) {
+    if (entity.id != 0) {
+      _decks.removeWhere((deck) => deck.id == entity.id);
+      _decks.add(entity);
+      return entity;
+    }
+
+    final nextId =
+        _decks.fold<int>(0, (maxId, deck) {
           return deck.id > maxId ? deck.id : maxId;
         }) +
         1;
-    final saved = entity.id == 0 ? entity.copyWith(id: nextId) : entity;
+    final saved = entity.copyWith(id: nextId);
     _decks.add(saved);
     return saved;
   }
@@ -57,5 +70,10 @@ class FakeDeckRepository implements DeckRepository {
   @override
   Stream<List<DeckEntity>> watchAll() async* {
     yield [..._decks];
+  }
+
+  @override
+  Stream<List<DeckEntity>> watchByFolder(int folderId) async* {
+    yield _decks.where((deck) => deck.folderId == folderId).toList();
   }
 }

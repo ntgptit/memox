@@ -19,9 +19,7 @@ final class ReorderDecksUseCase {
       await _repository.reorder(folderId: folderId, deckIds: deckIds);
       return const Result<void>.success(null);
     } catch (_) {
-      return const Result.failure(
-        Failure.unknown('Unable to reorder decks'),
-      );
+      return const Result.failure(Failure.unknown('Unable to reorder decks'));
     }
   }
 }

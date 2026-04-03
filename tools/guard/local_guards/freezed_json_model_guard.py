@@ -19,6 +19,7 @@ class FreezedJsonModelGuard(BaseGuard):
     FROM_JSON_PATTERN = re.compile(
         r'factory\s+\w+\.fromJson\s*\(\s*Map<String,\s*dynamic>\s+json\s*\)',
     )
+    RECORD_TYPEDEF_PATTERN = re.compile(r'^\s*typedef\s+\w+\s*=\s*\(\{', re.MULTILINE)
 
     def check_file(self, file_path: Path, lines: list[str]) -> list[Violation]:
         if not self._is_model_file(file_path):
@@ -26,6 +27,10 @@ class FreezedJsonModelGuard(BaseGuard):
 
         relative = self.paths.relative_path(file_path)
         content = '\n'.join(lines)
+
+        if self._is_record_typedef(content):
+            return []
+
         violations: list[Violation] = []
 
         if self.FREEZED_IMPORT not in content:
@@ -87,6 +92,12 @@ class FreezedJsonModelGuard(BaseGuard):
         patterns = self.project_rules.get(self.GUARD_ID, {}).get('model_file_patterns', [])
         source_relative = PurePosixPath(self.paths.source_relative_path(file_path))
         return any(source_relative.match(pattern) for pattern in patterns)
+
+    def _is_record_typedef(self, content: str) -> bool:
+        return (
+            self.RECORD_TYPEDEF_PATTERN.search(content) is not None
+            and 'class ' not in content
+        )
 
     def _violation(
         self,

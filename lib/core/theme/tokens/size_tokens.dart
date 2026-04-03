@@ -29,6 +29,8 @@ abstract final class SizeTokens {
   // ── Inputs ──
   static const double inputHeight = 52; // outlined text field
   static const double searchBarHeight = 48;
+  static const double deckDetailHeaderHeightCompact = 208;
+  static const double deckDetailHeaderHeight = 224;
 
   // ── Dialogs ──
   static const double dialogWidthMd = 420;

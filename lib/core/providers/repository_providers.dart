@@ -41,7 +41,10 @@ FolderRepository folderRepository(Ref ref) {
 @Riverpod(keepAlive: true)
 DeckRepository deckRepository(Ref ref) {
   return DeckRepositoryImpl(
+    database: ref.watch(appDatabaseProvider),
     localDataSource: ref.watch(deckLocalDataSourceProvider),
+    flashcardLocalDataSource: ref.watch(flashcardLocalDataSourceProvider),
+    cardReviewDao: ref.watch(cardReviewDaoProvider),
     logger: ref.watch(appLoggerProvider),
   );
 }
@@ -49,7 +52,9 @@ DeckRepository deckRepository(Ref ref) {
 @Riverpod(keepAlive: true)
 FlashcardRepository flashcardRepository(Ref ref) {
   return FlashcardRepositoryImpl(
+    database: ref.watch(appDatabaseProvider),
     localDataSource: ref.watch(flashcardLocalDataSourceProvider),
+    cardReviewDao: ref.watch(cardReviewDaoProvider),
     logger: ref.watch(appLoggerProvider),
   );
 }

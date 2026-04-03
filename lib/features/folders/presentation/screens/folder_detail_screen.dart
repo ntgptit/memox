@@ -7,10 +7,12 @@ import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/providers/usecase_providers.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/decks/domain/entities/deck_entity.dart';
+import 'package:memox/features/decks/presentation/screens/deck_detail_screen.dart';
+import 'package:memox/features/decks/presentation/widgets/create_deck_dialog.dart';
+import 'package:memox/features/decks/presentation/widgets/deck_list_view.dart';
 import 'package:memox/features/folders/domain/entities/folder_entity.dart';
 import 'package:memox/features/folders/presentation/providers/folder_detail_provider.dart';
 import 'package:memox/features/folders/presentation/widgets/create_folder_dialog.dart';
-import 'package:memox/features/folders/presentation/widgets/deck_list_view.dart';
 import 'package:memox/features/folders/presentation/widgets/delete_folder_confirm_dialog.dart';
 import 'package:memox/features/folders/presentation/widgets/folder_constraint_footer.dart';
 import 'package:memox/features/folders/presentation/widgets/folder_detail_app_bar_title.dart';
@@ -18,7 +20,6 @@ import 'package:memox/features/folders/presentation/widgets/folder_list_view.dar
 import 'package:memox/features/folders/presentation/widgets/folder_status_bar.dart';
 import 'package:memox/features/folders/presentation/widgets/folder_type_chooser_sheet.dart';
 import 'package:memox/shared/widgets/buttons/app_fab.dart';
-import 'package:memox/shared/widgets/dialogs/input_dialog.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
 import 'package:memox/shared/widgets/feedback/empty_state_view.dart';
 import 'package:memox/shared/widgets/layout/app_scaffold.dart';
@@ -75,7 +76,7 @@ class FolderDetailScreen extends ConsumerWidget {
         ),
         fab: AppFab(
           icon: Icons.add_outlined,
-          tooltip: _fabLabel(context, detail.contentType),
+          tooltip: _folderFabLabel(context, detail.contentType),
           onTap: () {
             unawaited(_handleFab(context, ref, detail));
           },
@@ -96,14 +97,6 @@ class FolderDetailScreen extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  String _fabLabel(BuildContext context, ContentType contentType) {
-    return switch (contentType) {
-      ContentType.subfolders => context.l10n.createSubfolder,
-      ContentType.decks => context.l10n.createDeck,
-      ContentType.empty => context.l10n.createAction,
-    };
   }
 }
 
@@ -151,6 +144,7 @@ class _FolderContent extends ConsumerWidget {
     return DeckListView(
       decks: detail.decks,
       highlightedDeckId: focusDeckId,
+      onTap: (deck) => context.push(DeckDetailScreen.routeLocation(deck.id)),
       onReorder: (oldIndex, newIndex) {
         unawaited(
           _reorderDecks(
@@ -203,29 +197,23 @@ Future<void> _handleFab(
     return;
   }
 
-  final name = await showInputDialog(
+  final draft = await showCreateDeckDialog(
     context,
-    title: context.l10n.createDeck,
-    hint: context.l10n.deckNameHint,
-    validator: (value) {
-      if (value.trim().isEmpty) {
-        return context.l10n.deckNameEmptyError;
-      }
-
-      return null;
-    },
+    initialColorValue: detail.folder.colorValue,
   );
 
-  if (name == null || !context.mounted) {
+  if (draft == null || !context.mounted) {
     return;
   }
 
   final result = await ref
       .read(createDeckUseCaseProvider)
       .call(
-        name: name,
+        name: draft.name,
         folderId: detail.folder.id,
-        colorValue: detail.folder.colorValue,
+        description: draft.description,
+        colorValue: draft.colorValue,
+        tags: draft.tags,
       );
 
   if (!context.mounted || result.isSuccess) {
@@ -359,9 +347,14 @@ Future<void> _reorderDecks(
       );
 }
 
-T? _asyncValueOrNull<T>(AsyncValue<T> value) {
-  return switch (value) {
-    AsyncData<T>(:final value) => value,
-    _ => null,
-  };
-}
+T? _asyncValueOrNull<T>(AsyncValue<T> value) => switch (value) {
+  AsyncData<T>(:final value) => value,
+  _ => null,
+};
+
+String _folderFabLabel(BuildContext context, ContentType contentType) =>
+    switch (contentType) {
+      ContentType.subfolders => context.l10n.createSubfolder,
+      ContentType.decks => context.l10n.createDeck,
+      ContentType.empty => context.l10n.createAction,
+    };

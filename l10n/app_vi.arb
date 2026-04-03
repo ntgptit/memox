@@ -210,6 +210,118 @@
   },
   "folderEmptyTitle": "Chưa có gì ở đây",
   "folderEmptySubtitle": "Tạo thư mục con hoặc bộ thẻ để xác định loại nội dung của thư mục này.",
+  "deckNameLabel": "Tên bộ thẻ",
   "deckNameHint": "ví dụ: Từ vựng cốt lõi",
-  "deckNameEmptyError": "Tên bộ thẻ không được để trống"
+  "deckNameEmptyError": "Tên bộ thẻ không được để trống",
+  "deckDescriptionLabel": "Mô tả",
+  "deckDescriptionHint": "Ghi chú ngắn về nội dung của bộ thẻ này",
+  "deckTagsLabel": "Thẻ nhãn",
+  "deckCardsDueSubtitle": "{cardCount, plural, =0{Không có thẻ} =1{1 thẻ} other{{cardCount} thẻ}} · {dueCount, plural, =0{0 thẻ đến hạn hôm nay} =1{1 thẻ đến hạn hôm nay} other{{dueCount} thẻ đến hạn hôm nay}}",
+  "@deckCardsDueSubtitle": {
+    "placeholders": {
+      "cardCount": {
+        "type": "int"
+      },
+      "dueCount": {
+        "type": "int"
+      }
+    }
+  },
+  "totalLabel": "Tổng",
+  "dueLabel": "Đến hạn",
+  "knownLabel": "Đã biết",
+  "newLabel": "Mới",
+  "studyModeSheetTitle": "Chọn chế độ học",
+  "modeReviewDescription": "Ôn tập SRS cổ điển cho các thẻ đến hạn",
+  "modeMatchDescription": "Ghép mặt trước và mặt sau nhanh nhất có thể",
+  "modeGuessDescription": "Nhìn một mặt và đoán phần còn lại",
+  "modeRecallDescription": "Tự nhớ câu trả lời trước khi lật ra",
+  "modeFillDescription": "Gõ đáp án còn thiếu để tăng ghi nhớ",
+  "searchCardsHint": "Tìm thẻ",
+  "sortDateLabel": "Ngày",
+  "sortAlphaLabel": "A-Z",
+  "sortStatusLabel": "Trạng thái",
+  "createCardAction": "Tạo thẻ",
+  "studyDueCardsAction": "Học {count, plural, =0{0 thẻ đến hạn} =1{1 thẻ đến hạn} other{{count} thẻ đến hạn}}",
+  "@studyDueCardsAction": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chooseStudyModeAction": "hoặc chọn một chế độ học",
+  "chooseStudyModeButton": "Chọn chế độ học",
+  "cardsEmptyTitle": "Chưa có thẻ nào",
+  "cardsEmptySubtitle": "Hãy thêm thẻ để bắt đầu ôn bộ thẻ này.",
+  "deckEmptySummary": "Hãy bắt đầu bằng cách thêm thẻ hoặc nhập hàng loạt.",
+  "deckCaughtUpTitle": "Đã ôn xong hôm nay",
+  "deckCaughtUpBody": "Hiện không có thẻ nào đến hạn, nhưng bạn vẫn có thể học bộ thẻ này bằng chế độ khác.",
+  "deckCaughtUpSubtitle": "{cardCount, plural, =0{Chưa có thẻ nào trong bộ này} =1{1 thẻ trong bộ này · 0 thẻ đến hạn hôm nay} other{{cardCount} thẻ trong bộ này · 0 thẻ đến hạn hôm nay}}",
+  "@deckCaughtUpSubtitle": {
+    "placeholders": {
+      "cardCount": {
+        "type": "int"
+      }
+    }
+  },
+  "deckMasteryLabel": "Thành thạo {percent}%",
+  "@deckMasteryLabel": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "addFirstCardAction": "Thêm thẻ đầu tiên",
+  "importBatchAction": "Nhập hàng loạt",
+  "deleteDeckAction": "Xoá bộ thẻ",
+  "deleteDeckMessage": "Hành động này sẽ xoá vĩnh viễn bộ thẻ, các thẻ và lịch sử ôn tập của nó.",
+  "deleteCardAction": "Xoá thẻ",
+  "deleteCardMessage": "Thẻ này và lịch sử ôn tập của nó sẽ bị xoá vĩnh viễn.",
+  "newCardTitle": "Thẻ mới",
+  "editCardTitle": "Sửa thẻ",
+  "cardFrontLabel": "Mặt trước",
+  "cardFrontHint": "Nhập câu hỏi hoặc gợi ý",
+  "cardBackLabel": "Mặt sau",
+  "cardBackHint": "Nhập đáp án",
+  "cardHintLabel": "Gợi ý",
+  "cardHintHint": "Gợi ý tuỳ chọn",
+  "cardExampleLabel": "Ví dụ",
+  "cardExampleHint": "Ví dụ câu hoặc ghi chú tuỳ chọn",
+  "cardTagsLabel": "Thẻ nhãn",
+  "addMoreDetailsAction": "Thêm chi tiết +",
+  "addAnotherAction": "Thêm tiếp",
+  "singleModeLabel": "Một thẻ",
+  "batchModeLabel": "Hàng loạt",
+  "batchCardsLabel": "Nhập hàng loạt",
+  "batchCardsHint": "Mỗi dòng một thẻ: front<separator>back",
+  "batchSeparatorLabel": "Dấu phân cách",
+  "batchSeparatorTab": "Tab",
+  "batchSeparatorPipe": "|",
+  "batchSeparatorComma": ",",
+  "batchPreviewCount": "{count, plural, =0{Chưa có thẻ hợp lệ} =1{Có 1 thẻ sẵn sàng để nhập} other{Có {count} thẻ sẵn sàng để nhập}}",
+  "@batchPreviewCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "batchNoValidCardsError": "Không tìm thấy thẻ hợp lệ trong nội dung batch.",
+  "batchSaveSummary": "Đã lưu {savedCount} thẻ và bỏ qua {skippedCount} dòng không hợp lệ.",
+  "@batchSaveSummary": {
+    "placeholders": {
+      "savedCount": {
+        "type": "int"
+      },
+      "skippedCount": {
+        "type": "int"
+      }
+    }
+  },
+  "cardFrontEmptyError": "Mặt trước không được để trống",
+  "cardBackEmptyError": "Mặt sau không được để trống",
+  "cardMissingTitle": "Không tìm thấy thẻ",
+  "cardMissingSubtitle": "Có thể thẻ này đã bị xoá."
 }

@@ -1,9 +1,14 @@
+import 'dart:convert';
+
 import 'package:drift/drift.dart';
 import 'package:memox/core/database/app_database.dart';
 import 'package:memox/features/cards/domain/entities/flashcard_entity.dart';
 
 abstract final class FlashcardMapper {
   static FlashcardEntity toEntity(CardsTableData row) {
+    final tags = row.tags.isEmpty
+        ? const <String>[]
+        : List<String>.from(jsonDecode(row.tags) as List<dynamic>);
     return FlashcardEntity(
       id: row.id,
       deckId: row.deckId,
@@ -11,6 +16,7 @@ abstract final class FlashcardMapper {
       back: row.back,
       hint: row.hint,
       example: row.example,
+      tags: tags,
       imagePath: row.imagePath,
       status: row.status,
       easeFactor: row.easeFactor,
@@ -46,6 +52,7 @@ abstract final class FlashcardMapper {
       back: Value<String>(entity.back),
       hint: Value<String>(entity.hint),
       example: Value<String>(entity.example),
+      tags: Value<String>(jsonEncode(entity.tags)),
       imagePath: Value<String>(entity.imagePath),
       status: Value(entity.status),
       easeFactor: Value<double>(entity.easeFactor),

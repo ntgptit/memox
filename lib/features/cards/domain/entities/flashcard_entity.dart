@@ -13,6 +13,7 @@ abstract class FlashcardEntity with _$FlashcardEntity {
     @Default(0) int deckId,
     @Default('') String hint,
     @Default('') String example,
+    @Default(<String>[]) List<String> tags,
     @Default('') String imagePath,
     @Default(CardStatus.newCard) CardStatus status,
     @Default(2.5) double easeFactor,

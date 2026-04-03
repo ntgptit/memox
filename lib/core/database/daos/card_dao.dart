@@ -12,11 +12,31 @@ class CardDao extends DatabaseAccessor<AppDatabase> with _$CardDaoMixin {
         .watch();
   }
 
+  Stream<List<CardsTableData>> watchByDeck(int deckId) {
+    return (select(cardsTable)
+          ..where((CardsTable tbl) => tbl.deckId.equals(deckId))
+          ..orderBy([
+            (CardsTable tbl) => OrderingTerm.desc(tbl.updatedAt),
+            (CardsTable tbl) => OrderingTerm.desc(tbl.createdAt),
+          ]))
+        .watch();
+  }
+
   Future<List<CardsTableData>> getAll() {
     return (select(cardsTable)..orderBy([
           (CardsTable tbl) => OrderingTerm.desc(tbl.updatedAt),
           (CardsTable tbl) => OrderingTerm.desc(tbl.createdAt),
         ]))
+        .get();
+  }
+
+  Future<List<CardsTableData>> getByDeck(int deckId) {
+    return (select(cardsTable)
+          ..where((CardsTable tbl) => tbl.deckId.equals(deckId))
+          ..orderBy([
+            (CardsTable tbl) => OrderingTerm.desc(tbl.updatedAt),
+            (CardsTable tbl) => OrderingTerm.desc(tbl.createdAt),
+          ]))
         .get();
   }
 
@@ -52,27 +72,28 @@ class CardDao extends DatabaseAccessor<AppDatabase> with _$CardDaoMixin {
 
   Future<int> deleteAll() => delete(cardsTable).go();
 
-  Future<List<CardsTableData>> getDueCards({
-    int? deckId,
-    int limit = DbConstants.defaultGoalCount,
-  }) {
+  Future<List<CardsTableData>> getDueCards({int? deckId, int? limit}) {
     final now = DateTime.now();
-    return (select(cardsTable)
-          ..where((CardsTable tbl) {
-            final duePredicate =
-                tbl.nextReviewDate.isSmallerOrEqualValue(now) |
-                tbl.status.equals(DbConstants.defaultCardStatusIndex);
-            if (deckId == null) {
-              return duePredicate;
-            }
-            return tbl.deckId.equals(deckId) & duePredicate;
-          })
-          ..orderBy([
-            (CardsTable tbl) => OrderingTerm.asc(tbl.nextReviewDate),
-            (CardsTable tbl) => OrderingTerm.asc(tbl.createdAt),
-          ])
-          ..limit(limit))
-        .get();
+    final query = select(cardsTable)
+      ..where((CardsTable tbl) {
+        final duePredicate =
+            tbl.nextReviewDate.isSmallerOrEqualValue(now) |
+            tbl.status.equals(DbConstants.defaultCardStatusIndex);
+        if (deckId == null) {
+          return duePredicate;
+        }
+        return tbl.deckId.equals(deckId) & duePredicate;
+      })
+      ..orderBy([
+        (CardsTable tbl) => OrderingTerm.asc(tbl.nextReviewDate),
+        (CardsTable tbl) => OrderingTerm.asc(tbl.createdAt),
+      ]);
+
+    if (limit != null) {
+      query.limit(limit);
+    }
+
+    return query.get();
   }
 
   Future<({int total, int known, int learning, int newCards})>

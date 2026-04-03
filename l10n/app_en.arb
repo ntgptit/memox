@@ -210,6 +210,118 @@
   },
   "folderEmptyTitle": "Nothing here yet",
   "folderEmptySubtitle": "Create a subfolder or a deck to define this folder's content type.",
+  "deckNameLabel": "Deck name",
   "deckNameHint": "e.g. Core Vocabulary",
-  "deckNameEmptyError": "Deck name can't be empty"
+  "deckNameEmptyError": "Deck name can't be empty",
+  "deckDescriptionLabel": "Description",
+  "deckDescriptionHint": "Optional notes about what this deck covers",
+  "deckTagsLabel": "Tags",
+  "deckCardsDueSubtitle": "{cardCount, plural, =0{No cards} =1{1 card} other{{cardCount} cards}} · {dueCount, plural, =0{0 due today} =1{1 due today} other{{dueCount} due today}}",
+  "@deckCardsDueSubtitle": {
+    "placeholders": {
+      "cardCount": {
+        "type": "int"
+      },
+      "dueCount": {
+        "type": "int"
+      }
+    }
+  },
+  "totalLabel": "Total",
+  "dueLabel": "Due",
+  "knownLabel": "Known",
+  "newLabel": "New",
+  "studyModeSheetTitle": "Choose a study mode",
+  "modeReviewDescription": "Classic spaced repetition review for due cards",
+  "modeMatchDescription": "Match fronts and backs as quickly as possible",
+  "modeGuessDescription": "See one side and guess the hidden answer",
+  "modeRecallDescription": "Recall the answer from memory before revealing it",
+  "modeFillDescription": "Type the missing answer to reinforce recall",
+  "searchCardsHint": "Search cards",
+  "sortDateLabel": "Date",
+  "sortAlphaLabel": "A-Z",
+  "sortStatusLabel": "Status",
+  "createCardAction": "Create card",
+  "studyDueCardsAction": "Study {count, plural, =0{0 due cards} =1{1 due card} other{{count} due cards}}",
+  "@studyDueCardsAction": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chooseStudyModeAction": "or choose a study mode",
+  "chooseStudyModeButton": "Choose study mode",
+  "cardsEmptyTitle": "No cards yet",
+  "cardsEmptySubtitle": "Add cards to start reviewing this deck.",
+  "deckEmptySummary": "Start by adding cards or importing a batch.",
+  "deckCaughtUpTitle": "All caught up",
+  "deckCaughtUpBody": "No cards are due right now, but you can still study this deck in another mode.",
+  "deckCaughtUpSubtitle": "{cardCount, plural, =0{No cards in this deck} =1{1 card in this deck · 0 due today} other{{cardCount} cards in this deck · 0 due today}}",
+  "@deckCaughtUpSubtitle": {
+    "placeholders": {
+      "cardCount": {
+        "type": "int"
+      }
+    }
+  },
+  "deckMasteryLabel": "{percent}% mastered",
+  "@deckMasteryLabel": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "addFirstCardAction": "Add first card",
+  "importBatchAction": "Import batch",
+  "deleteDeckAction": "Delete deck",
+  "deleteDeckMessage": "This will permanently delete this deck, its cards, and review history.",
+  "deleteCardAction": "Delete card",
+  "deleteCardMessage": "This card and its review history will be permanently deleted.",
+  "newCardTitle": "New Card",
+  "editCardTitle": "Edit Card",
+  "cardFrontLabel": "Front",
+  "cardFrontHint": "Enter the prompt or question",
+  "cardBackLabel": "Back",
+  "cardBackHint": "Enter the answer",
+  "cardHintLabel": "Hint",
+  "cardHintHint": "Optional clue",
+  "cardExampleLabel": "Example",
+  "cardExampleHint": "Optional example sentence or note",
+  "cardTagsLabel": "Tags",
+  "addMoreDetailsAction": "Add more details +",
+  "addAnotherAction": "Add another",
+  "singleModeLabel": "Single",
+  "batchModeLabel": "Batch",
+  "batchCardsLabel": "Batch input",
+  "batchCardsHint": "One card per line: front<separator>back",
+  "batchSeparatorLabel": "Separator",
+  "batchSeparatorTab": "Tab",
+  "batchSeparatorPipe": "|",
+  "batchSeparatorComma": ",",
+  "batchPreviewCount": "{count, plural, =0{No valid cards parsed yet} =1{1 card ready to import} other{{count} cards ready to import}}",
+  "@batchPreviewCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "batchNoValidCardsError": "No valid cards were found in the batch input.",
+  "batchSaveSummary": "Saved {savedCount} cards and skipped {skippedCount} invalid lines.",
+  "@batchSaveSummary": {
+    "placeholders": {
+      "savedCount": {
+        "type": "int"
+      },
+      "skippedCount": {
+        "type": "int"
+      }
+    }
+  },
+  "cardFrontEmptyError": "Front can't be empty",
+  "cardBackEmptyError": "Back can't be empty",
+  "cardMissingTitle": "Card not found",
+  "cardMissingSubtitle": "This card may have been deleted already."
 }

@@ -1,9 +1,17 @@
 import 'package:memox/core/providers/repository_providers.dart';
 import 'package:memox/core/providers/service_providers.dart';
+import 'package:memox/features/cards/domain/usecases/create_card.dart';
+import 'package:memox/features/cards/domain/usecases/create_cards_batch.dart';
+import 'package:memox/features/cards/domain/usecases/delete_card.dart';
+import 'package:memox/features/cards/domain/usecases/get_cards_by_deck.dart';
 import 'package:memox/features/decks/domain/usecases/create_deck.dart';
 import 'package:memox/features/cards/domain/usecases/get_due_cards.dart';
 import 'package:memox/features/cards/domain/usecases/get_flashcards.dart';
+import 'package:memox/features/cards/domain/usecases/update_card.dart';
 import 'package:memox/features/decks/domain/usecases/get_decks.dart';
+import 'package:memox/features/decks/domain/usecases/delete_deck.dart';
+import 'package:memox/features/decks/domain/usecases/get_deck_stats.dart';
+import 'package:memox/features/decks/domain/usecases/get_decks_by_folder.dart';
 import 'package:memox/features/decks/domain/usecases/reorder_decks.dart';
 import 'package:memox/features/folders/domain/usecases/can_create_deck.dart';
 import 'package:memox/features/folders/domain/usecases/can_create_subfolder.dart';
@@ -109,12 +117,30 @@ GetDecksUseCase getDecksUseCase(Ref ref) {
 
 @riverpod
 CreateDeckUseCase createDeckUseCase(Ref ref) {
-  return CreateDeckUseCase(ref.watch(deckRepositoryProvider));
+  return CreateDeckUseCase(
+    repository: ref.watch(deckRepositoryProvider),
+    canCreateDeckUseCase: ref.watch(canCreateDeckUseCaseProvider),
+  );
 }
 
 @riverpod
 ReorderDecksUseCase reorderDecksUseCase(Ref ref) {
   return ReorderDecksUseCase(ref.watch(deckRepositoryProvider));
+}
+
+@riverpod
+GetDecksByFolderUseCase getDecksByFolderUseCase(Ref ref) {
+  return GetDecksByFolderUseCase(ref.watch(deckRepositoryProvider));
+}
+
+@riverpod
+DeleteDeckUseCase deleteDeckUseCase(Ref ref) {
+  return DeleteDeckUseCase(ref.watch(deckRepositoryProvider));
+}
+
+@riverpod
+GetDeckStatsUseCase getDeckStatsUseCase(Ref ref) {
+  return GetDeckStatsUseCase(ref.watch(flashcardRepositoryProvider));
 }
 
 @riverpod
@@ -125,6 +151,31 @@ GetFlashcardsUseCase getFlashcardsUseCase(Ref ref) {
 @riverpod
 GetDueCardsUseCase getDueCardsUseCase(Ref ref) {
   return GetDueCardsUseCase(ref.watch(flashcardRepositoryProvider));
+}
+
+@riverpod
+GetCardsByDeckUseCase getCardsByDeckUseCase(Ref ref) {
+  return GetCardsByDeckUseCase(ref.watch(flashcardRepositoryProvider));
+}
+
+@riverpod
+CreateCardUseCase createCardUseCase(Ref ref) {
+  return CreateCardUseCase(ref.watch(flashcardRepositoryProvider));
+}
+
+@riverpod
+CreateCardsBatchUseCase createCardsBatchUseCase(Ref ref) {
+  return CreateCardsBatchUseCase(ref.watch(flashcardRepositoryProvider));
+}
+
+@riverpod
+UpdateCardUseCase updateCardUseCase(Ref ref) {
+  return UpdateCardUseCase(ref.watch(flashcardRepositoryProvider));
+}
+
+@riverpod
+DeleteCardUseCase deleteCardUseCase(Ref ref) {
+  return DeleteCardUseCase(ref.watch(flashcardRepositoryProvider));
 }
 
 @riverpod

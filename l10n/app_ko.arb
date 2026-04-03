@@ -210,6 +210,118 @@
   },
   "folderEmptyTitle": "아직 아무 것도 없습니다",
   "folderEmptySubtitle": "이 폴더의 콘텐츠 타입을 정하려면 하위 폴더나 덱을 만들어 주세요.",
+  "deckNameLabel": "덱 이름",
   "deckNameHint": "예: 핵심 어휘",
-  "deckNameEmptyError": "덱 이름은 비워둘 수 없습니다"
+  "deckNameEmptyError": "덱 이름은 비워둘 수 없습니다",
+  "deckDescriptionLabel": "설명",
+  "deckDescriptionHint": "이 덱이 다루는 내용을 간단히 적어 주세요",
+  "deckTagsLabel": "태그",
+  "deckCardsDueSubtitle": "{cardCount, plural, =0{카드 없음} =1{카드 1장} other{카드 {cardCount}장}} · {dueCount, plural, =0{오늘 복습 0장} =1{오늘 복습 1장} other{오늘 복습 {dueCount}장}}",
+  "@deckCardsDueSubtitle": {
+    "placeholders": {
+      "cardCount": {
+        "type": "int"
+      },
+      "dueCount": {
+        "type": "int"
+      }
+    }
+  },
+  "totalLabel": "전체",
+  "dueLabel": "복습",
+  "knownLabel": "숙지",
+  "newLabel": "새 카드",
+  "studyModeSheetTitle": "학습 모드 선택",
+  "modeReviewDescription": "복습이 필요한 카드를 위한 기본 SRS 리뷰",
+  "modeMatchDescription": "앞면과 뒷면을 최대한 빨리 매칭합니다",
+  "modeGuessDescription": "한 면을 보고 숨겨진 답을 추측합니다",
+  "modeRecallDescription": "답을 먼저 떠올린 뒤 확인합니다",
+  "modeFillDescription": "빠진 답을 직접 입력해 기억을 강화합니다",
+  "searchCardsHint": "카드 검색",
+  "sortDateLabel": "날짜",
+  "sortAlphaLabel": "A-Z",
+  "sortStatusLabel": "상태",
+  "createCardAction": "카드 만들기",
+  "studyDueCardsAction": "{count, plural, =0{복습 카드 0장 학습} =1{복습 카드 1장 학습} other{복습 카드 {count}장 학습}}",
+  "@studyDueCardsAction": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chooseStudyModeAction": "또는 다른 학습 모드 선택",
+  "chooseStudyModeButton": "학습 모드 선택",
+  "cardsEmptyTitle": "아직 카드가 없습니다",
+  "cardsEmptySubtitle": "이 덱을 복습하려면 카드를 추가하세요.",
+  "deckEmptySummary": "카드를 추가하거나 일괄 가져오기로 시작하세요.",
+  "deckCaughtUpTitle": "오늘 학습이 끝났습니다",
+  "deckCaughtUpBody": "지금은 복습할 카드가 없지만, 다른 모드로 이 덱을 계속 학습할 수 있습니다.",
+  "deckCaughtUpSubtitle": "{cardCount, plural, =0{이 덱에 카드가 없습니다} =1{이 덱에 카드 1장 · 오늘 복습 0장} other{이 덱에 카드 {cardCount}장 · 오늘 복습 0장}}",
+  "@deckCaughtUpSubtitle": {
+    "placeholders": {
+      "cardCount": {
+        "type": "int"
+      }
+    }
+  },
+  "deckMasteryLabel": "{percent}% 숙달",
+  "@deckMasteryLabel": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "addFirstCardAction": "첫 카드 추가",
+  "importBatchAction": "일괄 가져오기",
+  "deleteDeckAction": "덱 삭제",
+  "deleteDeckMessage": "이 작업은 덱, 카드, 복습 기록을 영구 삭제합니다.",
+  "deleteCardAction": "카드 삭제",
+  "deleteCardMessage": "이 카드와 복습 기록이 영구 삭제됩니다.",
+  "newCardTitle": "새 카드",
+  "editCardTitle": "카드 수정",
+  "cardFrontLabel": "앞면",
+  "cardFrontHint": "질문이나 프롬프트를 입력하세요",
+  "cardBackLabel": "뒷면",
+  "cardBackHint": "정답을 입력하세요",
+  "cardHintLabel": "힌트",
+  "cardHintHint": "선택 사항 힌트",
+  "cardExampleLabel": "예문",
+  "cardExampleHint": "선택 사항 예문 또는 메모",
+  "cardTagsLabel": "태그",
+  "addMoreDetailsAction": "추가 정보 +",
+  "addAnotherAction": "하나 더 추가",
+  "singleModeLabel": "단일",
+  "batchModeLabel": "일괄",
+  "batchCardsLabel": "일괄 입력",
+  "batchCardsHint": "한 줄에 카드 하나씩: front<separator>back",
+  "batchSeparatorLabel": "구분자",
+  "batchSeparatorTab": "Tab",
+  "batchSeparatorPipe": "|",
+  "batchSeparatorComma": ",",
+  "batchPreviewCount": "{count, plural, =0{아직 유효한 카드가 없습니다} =1{가져올 카드 1장 준비됨} other{가져올 카드 {count}장 준비됨}}",
+  "@batchPreviewCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "batchNoValidCardsError": "일괄 입력에서 유효한 카드를 찾지 못했습니다.",
+  "batchSaveSummary": "카드 {savedCount}장을 저장하고 잘못된 줄 {skippedCount}개를 건너뛰었습니다.",
+  "@batchSaveSummary": {
+    "placeholders": {
+      "savedCount": {
+        "type": "int"
+      },
+      "skippedCount": {
+        "type": "int"
+      }
+    }
+  },
+  "cardFrontEmptyError": "앞면은 비워둘 수 없습니다",
+  "cardBackEmptyError": "뒷면은 비워둘 수 없습니다",
+  "cardMissingTitle": "카드를 찾을 수 없습니다",
+  "cardMissingSubtitle": "이미 삭제되었을 수 있습니다."
 }

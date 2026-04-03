@@ -1,11 +1,16 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/features/decks/domain/entities/deck_entity.dart';
 import 'package:memox/features/decks/domain/usecases/create_deck.dart';
+import 'package:memox/features/folders/domain/usecases/can_create_deck.dart';
 import '../../../../test_helpers/fakes/fake_deck_repository.dart';
+import '../../../../test_helpers/fakes/fake_folder_repository.dart';
 
 void main() {
   test('creates deck when name is unique inside folder', () async {
-    final useCase = CreateDeckUseCase(FakeDeckRepository());
+    final useCase = CreateDeckUseCase(
+      repository: FakeDeckRepository(),
+      canCreateDeckUseCase: CanCreateDeckUseCase(FakeFolderRepository()),
+    );
 
     final result = await useCase.call(
       name: 'Core Vocabulary',
@@ -19,9 +24,10 @@ void main() {
 
   test('returns conflict when name already exists inside folder', () async {
     final useCase = CreateDeckUseCase(
-      FakeDeckRepository(
+      repository: FakeDeckRepository(
         decks: const [DeckEntity(id: 1, name: 'Core Vocabulary', folderId: 1)],
       ),
+      canCreateDeckUseCase: CanCreateDeckUseCase(FakeFolderRepository()),
     );
 
     final result = await useCase.call(

@@ -19,6 +19,8 @@ class CardsTable extends Table {
 
   TextColumn get example => text().withDefault(const Constant(''))();
 
+  TextColumn get tags => text().withDefault(const Constant(''))();
+
   TextColumn get imagePath => text().withDefault(const Constant(''))();
 
   IntColumn get status => intEnum<CardStatus>().withDefault(

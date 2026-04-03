@@ -26,13 +26,32 @@ final class _FakeFlashcardRepository implements FlashcardRepository {
   Future<List<FlashcardEntity>> getAll() async => _cards;
 
   @override
-  Future<List<FlashcardEntity>> getDueCards() async => _cards;
+  Future<List<FlashcardEntity>> getByDeck(int deckId) async => _cards;
+
+  @override
+  Future<FlashcardEntity?> getById(int id) async => null;
+
+  @override
+  Future<List<FlashcardEntity>> getDueCards({
+    int? deckId,
+    int limit = 20,
+  }) async => _cards.take(limit).toList();
 
   @override
   Future<FlashcardEntity> save(FlashcardEntity entity) async => entity;
 
   @override
+  Future<List<FlashcardEntity>> saveAll(List<FlashcardEntity> entities) async {
+    return entities;
+  }
+
+  @override
   Stream<List<FlashcardEntity>> watchAll() async* {
+    yield _cards;
+  }
+
+  @override
+  Stream<List<FlashcardEntity>> watchByDeck(int deckId) async* {
     yield _cards;
   }
 }
