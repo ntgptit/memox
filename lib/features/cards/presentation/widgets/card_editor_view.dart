@@ -83,7 +83,12 @@ class CardEditorViewState extends ConsumerState<CardEditorView> {
 
   @override
   Widget build(BuildContext context) => ListView(
-    padding: const EdgeInsets.all(SpacingTokens.lg),
+    padding: EdgeInsets.fromLTRB(
+      context.screenType.screenPadding,
+      SpacingTokens.lg,
+      context.screenType.screenPadding,
+      SpacingTokens.lg,
+    ),
     children: [
       if (!widget.isEditing) _ModeSelector(mode: _mode, onChanged: _setMode),
       if (!widget.isEditing) const SizedBox(height: SpacingTokens.fieldGap),

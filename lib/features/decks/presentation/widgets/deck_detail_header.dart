@@ -4,6 +4,7 @@ import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/shared/widgets/navigation/breadcrumb_bar.dart';
 import 'package:memox/shared/widgets/navigation/top_bar_action_row.dart';
+import 'package:memox/shared/widgets/navigation/top_bar_back_button.dart';
 import 'package:memox/shared/widgets/navigation/top_bar_icon_button.dart';
 import 'package:memox/shared/widgets/progress/mastery_bar.dart';
 
@@ -42,49 +43,42 @@ class DeckDetailHeader extends StatelessWidget {
   final VoidCallback onDelete;
 
   @override
-  Widget build(BuildContext context) {
-    final backTooltip = MaterialLocalizations.of(context).backButtonTooltip;
-
-    return SliverAppBar(
-      pinned: true,
-      centerTitle: true,
-      automaticallyImplyLeading: false,
-      leadingWidth: TopBarIconButton.balancedSlotWidth,
-      leading: TopBarIconButton(
-        tooltip: backTooltip,
-        onPressed: () => context.pop<void>(),
-        icon: Icons.arrow_back_outlined,
-        alignment: Alignment.centerLeft,
-        slotWidth: TopBarIconButton.balancedSlotWidth,
-      ),
-      expandedHeight: _expandedHeaderHeight(context, showMasteryBar),
-      title: showCollapsedTitle
-          ? Text(deckName, maxLines: 1, overflow: TextOverflow.ellipsis)
-          : null,
-      actionsPadding: EdgeInsets.zero,
-      actions: [_DeckDetailHeaderActions(onEdit: onEdit, onDelete: onDelete)],
-      flexibleSpace: FlexibleSpaceBar(
-        background: Padding(
-          padding: EdgeInsets.fromLTRB(
-            context.screenType.screenPadding,
-            SizeTokens.appBarHeight + SpacingTokens.sm,
-            context.screenType.screenPadding,
-            SpacingTokens.md,
-          ),
-          child: Align(
-            alignment: Alignment.bottomLeft,
-            child: _DeckDetailHeaderBody(
-              deckName: deckName,
-              summary: summary,
-              breadcrumb: breadcrumb,
-              masteryPercentage: masteryPercentage,
-              showMasteryBar: showMasteryBar,
-            ),
+  Widget build(BuildContext context) => SliverAppBar(
+    pinned: true,
+    centerTitle: true,
+    automaticallyImplyLeading: false,
+    leadingWidth: TopBarBackButton.balancedSlotWidth,
+    leading: TopBarBackButton(
+      onPressed: () => context.pop<void>(),
+      startPadding: context.screenType.screenPadding,
+    ),
+    expandedHeight: _expandedHeaderHeight(context, showMasteryBar),
+    title: showCollapsedTitle
+        ? Text(deckName, maxLines: 1, overflow: TextOverflow.ellipsis)
+        : null,
+    actionsPadding: EdgeInsets.zero,
+    actions: [_DeckDetailHeaderActions(onEdit: onEdit, onDelete: onDelete)],
+    flexibleSpace: FlexibleSpaceBar(
+      background: Padding(
+        padding: EdgeInsets.fromLTRB(
+          context.screenType.screenPadding,
+          SizeTokens.appBarHeight + SpacingTokens.sm,
+          context.screenType.screenPadding,
+          SpacingTokens.md,
+        ),
+        child: Align(
+          alignment: Alignment.bottomLeft,
+          child: _DeckDetailHeaderBody(
+            deckName: deckName,
+            summary: summary,
+            breadcrumb: breadcrumb,
+            masteryPercentage: masteryPercentage,
+            showMasteryBar: showMasteryBar,
           ),
         ),
       ),
-    );
-  }
+    ),
+  );
 }
 
 class _DeckDetailHeaderActions extends StatelessWidget {

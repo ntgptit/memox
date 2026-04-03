@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/opacity_tokens.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
-import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/shared/widgets/buttons/primary_button.dart';
-import 'package:memox/shared/widgets/navigation/top_bar_icon_button.dart';
+import 'package:memox/shared/widgets/navigation/top_bar_back_button.dart';
 
 class EditorTopBar extends StatelessWidget implements PreferredSizeWidget {
   const EditorTopBar({
@@ -36,18 +35,14 @@ class EditorTopBar extends StatelessWidget implements PreferredSizeWidget {
         child: SizedBox(
           height: SizeTokens.appBarHeightLg,
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: SpacingTokens.md),
+            padding: EdgeInsets.symmetric(
+              horizontal: context.screenType.screenPadding,
+            ),
             child: Row(
               children: [
                 SizedBox(
-                  width: TopBarIconButton.balancedSlotWidth,
-                  child: TopBarIconButton(
-                    tooltip: context.l10n.cancelAction,
-                    onPressed: onClose,
-                    icon: Icons.arrow_back_outlined,
-                    alignment: Alignment.centerLeft,
-                    slotWidth: TopBarIconButton.balancedSlotWidth,
-                  ),
+                  width: TopBarBackButton.balancedSlotWidth,
+                  child: TopBarBackButton(onPressed: onClose),
                 ),
                 Expanded(
                   child: Text(
@@ -59,7 +54,7 @@ class EditorTopBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ),
                 SizedBox(
-                  width: TopBarIconButton.balancedSlotWidth,
+                  width: TopBarBackButton.balancedSlotWidth,
                   child: Align(
                     alignment: Alignment.centerRight,
                     child: onSave == null

@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/features/cards/presentation/screens/card_create_screen.dart';
 import 'package:memox/features/cards/presentation/widgets/card_editor_view.dart';
 import 'package:memox/shared/widgets/inputs/app_switch_tile.dart';
+import 'package:memox/shared/widgets/inputs/app_text_field.dart';
+import 'package:memox/shared/widgets/navigation/top_bar_back_button.dart';
 import '../../../../test_helpers/test_app.dart';
 
 void main() {
@@ -81,5 +83,24 @@ void main() {
 
     expect(find.byType(AppSwitchTile), findsOneWidget);
     expect(find.byType(SwitchListTile), findsNothing);
+  });
+
+  testWidgets('CardCreateScreen aligns back button with form content', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(
+      ProviderScope(
+        child: buildTestApp(home: const CardCreateScreen(deckId: 1)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final backRect = tester.getRect(find.byType(TopBarBackButton));
+    final fieldRect = tester.getRect(find.byType(AppTextField).first);
+
+    expect(backRect.left, closeTo(fieldRect.left, 0.01));
   });
 }
