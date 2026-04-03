@@ -3,6 +3,7 @@ import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/shared/widgets/navigation/breadcrumb_bar.dart';
+import 'package:memox/shared/widgets/navigation/top_bar_action_row.dart';
 import 'package:memox/shared/widgets/navigation/top_bar_icon_button.dart';
 import 'package:memox/shared/widgets/progress/mastery_bar.dart';
 
@@ -48,32 +49,20 @@ class DeckDetailHeader extends StatelessWidget {
       pinned: true,
       centerTitle: true,
       automaticallyImplyLeading: false,
-      leadingWidth: TopBarIconButton.slotWidth,
+      leadingWidth: TopBarIconButton.balancedSlotWidth,
       leading: TopBarIconButton(
         tooltip: backTooltip,
         onPressed: () => context.pop<void>(),
         icon: Icons.arrow_back_outlined,
         alignment: Alignment.centerLeft,
+        slotWidth: TopBarIconButton.balancedSlotWidth,
       ),
       expandedHeight: _expandedHeaderHeight(context, showMasteryBar),
       title: showCollapsedTitle
           ? Text(deckName, maxLines: 1, overflow: TextOverflow.ellipsis)
           : null,
       actionsPadding: EdgeInsets.zero,
-      actions: [
-        TopBarIconButton(
-          tooltip: context.l10n.editAction,
-          onPressed: onEdit,
-          icon: Icons.edit_outlined,
-          alignment: Alignment.centerRight,
-        ),
-        TopBarIconButton(
-          tooltip: context.l10n.deleteDeckAction,
-          onPressed: onDelete,
-          icon: Icons.delete_outline,
-          alignment: Alignment.centerRight,
-        ),
-      ],
+      actions: [_DeckDetailHeaderActions(onEdit: onEdit, onDelete: onDelete)],
       flexibleSpace: FlexibleSpaceBar(
         background: Padding(
           padding: EdgeInsets.fromLTRB(
@@ -96,6 +85,34 @@ class DeckDetailHeader extends StatelessWidget {
       ),
     );
   }
+}
+
+class _DeckDetailHeaderActions extends StatelessWidget {
+  const _DeckDetailHeaderActions({
+    required this.onEdit,
+    required this.onDelete,
+  });
+
+  final VoidCallback onEdit;
+  final VoidCallback onDelete;
+
+  @override
+  Widget build(BuildContext context) => TopBarActionRow(
+    children: [
+      TopBarIconButton(
+        tooltip: context.l10n.editAction,
+        onPressed: onEdit,
+        icon: Icons.edit_outlined,
+        alignment: Alignment.centerRight,
+      ),
+      TopBarIconButton(
+        tooltip: context.l10n.deleteDeckAction,
+        onPressed: onDelete,
+        icon: Icons.delete_outline,
+        alignment: Alignment.centerRight,
+      ),
+    ],
+  );
 }
 
 class _DeckDetailHeaderBody extends StatelessWidget {

@@ -5,7 +5,6 @@ import 'package:memox/core/theme/tokens/radius_tokens.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/decks/domain/entities/deck_entity.dart';
-import 'package:memox/shared/widgets/buttons/icon_action_button.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
 import 'package:memox/shared/widgets/chips/tag_chip.dart';
 import 'package:memox/shared/widgets/progress/mastery_bar.dart';
@@ -153,26 +152,69 @@ class _DeckActions extends StatelessWidget {
   final VoidCallback? onDelete;
 
   @override
-  Widget build(BuildContext context) => Column(
-    children: [
+  Widget build(BuildContext context) => PopupMenuButton<_DeckAction>(
+    icon: const Icon(Icons.more_vert),
+    padding: EdgeInsets.zero,
+    position: PopupMenuPosition.under,
+    menuPadding: const EdgeInsets.symmetric(vertical: SpacingTokens.xs),
+    onSelected: (_DeckAction action) {
+      if (action == _DeckAction.edit) {
+        onEdit?.call();
+        return;
+      }
+
+      onDelete?.call();
+    },
+    itemBuilder: (BuildContext context) => <PopupMenuEntry<_DeckAction>>[
       if (onEdit != null)
-        IconActionButton(
-          icon: Icons.edit_outlined,
-          tooltip: context.l10n.editAction,
-          size: SizeTokens.buttonHeightSm,
-          onTap: onEdit,
+        PopupMenuItem<_DeckAction>(
+          value: _DeckAction.edit,
+          height: SizeTokens.listItemCompact,
+          padding: const EdgeInsets.symmetric(horizontal: SpacingTokens.md),
+          child: _DeckActionItem(
+            icon: Icons.edit_outlined,
+            label: context.l10n.editAction,
+          ),
         ),
-      if (onEdit != null && onDelete != null)
-        const SizedBox(height: SpacingTokens.xs),
       if (onDelete != null)
-        IconActionButton(
-          icon: Icons.delete_outline,
-          tooltip: context.l10n.deleteDeckAction,
-          size: SizeTokens.buttonHeightSm,
-          onTap: onDelete,
+        PopupMenuItem<_DeckAction>(
+          value: _DeckAction.delete,
+          height: SizeTokens.listItemCompact,
+          padding: const EdgeInsets.symmetric(horizontal: SpacingTokens.md),
+          child: _DeckActionItem(
+            icon: Icons.delete_outline,
+            label: context.l10n.deleteDeckAction,
+            color: context.customColors.ratingAgain,
+          ),
         ),
     ],
   );
+}
+
+enum _DeckAction { edit, delete }
+
+class _DeckActionItem extends StatelessWidget {
+  const _DeckActionItem({required this.icon, required this.label, this.color});
+
+  final IconData icon;
+  final String label;
+  final Color? color;
+
+  @override
+  Widget build(BuildContext context) {
+    final foregroundColor = color ?? context.colors.onSurface;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: SizeTokens.iconSm, color: foregroundColor),
+        const SizedBox(width: SpacingTokens.md),
+        Text(
+          label,
+          style: context.textTheme.bodyMedium?.copyWith(color: foregroundColor),
+        ),
+      ],
+    );
+  }
 }
 
 class _DeckProgress extends StatelessWidget {

@@ -24,6 +24,8 @@ import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
 import 'package:memox/shared/widgets/feedback/empty_state_view.dart';
 import 'package:memox/shared/widgets/layout/app_scaffold.dart';
 import 'package:memox/shared/widgets/lists/reorder_mode_banner.dart';
+import 'package:memox/shared/widgets/navigation/top_bar_action_row.dart';
+import 'package:memox/shared/widgets/navigation/top_bar_icon_button.dart';
 
 class FolderDetailScreen extends ConsumerStatefulWidget {
   const FolderDetailScreen({
@@ -62,40 +64,7 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
     return AppAsyncBuilder<FolderDetailData>(
       value: detailAsync,
       onData: (detail) => AppScaffold(
-        appBar: AppBar(
-          title: FolderDetailAppBarTitle(
-            title: detail.folder.name,
-            breadcrumb: breadcrumb,
-          ),
-          actions: [
-            if (_canSort(detail))
-              IconButton(
-                tooltip: _isSortMode
-                    ? context.l10n.doneAction
-                    : context.l10n.reorderAction,
-                onPressed: _toggleSortMode,
-                icon: Icon(
-                  _isSortMode
-                      ? Icons.done_outline
-                      : Icons.drag_indicator_outlined,
-                ),
-              ),
-            IconButton(
-              tooltip: context.l10n.editFolder,
-              onPressed: () {
-                unawaited(_editFolder(context, ref, detail.folder));
-              },
-              icon: const Icon(Icons.edit_outlined),
-            ),
-            IconButton(
-              tooltip: context.l10n.deleteFolder,
-              onPressed: () {
-                unawaited(_deleteCurrentFolder(context, ref, widget.folderId));
-              },
-              icon: const Icon(Icons.delete_outline),
-            ),
-          ],
-        ),
+        appBar: _buildAppBar(context, breadcrumb, detail),
         fab: AppFab(
           icon: Icons.add_outlined,
           tooltip: _folderFabLabel(context, detail.contentType),
@@ -134,6 +103,51 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
       _isSortMode = !_isSortMode;
     });
   }
+
+  PreferredSizeWidget _buildAppBar(
+    BuildContext context,
+    List<FolderEntity> breadcrumb,
+    FolderDetailData detail,
+  ) => AppBar(
+    title: FolderDetailAppBarTitle(
+      title: detail.folder.name,
+      breadcrumb: breadcrumb,
+    ),
+    actionsPadding: EdgeInsets.zero,
+    actions: [
+      TopBarActionRow(
+        children: [
+          if (_canSort(detail))
+            TopBarIconButton(
+              tooltip: _isSortMode
+                  ? context.l10n.doneAction
+                  : context.l10n.reorderAction,
+              onPressed: _toggleSortMode,
+              icon: _isSortMode
+                  ? Icons.done_outline
+                  : Icons.drag_indicator_outlined,
+              alignment: Alignment.centerRight,
+            ),
+          TopBarIconButton(
+            tooltip: context.l10n.editFolder,
+            onPressed: () {
+              unawaited(_editFolder(context, ref, detail.folder));
+            },
+            icon: Icons.edit_outlined,
+            alignment: Alignment.centerRight,
+          ),
+          TopBarIconButton(
+            tooltip: context.l10n.deleteFolder,
+            onPressed: () {
+              unawaited(_deleteCurrentFolder(context, ref, widget.folderId));
+            },
+            icon: Icons.delete_outline,
+            alignment: Alignment.centerRight,
+          ),
+        ],
+      ),
+    ],
+  );
 }
 
 class _FolderContent extends ConsumerWidget {

@@ -31,4 +31,40 @@ void main() {
     expect(find.byIcon(Icons.style_outlined), findsOneWidget);
     expect(find.text('8'), findsOneWidget);
   });
+
+  testWidgets('DeckTile shows popup edit and delete actions', (tester) async {
+    var edited = false;
+    var deleted = false;
+
+    await tester.pumpWidget(
+      buildTestApp(
+        home: DeckTile(
+          deck: const DeckEntity(id: 1, name: 'Core Vocabulary'),
+          subtitle: '42 cards · 8 due today',
+          masteryPercentage: 0.5,
+          dueCount: 8,
+          onEdit: () => edited = true,
+          onDelete: () => deleted = true,
+        ),
+      ),
+    );
+
+    await tester.tap(find.byIcon(Icons.more_vert));
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.edit_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.delete_outline), findsOneWidget);
+    expect(find.text('Edit'), findsOneWidget);
+    expect(find.text('Delete deck'), findsOneWidget);
+
+    await tester.tap(find.text('Edit'));
+    await tester.pumpAndSettle();
+    expect(edited, isTrue);
+
+    await tester.tap(find.byIcon(Icons.more_vert));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Delete deck'));
+    await tester.pumpAndSettle();
+    expect(deleted, isTrue);
+  });
 }

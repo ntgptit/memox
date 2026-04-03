@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/core/providers/repository_providers.dart';
@@ -82,16 +83,23 @@ void main() {
     expect(find.text('Korean Core'), findsOneWidget);
     expect(find.text('First 50 phrases'), findsOneWidget);
     expect(find.byTooltip('Reorder'), findsOneWidget);
-    expect(find.byTooltip('Edit'), findsOneWidget);
-    expect(find.byTooltip('Delete deck'), findsOneWidget);
+    expect(find.byIcon(Icons.more_vert), findsOneWidget);
+
+    await tester.tap(find.byIcon(Icons.more_vert));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Edit'), findsOneWidget);
+    expect(find.text('Delete deck'), findsOneWidget);
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
 
     await tester.tap(find.byTooltip('Reorder'));
     await tester.pumpAndSettle();
 
     expect(find.byTooltip('Done'), findsOneWidget);
     expect(find.text('Done'), findsOneWidget);
-    expect(find.byTooltip('Edit'), findsNothing);
-    expect(find.byTooltip('Delete deck'), findsNothing);
+    expect(find.byIcon(Icons.more_vert), findsNothing);
     expect(find.text('Drag items to change their order.'), findsOneWidget);
   });
 }

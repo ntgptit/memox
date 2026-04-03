@@ -108,6 +108,7 @@ class _StudyTopBarHeader extends StatelessWidget {
             onPressed: onClose,
             icon: Icons.close_outlined,
             alignment: Alignment.centerLeft,
+            slotWidth: TopBarIconButton.balancedSlotWidth,
           ),
           Expanded(
             child: _StudyTopBarTitle(
@@ -118,7 +119,7 @@ class _StudyTopBarHeader extends StatelessWidget {
             ),
           ),
           SizedBox(
-            width: TopBarIconButton.slotWidth,
+            width: TopBarIconButton.balancedSlotWidth,
             child: Align(
               alignment: Alignment.centerRight,
               child: _studyTopBarTrailingWidget(

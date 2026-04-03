@@ -22,6 +22,8 @@ import 'package:memox/shared/widgets/feedback/empty_state_view.dart';
 import 'package:memox/shared/widgets/layout/app_scaffold.dart';
 import 'package:memox/shared/widgets/lists/reorder_mode_banner.dart';
 import 'package:memox/shared/widgets/navigation/app_root_bottom_nav.dart';
+import 'package:memox/shared/widgets/navigation/top_bar_action_row.dart';
+import 'package:memox/shared/widgets/navigation/top_bar_icon_button.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -46,6 +48,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return AppScaffold(
       appBar: AppBar(
         title: Text(context.l10n.appName),
+        actionsPadding: EdgeInsets.zero,
         actions: _buildAppBarActions(context, showSortAction),
       ),
       fab: AppFab(
@@ -105,25 +108,32 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   List<Widget> _buildAppBarActions(BuildContext context, bool showSortAction) =>
       [
-        if (showSortAction)
-          IconButton(
-            tooltip: _isSortMode
-                ? context.l10n.doneAction
-                : context.l10n.reorderAction,
-            onPressed: _toggleSortMode,
-            icon: Icon(
-              _isSortMode ? Icons.done_outline : Icons.drag_indicator_outlined,
+        TopBarActionRow(
+          children: [
+            if (showSortAction)
+              TopBarIconButton(
+                tooltip: _isSortMode
+                    ? context.l10n.doneAction
+                    : context.l10n.reorderAction,
+                onPressed: _toggleSortMode,
+                icon: _isSortMode
+                    ? Icons.done_outline
+                    : Icons.drag_indicator_outlined,
+                alignment: Alignment.centerRight,
+              ),
+            TopBarIconButton(
+              tooltip: context.l10n.searchAction,
+              onPressed: () => context.push(SearchScreen.routePath),
+              icon: Icons.search_outlined,
+              alignment: Alignment.centerRight,
             ),
-          ),
-        IconButton(
-          tooltip: context.l10n.searchAction,
-          onPressed: () => context.push(SearchScreen.routePath),
-          icon: const Icon(Icons.search_outlined),
-        ),
-        IconButton(
-          tooltip: context.l10n.profileAction,
-          onPressed: () => context.go(SettingsScreen.routePath),
-          icon: const Icon(Icons.account_circle_outlined),
+            TopBarIconButton(
+              tooltip: context.l10n.profileAction,
+              onPressed: () => context.go(SettingsScreen.routePath),
+              icon: Icons.account_circle_outlined,
+              alignment: Alignment.centerRight,
+            ),
+          ],
         ),
       ];
 }

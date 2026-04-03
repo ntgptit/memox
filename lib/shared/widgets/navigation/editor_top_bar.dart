@@ -40,12 +40,13 @@ class EditorTopBar extends StatelessWidget implements PreferredSizeWidget {
             child: Row(
               children: [
                 SizedBox(
-                  width: TopBarIconButton.slotWidth,
+                  width: TopBarIconButton.balancedSlotWidth,
                   child: TopBarIconButton(
                     tooltip: context.l10n.cancelAction,
                     onPressed: onClose,
                     icon: Icons.arrow_back_outlined,
                     alignment: Alignment.centerLeft,
+                    slotWidth: TopBarIconButton.balancedSlotWidth,
                   ),
                 ),
                 Expanded(
@@ -58,7 +59,7 @@ class EditorTopBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ),
                 SizedBox(
-                  width: TopBarIconButton.slotWidth,
+                  width: TopBarIconButton.balancedSlotWidth,
                   child: Align(
                     alignment: Alignment.centerRight,
                     child: onSave == null

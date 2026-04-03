@@ -8,15 +8,18 @@ class TopBarIconButton extends StatelessWidget {
     required this.onPressed,
     this.tooltip,
     this.alignment = Alignment.center,
+    this.slotWidth = SizeTokens.touchTarget,
     super.key,
   });
 
-  static const double slotWidth = SizeTokens.touchTarget + SpacingTokens.xxxl;
+  static const double balancedSlotWidth =
+      SizeTokens.touchTarget + SpacingTokens.xxxl;
 
   final IconData icon;
   final VoidCallback onPressed;
   final String? tooltip;
   final Alignment alignment;
+  final double slotWidth;
 
   @override
   Widget build(BuildContext context) => SizedBox(
