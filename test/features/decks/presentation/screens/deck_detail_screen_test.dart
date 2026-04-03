@@ -112,6 +112,61 @@ void main() {
     expect(find.text('Search cards'), findsNothing);
   });
 
+  testWidgets('DeckDetailScreen does not overflow on compact viewports', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          folderRepositoryProvider.overrideWithValue(
+            FakeFolderRepository(
+              folders: const [
+                FolderEntity(id: 1, name: 'Root'),
+                FolderEntity(id: 2, name: 'Languages', parentId: 1),
+              ],
+            ),
+          ),
+          deckRepositoryProvider.overrideWithValue(
+            FakeDeckRepository(
+              decks: const [
+                DeckEntity(id: 3, name: 'Korean Core', folderId: 2),
+              ],
+            ),
+          ),
+          flashcardRepositoryProvider.overrideWithValue(
+            FakeFlashcardRepository(
+              cards: [
+                const FlashcardEntity(
+                  id: 1,
+                  deckId: 3,
+                  front: '안녕하세요',
+                  back: 'Hello',
+                ),
+                FlashcardEntity(
+                  id: 2,
+                  deckId: 3,
+                  front: '감사합니다',
+                  back: 'Thank you',
+                  status: CardStatus.mastered,
+                  nextReviewDate: DateTime.now().add(const Duration(days: 1)),
+                ),
+              ],
+            ),
+          ),
+        ],
+        child: buildTestApp(home: const DeckDetailScreen(deckId: 3)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('Korean Core'), findsWidgets);
+    expect(find.text('Study 1 due card'), findsOneWidget);
+  });
+
   testWidgets('DeckDetailScreen loads more cards while scrolling', (
     tester,
   ) async {

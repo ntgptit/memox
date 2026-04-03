@@ -10,6 +10,7 @@ import 'package:memox/core/responsive/responsive_padding.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/cards/domain/entities/flashcard_entity.dart';
+import 'package:memox/features/cards/presentation/providers/cards_by_deck_provider.dart';
 import 'package:memox/features/cards/presentation/screens/card_create_screen.dart';
 import 'package:memox/features/cards/presentation/screens/card_edit_screen.dart';
 import 'package:memox/features/cards/presentation/widgets/card_list_tile.dart';
@@ -17,18 +18,23 @@ import 'package:memox/features/decks/domain/entities/deck_entity.dart';
 import 'package:memox/features/decks/presentation/models/deck_card_sort.dart';
 import 'package:memox/features/decks/presentation/models/deck_detail_view_state.dart';
 import 'package:memox/features/decks/presentation/providers/deck_detail_provider.dart';
+import 'package:memox/features/decks/presentation/providers/deck_stats_provider.dart';
 import 'package:memox/features/decks/presentation/widgets/create_deck_dialog.dart';
 import 'package:memox/features/decks/presentation/widgets/deck_cards_toolbar.dart';
 import 'package:memox/features/decks/presentation/widgets/deck_cards_toolbar_delegate.dart';
 import 'package:memox/features/decks/presentation/widgets/deck_detail_header.dart';
 import 'package:memox/features/decks/presentation/widgets/deck_detail_overview.dart';
 import 'package:memox/features/decks/presentation/widgets/study_mode_sheet.dart';
+import 'package:memox/features/folders/presentation/providers/folder_detail_provider.dart';
+import 'package:memox/features/folders/presentation/providers/folders_provider.dart';
 import 'package:memox/features/folders/presentation/screens/folder_detail_screen.dart';
 import 'package:memox/features/folders/presentation/screens/home_screen.dart';
 import 'package:memox/features/study/presentation/screens/study_screen.dart';
 import 'package:memox/shared/widgets/buttons/app_fab.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
+import 'package:memox/shared/widgets/feedback/app_refresh_indicator.dart';
 import 'package:memox/shared/widgets/feedback/loading_indicator.dart';
+import 'package:memox/shared/widgets/layout/app_scaffold.dart';
 import 'package:memox/shared/widgets/navigation/breadcrumb_bar.dart';
 
 class DeckDetailScreen extends ConsumerStatefulWidget {
@@ -57,6 +63,9 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
     final detailAsync = ref.watch(deckDetailProvider(widget.deckId));
     return AppAsyncBuilder<DeckDetailData>(
       value: detailAsync,
+      onRetry: () {
+        unawaited(_refreshDeckDetail());
+      },
       onData: (detail) => _buildScaffold(context, detail),
     );
   }
@@ -65,77 +74,73 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
     final allCards = _sortedCards(_filteredCards(detail.cards));
     final cards = _visibleCards(allCards);
     final viewState = _viewState(detail);
-    return Scaffold(
-      floatingActionButton: AppFab(
+    return AppScaffold(
+      fab: AppFab(
         icon: Icons.add_outlined,
         tooltip: context.l10n.createCardAction,
         onTap: () =>
             context.push(CardCreateScreen.routeLocation(detail.deck.id)),
       ),
-      body: SafeArea(
-        child: Align(
-          alignment: Alignment.topCenter,
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: context.screenType.maxContentWidth,
-            ),
-            child: NotificationListener<ScrollNotification>(
-              onNotification: (notification) => _handleScrollNotification(
-                context,
-                notification,
-                allCards.length,
+      applyHorizontalPadding: false,
+      body: AppRefreshIndicator(
+        onRefresh: _refreshDeckDetail,
+        child: NotificationListener<ScrollNotification>(
+          onNotification: (notification) => _handleScrollNotification(
+            context,
+            notification,
+            allCards.length,
+            detail.stats.total > 0,
+          ),
+          child: CustomScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            slivers: [
+              DeckDetailHeader(
+                deckName: detail.deck.name,
+                summary: _headerSummary(context, detail, viewState),
+                breadcrumb: _breadcrumbSegments(context, detail),
+                masteryPercentage: detail.stats.mastery,
+                showMasteryBar: detail.stats.total > 0,
+                showCollapsedTitle: _showCollapsedTitle,
+                onEdit: () {
+                  unawaited(_editDeck(detail.deck));
+                },
+                onDelete: () {
+                  unawaited(_deleteDeck(detail.deck.id));
+                },
               ),
-              child: CustomScrollView(
-                slivers: [
-                  DeckDetailHeader(
-                    deckName: detail.deck.name,
-                  summary: _headerSummary(context, detail, viewState),
-                  breadcrumb: _breadcrumbSegments(context, detail),
-                  masteryPercentage: detail.stats.mastery,
-                  showMasteryBar: detail.stats.total > 0,
-                  showCollapsedTitle: _showCollapsedTitle,
-                  onEdit: () {
-                    unawaited(_editDeck(detail.deck));
-                  },
-                  onDelete: () {
-                    unawaited(_deleteDeck(detail.deck.id));
-                  },
-                  ),
-                  DeckDetailOverview(
-                    stats: detail.stats,
-                    viewState: viewState,
-                    onStudyDueCards: () {
-                      unawaited(_openStudy(detail.deck.id));
-                    },
-                    onChooseStudyMode: () {
-                      unawaited(_openStudy(detail.deck.id));
-                    },
-                    onAddFirstCard: () {
-                      unawaited(
-                        context.push(
-                          CardCreateScreen.routeLocation(detail.deck.id),
-                        ),
-                      );
-                    },
-                    onImportBatch: () {
-                      unawaited(
-                        context.push(
-                          CardCreateScreen.batchRouteLocation(detail.deck.id),
-                        ),
-                      );
-                    },
-                  ),
-                  if (viewState != DeckDetailViewState.empty)
-                    _buildCardsHeading(context),
-                  if (viewState != DeckDetailViewState.empty)
-                    _buildToolbar(context),
-                  if (viewState != DeckDetailViewState.empty)
-                    _buildCardsSliver(context, detail, cards),
-                  if (cards.length < allCards.length)
-                    _buildLoadingMoreSliver(context),
-                ],
+              DeckDetailOverview(
+                stats: detail.stats,
+                viewState: viewState,
+                onStudyDueCards: () {
+                  unawaited(_openStudy(detail.deck.id));
+                },
+                onChooseStudyMode: () {
+                  unawaited(_openStudy(detail.deck.id));
+                },
+                onAddFirstCard: () {
+                  unawaited(
+                    context.push(
+                      CardCreateScreen.routeLocation(detail.deck.id),
+                    ),
+                  );
+                },
+                onImportBatch: () {
+                  unawaited(
+                    context.push(
+                      CardCreateScreen.batchRouteLocation(detail.deck.id),
+                    ),
+                  );
+                },
               ),
-            ),
+              if (viewState != DeckDetailViewState.empty)
+                _buildCardsHeading(context),
+              if (viewState != DeckDetailViewState.empty)
+                _buildToolbar(context),
+              if (viewState != DeckDetailViewState.empty)
+                _buildCardsSliver(context, detail, cards),
+              if (cards.length < allCards.length)
+                _buildLoadingMoreSliver(context),
+            ],
           ),
         ),
       ),
@@ -146,6 +151,7 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
     BuildContext context,
     ScrollNotification notification,
     int totalCards,
+    bool showMasteryBar,
   ) {
     if (notification.metrics.axis != Axis.vertical) {
       return false;
@@ -154,7 +160,8 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
     _maybeLoadMoreCards(notification, totalCards);
 
     final nextValue =
-        notification.metrics.pixels >= _collapsedTitleThreshold(context);
+        notification.metrics.pixels >=
+        _collapsedTitleThreshold(context, showMasteryBar);
 
     if (nextValue == _showCollapsedTitle) {
       return false;
@@ -182,10 +189,11 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
     setState(() => _visibleCardCount = nextCount);
   }
 
-  double _collapsedTitleThreshold(BuildContext context) {
-    final expandedHeight = context.isCompact
-        ? SizeTokens.deckDetailHeaderHeightCompact
-        : SizeTokens.deckDetailHeaderHeight;
+  double _collapsedTitleThreshold(BuildContext context, bool showMasteryBar) {
+    final expandedHeight = deckDetailHeaderExpandedHeight(
+      context,
+      showMasteryBar: showMasteryBar,
+    );
     return expandedHeight - SizeTokens.appBarHeight - SpacingTokens.xl;
   }
 
@@ -442,5 +450,32 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
     }
 
     await context.push(StudyScreen.routeLocation(deckId, selectedMode.name));
+  }
+
+  Future<void> _refreshDeckDetail() async {
+    if (mounted) {
+      setState(() => _visibleCardCount = _cardsPageSize);
+    }
+
+    ref
+      ..invalidate(allDecksProvider)
+      ..invalidate(cardsByDeckProvider(widget.deckId))
+      ..invalidate(deckStatsProvider(widget.deckId))
+      ..invalidate(deckDetailProvider(widget.deckId));
+    final decks = await ref.read(allDecksProvider.future);
+    await Future.wait<Object?>([
+      ref.read(cardsByDeckProvider(widget.deckId).future),
+      ref.read(deckStatsProvider(widget.deckId).future),
+    ]);
+
+    for (final deck in decks) {
+      if (deck.id != widget.deckId) {
+        continue;
+      }
+
+      ref.invalidate(folderBreadcrumbProvider(deck.folderId));
+      await ref.read(folderBreadcrumbProvider(deck.folderId).future);
+      return;
+    }
   }
 }

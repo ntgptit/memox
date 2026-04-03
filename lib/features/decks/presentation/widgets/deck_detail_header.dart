@@ -8,16 +8,25 @@ import 'package:memox/shared/widgets/navigation/top_bar_back_button.dart';
 import 'package:memox/shared/widgets/navigation/top_bar_icon_button.dart';
 import 'package:memox/shared/widgets/progress/mastery_bar.dart';
 
-double _expandedHeaderHeight(BuildContext context, bool showMasteryBar) {
+const double _compactMasteryHeightCompensation = SpacingTokens.md;
+
+double deckDetailHeaderExpandedHeight(
+  BuildContext context, {
+  required bool showMasteryBar,
+}) {
   if (!context.isCompact) {
-    return SizeTokens.deckDetailHeaderHeight;
+    return SizeTokens.deckDetailHeaderHeight + SpacingTokens.sm;
   }
 
   if (showMasteryBar) {
-    return SizeTokens.deckDetailHeaderHeightCompact;
+    return SizeTokens.deckDetailHeaderHeightCompact +
+        SpacingTokens.sm +
+        _compactMasteryHeightCompensation;
   }
 
-  return SizeTokens.deckDetailHeaderHeightCompact - SizeTokens.avatarLg;
+  return SizeTokens.deckDetailHeaderHeightCompact -
+      SizeTokens.avatarLg +
+      SpacingTokens.sm;
 }
 
 class DeckDetailHeader extends StatelessWidget {
@@ -52,7 +61,10 @@ class DeckDetailHeader extends StatelessWidget {
       onPressed: () => context.pop<void>(),
       startPadding: context.screenType.screenPadding,
     ),
-    expandedHeight: _expandedHeaderHeight(context, showMasteryBar),
+    expandedHeight: deckDetailHeaderExpandedHeight(
+      context,
+      showMasteryBar: showMasteryBar,
+    ),
     title: showCollapsedTitle
         ? Text(deckName, maxLines: 1, overflow: TextOverflow.ellipsis)
         : null,

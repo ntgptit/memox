@@ -18,6 +18,7 @@ import 'package:memox/features/search/presentation/screens/search_screen.dart';
 import 'package:memox/features/settings/presentation/screens/settings_screen.dart';
 import 'package:memox/shared/widgets/buttons/app_fab.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
+import 'package:memox/shared/widgets/feedback/app_refresh_indicator.dart';
 import 'package:memox/shared/widgets/feedback/empty_state_view.dart';
 import 'package:memox/shared/widgets/layout/app_scaffold.dart';
 import 'package:memox/shared/widgets/lists/reorder_mode_banner.dart';
@@ -64,6 +65,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         children: [
           HomeGreetingCard(
             summary: dueSummary,
+            onRetry: () {
+              unawaited(_refreshHomeData(ref));
+            },
             onReviewNow: (deck) => context.push(
               FolderDetailScreen.routeLocation(
                 deck.folderId,
@@ -75,10 +79,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           Expanded(
             child: AppAsyncBuilder<List<FolderEntity>>(
               value: foldersAsync,
+              onRetry: () {
+                unawaited(_refreshHomeData(ref));
+              },
               onData: (folders) => _HomeFolderSection(
                 folders: folders,
                 isSortMode: _isSortMode,
                 onToggleSort: _toggleSortMode,
+                onRefresh: () => _refreshHomeData(ref),
                 onTap: (folder) =>
                     context.push(FolderDetailScreen.routeLocation(folder.id)),
                 onEdit: (folder) {
@@ -143,6 +151,7 @@ class _HomeFolderSection extends StatelessWidget {
     required this.folders,
     required this.isSortMode,
     required this.onToggleSort,
+    required this.onRefresh,
     required this.onTap,
     required this.onEdit,
     required this.onDelete,
@@ -152,6 +161,7 @@ class _HomeFolderSection extends StatelessWidget {
   final List<FolderEntity> folders;
   final bool isSortMode;
   final VoidCallback onToggleSort;
+  final RefreshCallback onRefresh;
   final ValueChanged<FolderEntity> onTap;
   final ValueChanged<FolderEntity> onEdit;
   final ValueChanged<FolderEntity> onDelete;
@@ -160,10 +170,13 @@ class _HomeFolderSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (folders.isEmpty) {
-      return EmptyStateView(
-        icon: Icons.folder_open_outlined,
-        title: context.l10n.homeFoldersEmptyTitle,
-        subtitle: context.l10n.homeFoldersEmptySubtitle,
+      return AppRefreshScrollView(
+        onRefresh: onRefresh,
+        child: EmptyStateView(
+          icon: Icons.folder_open_outlined,
+          title: context.l10n.homeFoldersEmptyTitle,
+          subtitle: context.l10n.homeFoldersEmptySubtitle,
+        ),
       );
     }
 
@@ -189,6 +202,7 @@ class _HomeFolderSection extends StatelessWidget {
           child: FolderListView(
             folders: folders,
             isSortMode: isSortMode,
+            onRefresh: onRefresh,
             onTap: onTap,
             onEdit: onEdit,
             onDelete: onDelete,
@@ -296,3 +310,16 @@ T? _asyncValueOrNull<T>(AsyncValue<T> value) => switch (value) {
   AsyncData<T>(:final value) => value,
   _ => null,
 };
+
+Future<void> _refreshHomeData(WidgetRef ref) async {
+  ref
+    ..invalidate(foldersProvider)
+    ..invalidate(allDecksProvider)
+    ..invalidate(allFlashcardsProvider)
+    ..invalidate(homeDueSummaryProvider);
+  await Future.wait<Object?>([
+    ref.read(foldersProvider.future),
+    ref.read(allDecksProvider.future),
+    ref.read(allFlashcardsProvider.future),
+  ]);
+}

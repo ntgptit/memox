@@ -37,50 +37,90 @@ class GuessRoundView extends StatelessWidget {
         const SizedBox(height: SpacingTokens.xl),
         Expanded(
           flex: 6,
-          child: Column(
-            children: [
-              ...state.currentQuestion.options.asMap().entries.map(
-                (entry) => Padding(
-                  padding: const EdgeInsets.only(bottom: SpacingTokens.sm),
-                  child: GuessOptionButton(
-                    option: entry.value,
-                    prefixLabel: _optionPrefix(context, entry.key),
-                    isAnswered: state.isAnswered,
-                    isSelected: state.selectedOptionIndex == entry.key,
-                    isCorrectAnswer: state.isAnswered && entry.value.isCorrect,
-                    isWrongSelection:
-                        state.isAnswered &&
-                        state.selectedOptionIndex == entry.key &&
-                        state.isCorrect == false,
-                    onTap: () => onSelect(entry.key),
-                  ),
-                ),
-              ),
-              const Spacer(),
-              if (state.canContinue)
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextLinkButton(
-                    label: context.l10n.guessContinueAction,
-                    onTap: onContinue,
-                    showTrailingArrow: true,
-                  ),
-                ),
-              if (!state.isAnswered)
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextLinkButton(
-                    label: context.l10n.guessSkipAction,
-                    onTap: onSkip,
-                    showTrailingArrow: true,
-                  ),
-                ),
-            ],
+          child: _GuessAnswerArea(
+            state: state,
+            onSelect: onSelect,
+            onSkip: onSkip,
+            onContinue: onContinue,
           ),
         ),
       ],
     ),
   );
+}
+
+class _GuessAnswerArea extends StatelessWidget {
+  const _GuessAnswerArea({
+    required this.state,
+    required this.onSelect,
+    required this.onSkip,
+    required this.onContinue,
+  });
+
+  final GuessState state;
+  final ValueChanged<int> onSelect;
+  final VoidCallback onSkip;
+  final VoidCallback onContinue;
+
+  @override
+  Widget build(BuildContext context) {
+    final footerAction = _footerAction(context);
+
+    return Column(
+      children: [
+        Expanded(
+          child: SingleChildScrollView(
+            child: Column(
+              children: [
+                ...state.currentQuestion.options.asMap().entries.map(
+                  (entry) => Padding(
+                    padding: const EdgeInsets.only(bottom: SpacingTokens.sm),
+                    child: GuessOptionButton(
+                      option: entry.value,
+                      prefixLabel: _optionPrefix(context, entry.key),
+                      isAnswered: state.isAnswered,
+                      isSelected: state.selectedOptionIndex == entry.key,
+                      isCorrectAnswer:
+                          state.isAnswered && entry.value.isCorrect,
+                      isWrongSelection:
+                          state.isAnswered &&
+                          state.selectedOptionIndex == entry.key &&
+                          state.isCorrect == false,
+                      onTap: () => onSelect(entry.key),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        if (footerAction != null) ...[
+          const SizedBox(height: SpacingTokens.sm),
+          Align(alignment: Alignment.centerLeft, child: footerAction),
+        ],
+      ],
+    );
+  }
+
+  Widget? _footerAction(BuildContext context) {
+    if (state.canContinue) {
+      return TextLinkButton(
+        label: context.l10n.guessContinueAction,
+        onTap: onContinue,
+        showTrailingArrow: true,
+      );
+    }
+
+    if (!state.isAnswered) {
+      return TextLinkButton(
+        label: context.l10n.guessSkipAction,
+        onTap: onSkip,
+        showTrailingArrow: true,
+      );
+    }
+
+    return null;
+  }
 }
 
 String _optionPrefix(BuildContext context, int index) => switch (index) {

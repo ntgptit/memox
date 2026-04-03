@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
+import 'package:memox/features/statistics/domain/value_objects/date_range.dart';
 import 'package:memox/features/statistics/presentation/providers/statistics_date_range_provider.dart';
 import 'package:memox/features/statistics/presentation/providers/study_stats_provider.dart';
 import 'package:memox/features/statistics/presentation/widgets/difficult_cards_section.dart';
@@ -12,6 +15,7 @@ import 'package:memox/features/statistics/presentation/widgets/statistics_practi
 import 'package:memox/features/statistics/presentation/widgets/streak_hero_card.dart';
 import 'package:memox/features/statistics/presentation/widgets/weekly_bar_chart_section.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
+import 'package:memox/shared/widgets/feedback/app_refresh_indicator.dart';
 import 'package:memox/shared/widgets/layout/spacing.dart';
 
 class StatisticsContentView extends ConsumerWidget {
@@ -24,48 +28,63 @@ class StatisticsContentView extends ConsumerWidget {
 
     return AppAsyncBuilder<StatisticsScreenData>(
       value: statsAsync,
+      onRetry: () {
+        unawaited(_refreshStatistics(ref, range));
+      },
       onData: (data) {
         if (!data.hasHistory) {
-          return const StatisticsEmptyView();
+          return AppRefreshScrollView(
+            onRefresh: () => _refreshStatistics(ref, range),
+            child: const StatisticsEmptyView(),
+          );
         }
 
-        return SingleChildScrollView(
-          padding: const EdgeInsets.only(
-            top: SpacingTokens.xl,
-            bottom: SpacingTokens.xxxl,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              StatisticsHeader(
-                selectedRange: range,
-                onRangeSelected: (value) {
-                  ref
-                          .read(statisticsDateRangeSelectionProvider.notifier)
-                          .selectedRange =
-                      value;
-                },
-              ),
-              const Gap.section(),
-              StreakHeroCard(stats: data.stats),
-              const Gap.section(),
-              WeeklyBarChartSection(activities: data.stats.weeklyActivity),
-              const Gap.section(),
-              MasteryDonutChartSection(mastery: data.stats.mastery),
-              const Gap.section(),
-              ModeUsageChart(modeUsage: data.stats.modeUsage),
-              const Gap.section(),
-              DifficultCardsSection(
-                cards: data.stats.difficultCards,
-                onPractice: () => showStatisticsPracticeFlow(
-                  context,
-                  data.stats.difficultCards,
+        return AppRefreshIndicator(
+          onRefresh: () => _refreshStatistics(ref, range),
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.only(
+              top: SpacingTokens.xl,
+              bottom: SpacingTokens.xxxl,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                StatisticsHeader(
+                  selectedRange: range,
+                  onRangeSelected: (value) {
+                    ref
+                            .read(statisticsDateRangeSelectionProvider.notifier)
+                            .selectedRange =
+                        value;
+                  },
                 ),
-              ),
-            ],
+                const Gap.section(),
+                StreakHeroCard(stats: data.stats),
+                const Gap.section(),
+                WeeklyBarChartSection(activities: data.stats.weeklyActivity),
+                const Gap.section(),
+                MasteryDonutChartSection(mastery: data.stats.mastery),
+                const Gap.section(),
+                ModeUsageChart(modeUsage: data.stats.modeUsage),
+                const Gap.section(),
+                DifficultCardsSection(
+                  cards: data.stats.difficultCards,
+                  onPractice: () => showStatisticsPracticeFlow(
+                    context,
+                    data.stats.difficultCards,
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },
     );
   }
+}
+
+Future<void> _refreshStatistics(WidgetRef ref, DateRange range) async {
+  ref.invalidate(statisticsScreenDataProvider(range));
+  await ref.read(statisticsScreenDataProvider(range).future);
 }

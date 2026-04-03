@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
@@ -6,6 +8,7 @@ import 'package:memox/features/cards/presentation/providers/cards_by_deck_provid
 import 'package:memox/features/cards/presentation/widgets/card_editor_view.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
 import 'package:memox/shared/widgets/feedback/empty_state_view.dart';
+import 'package:memox/shared/widgets/layout/app_scaffold.dart';
 import 'package:memox/shared/widgets/navigation/editor_top_bar.dart';
 
 class CardEditScreen extends ConsumerWidget {
@@ -25,6 +28,9 @@ class CardEditScreen extends ConsumerWidget {
     final cardsAsync = ref.watch(cardsByDeckProvider(deckId));
     return AppAsyncBuilder<List<FlashcardEntity>>(
       value: cardsAsync,
+      onRetry: () {
+        unawaited(_refreshCards(ref, deckId));
+      },
       onData: (cards) {
         FlashcardEntity? card;
 
@@ -36,11 +42,12 @@ class CardEditScreen extends ConsumerWidget {
         }
 
         if (card == null) {
-          return Scaffold(
+          return AppScaffold(
             appBar: EditorTopBar(
               title: context.l10n.editCardTitle,
               onClose: () => context.pop<void>(),
             ),
+            applyHorizontalPadding: false,
             body: EmptyStateView(
               icon: Icons.style_outlined,
               title: context.l10n.cardMissingTitle,
@@ -69,12 +76,13 @@ class _CardEditScaffoldState extends State<_CardEditScaffold> {
   final _editorKey = GlobalKey<_CardEditBodyState>();
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) => AppScaffold(
     appBar: EditorTopBar(
       title: context.l10n.editCardTitle,
       onClose: () => context.pop<void>(),
       onSave: () => _editorKey.currentState?.save(),
     ),
+    applyHorizontalPadding: false,
     body: CardEditBody(
       key: _editorKey,
       deckId: widget.deckId,
@@ -110,4 +118,9 @@ class _CardEditBodyState extends State<CardEditBody> {
     deckId: widget.deckId,
     initialCard: widget.card,
   );
+}
+
+Future<void> _refreshCards(WidgetRef ref, int deckId) async {
+  ref.invalidate(cardsByDeckProvider(deckId));
+  await ref.read(cardsByDeckProvider(deckId).future);
 }

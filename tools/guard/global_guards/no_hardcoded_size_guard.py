@@ -13,8 +13,9 @@ class NoHardcodedSizeGuard(BaseGuard):
     DESCRIPTION = 'Use SizeTokens or SpacingTokens instead of numeric widget sizes.'
     DEFAULT_SEVERITY = Severity.ERROR
 
+    SIZED_BOX_PATTERN = re.compile(r'SizedBox\([^)]*(height|width)\s*:\s*\d')
     PATTERNS = (
-        re.compile(r'SizedBox\([^)]*(height|width)\s*:\s*\d'),
+        SIZED_BOX_PATTERN,
         re.compile(r'\b(size|width|height)\s*:\s*\d+(?:\.\d+)?\b'),
         re.compile(r'EdgeInsets\.(?:all|symmetric|only)\([^)]*\d'),
     )
@@ -41,12 +42,17 @@ class NoHardcodedSizeGuard(BaseGuard):
             if not any(pattern.search(line) for pattern in self.PATTERNS):
                 continue
 
+            message = 'Hardcoded size detected. Dùng SizeTokens.* hoặc SpacingTokens.*'
+
+            if self.SIZED_BOX_PATTERN.search(line):
+                message = 'Hardcoded SizedBox spacing detected. Dùng Gap.* và SpacingTokens.*'
+
             violations.append(
                 Violation(
                     file_path=relative,
                     line_number=index,
                     line_content=line,
-                    message='Hardcoded size detected. Dùng SizeTokens.* hoặc SpacingTokens.*',
+                    message=message,
                     guard_id=self.GUARD_ID,
                     severity=self.severity,
                 ),

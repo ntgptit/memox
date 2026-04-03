@@ -17,6 +17,7 @@ class DeckListView extends StatelessWidget {
     required this.onTap,
     required this.onEdit,
     required this.onDelete,
+    this.onRefresh,
     this.isSortMode = false,
     this.highlightedDeckId,
     super.key,
@@ -27,6 +28,7 @@ class DeckListView extends StatelessWidget {
   final ValueChanged<DeckEntity> onTap;
   final ValueChanged<DeckEntity> onEdit;
   final ValueChanged<DeckEntity> onDelete;
+  final RefreshCallback? onRefresh;
   final bool isSortMode;
   final int? highlightedDeckId;
 
@@ -34,6 +36,7 @@ class DeckListView extends StatelessWidget {
   Widget build(BuildContext context) => ReorderableListWidget<DeckEntity>(
     items: decks,
     onReorder: onReorder,
+    onRefresh: onRefresh,
     isReorderEnabled: isSortMode,
     itemBuilder: (context, deck, index) => Padding(
       padding: const EdgeInsets.only(bottom: SpacingTokens.sm),

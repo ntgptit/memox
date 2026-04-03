@@ -16,6 +16,7 @@ class FolderListView extends ConsumerWidget {
     required this.onEdit,
     required this.onDelete,
     required this.onReorder,
+    this.onRefresh,
     this.isSortMode = false,
     super.key,
   });
@@ -25,49 +26,54 @@ class FolderListView extends ConsumerWidget {
   final ValueChanged<FolderEntity> onEdit;
   final ValueChanged<FolderEntity> onDelete;
   final ReorderCallback onReorder;
+  final RefreshCallback? onRefresh;
   final bool isSortMode;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => ReorderableListWidget<FolderEntity>(
-      items: folders,
-      onReorder: onReorder,
-      isReorderEnabled: isSortMode,
-      itemBuilder: (context, folder, index) {
-        final detail = switch (ref.watch(folderDetailProvider(folder.id))) {
-          AsyncData<FolderDetailData>(:final value) => value,
-          _ => null,
-        };
-        final subtitle = detail == null
-            ? context.l10n.folderEmptyStatus
-            : _subtitle(context, detail);
+  Widget build(BuildContext context, WidgetRef ref) =>
+      ReorderableListWidget<FolderEntity>(
+        items: folders,
+        onReorder: onReorder,
+        onRefresh: onRefresh,
+        isReorderEnabled: isSortMode,
+        itemBuilder: (context, folder, index) {
+          final detail = switch (ref.watch(folderDetailProvider(folder.id))) {
+            AsyncData<FolderDetailData>(:final value) => value,
+            _ => null,
+          };
+          final subtitle = detail == null
+              ? context.l10n.folderEmptyStatus
+              : _subtitle(context, detail);
 
-        return Padding(
-          padding: const EdgeInsets.only(bottom: SpacingTokens.sm),
-          child: FadeInWidget(
-            delay: Duration(
-              milliseconds: DurationTokens.staggerDelay.inMilliseconds * index,
+          return Padding(
+            padding: const EdgeInsets.only(bottom: SpacingTokens.sm),
+            child: FadeInWidget(
+              delay: Duration(
+                milliseconds:
+                    DurationTokens.staggerDelay.inMilliseconds * index,
+              ),
+              child: FolderTile(
+                folder: folder,
+                subtitle: subtitle,
+                masteryPercentage: detail?.masteryPercentage ?? 0,
+                onTap: isSortMode ? null : () => onTap(folder),
+                onEdit: isSortMode ? null : () => onEdit(folder),
+                onDelete: isSortMode ? null : () => onDelete(folder),
+              ),
             ),
-            child: FolderTile(
-              folder: folder,
-              subtitle: subtitle,
-              masteryPercentage: detail?.masteryPercentage ?? 0,
-              onTap: isSortMode ? null : () => onTap(folder),
-              onEdit: isSortMode ? null : () => onEdit(folder),
-              onDelete: isSortMode ? null : () => onDelete(folder),
-            ),
-          ),
-        );
-      },
-    );
+          );
+        },
+      );
 
-  String _subtitle(BuildContext context, FolderDetailData detail) => switch (detail.contentType) {
-      ContentType.subfolders => context.l10n.folderSubfolderCount(
-        detail.subfolderCount,
-      ),
-      ContentType.decks => context.l10n.folderDeckSubtitle(
-        detail.deckCount,
-        detail.totalCards,
-      ),
-      ContentType.empty => context.l10n.folderEmptyStatus,
-    };
+  String _subtitle(BuildContext context, FolderDetailData detail) =>
+      switch (detail.contentType) {
+        ContentType.subfolders => context.l10n.folderSubfolderCount(
+          detail.subfolderCount,
+        ),
+        ContentType.decks => context.l10n.folderDeckSubtitle(
+          detail.deckCount,
+          detail.totalCards,
+        ),
+        ContentType.empty => context.l10n.folderEmptyStatus,
+      };
 }

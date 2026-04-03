@@ -6,6 +6,7 @@ import 'package:memox/features/study/presentation/screens/guess_mode_screen.dart
 import 'package:memox/features/study/presentation/screens/match_mode_screen.dart';
 import 'package:memox/features/study/presentation/screens/recall_mode_screen.dart';
 import 'package:memox/features/study/presentation/widgets/study_placeholder_view.dart';
+import 'package:memox/shared/widgets/layout/app_scaffold.dart';
 
 class StudyScreen extends StatelessWidget {
   const StudyScreen({this.deckId, this.mode, super.key});
@@ -38,7 +39,7 @@ class StudyScreen extends StatelessWidget {
       return FillModeScreen(deckId: deckId!);
     }
 
-    return Scaffold(
+    return AppScaffold(
       appBar: AppBar(
         title: Text(mode?.label(context.l10n) ?? context.l10n.studyTitle),
       ),

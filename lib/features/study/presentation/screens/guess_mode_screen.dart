@@ -10,6 +10,7 @@ import 'package:memox/shared/widgets/buttons/secondary_button.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
 import 'package:memox/shared/widgets/feedback/empty_state_view.dart';
 import 'package:memox/shared/widgets/feedback/session_complete_view.dart';
+import 'package:memox/shared/widgets/layout/app_scaffold.dart';
 import 'package:memox/shared/widgets/navigation/study_top_bar.dart';
 
 class GuessModeScreen extends ConsumerWidget {
@@ -22,7 +23,12 @@ class GuessModeScreen extends ConsumerWidget {
     final state = ref.watch(guessSessionProvider(deckId));
     return AppAsyncBuilder<GuessState>(
       value: state,
-      onData: (data) => Scaffold(
+      onRetry: () {
+        unawaited(
+          ref.read(guessSessionProvider(deckId).notifier).startSession(),
+        );
+      },
+      onData: (data) => AppScaffold(
         appBar: StudyTopBar(
           title: context.l10n.modeGuess,
           current: data.isComplete ? data.totalCards : data.displayIndex,
@@ -31,6 +37,8 @@ class GuessModeScreen extends ConsumerWidget {
           showProgress: data.cards.isNotEmpty && !data.isComplete,
           onClose: () => unawaited(_handleClose(context)),
         ),
+        applyBottomPadding: false,
+        applyHorizontalPadding: false,
         body: _buildBody(context, ref, deckId, data),
       ),
     );

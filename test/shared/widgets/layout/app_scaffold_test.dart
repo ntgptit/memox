@@ -54,4 +54,43 @@ void main() {
       closeTo(SizeTokens.fabSize + SpacingTokens.lg, 0.01),
     );
   });
+
+  testWidgets('AppScaffold can disable bottom breathing room', (tester) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(
+      buildTestApp(
+        home: AppScaffold(
+          applyBottomPadding: false,
+          body: Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(key: const Key('flush-bottom-box'), height: 40),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final boxRect = tester.getRect(find.byKey(const Key('flush-bottom-box')));
+    expect(844 - boxRect.bottom, closeTo(0, 0.01));
+  });
+
+  testWidgets('AppScaffold forwards drawer and endDrawer to Scaffold', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      buildTestApp(
+        home: const AppScaffold(
+          drawer: Drawer(),
+          endDrawer: Drawer(),
+          body: SizedBox.shrink(),
+        ),
+      ),
+    );
+
+    final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
+    expect(scaffold.drawer, isNotNull);
+    expect(scaffold.endDrawer, isNotNull);
+  });
 }

@@ -14,6 +14,9 @@ class NoHardcodedRadiusGuard(BaseGuard):
     DEFAULT_SEVERITY = Severity.ERROR
 
     PATTERN = re.compile(r'BorderRadius\.(?:all|circular)\(\s*[^)]*\d')
+    WRONG_TOKEN_PATTERN = re.compile(
+        r'BorderRadius\.(?:all|circular)\(\s*[^)]*(?:SpacingTokens|SizeTokens|DurationTokens|OpacityTokens|ColorTokens)\.',
+    )
     WHITELIST = ('lib/core/theme/tokens/radius_tokens.dart', 'test/')
 
     def check_file(self, file_path: Path, lines: list[str]) -> list[Violation]:
@@ -30,7 +33,7 @@ class NoHardcodedRadiusGuard(BaseGuard):
             if stripped.startswith('//') or stripped.startswith('///'):
                 continue
 
-            if not self.PATTERN.search(line):
+            if not self.PATTERN.search(line) and not self.WRONG_TOKEN_PATTERN.search(line):
                 continue
 
             violations.append(
@@ -38,7 +41,7 @@ class NoHardcodedRadiusGuard(BaseGuard):
                     file_path=relative,
                     line_number=index,
                     line_content=line,
-                    message='Hardcoded radius. Dùng RadiusTokens.*',
+                    message='Radius phải dùng BorderRadius.circular(RadiusTokens.*)',
                     guard_id=self.GUARD_ID,
                     severity=self.severity,
                 ),

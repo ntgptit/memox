@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:memox/core/theme/tokens/radius_tokens.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/shared/widgets/lists/app_list_tile.dart';
@@ -40,7 +41,7 @@ class ChoiceBottomSheet<T> extends StatelessWidget {
             height: SizeTokens.bottomSheetHandle,
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.outline,
-              borderRadius: BorderRadius.circular(SizeTokens.bottomSheetHandle),
+              borderRadius: BorderRadius.circular(RadiusTokens.full),
             ),
           ),
           const SizedBox(height: SpacingTokens.lg),

@@ -12,6 +12,7 @@ import 'package:memox/features/study/presentation/widgets/fill_round_view.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
 import 'package:memox/shared/widgets/feedback/empty_state_view.dart';
 import 'package:memox/shared/widgets/feedback/session_complete_view.dart';
+import 'package:memox/shared/widgets/layout/app_scaffold.dart';
 import 'package:memox/shared/widgets/navigation/study_top_bar.dart';
 
 class FillModeScreen extends ConsumerStatefulWidget {
@@ -37,10 +38,18 @@ class _FillModeScreenState extends ConsumerState<FillModeScreen> {
   @override
   Widget build(BuildContext context) {
     final provider = fillSessionProvider(widget.deckId);
-    ref.listen<AsyncValue<FillState>>(provider, (_, next) => _handleState(next));
+    ref.listen<AsyncValue<FillState>>(
+      provider,
+      (_, next) => _handleState(next),
+    );
     return AppAsyncBuilder<FillState>(
       value: ref.watch(provider),
-      onData: (state) => Scaffold(
+      onRetry: () {
+        unawaited(
+          ref.read(fillSessionProvider(widget.deckId).notifier).startSession(),
+        );
+      },
+      onData: (state) => AppScaffold(
         appBar: StudyTopBar(
           title: context.l10n.modeFill,
           current: state.isComplete ? state.totalCards : state.displayIndex,
@@ -49,7 +58,16 @@ class _FillModeScreenState extends ConsumerState<FillModeScreen> {
           streakThreshold: 3,
           onClose: () => unawaited(_handleClose(context)),
         ),
-        body: _buildBody(context, ref, widget.deckId, state, _controller, _focusNode),
+        applyBottomPadding: false,
+        applyHorizontalPadding: false,
+        body: _buildBody(
+          context,
+          ref,
+          widget.deckId,
+          state,
+          _controller,
+          _focusNode,
+        ),
       ),
     );
   }
@@ -188,8 +206,10 @@ Widget _buildBody(
     isNumericAnswer: isNumericAnswer,
     onInputChanged: (text) =>
         ref.read(fillSessionProvider(deckId).notifier).updateInput(text),
-    onSubmit: () => ref.read(fillSessionProvider(deckId).notifier).submitAnswer(),
-    onShowHint: () => ref.read(fillSessionProvider(deckId).notifier).toggleHint(),
+    onSubmit: () =>
+        ref.read(fillSessionProvider(deckId).notifier).submitAnswer(),
+    onShowHint: () =>
+        ref.read(fillSessionProvider(deckId).notifier).toggleHint(),
     onAcceptClose: () =>
         ref.read(fillSessionProvider(deckId).notifier).acceptClose(),
     onRejectClose: () =>

@@ -5,6 +5,7 @@ import 'package:memox/features/study/domain/fill/fill_engine.dart';
 import 'package:memox/features/study/presentation/widgets/fill_prompt_sentence.dart';
 import 'package:memox/shared/widgets/buttons/text_link_button.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
+import 'package:memox/shared/widgets/layout/spacing.dart';
 
 class FillPromptCard extends StatelessWidget {
   const FillPromptCard({
@@ -34,10 +35,10 @@ class FillPromptCard extends StatelessWidget {
           ),
           textAlign: TextAlign.center,
         ),
-        const SizedBox(height: SpacingTokens.md),
+        const Gap.md(),
         FillPromptSentence(prompt: prompt, showAnswer: showAnswer),
         if (showHint && prompt.hint != null) ...[
-          const SizedBox(height: SpacingTokens.md),
+          const Gap.md(),
           Text(
             context.l10n.fillHintValue(prompt.hint!),
             style: context.textTheme.bodySmall,
@@ -45,7 +46,7 @@ class FillPromptCard extends StatelessWidget {
           ),
         ],
         if (!showHint && prompt.hint != null) ...[
-          const SizedBox(height: SpacingTokens.md),
+          const Gap.md(),
           Center(
             child: TextLinkButton(
               label: context.l10n.fillShowHintAction,

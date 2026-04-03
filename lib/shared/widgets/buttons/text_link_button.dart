@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
+import 'package:memox/core/theme/tokens/radius_tokens.dart';
+import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 
 class TextLinkButton extends StatelessWidget {
@@ -20,28 +22,33 @@ class TextLinkButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final accentColor = color ?? context.colors.primary;
 
-    return TextButton(
-      onPressed: onTap,
-      style: TextButton.styleFrom(
-        foregroundColor: accentColor,
-        padding: EdgeInsets.zero,
-        minimumSize: Size.zero,
-        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        visualDensity: VisualDensity.compact,
-        alignment: Alignment.centerLeft,
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(
-            label,
-            style: context.appTextStyles.tagText.copyWith(color: accentColor),
+    return Material(
+      color: context.colors.surface.withValues(alpha: 0),
+      borderRadius: BorderRadius.circular(RadiusTokens.full),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(RadiusTokens.full),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(minHeight: SizeTokens.touchTarget),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: SpacingTokens.xs),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  label,
+                  style: context.appTextStyles.tagText.copyWith(
+                    color: accentColor,
+                  ),
+                ),
+                if (showTrailingArrow) ...[
+                  const SizedBox(width: SpacingTokens.xs),
+                  Icon(Icons.arrow_forward, color: accentColor),
+                ],
+              ],
+            ),
           ),
-          if (showTrailingArrow) ...[
-            const SizedBox(width: SpacingTokens.xs),
-            Icon(Icons.arrow_forward, color: accentColor),
-          ],
-        ],
+        ),
       ),
     );
   }

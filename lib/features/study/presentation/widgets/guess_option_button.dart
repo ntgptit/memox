@@ -38,6 +38,7 @@ class GuessOptionButton extends StatelessWidget {
     child: AnimatedContainer(
       duration: DurationTokens.normal,
       curve: Curves.easeInOut,
+      height: SizeTokens.inputHeight,
       decoration: BoxDecoration(
         color: _guessOptionHighlightColor(
           context,
@@ -62,22 +63,19 @@ class GuessOptionButton extends StatelessWidget {
         child: InkWell(
           borderRadius: BorderRadius.circular(RadiusTokens.input),
           onTap: onTap,
-          child: SizedBox(
-            height: SizeTokens.inputHeight,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: SpacingTokens.md),
-              child: _GuessOptionContent(
-                option: option,
-                prefixLabel: prefixLabel,
-                contentColor: _guessOptionContentColor(
-                  context,
-                  isCorrectAnswer: isCorrectAnswer,
-                  isWrongSelection: isWrongSelection,
-                ),
-                trailingIcon: _guessOptionTrailingIcon(
-                  isCorrectAnswer: isCorrectAnswer,
-                  isWrongSelection: isWrongSelection,
-                ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: SpacingTokens.md),
+            child: _GuessOptionContent(
+              option: option,
+              prefixLabel: prefixLabel,
+              contentColor: _guessOptionContentColor(
+                context,
+                isCorrectAnswer: isCorrectAnswer,
+                isWrongSelection: isWrongSelection,
+              ),
+              trailingIcon: _guessOptionTrailingIcon(
+                isCorrectAnswer: isCorrectAnswer,
+                isWrongSelection: isWrongSelection,
               ),
             ),
           ),

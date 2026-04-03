@@ -11,6 +11,7 @@ import 'package:memox/features/study/presentation/widgets/match_star_rating.dart
 import 'package:memox/shared/widgets/buttons/secondary_button.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
 import 'package:memox/shared/widgets/feedback/session_complete_view.dart';
+import 'package:memox/shared/widgets/layout/app_scaffold.dart';
 import 'package:memox/shared/widgets/navigation/study_top_bar.dart';
 
 class MatchModeScreen extends ConsumerWidget {
@@ -23,7 +24,10 @@ class MatchModeScreen extends ConsumerWidget {
     final state = ref.watch(matchSessionProvider(deckId));
     return AppAsyncBuilder<MatchState>(
       value: state,
-      onData: (data) => Scaffold(
+      onRetry: () {
+        unawaited(ref.read(matchSessionProvider(deckId).notifier).startGame());
+      },
+      onData: (data) => AppScaffold(
         appBar: StudyTopBar(
           title: context.l10n.modeMatch,
           current: data.matchedCount,
@@ -40,6 +44,8 @@ class MatchModeScreen extends ConsumerWidget {
           showProgress: false,
           onClose: () => unawaited(_handleClose(context)),
         ),
+        applyBottomPadding: false,
+        applyHorizontalPadding: false,
         body: data.isComplete
             ? _buildCompletionView(
                 context,

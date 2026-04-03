@@ -16,6 +16,7 @@ class AppDialog extends StatelessWidget {
       horizontal: context.screenType.screenPadding,
       vertical: SpacingTokens.xl,
     ),
+    scrollable: true,
     constraints: BoxConstraints(maxWidth: _maxWidth(context)),
     title: title,
     content: _content,

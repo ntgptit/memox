@@ -57,13 +57,18 @@ class _ColorChoice extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         customBorder: const CircleBorder(),
-        child: Ink(
-          width: SizeTokens.avatarLg,
-          height: SizeTokens.avatarLg,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-          child: isSelected
-              ? Icon(Icons.check, color: iconColor)
-              : const SizedBox.shrink(),
+        child: SizedBox.square(
+          dimension: SizeTokens.touchTarget,
+          child: Center(
+            child: Ink(
+              width: SizeTokens.avatarLg,
+              height: SizeTokens.avatarLg,
+              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+              child: isSelected
+                  ? Icon(Icons.check, color: iconColor)
+                  : const SizedBox.shrink(),
+            ),
+          ),
         ),
       ),
     );

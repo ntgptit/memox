@@ -7,6 +7,7 @@ import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/decks/domain/entities/deck_entity.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
 import 'package:memox/shared/widgets/chips/tag_chip.dart';
+import 'package:memox/shared/widgets/layout/spacing.dart';
 import 'package:memox/shared/widgets/progress/mastery_bar.dart';
 
 class DeckTile extends StatelessWidget {
@@ -47,7 +48,7 @@ class DeckTile extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _DeckGlyph(color: accentColor),
-              const SizedBox(width: SpacingTokens.md),
+              const Gap.md(),
               Expanded(
                 child: _DeckCopy(
                   deck: deck,
@@ -56,20 +57,20 @@ class DeckTile extends StatelessWidget {
                 ),
               ),
               if (onEdit != null || onDelete != null) ...[
-                const SizedBox(width: SpacingTokens.md),
+                const Gap.md(),
                 _DeckActions(onEdit: onEdit, onDelete: onDelete),
               ],
             ],
           ),
           if (deck.tags.isNotEmpty) ...[
-            const SizedBox(height: SpacingTokens.md),
+            const Gap.md(),
             Wrap(
               spacing: SpacingTokens.chipGap,
               runSpacing: SpacingTokens.chipGap,
               children: deck.tags.map((tag) => TagChip(label: tag)).toList(),
             ),
           ],
-          const SizedBox(height: SpacingTokens.md),
+          const Gap.md(),
           _DeckProgress(
             masteryPercentage: masteryPercentage,
             accentColor: accentColor,
@@ -101,13 +102,10 @@ class _DeckCopy extends StatelessWidget {
           Expanded(
             child: Text(deck.name, style: context.textTheme.titleMedium),
           ),
-          if (dueCount > 0) ...[
-            const SizedBox(width: SpacingTokens.sm),
-            _DuePill(count: dueCount),
-          ],
+          if (dueCount > 0) ...[const Gap.sm(), _DuePill(count: dueCount)],
         ],
       ),
-      const SizedBox(height: SpacingTokens.xs),
+      const Gap.xs(),
       Text(
         subtitle,
         style: context.textTheme.bodySmall?.copyWith(
@@ -115,7 +113,7 @@ class _DeckCopy extends StatelessWidget {
         ),
       ),
       if (deck.description.trim().isNotEmpty) ...[
-        const SizedBox(height: SpacingTokens.sm),
+        const Gap.sm(),
         Text(
           deck.description,
           maxLines: 2,
@@ -207,7 +205,7 @@ class _DeckActionItem extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(icon, size: SizeTokens.iconSm, color: foregroundColor),
-        const SizedBox(width: SpacingTokens.md),
+        const Gap.md(),
         Text(
           label,
           style: context.textTheme.bodyMedium?.copyWith(color: foregroundColor),
@@ -230,7 +228,7 @@ class _DeckProgress extends StatelessWidget {
   Widget build(BuildContext context) => Row(
     children: [
       Expanded(child: MasteryBar(percentage: masteryPercentage)),
-      const SizedBox(width: SpacingTokens.md),
+      const Gap.md(),
       Text(
         context.l10n.deckMasteryLabel((masteryPercentage * 100).round()),
         style: context.textTheme.labelMedium?.copyWith(color: accentColor),

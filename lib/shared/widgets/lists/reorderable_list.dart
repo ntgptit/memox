@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
+import 'package:memox/shared/widgets/feedback/app_refresh_indicator.dart';
 
 class ReorderableListWidget<T extends Object> extends StatelessWidget {
   const ReorderableListWidget({
     required this.items,
     required this.onReorder,
     required this.itemBuilder,
+    this.onRefresh,
     this.isReorderEnabled = false,
     super.key,
   });
@@ -15,13 +17,17 @@ class ReorderableListWidget<T extends Object> extends StatelessWidget {
   final List<T> items;
   final ReorderCallback onReorder;
   final Widget Function(BuildContext context, T item, int index) itemBuilder;
+  final RefreshCallback? onRefresh;
   final bool isReorderEnabled;
 
   @override
   Widget build(BuildContext context) {
     if (!isReorderEnabled) {
-      return ListView.builder(
+      final listView = ListView.builder(
         padding: EdgeInsets.zero,
+        physics: onRefresh == null
+            ? null
+            : const AlwaysScrollableScrollPhysics(),
         itemCount: items.length,
         itemBuilder: (context, index) {
           final item = items[index];
@@ -31,6 +37,12 @@ class ReorderableListWidget<T extends Object> extends StatelessWidget {
           );
         },
       );
+
+      if (onRefresh == null) {
+        return listView;
+      }
+
+      return AppRefreshIndicator(onRefresh: onRefresh!, child: listView);
     }
 
     return ReorderableListView.builder(
@@ -52,7 +64,7 @@ class ReorderableListWidget<T extends Object> extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.only(right: SpacingTokens.sm),
                   child: SizedBox.square(
-                    dimension: SizeTokens.avatarMd,
+                    dimension: SizeTokens.touchTarget,
                     child: Icon(
                       Icons.drag_indicator_outlined,
                       size: SizeTokens.iconSm,

@@ -5,9 +5,31 @@ import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/shared/widgets/buttons/primary_button.dart';
 import 'package:memox/shared/widgets/buttons/secondary_button.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
+import 'package:memox/shared/widgets/inputs/app_text_field.dart';
+import 'package:memox/shared/widgets/layout/spacing.dart';
+import 'package:memox/shared/widgets/lists/app_list_tile.dart';
 
-class ThemeComponentsSection extends StatelessWidget {
+class ThemeComponentsSection extends StatefulWidget {
   const ThemeComponentsSection({super.key});
+
+  @override
+  State<ThemeComponentsSection> createState() => _ThemeComponentsSectionState();
+}
+
+class _ThemeComponentsSectionState extends State<ThemeComponentsSection> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,25 +40,24 @@ class ThemeComponentsSection extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(l10n.themeComponentsTitle, style: context.textTheme.titleMedium),
-          const SizedBox(height: SpacingTokens.lg),
+          const Gap.lg(),
           AppCard(
             padding: EdgeInsets.zero,
-            child: ListTile(
+            child: AppListTile(
+              title: l10n.themeCardTitle,
+              subtitle: l10n.themeCardSubtitle,
               leading: const CircleAvatar(child: Icon(Icons.style_outlined)),
-              title: Text(l10n.themeCardTitle),
-              subtitle: Text(l10n.themeCardSubtitle),
               trailing: const Icon(Icons.chevron_right),
             ),
           ),
-          const SizedBox(height: SpacingTokens.lg),
-          TextField(
-            decoration: InputDecoration(
-              labelText: l10n.themeInputLabel,
-              hintText: l10n.themeInputHint,
-              prefixIcon: const Icon(Icons.search_outlined),
-            ),
+          const Gap.lg(),
+          AppTextField(
+            controller: _controller,
+            label: l10n.themeInputLabel,
+            hint: l10n.themeInputHint,
+            prefixIcon: const Icon(Icons.search_outlined),
           ),
-          const SizedBox(height: SpacingTokens.lg),
+          const Gap.lg(),
           Wrap(
             spacing: SpacingTokens.sm,
             runSpacing: SpacingTokens.sm,
@@ -59,7 +80,7 @@ class ThemeComponentsSection extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: SpacingTokens.lg),
+          const Gap.lg(),
           const LinearProgressIndicator(
             value: 0.65,
             minHeight: SizeTokens.progressBarHeight,

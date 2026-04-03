@@ -3,7 +3,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/shared/widgets/buttons/text_link_button.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
 import 'package:memox/shared/widgets/chips/streak_chip.dart';
+import 'package:memox/shared/widgets/feedback/offline_state_view.dart';
 import 'package:memox/shared/widgets/feedback/success_indicator.dart';
+import 'package:memox/shared/widgets/feedback/unauthorized_state_view.dart';
 import 'package:memox/shared/widgets/layout/app_scaffold.dart';
 import 'package:memox/shared/widgets/layout/section_container.dart';
 import 'package:memox/shared/widgets/lists/app_list_tile.dart';
@@ -27,12 +29,20 @@ void main() {
                 child: const AppListTile(title: 'Deck', subtitle: '12 cards'),
               ),
               const SuccessIndicator(),
+              const OfflineStateView(),
+              const UnauthorizedStateView(),
               const StreakChip(count: 3),
               const CountUpText(endValue: 12, style: TextStyle(), suffix: '%'),
             ],
           ),
         ),
       ),
+    );
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('12%', skipOffstage: false),
+      200,
+      scrollable: find.byType(Scrollable).first,
     );
     await tester.pumpAndSettle();
 
@@ -42,7 +52,9 @@ void main() {
     expect(find.byType(AppListTile), findsOneWidget);
     expect(find.byType(TextLinkButton), findsOneWidget);
     expect(find.byType(SuccessIndicator), findsOneWidget);
+    expect(find.byType(OfflineStateView), findsOneWidget);
+    expect(find.byType(UnauthorizedStateView), findsOneWidget);
     expect(find.byType(StreakChip), findsOneWidget);
-    expect(find.text('12%'), findsOneWidget);
+    expect(find.text('12%', skipOffstage: false), findsOneWidget);
   });
 }

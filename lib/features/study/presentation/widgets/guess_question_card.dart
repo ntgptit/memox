@@ -3,6 +3,7 @@ import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/study/domain/guess/guess_engine.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
+import 'package:memox/shared/widgets/layout/spacing.dart';
 
 class GuessQuestionCard extends StatelessWidget {
   const GuessQuestionCard({required this.question, super.key});
@@ -20,7 +21,7 @@ class GuessQuestionCard extends StatelessWidget {
           context.l10n.guessPromptLabel,
           style: context.appTextStyles.statLabel,
         ),
-        const SizedBox(height: SpacingTokens.lg),
+        const Gap.lg(),
         Expanded(
           child: Center(
             child: SingleChildScrollView(

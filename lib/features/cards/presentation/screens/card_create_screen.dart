@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/features/cards/presentation/widgets/card_editor_view.dart';
+import 'package:memox/shared/widgets/layout/app_scaffold.dart';
 import 'package:memox/shared/widgets/navigation/editor_top_bar.dart';
 
 class CardCreateScreen extends StatefulWidget {
@@ -40,12 +41,13 @@ class _CardCreateScreenState extends State<CardCreateScreen> {
   final _editorKey = GlobalKey<_CardCreateScreenBodyState>();
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) => AppScaffold(
     appBar: EditorTopBar(
       title: context.l10n.newCardTitle,
       onClose: () => context.pop<void>(),
       onSave: () => _editorKey.currentState?.save(),
     ),
+    applyHorizontalPadding: false,
     body: CardCreateScreenBody(
       key: _editorKey,
       deckId: widget.deckId,

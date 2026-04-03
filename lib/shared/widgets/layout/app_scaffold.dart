@@ -8,7 +8,11 @@ class AppScaffold extends StatelessWidget {
     required this.body,
     this.appBar,
     this.fab,
+    this.drawer,
+    this.endDrawer,
     this.bottomNavigationBar,
+    this.applyHorizontalPadding = true,
+    this.applyBottomPadding = true,
     this.useSafeArea = true,
     this.extendBehindAppBar = false,
     super.key,
@@ -17,7 +21,11 @@ class AppScaffold extends StatelessWidget {
   final Widget body;
   final PreferredSizeWidget? appBar;
   final Widget? fab;
+  final Widget? drawer;
+  final Widget? endDrawer;
   final Widget? bottomNavigationBar;
+  final bool applyHorizontalPadding;
+  final bool applyBottomPadding;
   final bool useSafeArea;
   final bool extendBehindAppBar;
 
@@ -42,6 +50,7 @@ class AppScaffold extends StatelessWidget {
       hasBottomNav: bottomNavigationBar != null,
       hasFab: fab != null,
     );
+    final resolvedBottomPadding = applyBottomPadding ? bottomPadding : 0.0;
     final content = Align(
       alignment: Alignment.topCenter,
       child: ConstrainedBox(
@@ -50,10 +59,10 @@ class AppScaffold extends StatelessWidget {
         ),
         child: Padding(
           padding: EdgeInsets.fromLTRB(
-            context.screenType.screenPadding,
+            applyHorizontalPadding ? context.screenType.screenPadding : 0,
             0,
-            context.screenType.screenPadding,
-            bottomPadding,
+            applyHorizontalPadding ? context.screenType.screenPadding : 0,
+            resolvedBottomPadding,
           ),
           child: body,
         ),
@@ -64,6 +73,8 @@ class AppScaffold extends StatelessWidget {
       appBar: appBar,
       extendBodyBehindAppBar: extendBehindAppBar,
       floatingActionButton: fab,
+      drawer: drawer,
+      endDrawer: endDrawer,
       bottomNavigationBar: bottomNavigationBar,
       body: useSafeArea ? SafeArea(child: content) : content,
     );

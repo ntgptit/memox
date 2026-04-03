@@ -5,6 +5,7 @@ import 'package:memox/features/settings/presentation/widgets/theme_preview/theme
 import 'package:memox/features/settings/presentation/widgets/theme_preview/theme_mode_selector.dart';
 import 'package:memox/features/settings/presentation/widgets/theme_preview/theme_preview_navigation_bar.dart';
 import 'package:memox/features/settings/presentation/widgets/theme_preview/theme_typography_section.dart';
+import 'package:memox/shared/widgets/layout/app_scaffold.dart';
 
 class ThemePreviewScreen extends StatelessWidget {
   const ThemePreviewScreen({super.key});
@@ -13,13 +14,14 @@ class ThemePreviewScreen extends StatelessWidget {
   static const String routePath = '/theme-preview';
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget build(BuildContext context) => AppScaffold(
     appBar: AppBar(title: Text(context.l10n.themePreviewTitle)),
-    floatingActionButton: FloatingActionButton.extended(
+    fab: FloatingActionButton.extended(
       onPressed: () {},
       icon: const Icon(Icons.add),
       label: Text(context.l10n.themeFabLabel),
     ),
+    applyHorizontalPadding: false,
     bottomNavigationBar: const ThemePreviewNavigationBar(),
     body: ListView(
       padding: const EdgeInsets.all(SpacingTokens.xl),

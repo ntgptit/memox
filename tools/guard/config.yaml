@@ -53,10 +53,15 @@ local_guards:
   provider_naming: true
   records_patterns: true
   riverpod_syntax: true
+  responsive_layout_test: true
+  refresh_retry: true
+  safe_area_keyboard: true
+  screen_scaffold: true
   shared_widget_mapping: true
   srs_field: true
   test_coverage: true
   text_style: true
+  touch_target: true
 
 severity_overrides:
   widget_length: "warning"

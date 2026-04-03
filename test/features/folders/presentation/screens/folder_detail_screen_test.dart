@@ -149,6 +149,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    expect(tester.takeException(), isNull);
     final titleRect = tester.getRect(find.text('Korean1').first);
     const expectedLeft =
         SpacingTokens.lg + SizeTokens.touchTarget + SpacingTokens.sm;

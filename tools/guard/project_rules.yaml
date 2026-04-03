@@ -200,6 +200,75 @@ riverpod_syntax:
     - "StateNotifierProvider"
     - "ChangeNotifierProvider"
 
+responsive_layout_test:
+  cases:
+    - screen: "features/decks/presentation/screens/deck_detail_screen.dart"
+      test: "features/decks/presentation/screens/deck_detail_screen_test.dart"
+      required_tokens:
+        - "setSurfaceSize("
+        - "takeException()"
+    - screen: "features/folders/presentation/screens/folder_detail_screen.dart"
+      test: "features/folders/presentation/screens/folder_detail_screen_test.dart"
+      required_tokens:
+        - "setSurfaceSize("
+        - "takeException()"
+
+refresh_retry:
+  retry_path_patterns:
+    - "features/*/presentation/screens/*_screen.dart"
+    - "features/*/presentation/widgets/*_view.dart"
+    - "features/*/presentation/widgets/*_card.dart"
+  refresh_path_patterns:
+    - "features/folders/presentation/screens/home_screen.dart"
+    - "features/folders/presentation/screens/folder_detail_screen.dart"
+    - "features/decks/presentation/screens/deck_detail_screen.dart"
+    - "features/statistics/presentation/widgets/statistics_content_view.dart"
+    - "features/settings/presentation/widgets/settings_content_view.dart"
+  refresh_tokens:
+    - "AppRefreshIndicator("
+    - "AppRefreshScrollView("
+    - "onRefresh:"
+
+safe_area_keyboard:
+  path_patterns:
+    - "features/*/presentation/screens/*_screen.dart"
+    - "features/*/presentation/widgets/*_dialog.dart"
+    - "features/*/presentation/widgets/*_view.dart"
+    - "shared/widgets/dialogs/*_dialog.dart"
+  input_tokens:
+    - "AppTextField("
+    - "TextField("
+  keyboard_safe_tokens:
+    - "AppScaffold("
+    - "AppDialog("
+    - "SliverScaffold("
+    - "SingleChildScrollView("
+    - "ListView("
+    - "CustomScrollView("
+
+screen_scaffold:
+  path_patterns:
+    - "features/*/presentation/screens/*_screen.dart"
+  allowed_scaffolds:
+    - "AppScaffold("
+    - "SliverScaffold("
+
+touch_target:
+  path_patterns:
+    - "shared/widgets/buttons/text_link_button.dart"
+    - "shared/widgets/inputs/color_picker.dart"
+    - "shared/widgets/navigation/breadcrumb_bar.dart"
+    - "features/statistics/presentation/widgets/difficult_cards_section.dart"
+    - "features/study/presentation/widgets/fill_submit_button.dart"
+  required_tokens:
+    - "SizeTokens.touchTarget"
+    - "minimumSize:"
+    - "minHeight:"
+    - "SizeTokens.buttonHeight"
+    - "SizeTokens.inputHeight"
+    - "SizeTokens.listItemHeight"
+    - "SizeTokens.listItemTall"
+
 test_coverage:
   screen_file_glob: "presentation/screens/*_screen.dart"
   screen_test_glob: "presentation/screens/*_test.dart"

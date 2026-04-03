@@ -6,7 +6,11 @@ import 'package:memox/core/theme/tokens/radius_tokens.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
 
 class FillSubmitButton extends StatelessWidget {
-  const FillSubmitButton({required this.enabled, required this.onTap, super.key});
+  const FillSubmitButton({
+    required this.enabled,
+    required this.onTap,
+    super.key,
+  });
 
   final bool enabled;
   final VoidCallback onTap;
@@ -24,8 +28,8 @@ class FillSubmitButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(RadiusTokens.chip),
         onTap: enabled ? onTap : null,
         child: const SizedBox(
-          width: SizeTokens.buttonHeightSm,
-          height: SizeTokens.buttonHeightSm,
+          width: SizeTokens.touchTarget,
+          height: SizeTokens.touchTarget,
           child: Icon(Icons.arrow_forward, size: SizeTokens.iconSm),
         ),
       ),

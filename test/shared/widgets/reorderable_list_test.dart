@@ -42,4 +42,31 @@ void main() {
     );
     expect(icon.size, SizeTokens.iconSm);
   });
+
+  testWidgets('ReorderableListWidget supports pull-to-refresh in normal mode', (
+    tester,
+  ) async {
+    var refreshed = false;
+
+    await tester.pumpWidget(
+      buildTestApp(
+        home: SizedBox(
+          height: 320,
+          child: ReorderableListWidget<String>(
+            items: const <String>['A', 'B', 'C'],
+            onRefresh: () async => refreshed = true,
+            onReorder: (oldIndex, newIndex) {},
+            itemBuilder: (context, item, index) =>
+                SizedBox(height: 80, child: Text(item)),
+          ),
+        ),
+      ),
+    );
+
+    await tester.drag(find.byType(ListView), const Offset(0, 300));
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 1));
+
+    expect(refreshed, isTrue);
+  });
 }

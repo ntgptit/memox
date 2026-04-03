@@ -43,9 +43,18 @@ class BreadcrumbBar extends StatelessWidget {
               : TypographyTokens.regular,
         );
 
-        return InkWell(
-          onTap: isCurrent ? null : segment.onTap,
-          child: Text(segment.label, style: style),
+        return Material(
+          type: MaterialType.transparency,
+          child: InkWell(
+            onTap: isCurrent ? null : segment.onTap,
+            child: SizedBox(
+              height: SizeTokens.touchTarget,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(segment.label, style: style),
+              ),
+            ),
+          ),
         );
       }),
     ),

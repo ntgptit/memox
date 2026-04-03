@@ -7,6 +7,7 @@ import 'package:memox/core/theme/tokens/typography_tokens.dart';
 import 'package:memox/features/cards/domain/entities/flashcard_entity.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
 import 'package:memox/shared/widgets/chips/tag_chip.dart';
+import 'package:memox/shared/widgets/layout/spacing.dart';
 
 class RecallPromptCard extends StatelessWidget {
   const RecallPromptCard({required this.card, super.key});
@@ -28,14 +29,14 @@ class RecallPromptCard extends StatelessWidget {
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: SpacingTokens.md),
+                const Gap.md(),
                 Text(
                   card.front,
                   style: context.appTextStyles.recallTerm,
                   textAlign: TextAlign.center,
                 ),
                 if (card.tags.isNotEmpty) ...[
-                  const SizedBox(height: SpacingTokens.md),
+                  const Gap.md(),
                   TagChip(label: card.tags.first),
                 ],
               ],

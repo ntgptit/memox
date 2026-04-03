@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
+import 'package:memox/core/theme/tokens/opacity_tokens.dart';
+import 'package:memox/core/theme/tokens/radius_tokens.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/folders/domain/entities/folder_entity.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
+import 'package:memox/shared/widgets/layout/spacing.dart';
 import 'package:memox/shared/widgets/progress/mastery_ring.dart';
 
 class FolderTile extends StatelessWidget {
@@ -33,14 +36,14 @@ class FolderTile extends StatelessWidget {
     child: Row(
       children: [
         _FolderLeading(colorValue: folder.colorValue),
-        const SizedBox(width: SpacingTokens.lg),
+        const Gap.lg(),
         Expanded(
           child: _FolderText(name: folder.name, subtitle: subtitle),
         ),
-        const SizedBox(width: SpacingTokens.md),
+        const Gap.md(),
         MasteryRing(percentage: masteryPercentage, showZeroPercentText: true),
         if (onEdit != null || onDelete != null) ...[
-          const SizedBox(width: SpacingTokens.xs),
+          const Gap.xs(),
           _FolderActionMenu(onEdit: onEdit, onDelete: onDelete),
         ],
       ],
@@ -114,7 +117,7 @@ class _FolderActionItem extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(icon, size: SizeTokens.iconSm, color: foregroundColor),
-        const SizedBox(width: SpacingTokens.md),
+        const Gap.md(),
         Text(
           label,
           style: context.textTheme.bodyMedium?.copyWith(color: foregroundColor),
@@ -131,15 +134,15 @@ class _FolderLeading extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DecoratedBox(
-      decoration: BoxDecoration(
-        color: Color(colorValue).withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(SpacingTokens.md),
-      ),
-      child: const SizedBox.square(
-        dimension: SizeTokens.avatarLg,
-        child: Icon(Icons.folder_outlined),
-      ),
-    );
+    decoration: BoxDecoration(
+      color: Color(colorValue).withValues(alpha: OpacityTokens.focus),
+      borderRadius: BorderRadius.circular(RadiusTokens.md),
+    ),
+    child: const SizedBox.square(
+      dimension: SizeTokens.avatarLg,
+      child: Icon(Icons.folder_outlined),
+    ),
+  );
 }
 
 class _FolderText extends StatelessWidget {
@@ -152,8 +155,8 @@ class _FolderText extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
-      Text(name, style: Theme.of(context).textTheme.titleMedium),
-      Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
+      Text(name, style: context.textTheme.titleMedium),
+      Text(subtitle, style: context.textTheme.bodySmall),
     ],
   );
 }

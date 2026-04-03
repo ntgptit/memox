@@ -18,6 +18,9 @@ class SharedWidgetGuard(BaseGuard):
         r'\.when\s*\(': 'Dùng AppAsyncBuilder thay vì raw .when(...)',
         r'\bElevatedButton\(': 'Dùng PrimaryButton thay vì raw ElevatedButton()',
         r'\bCircularProgressIndicator\(': 'Dùng LoadingIndicator thay vì raw CircularProgressIndicator()',
+        r'\bTextField\(': 'Dùng AppTextField thay vì raw TextField()',
+        r'\bListTile\(': 'Dùng AppListTile thay vì raw ListTile()',
+        r'\bSwitchListTile\(': 'Dùng AppSwitchTile thay vì raw SwitchListTile()',
         r'ScaffoldMessenger\.of\(': 'Dùng Toast thay vì raw ScaffoldMessenger',
         r'\bDismissible\(': 'Dùng AppSlidableRow thay vì raw Dismissible()',
     }

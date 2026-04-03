@@ -13,6 +13,7 @@ import 'package:memox/features/decks/presentation/widgets/create_deck_dialog.dar
 import 'package:memox/features/decks/presentation/widgets/deck_list_view.dart';
 import 'package:memox/features/folders/domain/entities/folder_entity.dart';
 import 'package:memox/features/folders/presentation/providers/folder_detail_provider.dart';
+import 'package:memox/features/folders/presentation/providers/folders_provider.dart';
 import 'package:memox/features/folders/presentation/widgets/create_folder_dialog.dart';
 import 'package:memox/features/folders/presentation/widgets/delete_folder_confirm_dialog.dart';
 import 'package:memox/features/folders/presentation/widgets/folder_constraint_footer.dart';
@@ -22,6 +23,7 @@ import 'package:memox/features/folders/presentation/widgets/folder_status_bar.da
 import 'package:memox/features/folders/presentation/widgets/folder_type_chooser_sheet.dart';
 import 'package:memox/shared/widgets/buttons/app_fab.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
+import 'package:memox/shared/widgets/feedback/app_refresh_indicator.dart';
 import 'package:memox/shared/widgets/feedback/empty_state_view.dart';
 import 'package:memox/shared/widgets/layout/app_scaffold.dart';
 import 'package:memox/shared/widgets/lists/reorder_mode_banner.dart';
@@ -65,6 +67,9 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
 
     return AppAsyncBuilder<FolderDetailData>(
       value: detailAsync,
+      onRetry: () {
+        unawaited(_refreshFolderDetailData(ref, widget.folderId));
+      },
       onData: (detail) => AppScaffold(
         appBar: _buildAppBar(context, breadcrumb, detail),
         fab: AppFab(
@@ -88,6 +93,7 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
                 detail: detail,
                 focusDeckId: widget.focusDeckId,
                 isSortMode: _isSortMode,
+                onRefresh: () => _refreshFolderDetailData(ref, widget.folderId),
               ),
             ),
             FolderConstraintFooter(depth: breadcrumb.length),
@@ -161,19 +167,24 @@ class _FolderContent extends ConsumerWidget {
     required this.detail,
     required this.focusDeckId,
     required this.isSortMode,
+    required this.onRefresh,
   });
 
   final FolderDetailData detail;
   final int? focusDeckId;
   final bool isSortMode;
+  final RefreshCallback onRefresh;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (detail.contentType == ContentType.empty) {
-      return EmptyStateView(
-        icon: Icons.folder_open_outlined,
-        title: context.l10n.folderEmptyTitle,
-        subtitle: context.l10n.folderEmptySubtitle,
+      return AppRefreshScrollView(
+        onRefresh: onRefresh,
+        child: EmptyStateView(
+          icon: Icons.folder_open_outlined,
+          title: context.l10n.folderEmptyTitle,
+          subtitle: context.l10n.folderEmptySubtitle,
+        ),
       );
     }
 
@@ -181,6 +192,7 @@ class _FolderContent extends ConsumerWidget {
       return FolderListView(
         folders: detail.subfolders,
         isSortMode: isSortMode,
+        onRefresh: onRefresh,
         onTap: (folder) =>
             context.push(FolderDetailScreen.routeLocation(folder.id)),
         onEdit: (folder) {
@@ -206,6 +218,7 @@ class _FolderContent extends ConsumerWidget {
     return DeckListView(
       decks: detail.decks,
       isSortMode: isSortMode,
+      onRefresh: onRefresh,
       highlightedDeckId: focusDeckId,
       onTap: (deck) => context.push(DeckDetailScreen.routeLocation(deck.id)),
       onEdit: (deck) {
@@ -499,4 +512,19 @@ bool _canSort(FolderDetailData detail) {
   }
 
   return false;
+}
+
+Future<void> _refreshFolderDetailData(WidgetRef ref, int folderId) async {
+  ref
+    ..invalidate(allFoldersProvider)
+    ..invalidate(allDecksProvider)
+    ..invalidate(allFlashcardsProvider)
+    ..invalidate(folderDetailProvider(folderId))
+    ..invalidate(folderBreadcrumbProvider(folderId));
+  await Future.wait<Object?>([
+    ref.read(allFoldersProvider.future),
+    ref.read(allDecksProvider.future),
+    ref.read(allFlashcardsProvider.future),
+    ref.read(folderBreadcrumbProvider(folderId).future),
+  ]);
 }

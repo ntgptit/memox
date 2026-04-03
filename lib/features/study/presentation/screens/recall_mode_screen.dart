@@ -8,6 +8,7 @@ import 'package:memox/features/study/presentation/widgets/recall_round_view.dart
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
 import 'package:memox/shared/widgets/feedback/empty_state_view.dart';
 import 'package:memox/shared/widgets/feedback/session_complete_view.dart';
+import 'package:memox/shared/widgets/layout/app_scaffold.dart';
 import 'package:memox/shared/widgets/navigation/study_top_bar.dart';
 
 class RecallModeScreen extends ConsumerStatefulWidget {
@@ -33,15 +34,24 @@ class _RecallModeScreenState extends ConsumerState<RecallModeScreen> {
     final state = ref.watch(recallSessionProvider(widget.deckId));
     return AppAsyncBuilder<RecallState>(
       value: state,
+      onRetry: () {
+        unawaited(
+          ref
+              .read(recallSessionProvider(widget.deckId).notifier)
+              .startSession(),
+        );
+      },
       onData: (data) {
         _syncAnswerController(data.userAnswer);
-        return Scaffold(
+        return AppScaffold(
           appBar: StudyTopBar(
             title: context.l10n.modeRecall,
             current: data.isComplete ? data.totalCards : data.displayIndex,
             total: data.totalCards,
             onClose: () => unawaited(_handleClose(context)),
           ),
+          applyBottomPadding: false,
+          applyHorizontalPadding: false,
           body: _buildBody(
             context,
             ref,
