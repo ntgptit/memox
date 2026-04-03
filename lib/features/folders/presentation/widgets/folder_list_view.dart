@@ -16,6 +16,7 @@ class FolderListView extends ConsumerWidget {
     required this.onEdit,
     required this.onDelete,
     required this.onReorder,
+    this.isSortMode = false,
     super.key,
   });
 
@@ -24,12 +25,13 @@ class FolderListView extends ConsumerWidget {
   final ValueChanged<FolderEntity> onEdit;
   final ValueChanged<FolderEntity> onDelete;
   final ReorderCallback onReorder;
+  final bool isSortMode;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return ReorderableListWidget<FolderEntity>(
+  Widget build(BuildContext context, WidgetRef ref) => ReorderableListWidget<FolderEntity>(
       items: folders,
       onReorder: onReorder,
+      isReorderEnabled: isSortMode,
       itemBuilder: (context, folder, index) {
         final detail = switch (ref.watch(folderDetailProvider(folder.id))) {
           AsyncData<FolderDetailData>(:final value) => value,
@@ -49,18 +51,16 @@ class FolderListView extends ConsumerWidget {
               folder: folder,
               subtitle: subtitle,
               masteryPercentage: detail?.masteryPercentage ?? 0,
-              onTap: () => onTap(folder),
-              onEdit: () => onEdit(folder),
-              onDelete: () => onDelete(folder),
+              onTap: isSortMode ? null : () => onTap(folder),
+              onEdit: isSortMode ? null : () => onEdit(folder),
+              onDelete: isSortMode ? null : () => onDelete(folder),
             ),
           ),
         );
       },
     );
-  }
 
-  String _subtitle(BuildContext context, FolderDetailData detail) {
-    return switch (detail.contentType) {
+  String _subtitle(BuildContext context, FolderDetailData detail) => switch (detail.contentType) {
       ContentType.subfolders => context.l10n.folderSubfolderCount(
         detail.subfolderCount,
       ),
@@ -70,5 +70,4 @@ class FolderListView extends ConsumerWidget {
       ),
       ContentType.empty => context.l10n.folderEmptyStatus,
     };
-  }
 }

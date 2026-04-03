@@ -6,7 +6,5 @@ final class GetSubfoldersUseCase {
 
   final FolderRepository _repository;
 
-  Stream<List<FolderEntity>> call(int parentId) {
-    return _repository.watchSubfolders(parentId);
-  }
+  Stream<List<FolderEntity>> call(int parentId) => _repository.watchSubfolders(parentId);
 }

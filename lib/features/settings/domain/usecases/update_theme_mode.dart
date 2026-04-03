@@ -6,7 +6,5 @@ final class UpdateThemeModeUseCase {
 
   final SettingsRepository _repository;
 
-  Future<void> call(ThemeMode themeMode) {
-    return _repository.updateThemeMode(themeMode);
-  }
+  Future<void> call(ThemeMode themeMode) => _repository.updateThemeMode(themeMode);
 }

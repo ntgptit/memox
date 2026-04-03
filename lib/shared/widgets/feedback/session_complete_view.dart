@@ -15,6 +15,7 @@ class SessionCompleteView extends StatelessWidget {
   const SessionCompleteView({
     required this.stats,
     required this.primaryAction,
+    this.title,
     this.secondaryAction,
     this.extraContent,
     super.key,
@@ -22,6 +23,7 @@ class SessionCompleteView extends StatelessWidget {
 
   final List<SessionStat> stats;
   final SessionAction primaryAction;
+  final String? title;
   final SessionAction? secondaryAction;
   final Widget? extraContent;
 
@@ -35,7 +37,7 @@ class SessionCompleteView extends StatelessWidget {
                 const SuccessIndicator(),
                 const SizedBox(height: SpacingTokens.lg),
                 Text(
-                  context.l10n.sessionCompleteTitle,
+                  title ?? context.l10n.sessionCompleteTitle,
                   style: context.appTextStyles.statNumberSm,
                   textAlign: TextAlign.center,
                 ),
@@ -91,6 +93,13 @@ class _SessionStatRow extends StatelessWidget {
             ),
           ),
         ),
+        if (stat.value != null)
+          Text(
+            stat.value!,
+            style: context.appTextStyles.statNumberSm.copyWith(
+              color: stat.valueColor ?? context.colors.onSurface,
+            ),
+          ),
       ],
     ),
   );
@@ -101,6 +110,7 @@ abstract class SessionStat with _$SessionStat {
   const factory SessionStat({
     required String label,
     required IconData icon,
+    String? value,
     Color? valueColor,
   }) = _SessionStat;
 }

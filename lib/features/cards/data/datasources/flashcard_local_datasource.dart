@@ -33,9 +33,7 @@ final class FlashcardLocalDataSourceImpl implements FlashcardLocalDataSource {
   Future<void> delete(int id) => _cardDao.deleteById(id);
 
   @override
-  Future<void> deleteByDeckIds(List<int> deckIds) {
-    return _cardDao.deleteByDeckIds(deckIds);
-  }
+  Future<void> deleteByDeckIds(List<int> deckIds) => _cardDao.deleteByDeckIds(deckIds);
 
   @override
   Future<List<CardsTableData>> getAll() => _cardDao.getAll();
@@ -48,14 +46,10 @@ final class FlashcardLocalDataSourceImpl implements FlashcardLocalDataSource {
   Future<CardsTableData?> getById(int id) => _cardDao.getById(id);
 
   @override
-  Future<List<CardsTableData>> getDueCards({int? deckId}) {
-    return _cardDao.getDueCards(deckId: deckId);
-  }
+  Future<List<CardsTableData>> getDueCards({int? deckId}) => _cardDao.getDueCards(deckId: deckId);
 
   @override
-  Future<List<int>> getIdsByDeckIds(List<int> deckIds) {
-    return _cardDao.getIdsByDeckIds(deckIds);
-  }
+  Future<List<int>> getIdsByDeckIds(List<int> deckIds) => _cardDao.getIdsByDeckIds(deckIds);
 
   @override
   Future<CardsTableData> save(CardsTableCompanion companion) async {
@@ -69,9 +63,7 @@ final class FlashcardLocalDataSourceImpl implements FlashcardLocalDataSource {
   Stream<List<CardsTableData>> watchAll() => _cardDao.watchAll();
 
   @override
-  Stream<List<CardsTableData>> watchByDeck(int deckId) {
-    return _cardDao.watchByDeck(deckId);
-  }
+  Stream<List<CardsTableData>> watchByDeck(int deckId) => _cardDao.watchByDeck(deckId);
 
   @override
   Future<List<CardsTableData>> saveAll(

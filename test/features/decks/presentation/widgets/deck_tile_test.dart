@@ -12,19 +12,23 @@ void main() {
           deck: DeckEntity(
             id: 1,
             name: 'Core Vocabulary',
+            description: 'Daily phrases and verbs',
             tags: <String>['topik', 'verbs'],
           ),
           subtitle: '42 cards · 8 due today',
           masteryPercentage: 0.5,
+          dueCount: 8,
         ),
       ),
     );
 
     expect(find.text('Core Vocabulary'), findsOneWidget);
     expect(find.text('42 cards · 8 due today'), findsOneWidget);
+    expect(find.text('Daily phrases and verbs'), findsOneWidget);
     expect(find.text('topik'), findsOneWidget);
     expect(find.text('verbs'), findsOneWidget);
     expect(find.byType(LinearProgressIndicator), findsNothing);
     expect(find.byIcon(Icons.style_outlined), findsOneWidget);
+    expect(find.text('8'), findsOneWidget);
   });
 }

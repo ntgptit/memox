@@ -49,6 +49,7 @@ abstract final class SizeTokens {
   // ── Navigation ──
   static const double appBarHeight = 56; // standard
   static const double appBarHeightLg = 64; // large/medium top app bar collapsed
+  static const double studyTopBarMetaHeight = 28;
   static const double bottomNavHeight = 80; // M3 NavigationBar
   static const double bottomSheetHandle = 4; // drag handle height
   static const double bottomSheetHandleWidth = 32;
@@ -58,12 +59,20 @@ abstract final class SizeTokens {
   static const double masteryBarHeight = 4; // deck mastery bar
   static const double masteryRingSize = 40; // circular progress in list tiles
   static const double masteryRingStroke = 3;
+  static const double statisticsWeeklyChartHeight = 120;
+  static const double statisticsDonutSize = 160;
+  static const double statisticsDonutStroke = 14;
+  static const double statisticsModeBarHeight = 8;
 
   // ── Cards (study modes) ──
   static const double flashcardMinHeight = 300;
   static const double flashcardMaxHeight = 400;
   static const double ratingButtonWidth = 72;
   static const double ratingButtonHeight = 48;
+  static const double fillBlankMinWidth = 80;
+  static const double fillBlankMaxWidth = 140;
+  static const double recallWritingAreaMinHeight = 140;
+  static const double recallAnswerMaxHeight = 200;
   static const double maxBodyWidth = 720;
   static const double emptyStateTextWidth = 280;
 

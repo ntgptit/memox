@@ -41,9 +41,7 @@ final class _FakeFlashcardRepository implements FlashcardRepository {
   Future<FlashcardEntity> save(FlashcardEntity entity) async => entity;
 
   @override
-  Future<List<FlashcardEntity>> saveAll(List<FlashcardEntity> entities) async {
-    return entities;
-  }
+  Future<List<FlashcardEntity>> saveAll(List<FlashcardEntity> entities) async => entities;
 
   @override
   Stream<List<FlashcardEntity>> watchAll() async* {

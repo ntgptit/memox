@@ -23,8 +23,9 @@ import 'package:memox/shared/widgets/buttons/app_fab.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
 import 'package:memox/shared/widgets/feedback/empty_state_view.dart';
 import 'package:memox/shared/widgets/layout/app_scaffold.dart';
+import 'package:memox/shared/widgets/lists/reorder_mode_banner.dart';
 
-class FolderDetailScreen extends ConsumerWidget {
+class FolderDetailScreen extends ConsumerStatefulWidget {
   const FolderDetailScreen({
     required this.folderId,
     this.focusDeckId,
@@ -43,9 +44,18 @@ class FolderDetailScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final detailAsync = ref.watch(folderDetailProvider(folderId));
-    final breadcrumbAsync = ref.watch(folderBreadcrumbProvider(folderId));
+  ConsumerState<FolderDetailScreen> createState() => _FolderDetailScreenState();
+}
+
+class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
+  var _isSortMode = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final detailAsync = ref.watch(folderDetailProvider(widget.folderId));
+    final breadcrumbAsync = ref.watch(
+      folderBreadcrumbProvider(widget.folderId),
+    );
     final breadcrumb =
         _asyncValueOrNull(breadcrumbAsync) ?? const <FolderEntity>[];
 
@@ -58,6 +68,18 @@ class FolderDetailScreen extends ConsumerWidget {
             breadcrumb: breadcrumb,
           ),
           actions: [
+            if (_canSort(detail))
+              IconButton(
+                tooltip: _isSortMode
+                    ? context.l10n.doneAction
+                    : context.l10n.reorderAction,
+                onPressed: _toggleSortMode,
+                icon: Icon(
+                  _isSortMode
+                      ? Icons.done_outline
+                      : Icons.drag_indicator_outlined,
+                ),
+              ),
             IconButton(
               tooltip: context.l10n.editFolder,
               onPressed: () {
@@ -68,7 +90,7 @@ class FolderDetailScreen extends ConsumerWidget {
             IconButton(
               tooltip: context.l10n.deleteFolder,
               onPressed: () {
-                unawaited(_deleteCurrentFolder(context, ref, folderId));
+                unawaited(_deleteCurrentFolder(context, ref, widget.folderId));
               },
               icon: const Icon(Icons.delete_outline),
             ),
@@ -86,8 +108,16 @@ class FolderDetailScreen extends ConsumerWidget {
           children: [
             FolderStatusBar(detail: detail),
             const SizedBox(height: SpacingTokens.lg),
+            if (_isSortMode) ...[
+              ReorderModeBanner(onDone: _toggleSortMode),
+              const SizedBox(height: SpacingTokens.lg),
+            ],
             Expanded(
-              child: _FolderContent(detail: detail, focusDeckId: focusDeckId),
+              child: _FolderContent(
+                detail: detail,
+                focusDeckId: widget.focusDeckId,
+                isSortMode: _isSortMode,
+              ),
             ),
             FolderConstraintFooter(
               contentType: detail.contentType,
@@ -98,13 +128,24 @@ class FolderDetailScreen extends ConsumerWidget {
       ),
     );
   }
+
+  void _toggleSortMode() {
+    setState(() {
+      _isSortMode = !_isSortMode;
+    });
+  }
 }
 
 class _FolderContent extends ConsumerWidget {
-  const _FolderContent({required this.detail, required this.focusDeckId});
+  const _FolderContent({
+    required this.detail,
+    required this.focusDeckId,
+    required this.isSortMode,
+  });
 
   final FolderDetailData detail;
   final int? focusDeckId;
+  final bool isSortMode;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -119,6 +160,7 @@ class _FolderContent extends ConsumerWidget {
     if (detail.contentType == ContentType.subfolders) {
       return FolderListView(
         folders: detail.subfolders,
+        isSortMode: isSortMode,
         onTap: (folder) =>
             context.push(FolderDetailScreen.routeLocation(folder.id)),
         onEdit: (folder) {
@@ -143,8 +185,15 @@ class _FolderContent extends ConsumerWidget {
 
     return DeckListView(
       decks: detail.decks,
+      isSortMode: isSortMode,
       highlightedDeckId: focusDeckId,
       onTap: (deck) => context.push(DeckDetailScreen.routeLocation(deck.id)),
+      onEdit: (deck) {
+        unawaited(_editDeck(context, ref, deck));
+      },
+      onDelete: (deck) {
+        unawaited(_deleteDeck(context, ref, deck.id));
+      },
       onReorder: (oldIndex, newIndex) {
         unawaited(
           _reorderDecks(
@@ -223,6 +272,42 @@ Future<void> _handleFab(
   context.showSnackBar(result.failureOrNull?.message ?? '', isError: true);
 }
 
+Future<void> _editDeck(
+  BuildContext context,
+  WidgetRef ref,
+  DeckEntity deck,
+) async {
+  final draft = await showCreateDeckDialog(
+    context,
+    initialName: deck.name,
+    initialDescription: deck.description,
+    initialColorValue: deck.colorValue,
+    initialTags: deck.tags,
+    title: context.l10n.editAction,
+    submitLabel: context.l10n.saveAction,
+  );
+
+  if (draft == null || !context.mounted) {
+    return;
+  }
+
+  final result = await ref
+      .read(updateDeckUseCaseProvider)
+      .call(
+        id: deck.id,
+        name: draft.name,
+        description: draft.description,
+        colorValue: draft.colorValue,
+        tags: draft.tags,
+      );
+
+  if (!context.mounted || result.isSuccess) {
+    return;
+  }
+
+  context.showSnackBar(result.failureOrNull?.message ?? '', isError: true);
+}
+
 Future<void> _editFolder(
   BuildContext context,
   WidgetRef ref,
@@ -243,6 +328,31 @@ Future<void> _editFolder(
   final result = await ref
       .read(updateFolderUseCaseProvider)
       .call(id: folder.id, name: draft.name, colorValue: draft.colorValue);
+
+  if (!context.mounted || result.isSuccess) {
+    return;
+  }
+
+  context.showSnackBar(result.failureOrNull?.message ?? '', isError: true);
+}
+
+Future<void> _deleteDeck(
+  BuildContext context,
+  WidgetRef ref,
+  int deckId,
+) async {
+  final confirmed = await context.showConfirmDialog(
+    title: context.l10n.deleteDeckAction,
+    message: context.l10n.deleteDeckMessage,
+    confirmText: context.l10n.deleteAction,
+    isDestructive: true,
+  );
+
+  if (confirmed != true || !context.mounted) {
+    return;
+  }
+
+  final result = await ref.read(deleteDeckUseCaseProvider).call(deckId);
 
   if (!context.mounted || result.isSuccess) {
     return;
@@ -358,3 +468,15 @@ String _folderFabLabel(BuildContext context, ContentType contentType) =>
       ContentType.decks => context.l10n.createDeck,
       ContentType.empty => context.l10n.createAction,
     };
+
+bool _canSort(FolderDetailData detail) {
+  if (detail.contentType == ContentType.subfolders) {
+    return detail.subfolders.isNotEmpty;
+  }
+
+  if (detail.contentType == ContentType.decks) {
+    return detail.decks.isNotEmpty;
+  }
+
+  return false;
+}

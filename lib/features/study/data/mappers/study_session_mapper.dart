@@ -2,41 +2,39 @@ import 'package:drift/drift.dart';
 import 'package:memox/core/database/app_database.dart';
 import 'package:memox/features/study/domain/entities/study_session.dart';
 
-abstract final class StudySessionMapper {
-  static StudySession toEntity(StudySessionsTableData row) {
-    return StudySession(
-      id: row.id,
-      mode: row.mode,
-      deckId: row.deckId,
-      startedAt: row.startedAt,
-      completedAt: row.completedAt,
-      totalCards: row.totalCards,
-      correctCount: row.correctCount,
-      wrongCount: row.wrongCount,
-      durationSeconds: row.durationSeconds,
-    );
-  }
+extension StudySessionRowMapper on StudySessionsTableData {
+  StudySession toEntity() => StudySession(
+    id: id,
+    mode: mode,
+    deckId: deckId,
+    startedAt: startedAt,
+    completedAt: completedAt,
+    totalCards: totalCards,
+    correctCount: correctCount,
+    wrongCount: wrongCount,
+    durationSeconds: durationSeconds,
+  );
+}
 
-  static StudySessionsTableCompanion toCompanion(StudySession entity) {
-    final id = entity.id > 0
-        ? Value<int>(entity.id)
-        : const Value<int>.absent();
-    final startedAt = entity.startedAt == null
+extension StudySessionEntityMapper on StudySession {
+  StudySessionsTableCompanion toCompanion() {
+    final id = this.id > 0 ? Value<int>(this.id) : const Value<int>.absent();
+    final startedAt = this.startedAt == null
         ? Value<DateTime>(DateTime.now())
-        : Value<DateTime>(entity.startedAt!);
-    final completedAt = entity.completedAt == null
+        : Value<DateTime>(this.startedAt!);
+    final completedAt = this.completedAt == null
         ? const Value<DateTime?>.absent()
-        : Value<DateTime?>(entity.completedAt);
+        : Value<DateTime?>(this.completedAt);
     return StudySessionsTableCompanion(
       id: id,
-      deckId: Value<int>(entity.deckId),
-      mode: Value(entity.mode),
+      deckId: Value<int>(deckId),
+      mode: Value(mode),
       startedAt: startedAt,
       completedAt: completedAt,
-      totalCards: Value<int>(entity.totalCards),
-      correctCount: Value<int>(entity.correctCount),
-      wrongCount: Value<int>(entity.wrongCount),
-      durationSeconds: Value<int>(entity.durationSeconds),
+      totalCards: Value<int>(totalCards),
+      correctCount: Value<int>(correctCount),
+      wrongCount: Value<int>(wrongCount),
+      durationSeconds: Value<int>(durationSeconds),
     );
   }
 }

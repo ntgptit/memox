@@ -9,20 +9,30 @@ void main() {
     final repository = _FakeStudyRepository();
     final useCase = StartStudySessionUseCase(repository);
 
-    final result = await useCase.call(mode: StudyMode.match);
+    final result = await useCase.call(deckId: 7, mode: StudyMode.match);
 
     expect(result.mode, StudyMode.match);
+    expect(result.deckId, 7);
+    expect(repository.lastDeckId, 7);
     expect(repository.lastMode, StudyMode.match);
   });
 }
 
 final class _FakeStudyRepository implements StudyRepository {
+  int? lastDeckId;
   StudyMode? lastMode;
 
   @override
-  Future<StudySession> startSession(StudyMode mode) async {
+  Future<StudySession> completeSession(StudySession session) async => session;
+
+  @override
+  Future<StudySession> startSession({
+    required int deckId,
+    StudyMode mode = StudyMode.review,
+  }) async {
+    lastDeckId = deckId;
     lastMode = mode;
-    return StudySession(id: 1, mode: mode);
+    return StudySession(id: 1, deckId: deckId, mode: mode);
   }
 
   @override

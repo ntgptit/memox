@@ -6,7 +6,5 @@ final class GetFolderDeleteSummaryUseCase {
 
   final FolderRepository _repository;
 
-  Future<FolderDeleteSummary> call(int folderId) {
-    return _repository.getDeleteSummary(folderId);
-  }
+  Future<FolderDeleteSummary> call(int folderId) => _repository.getDeleteSummary(folderId);
 }

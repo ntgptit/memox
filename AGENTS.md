@@ -79,7 +79,7 @@ Recommended completion order:
 1. Run `dart run build_runner build --delete-conflicting-outputs` when freezed, Drift, or Riverpod files changed.
 2. Run `flutter gen-l10n` when `.arb` files changed.
 3. Immediately after build/codegen finishes, run `python tools/guard/run.py --scope <derived_scope>`.
-4. Run `flutter analyze`.
+4. Run `flutter analyze` and treat `info` diagnostics as real work, not ignorable noise.
 5. Run relevant tests, or `flutter test` for cross-cutting work.
 
 ## Coding rules
@@ -132,11 +132,11 @@ Do NOT recreate these. Import from `shared/widgets/`:
 Before considering any task complete:
 
 1. `python tools/guard/run.py --scope <derived_scope>` passes for the affected area.
-2. `flutter analyze` passes with zero warnings.
+2. `flutter analyze` must not be dismissed just because diagnostics are only `info`. Fix analyzer `error`, `warning`, and `info` diagnostics in every file touched by the task before completion.
 3. `dart run build_runner build --delete-conflicting-outputs` succeeds when freezed, Drift, or Riverpod files changed.
 4. `flutter gen-l10n` succeeds when `.arb` files changed.
 5. Relevant tests pass.
-6. Any analyzer warnings or similar issues already present in the files touched by the task must be fixed before completion. Do not leave pre-existing warnings behind in modified code.
+6. Any pre-existing analyzer diagnostics already present in the files touched by the task must be fixed before completion. Do not leave old `info`/`warning`/similar lint debt behind in modified code.
 7. No `else` keyword in new code.
 8. No hardcoded values — all from tokens or l10n.
 9. All new widgets use shared components listed above.

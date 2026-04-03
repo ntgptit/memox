@@ -5,7 +5,5 @@ final class UpdateLocaleUseCase {
 
   final SettingsRepository _repository;
 
-  Future<void> call(String? localeCode) {
-    return _repository.updateLocaleCode(localeCode);
-  }
+  Future<void> call(String? localeCode) => _repository.updateLocaleCode(localeCode);
 }

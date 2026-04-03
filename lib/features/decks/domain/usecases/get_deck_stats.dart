@@ -14,16 +14,10 @@ final class GetDeckStatsUseCase {
       deckId: deckId,
       limit: cards.length,
     );
-    final known = cards.where((FlashcardEntity card) {
-      return card.status == CardStatus.mastered;
-    }).length;
-    final learning = cards.where((FlashcardEntity card) {
-      return card.status == CardStatus.learning ||
-          card.status == CardStatus.reviewing;
-    }).length;
-    final newCards = cards.where((FlashcardEntity card) {
-      return card.status == CardStatus.newCard;
-    }).length;
+    final known = cards.where((FlashcardEntity card) => card.status == CardStatus.mastered).length;
+    final learning = cards.where((FlashcardEntity card) => card.status == CardStatus.learning ||
+          card.status == CardStatus.reviewing).length;
+    final newCards = cards.where((FlashcardEntity card) => card.status == CardStatus.newCard).length;
     final mastery = cards.isEmpty ? 0.0 : known / cards.length;
     return (
       total: cards.length,

@@ -20,7 +20,5 @@ class DeckCardsToolbarDelegate extends SliverPersistentHeaderDelegate {
   ) => child;
 
   @override
-  bool shouldRebuild(covariant DeckCardsToolbarDelegate oldDelegate) {
-    return child != oldDelegate.child || height != oldDelegate.height;
-  }
+  bool shouldRebuild(covariant DeckCardsToolbarDelegate oldDelegate) => child != oldDelegate.child || height != oldDelegate.height;
 }

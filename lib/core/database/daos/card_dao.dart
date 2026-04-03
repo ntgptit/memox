@@ -4,61 +4,50 @@ part of '../app_database.dart';
 class CardDao extends DatabaseAccessor<AppDatabase> with _$CardDaoMixin {
   CardDao(super.db);
 
-  Stream<List<CardsTableData>> watchAll() {
-    return (select(cardsTable)..orderBy([
-          (CardsTable tbl) => OrderingTerm.desc(tbl.updatedAt),
-          (CardsTable tbl) => OrderingTerm.desc(tbl.createdAt),
-        ]))
-        .watch();
-  }
-
-  Stream<List<CardsTableData>> watchByDeck(int deckId) {
-    return (select(cardsTable)
-          ..where((CardsTable tbl) => tbl.deckId.equals(deckId))
-          ..orderBy([
+  Stream<List<CardsTableData>> watchAll() =>
+      (select(cardsTable)..orderBy([
             (CardsTable tbl) => OrderingTerm.desc(tbl.updatedAt),
             (CardsTable tbl) => OrderingTerm.desc(tbl.createdAt),
           ]))
-        .watch();
-  }
+          .watch();
 
-  Future<List<CardsTableData>> getAll() {
-    return (select(cardsTable)..orderBy([
-          (CardsTable tbl) => OrderingTerm.desc(tbl.updatedAt),
-          (CardsTable tbl) => OrderingTerm.desc(tbl.createdAt),
-        ]))
-        .get();
-  }
+  Stream<List<CardsTableData>> watchByDeck(int deckId) =>
+      (select(cardsTable)
+            ..where((CardsTable tbl) => tbl.deckId.equals(deckId))
+            ..orderBy([
+              (CardsTable tbl) => OrderingTerm.desc(tbl.updatedAt),
+              (CardsTable tbl) => OrderingTerm.desc(tbl.createdAt),
+            ]))
+          .watch();
 
-  Future<List<CardsTableData>> getByDeck(int deckId) {
-    return (select(cardsTable)
-          ..where((CardsTable tbl) => tbl.deckId.equals(deckId))
-          ..orderBy([
+  Future<List<CardsTableData>> getAll() =>
+      (select(cardsTable)..orderBy([
             (CardsTable tbl) => OrderingTerm.desc(tbl.updatedAt),
             (CardsTable tbl) => OrderingTerm.desc(tbl.createdAt),
           ]))
-        .get();
-  }
+          .get();
 
-  Future<CardsTableData?> getById(int id) {
-    return (select(
-      cardsTable,
-    )..where((CardsTable tbl) => tbl.id.equals(id))).getSingleOrNull();
-  }
+  Future<List<CardsTableData>> getByDeck(int deckId) =>
+      (select(cardsTable)
+            ..where((CardsTable tbl) => tbl.deckId.equals(deckId))
+            ..orderBy([
+              (CardsTable tbl) => OrderingTerm.desc(tbl.updatedAt),
+              (CardsTable tbl) => OrderingTerm.desc(tbl.createdAt),
+            ]))
+          .get();
 
-  Future<int> insertCard(CardsTableCompanion card) {
-    return into(cardsTable).insert(card, mode: InsertMode.insertOrReplace);
-  }
+  Future<CardsTableData?> getById(int id) => (select(
+    cardsTable,
+  )..where((CardsTable tbl) => tbl.id.equals(id))).getSingleOrNull();
 
-  Future<bool> updateCard(CardsTableCompanion card) {
-    return update(cardsTable).replace(card);
-  }
+  Future<int> insertCard(CardsTableCompanion card) =>
+      into(cardsTable).insert(card, mode: InsertMode.insertOrReplace);
 
-  Future<int> deleteById(int id) {
-    return (delete(
-      cardsTable,
-    )..where((CardsTable tbl) => tbl.id.equals(id))).go();
-  }
+  Future<bool> updateCard(CardsTableCompanion card) =>
+      update(cardsTable).replace(card);
+
+  Future<int> deleteById(int id) =>
+      (delete(cardsTable)..where((CardsTable tbl) => tbl.id.equals(id))).go();
 
   Future<int> deleteByDeckIds(List<int> deckIds) {
     if (deckIds.isEmpty) {
@@ -101,16 +90,19 @@ class CardDao extends DatabaseAccessor<AppDatabase> with _$CardDaoMixin {
     final rows = await (select(
       cardsTable,
     )..where((CardsTable tbl) => tbl.deckId.equals(deckId))).get();
-    final known = rows.where((CardsTableData row) {
-      return row.status == CardStatus.mastered;
-    }).length;
-    final learning = rows.where((CardsTableData row) {
-      return row.status == CardStatus.learning ||
-          row.status == CardStatus.reviewing;
-    }).length;
-    final newCards = rows.where((CardsTableData row) {
-      return row.status == CardStatus.newCard;
-    }).length;
+    final known = rows
+        .where((CardsTableData row) => row.status == CardStatus.mastered)
+        .length;
+    final learning = rows
+        .where(
+          (CardsTableData row) =>
+              row.status == CardStatus.learning ||
+              row.status == CardStatus.reviewing,
+        )
+        .length;
+    final newCards = rows
+        .where((CardsTableData row) => row.status == CardStatus.newCard)
+        .length;
     return (
       total: rows.length,
       known: known,
@@ -119,12 +111,10 @@ class CardDao extends DatabaseAccessor<AppDatabase> with _$CardDaoMixin {
     );
   }
 
-  Future<void> insertBatch(List<CardsTableCompanion> cards) {
-    return batch(
-      (Batch batch) =>
-          batch.insertAll(cardsTable, cards, mode: InsertMode.insertOrReplace),
-    );
-  }
+  Future<void> insertBatch(List<CardsTableCompanion> cards) => batch(
+    (Batch batch) =>
+        batch.insertAll(cardsTable, cards, mode: InsertMode.insertOrReplace),
+  );
 
   Future<List<int>> getIdsByDeckIds(List<int> deckIds) async {
     if (deckIds.isEmpty) {

@@ -1,5 +1,5 @@
-import 'package:memox/core/providers/usecase_providers.dart';
 import 'package:memox/core/design/card_status.dart';
+import 'package:memox/core/providers/usecase_providers.dart';
 import 'package:memox/features/decks/domain/entities/deck_entity.dart';
 import 'package:memox/features/folders/domain/entities/folder_delete_summary.dart';
 import 'package:memox/features/folders/domain/entities/folder_entity.dart';
@@ -56,12 +56,8 @@ AsyncValue<FolderDetailData> folderDetail(Ref ref, int folderId) {
       .where((DeckEntity deck) => folderIdsInTree.contains(deck.folderId))
       .map((DeckEntity deck) => deck.id)
       .toSet();
-  final cards = cardsAsync.requireValue.where((card) {
-    return deckIdsInTree.contains(card.deckId);
-  }).toList();
-  final masteredCards = cards.where((card) {
-    return card.status == CardStatus.mastered;
-  }).length;
+  final cards = cardsAsync.requireValue.where((card) => deckIdsInTree.contains(card.deckId)).toList();
+  final masteredCards = cards.where((card) => card.status == CardStatus.mastered).length;
   final contentType = switch ((subfolders.isNotEmpty, directDecks.isNotEmpty)) {
     (true, _) => ContentType.subfolders,
     (false, true) => ContentType.decks,
@@ -83,14 +79,10 @@ AsyncValue<FolderDetailData> folderDetail(Ref ref, int folderId) {
 }
 
 @riverpod
-Future<List<FolderEntity>> folderBreadcrumb(Ref ref, int folderId) {
-  return ref.watch(getFolderBreadcrumbUseCaseProvider).call(folderId);
-}
+Future<List<FolderEntity>> folderBreadcrumb(Ref ref, int folderId) => ref.watch(getFolderBreadcrumbUseCaseProvider).call(folderId);
 
 @riverpod
-Future<FolderDeleteSummary> folderDeleteSummary(Ref ref, int folderId) {
-  return ref.watch(getFolderDeleteSummaryUseCaseProvider).call(folderId);
-}
+Future<FolderDeleteSummary> folderDeleteSummary(Ref ref, int folderId) => ref.watch(getFolderDeleteSummaryUseCaseProvider).call(folderId);
 
 @riverpod
 bool canCreateSubfolder(Ref ref, int folderId) {
@@ -104,12 +96,10 @@ bool canCreateDeck(Ref ref, int folderId) {
   return detail?.contentType != ContentType.subfolders;
 }
 
-T? _valueOrNull<T>(AsyncValue<T> value) {
-  return switch (value) {
+T? _valueOrNull<T>(AsyncValue<T> value) => switch (value) {
     AsyncData<T>(:final value) => value,
     _ => null,
   };
-}
 
 List<int> _descendantIds(List<FolderEntity> folders, int folderId) {
   final descendantIds = <int>[];
@@ -137,6 +127,4 @@ FolderEntity? _folderById(List<FolderEntity> folders, int folderId) {
   return null;
 }
 
-List<FolderEntity> _subfoldersFor(List<FolderEntity> folders, int folderId) {
-  return folders.where((FolderEntity folder) => folder.parentId == folderId).toList();
-}
+List<FolderEntity> _subfoldersFor(List<FolderEntity> folders, int folderId) => folders.where((FolderEntity folder) => folder.parentId == folderId).toList();

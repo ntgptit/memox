@@ -19,8 +19,7 @@ class HomeGreetingCard extends StatelessWidget {
   final ValueChanged<DeckEntity> onReviewNow;
 
   @override
-  Widget build(BuildContext context) {
-    return AppCard(
+  Widget build(BuildContext context) => AppCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -41,7 +40,6 @@ class HomeGreetingCard extends StatelessWidget {
         ],
       ),
     );
-  }
 
   String _timeOfDayLabel(BuildContext context) {
     final hour = DateTime.now().hour;
@@ -64,8 +62,7 @@ class _GreetingBody extends StatelessWidget {
   final ValueChanged<DeckEntity> onReviewNow;
 
   @override
-  Widget build(BuildContext context) {
-    return Row(
+  Widget build(BuildContext context) => Row(
       children: [
         Expanded(
           child: Text(
@@ -81,5 +78,4 @@ class _GreetingBody extends StatelessWidget {
           ),
       ],
     );
-  }
 }

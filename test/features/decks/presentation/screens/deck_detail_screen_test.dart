@@ -66,7 +66,13 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('안녕하세요'), findsOneWidget);
     expect(find.text('Hello'), findsOneWidget);
+    await tester.tap(find.text('안녕하세요'));
+    await tester.pumpAndSettle();
+    expect(find.text('Hello'), findsOneWidget);
+    expect(find.text('Back'), findsNothing);
     expect(find.byTooltip('Create card'), findsOneWidget);
+    expect(find.byTooltip('Edit'), findsWidgets);
+    expect(find.byTooltip('Delete deck'), findsOneWidget);
   });
 
   testWidgets('DeckDetailScreen shows empty deck actions before card tools', (

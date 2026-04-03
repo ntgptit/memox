@@ -45,13 +45,13 @@ final class DeckRepositoryImpl implements DeckRepository {
   @override
   Future<List<DeckEntity>> getAll() async {
     final rows = await _localDataSource.getAll();
-    return rows.map(DeckMapper.toEntity).toList();
+    return rows.map((row) => row.toEntity()).toList();
   }
 
   @override
   Future<List<DeckEntity>> getByFolder(int folderId) async {
     final rows = await _localDataSource.getByFolder(folderId);
-    return rows.map(DeckMapper.toEntity).toList();
+    return rows.map((row) => row.toEntity()).toList();
   }
 
   @override
@@ -62,38 +62,30 @@ final class DeckRepositoryImpl implements DeckRepository {
       return null;
     }
 
-    return DeckMapper.toEntity(row);
+    return row.toEntity();
   }
 
   @override
-  Future<int> getNextSortOrder(int folderId) {
-    return _localDataSource.getNextSortOrder(folderId);
-  }
+  Future<int> getNextSortOrder(int folderId) =>
+      _localDataSource.getNextSortOrder(folderId);
 
   @override
-  Future<void> reorder({required int folderId, required List<int> deckIds}) {
-    return _localDataSource.reorder(folderId, deckIds);
-  }
+  Future<void> reorder({required int folderId, required List<int> deckIds}) =>
+      _localDataSource.reorder(folderId, deckIds);
 
   @override
   Future<DeckEntity> save(DeckEntity entity) async {
-    final savedRow = await _localDataSource.save(
-      DeckMapper.toCompanion(entity),
-    );
-    return DeckMapper.toEntity(savedRow);
+    final savedRow = await _localDataSource.save(entity.toCompanion());
+    return savedRow.toEntity();
   }
 
   @override
-  Stream<List<DeckEntity>> watchAll() {
-    return _localDataSource.watchAll().map(
-      (rows) => rows.map(DeckMapper.toEntity).toList(),
-    );
-  }
+  Stream<List<DeckEntity>> watchAll() => _localDataSource.watchAll().map(
+    (rows) => rows.map((row) => row.toEntity()).toList(),
+  );
 
   @override
-  Stream<List<DeckEntity>> watchByFolder(int folderId) {
-    return _localDataSource
-        .watchByFolder(folderId)
-        .map((rows) => rows.map(DeckMapper.toEntity).toList());
-  }
+  Stream<List<DeckEntity>> watchByFolder(int folderId) => _localDataSource
+      .watchByFolder(folderId)
+      .map((rows) => rows.map((row) => row.toEntity()).toList());
 }

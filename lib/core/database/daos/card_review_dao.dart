@@ -5,18 +5,14 @@ class CardReviewDao extends DatabaseAccessor<AppDatabase>
     with _$CardReviewDaoMixin {
   CardReviewDao(super.db);
 
-  Future<List<CardReviewsTableData>> getAll() {
-    return (select(cardReviewsTable)..orderBy([
-          (CardReviewsTable tbl) => OrderingTerm.desc(tbl.reviewedAt),
-        ]))
-        .get();
-  }
+  Future<List<CardReviewsTableData>> getAll() =>
+      (select(cardReviewsTable)..orderBy([
+            (CardReviewsTable tbl) => OrderingTerm.desc(tbl.reviewedAt),
+          ]))
+          .get();
 
-  Future<int> insertReview(CardReviewsTableCompanion review) {
-    return into(
-      cardReviewsTable,
-    ).insert(review, mode: InsertMode.insertOrReplace);
-  }
+  Future<int> insertReview(CardReviewsTableCompanion review) =>
+      into(cardReviewsTable).insert(review, mode: InsertMode.insertOrReplace);
 
   Future<int> countByCardIds(List<int> cardIds) async {
     if (cardIds.isEmpty) {

@@ -10,6 +10,8 @@
   "undoAction": "실행 취소",
   "submitAction": "제출",
   "exitAction": "종료",
+  "doneAction": "완료",
+  "reorderAction": "정렬",
   "exitSessionTitle": "학습 세션을 종료할까요?",
   "exitSessionMessage": "진행 상황은 저장되지 않습니다.",
   "navHome": "홈",
@@ -64,12 +66,189 @@
   "cardsSubtitle": "카드 기능 스캐폴드가 구현 준비를 마쳤습니다.",
   "studyTitle": "학습",
   "studySubtitle": "학습 기능 스캐폴드가 구현 준비를 마쳤습니다.",
+  "matchPairsLeft": "{count, plural, =0{모든 쌍을 맞췄어요} =1{남은 쌍 1개} other{남은 쌍 {count}개}}",
+  "@matchPairsLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "matchCompleteTitle": "모두 맞췄어요!",
+  "matchTimeLabel": "시간",
+  "matchMistakesLabel": "실수",
+  "matchStarsLabel": "별점",
+  "matchPlayAgainAction": "다시 하기",
+  "matchEmptySubtitle": "매치 모드를 시작하기 전에 이 덱에 카드를 추가하세요.",
+  "guessPromptLabel": "이것은 무엇일까요?",
+  "guessSkipAction": "건너뛰기",
+  "guessContinueAction": "계속하기",
+  "guessCorrectLabel": "정답",
+  "guessAccuracyLabel": "정확도",
+  "guessBestStreakLabel": "최고 연속 기록",
+  "guessCompleteTitle": "추측 모드 완료",
+  "guessPlayAgainAction": "다시 하기",
+  "guessEmptySubtitle": "추측 모드를 시작하기 전에 이 덱에 카드를 추가하세요.",
+  "guessCompletionSummary": "{correct}/{total}개 정답 ({accuracy}%)",
+  "@guessCompletionSummary": {
+    "placeholders": {
+      "correct": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "accuracy": {
+        "type": "int"
+      }
+    }
+  },
+  "guessOptionPrefixA": "A.",
+  "guessOptionPrefixB": "B.",
+  "guessOptionPrefixC": "C.",
+  "guessOptionPrefixD": "D.",
   "statisticsTitle": "통계",
   "statisticsSubtitle": "통계 기능 스캐폴드가 구현 준비를 마쳤습니다.",
+  "progressHeaderTitle": "나의 학습 진행도",
+  "statisticsPeriodWeek": "주간",
+  "statisticsPeriodMonth": "월간",
+  "statisticsPeriodAllTime": "전체",
+  "statisticsTodayPrefix": "오늘:",
+  "statisticsCardsUnit": "장",
+  "statisticsMinutesUnit": "분",
+  "statisticsStreakLabel": "일 연속",
+  "statisticsDayStreak": "{count}일 연속",
+  "@statisticsDayStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "statisticsWeeklyActivityTitle": "주간 활동",
+  "statisticsMasteryTitle": "숙달 현황",
+  "statisticsModeUsageTitle": "학습 모드 사용 비율",
+  "statisticsCardsToFocusTitle": "집중해서 볼 카드",
+  "statisticsNoHistoryTitle": "아직 학습 기록이 없습니다",
+  "statisticsNoHistorySubtitle": "학습 세션을 완료하면 진행도가 쌓이기 시작합니다.",
+  "statisticsPracticeTheseAction": "이 카드 연습하기",
+  "statisticsNoDifficultCards": "지금은 따로 집중할 카드가 없습니다.",
+  "statisticsPracticeDeckTitle": "연습할 덱 선택",
+  "statisticsPracticeDeckSubtitle": "{count, plural, =1{집중 카드 1장} other{집중 카드 {count}장}}",
+  "@statisticsPracticeDeckSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "statisticsWeekdayMondayShort": "월",
+  "statisticsWeekdayTuesdayShort": "화",
+  "statisticsWeekdayWednesdayShort": "수",
+  "statisticsWeekdayThursdayShort": "목",
+  "statisticsWeekdayFridayShort": "금",
+  "statisticsWeekdaySaturdayShort": "토",
+  "statisticsWeekdaySundayShort": "일",
+  "statisticsBarTooltip": "{count, plural, =1{카드 1장} other{카드 {count}장}}",
+  "@statisticsBarTooltip": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "settingsTitle": "설정",
   "settingsSubtitle": "설정 기능 스캐폴드가 구현 준비를 마쳤습니다.",
+  "settingsAppearanceSection": "모양",
+  "settingsStudyingSection": "학습",
+  "settingsNotificationsSection": "알림",
   "settingsDataTitle": "데이터",
   "settingsDataSubtitle": "현재 로컬 데이터베이스를 SQLite 파일로 내보냅니다.",
+  "settingsThemePreferenceTitle": "테마",
+  "settingsAppColorTitle": "앱 색상",
+  "settingsDailyGoalTitle": "일일 목표",
+  "settingsSessionLimitTitle": "세션 제한",
+  "settingsAutoAdvanceTitle": "자동 진행",
+  "settingsAutoAdvancePickerTitle": "자동 진행 시간 선택",
+  "settingsStudyReminderTitle": "학습 알림",
+  "settingsReminderTimeTitle": "알림 시간",
+  "settingsStreakReminderTitle": "스트릭 알림",
+  "settingsExportCardsAction": "카드 내보내기 (JSON)",
+  "settingsImportFromFileAction": "파일에서 가져오기",
+  "settingsClearHistoryAction": "학습 기록 삭제",
+  "settingsGoalValue": "하루 {count}장",
+  "@settingsGoalValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsSessionLimitValue": "{minutes}분",
+  "@settingsSessionLimitValue": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsAutoAdvanceValue": "{seconds}초",
+  "@settingsAutoAdvanceValue": {
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsReminderTimePlaceholder": "시간 선택",
+  "settingsExportShareSubject": "MemoX 카드 내보내기",
+  "settingsExportSuccess": "{fileName} 파일을 내보냈습니다",
+  "@settingsExportSuccess": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsExportFailed": "카드를 내보내지 못했습니다.",
+  "settingsImportSuccess": "폴더 {folders}개 · 덱 {decks}개 · 카드 {cards}장을 가져왔습니다",
+  "@settingsImportSuccess": {
+    "placeholders": {
+      "folders": {
+        "type": "int"
+      },
+      "decks": {
+        "type": "int"
+      },
+      "cards": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsImportFailed": "이 파일을 가져오지 못했습니다.",
+  "settingsClearHistoryMessage": "학습 세션과 복습 기록은 모두 삭제되지만, 폴더·덱·카드는 그대로 유지됩니다.",
+  "settingsClearHistorySuccess": "세션 {sessions}개 · 리뷰 {reviews}개를 삭제했습니다",
+  "@settingsClearHistorySuccess": {
+    "placeholders": {
+      "sessions": {
+        "type": "int"
+      },
+      "reviews": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsStudyReminderNotificationTitle": "학습할 시간입니다",
+  "settingsStudyReminderNotificationBody": "오늘 목표는 카드 {count}장입니다.",
+  "@settingsStudyReminderNotificationBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsStreakReminderNotificationTitle": "스트릭을 지켜보세요",
+  "settingsStreakReminderNotificationBody": "오늘 카드 몇 장만 학습해도 스트릭을 이어갈 수 있습니다.",
   "exportDatabaseAction": "SQLite DB 내보내기",
   "databaseExportSuccess": "{fileName} 파일로 데이터베이스를 내보냈습니다",
   "@databaseExportSuccess": {
@@ -241,6 +420,7 @@
   "sortDateLabel": "날짜",
   "sortAlphaLabel": "A-Z",
   "sortStatusLabel": "상태",
+  "reorderModeHint": "드래그해서 순서를 바꾸세요.",
   "createCardAction": "카드 만들기",
   "studyDueCardsAction": "{count, plural, =0{복습 카드 0장 학습} =1{복습 카드 1장 학습} other{복습 카드 {count}장 학습}}",
   "@studyDueCardsAction": {
@@ -324,5 +504,90 @@
   "cardFrontEmptyError": "앞면은 비워둘 수 없습니다",
   "cardBackEmptyError": "뒷면은 비워둘 수 없습니다",
   "cardMissingTitle": "카드를 찾을 수 없습니다",
-  "cardMissingSubtitle": "이미 삭제되었을 수 있습니다."
+  "cardMissingSubtitle": "이미 삭제되었을 수 있습니다.",
+  "recallPromptLabel": "무엇이 떠오르나요:",
+  "recallYourAnswerLabel": "내 답변",
+  "recallAnswerHint": "기억나는 것을 모두 적어보세요...",
+  "recallRevealAction": "정답 보기",
+  "recallCompleteAnswerLabel": "전체 정답",
+  "recallSelfAssessmentLabel": "얼마나 잘 떠올렸나요?",
+  "recallRatingMissed": "놓쳤어요",
+  "recallRatingPartial": "부분 기억",
+  "recallRatingGotIt": "기억했어요",
+  "recallEmptySubtitle": "회상 모드를 시작하기 전에 이 덱에 카드를 추가하세요.",
+  "recallCompleteTitle": "{count}장 회상 완료",
+  "@recallCompleteTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recallCompletionSummary": "기억했어요: {gotIt} · 부분 기억: {partial} · 놓쳤어요: {missed}",
+  "@recallCompletionSummary": {
+    "placeholders": {
+      "gotIt": {
+        "type": "int"
+      },
+      "partial": {
+        "type": "int"
+      },
+      "missed": {
+        "type": "int"
+      }
+    }
+  },
+  "recallReviewMissedAction": "놓친 카드 다시 보기",
+  "fillPromptLabel": "빈칸을 채워 보세요",
+  "fillShowHintAction": "힌트 보기",
+  "fillHintValue": "힌트: {hint}",
+  "@fillHintValue": {
+    "placeholders": {
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "fillAnswerLabel": "내 답변",
+  "fillAnswerHint": "정답을 입력하세요...",
+  "fillRetryInputHint": "계속하려면 정답을 입력하세요",
+  "fillAlmostTitle": "거의 맞았어요! 올바른 표기는:",
+  "fillCorrectAnswerTitle": "정답은 다음과 같습니다:",
+  "fillAcceptCloseAction": "이대로 인정",
+  "fillRejectCloseAction": "오답으로 표시",
+  "fillSkipAction": "건너뛰기",
+  "fillEmptySubtitle": "빈칸 채우기 모드를 시작하기 전에 이 덱에 카드를 추가하세요.",
+  "fillCompleteTitle": "{count}장 완료",
+  "@fillCompleteTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "fillCorrectFirstTryLabel": "첫 시도 정답",
+  "fillAcceptedCloseLabel": "근접 정답 인정",
+  "fillRetryNeededLabel": "재입력 필요",
+  "fillLongestStreakLabel": "최장 연속 기록",
+  "fillCompletionSummary": "첫 시도 정답 {count}개 ({accuracy}%)",
+  "@fillCompletionSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "accuracy": {
+        "type": "int"
+      }
+    }
+  },
+  "fillPracticeMistakesAction": "실수 다시 연습",
+  "fillMistakesListAction": "실수 다시 보기",
+  "fillMistakeSummary": "{count, plural, =0{근접 정답으로 인정됨} =1{1번 다시 입력 필요} other{{count}번 다시 입력 필요}}",
+  "@fillMistakeSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

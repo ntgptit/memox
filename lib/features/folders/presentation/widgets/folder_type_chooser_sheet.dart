@@ -8,8 +8,7 @@ class FolderTypeChooserSheet extends StatelessWidget {
   const FolderTypeChooserSheet({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return ChoiceBottomSheet<FolderCreationKind>(
+  Widget build(BuildContext context) => ChoiceBottomSheet<FolderCreationKind>(
       title: context.l10n.folderTypeChooserTitle,
       options: [
         ChoiceOption<FolderCreationKind>(
@@ -26,11 +25,8 @@ class FolderTypeChooserSheet extends StatelessWidget {
         ),
       ],
     );
-  }
 }
 
-Future<FolderCreationKind?> showFolderTypeChooserSheet(BuildContext context) {
-  return context.showAppBottomSheet<FolderCreationKind>(
+Future<FolderCreationKind?> showFolderTypeChooserSheet(BuildContext context) => context.showAppBottomSheet<FolderCreationKind>(
     const FolderTypeChooserSheet(),
   );
-}

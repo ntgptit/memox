@@ -6,7 +6,5 @@ final class GetDueCardsUseCase {
 
   final FlashcardRepository _repository;
 
-  Future<List<FlashcardEntity>> call({int? deckId, int limit = 20}) {
-    return _repository.getDueCards(deckId: deckId, limit: limit);
-  }
+  Future<List<FlashcardEntity>> call({int? deckId, int limit = 20}) => _repository.getDueCards(deckId: deckId, limit: limit);
 }

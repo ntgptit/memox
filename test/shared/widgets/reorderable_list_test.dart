@@ -5,6 +5,23 @@ import 'package:memox/shared/widgets/lists/reorderable_list.dart';
 import '../../test_helpers/test_app.dart';
 
 void main() {
+  testWidgets('ReorderableListWidget hides drag handle in normal mode', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      buildTestApp(
+        home: ReorderableListWidget<String>(
+          items: const <String>['A'],
+          onReorder: (oldIndex, newIndex) {},
+          itemBuilder: (context, item, index) => Text(item),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byIcon(Icons.drag_indicator_outlined), findsNothing);
+  });
+
   testWidgets('ReorderableListWidget uses compact drag handle visuals', (
     tester,
   ) async {
@@ -12,6 +29,7 @@ void main() {
       buildTestApp(
         home: ReorderableListWidget<String>(
           items: const <String>['A'],
+          isReorderEnabled: true,
           onReorder: (oldIndex, newIndex) {},
           itemBuilder: (context, item, index) => Text(item),
         ),

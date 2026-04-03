@@ -4,61 +4,45 @@ part of '../app_database.dart';
 class DeckDao extends DatabaseAccessor<AppDatabase> with _$DeckDaoMixin {
   DeckDao(super.db);
 
-  Stream<List<DecksTableData>> watchAll() {
-    return (select(decksTable)..orderBy([
+  Stream<List<DecksTableData>> watchAll() => (select(decksTable)..orderBy([
           (DecksTable tbl) => OrderingTerm.asc(tbl.sortOrder),
           (DecksTable tbl) => OrderingTerm.asc(tbl.createdAt),
         ]))
         .watch();
-  }
 
-  Stream<List<DecksTableData>> watchByFolder(int folderId) {
-    return (select(decksTable)
+  Stream<List<DecksTableData>> watchByFolder(int folderId) => (select(decksTable)
           ..where((DecksTable tbl) => tbl.folderId.equals(folderId))
           ..orderBy([
             (DecksTable tbl) => OrderingTerm.asc(tbl.sortOrder),
             (DecksTable tbl) => OrderingTerm.asc(tbl.createdAt),
           ]))
         .watch();
-  }
 
-  Future<List<DecksTableData>> getAll() {
-    return (select(decksTable)..orderBy([
+  Future<List<DecksTableData>> getAll() => (select(decksTable)..orderBy([
           (DecksTable tbl) => OrderingTerm.asc(tbl.sortOrder),
           (DecksTable tbl) => OrderingTerm.asc(tbl.createdAt),
         ]))
         .get();
-  }
 
-  Future<DecksTableData?> getById(int id) {
-    return (select(
+  Future<DecksTableData?> getById(int id) => (select(
       decksTable,
     )..where((DecksTable tbl) => tbl.id.equals(id))).getSingleOrNull();
-  }
 
-  Future<List<DecksTableData>> getByFolder(int folderId) {
-    return (select(decksTable)
+  Future<List<DecksTableData>> getByFolder(int folderId) => (select(decksTable)
           ..where((DecksTable tbl) => tbl.folderId.equals(folderId))
           ..orderBy([
             (DecksTable tbl) => OrderingTerm.asc(tbl.sortOrder),
             (DecksTable tbl) => OrderingTerm.asc(tbl.createdAt),
           ]))
         .get();
-  }
 
-  Future<int> insertDeck(DecksTableCompanion deck) {
-    return into(decksTable).insert(deck, mode: InsertMode.insertOrReplace);
-  }
+  Future<int> insertDeck(DecksTableCompanion deck) => into(decksTable).insert(deck, mode: InsertMode.insertOrReplace);
 
-  Future<bool> updateDeck(DecksTableCompanion deck) {
-    return update(decksTable).replace(deck);
-  }
+  Future<bool> updateDeck(DecksTableCompanion deck) => update(decksTable).replace(deck);
 
-  Future<int> deleteById(int id) {
-    return (delete(
+  Future<int> deleteById(int id) => (delete(
       decksTable,
     )..where((DecksTable tbl) => tbl.id.equals(id))).go();
-  }
 
   Future<int> deleteByFolderIds(List<int> folderIds) {
     if (folderIds.isEmpty) {
@@ -98,8 +82,7 @@ class DeckDao extends DatabaseAccessor<AppDatabase> with _$DeckDaoMixin {
     return (currentMax ?? -1) + 1;
   }
 
-  Future<void> reorder(int folderId, List<int> deckIds) {
-    return transaction(() async {
+  Future<void> reorder(int folderId, List<int> deckIds) => transaction(() async {
       for (var index = 0; index < deckIds.length; index++) {
         final deckId = deckIds[index];
         await (update(
@@ -113,5 +96,4 @@ class DeckDao extends DatabaseAccessor<AppDatabase> with _$DeckDaoMixin {
         );
       }
     });
-  }
 }

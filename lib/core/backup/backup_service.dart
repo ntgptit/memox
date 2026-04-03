@@ -134,106 +134,96 @@ class BackupService {
     return importFromJson(jsonString);
   }
 
-  Map<String, dynamic> _folderToJson(FoldersTableData row) {
-    return <String, dynamic>{
-      'id': row.id,
-      'name': row.name,
-      'parentId': row.parentId,
-      'colorValue': row.colorValue,
-      'createdAt': row.createdAt.toIso8601String(),
-      'updatedAt': row.updatedAt.toIso8601String(),
-      'sortOrder': row.sortOrder,
-    };
-  }
+  Map<String, dynamic> _folderToJson(FoldersTableData row) => <String, dynamic>{
+    'id': row.id,
+    'name': row.name,
+    'parentId': row.parentId,
+    'colorValue': row.colorValue,
+    'createdAt': row.createdAt.toIso8601String(),
+    'updatedAt': row.updatedAt.toIso8601String(),
+    'sortOrder': row.sortOrder,
+  };
 
-  Map<String, dynamic> _deckToJson(DecksTableData row) {
-    return <String, dynamic>{
-      'id': row.id,
-      'name': row.name,
-      'description': row.description,
-      'folderId': row.folderId,
-      'colorValue': row.colorValue,
-      'tags': row.tags,
-      'createdAt': row.createdAt.toIso8601String(),
-      'updatedAt': row.updatedAt.toIso8601String(),
-      'sortOrder': row.sortOrder,
-    };
-  }
+  Map<String, dynamic> _deckToJson(DecksTableData row) => <String, dynamic>{
+    'id': row.id,
+    'name': row.name,
+    'description': row.description,
+    'folderId': row.folderId,
+    'colorValue': row.colorValue,
+    'tags': row.tags,
+    'createdAt': row.createdAt.toIso8601String(),
+    'updatedAt': row.updatedAt.toIso8601String(),
+    'sortOrder': row.sortOrder,
+  };
 
-  Map<String, dynamic> _cardToJson(CardsTableData row) {
-    return <String, dynamic>{
-      'id': row.id,
-      'deckId': row.deckId,
-      'front': row.front,
-      'back': row.back,
-      'hint': row.hint,
-      'example': row.example,
-      'imagePath': row.imagePath,
-      'status': row.status.name,
-      'easeFactor': row.easeFactor,
-      'interval': row.interval,
-      'repetitions': row.repetitions,
-      'nextReviewDate': row.nextReviewDate?.toIso8601String(),
-      'lastReviewedAt': row.lastReviewedAt?.toIso8601String(),
-      'createdAt': row.createdAt.toIso8601String(),
-      'updatedAt': row.updatedAt.toIso8601String(),
-    };
-  }
+  Map<String, dynamic> _cardToJson(CardsTableData row) => <String, dynamic>{
+    'id': row.id,
+    'deckId': row.deckId,
+    'front': row.front,
+    'back': row.back,
+    'hint': row.hint,
+    'example': row.example,
+    'imagePath': row.imagePath,
+    'status': row.status.name,
+    'easeFactor': row.easeFactor,
+    'interval': row.interval,
+    'repetitions': row.repetitions,
+    'nextReviewDate': row.nextReviewDate?.toIso8601String(),
+    'lastReviewedAt': row.lastReviewedAt?.toIso8601String(),
+    'createdAt': row.createdAt.toIso8601String(),
+    'updatedAt': row.updatedAt.toIso8601String(),
+  };
 
-  Map<String, dynamic> _studySessionToJson(StudySessionsTableData row) {
-    return <String, dynamic>{
-      'id': row.id,
-      'deckId': row.deckId,
-      'mode': row.mode.name,
-      'startedAt': row.startedAt.toIso8601String(),
-      'completedAt': row.completedAt?.toIso8601String(),
-      'totalCards': row.totalCards,
-      'correctCount': row.correctCount,
-      'wrongCount': row.wrongCount,
-      'durationSeconds': row.durationSeconds,
-    };
-  }
+  Map<String, dynamic> _studySessionToJson(StudySessionsTableData row) =>
+      <String, dynamic>{
+        'id': row.id,
+        'deckId': row.deckId,
+        'mode': row.mode.name,
+        'startedAt': row.startedAt.toIso8601String(),
+        'completedAt': row.completedAt?.toIso8601String(),
+        'totalCards': row.totalCards,
+        'correctCount': row.correctCount,
+        'wrongCount': row.wrongCount,
+        'durationSeconds': row.durationSeconds,
+      };
 
-  Map<String, dynamic> _cardReviewToJson(CardReviewsTableData row) {
-    return <String, dynamic>{
-      'id': row.id,
-      'cardId': row.cardId,
-      'sessionId': row.sessionId,
-      'mode': row.mode.name,
-      'rating': row.rating,
-      'selfRating': row.selfRating,
-      'isCorrect': row.isCorrect,
-      'userAnswer': row.userAnswer,
-      'responseTimeMs': row.responseTimeMs,
-      'reviewedAt': row.reviewedAt.toIso8601String(),
-    };
-  }
+  Map<String, dynamic> _cardReviewToJson(CardReviewsTableData row) =>
+      <String, dynamic>{
+        'id': row.id,
+        'cardId': row.cardId,
+        'sessionId': row.sessionId,
+        'mode': row.mode.name,
+        'rating': row.rating,
+        'selfRating': row.selfRating,
+        'isCorrect': row.isCorrect,
+        'userAnswer': row.userAnswer,
+        'responseTimeMs': row.responseTimeMs,
+        'reviewedAt': row.reviewedAt.toIso8601String(),
+      };
 
-  FoldersTableCompanion _folderFromJson(Map<String, dynamic> json) {
-    return FoldersTableCompanion(
-      id: Value<int>(json['id'] as int),
-      name: Value<String>(json['name'] as String),
-      parentId: Value<int?>(json['parentId'] as int?),
-      colorValue: Value<int>(json['colorValue'] as int),
-      createdAt: Value<DateTime>(DateTime.parse(json['createdAt'] as String)),
-      updatedAt: Value<DateTime>(DateTime.parse(json['updatedAt'] as String)),
-      sortOrder: Value<int>(json['sortOrder'] as int),
-    );
-  }
+  FoldersTableCompanion _folderFromJson(Map<String, dynamic> json) =>
+      FoldersTableCompanion(
+        id: Value<int>(json['id'] as int),
+        name: Value<String>(json['name'] as String),
+        parentId: Value<int?>(json['parentId'] as int?),
+        colorValue: Value<int>(json['colorValue'] as int),
+        createdAt: Value<DateTime>(DateTime.parse(json['createdAt'] as String)),
+        updatedAt: Value<DateTime>(DateTime.parse(json['updatedAt'] as String)),
+        sortOrder: Value<int>(json['sortOrder'] as int),
+      );
 
-  DecksTableCompanion _deckFromJson(Map<String, dynamic> json) {
-    return DecksTableCompanion(
-      id: Value<int>(json['id'] as int),
-      name: Value<String>(json['name'] as String),
-      description: Value<String>(json['description'] as String),
-      folderId: Value<int>(json['folderId'] as int),
-      colorValue: Value<int>(json['colorValue'] as int),
-      tags: Value<String>(json['tags'] as String),
-      createdAt: Value<DateTime>(DateTime.parse(json['createdAt'] as String)),
-      updatedAt: Value<DateTime>(DateTime.parse(json['updatedAt'] as String)),
-      sortOrder: Value<int>(json['sortOrder'] as int),
-    );
-  }
+  DecksTableCompanion _deckFromJson(Map<String, dynamic> json) =>
+      DecksTableCompanion(
+        id: Value<int>(json['id'] as int),
+        name: Value<String>(json['name'] as String),
+        description: Value<String>(json['description'] as String),
+        folderId: Value<int>(json['folderId'] as int),
+        colorValue: Value<int>(json['colorValue'] as int),
+        tags: Value<String>(json['tags'] as String),
+        createdAt: Value<DateTime>(DateTime.parse(json['createdAt'] as String)),
+        updatedAt: Value<DateTime>(DateTime.parse(json['updatedAt'] as String)),
+        sortOrder: Value<int>(json['sortOrder'] as int),
+      );
 
   CardsTableCompanion _cardFromJson(Map<String, dynamic> json) {
     final nextReviewDate = json['nextReviewDate'] as String?;
@@ -278,18 +268,19 @@ class BackupService {
     );
   }
 
-  CardReviewsTableCompanion _cardReviewFromJson(Map<String, dynamic> json) {
-    return CardReviewsTableCompanion(
-      id: Value<int>(json['id'] as int),
-      cardId: Value<int>(json['cardId'] as int),
-      sessionId: Value<int>(json['sessionId'] as int),
-      mode: Value(StudyMode.values.byName(json['mode'] as String)),
-      rating: Value<int?>(json['rating'] as int?),
-      selfRating: Value<int?>(json['selfRating'] as int?),
-      isCorrect: Value<bool>(json['isCorrect'] as bool),
-      userAnswer: Value<String>(json['userAnswer'] as String),
-      responseTimeMs: Value<int>(json['responseTimeMs'] as int),
-      reviewedAt: Value<DateTime>(DateTime.parse(json['reviewedAt'] as String)),
-    );
-  }
+  CardReviewsTableCompanion _cardReviewFromJson(Map<String, dynamic> json) =>
+      CardReviewsTableCompanion(
+        id: Value<int>(json['id'] as int),
+        cardId: Value<int>(json['cardId'] as int),
+        sessionId: Value<int>(json['sessionId'] as int),
+        mode: Value(StudyMode.values.byName(json['mode'] as String)),
+        rating: Value<int?>(json['rating'] as int?),
+        selfRating: Value<int?>(json['selfRating'] as int?),
+        isCorrect: Value<bool>(json['isCorrect'] as bool),
+        userAnswer: Value<String>(json['userAnswer'] as String),
+        responseTimeMs: Value<int>(json['responseTimeMs'] as int),
+        reviewedAt: Value<DateTime>(
+          DateTime.parse(json['reviewedAt'] as String),
+        ),
+      );
 }

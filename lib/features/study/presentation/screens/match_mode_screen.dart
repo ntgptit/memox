@@ -1,0 +1,133 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:memox/core/extensions/context_extensions.dart';
+import 'package:memox/core/theme/tokens/spacing_tokens.dart';
+import 'package:memox/features/study/presentation/providers/match_provider.dart';
+import 'package:memox/features/study/presentation/widgets/match_elapsed_timer_text.dart';
+import 'package:memox/features/study/presentation/widgets/match_round_view.dart';
+import 'package:memox/features/study/presentation/widgets/match_star_rating.dart';
+import 'package:memox/shared/widgets/buttons/secondary_button.dart';
+import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
+import 'package:memox/shared/widgets/feedback/session_complete_view.dart';
+import 'package:memox/shared/widgets/navigation/study_top_bar.dart';
+
+class MatchModeScreen extends ConsumerWidget {
+  const MatchModeScreen({required this.deckId, super.key});
+
+  final int deckId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(matchSessionProvider(deckId));
+    return AppAsyncBuilder<MatchState>(
+      value: state,
+      onData: (data) => Scaffold(
+        appBar: StudyTopBar(
+          title: context.l10n.modeMatch,
+          current: data.matchedCount,
+          total: data.totalPairs,
+          subtitle: context.l10n.matchPairsLeft(data.pairsLeft),
+          trailing: data.isComplete
+              ? Text(
+                  _elapsedLabel(data.startTime),
+                  style: context.appTextStyles.progressCount.copyWith(
+                    color: context.colors.onSurfaceVariant,
+                  ),
+                )
+              : MatchElapsedTimerText(startTime: data.startTime),
+          showProgress: false,
+          onClose: () => unawaited(_handleClose(context)),
+        ),
+        body: data.isComplete
+            ? _buildCompletionView(
+                context,
+                data,
+                onDone: () => context.pop<void>(),
+                onPlayAgain: () =>
+                    ref.read(matchSessionProvider(deckId).notifier).startGame(),
+              )
+            : MatchRoundView(
+                state: data,
+                onSelect: (item) => ref
+                    .read(matchSessionProvider(deckId).notifier)
+                    .selectItem(item),
+              ),
+      ),
+    );
+  }
+
+  Future<void> _handleClose(BuildContext context) async {
+    final confirmed = await context.showConfirmDialog(
+      title: context.l10n.exitSessionTitle,
+      message: context.l10n.exitSessionMessage,
+      confirmText: context.l10n.exitAction,
+      isDestructive: true,
+    );
+
+    if (confirmed == true && context.mounted) {
+      context.pop<void>();
+    }
+  }
+}
+
+Widget _buildCompletionView(
+  BuildContext context,
+  MatchState state, {
+  required VoidCallback onDone,
+  required VoidCallback onPlayAgain,
+}) {
+  final starCount = _starCount(state.mistakes);
+  return SessionCompleteView(
+    title: context.l10n.matchCompleteTitle,
+    stats: [
+      SessionStat(
+        label: context.l10n.matchTimeLabel,
+        icon: Icons.schedule_outlined,
+        value: _elapsedLabel(state.startTime),
+      ),
+      SessionStat(
+        label: context.l10n.matchMistakesLabel,
+        icon: Icons.close_outlined,
+        value: '${state.mistakes}',
+      ),
+      SessionStat(
+        label: context.l10n.matchStarsLabel,
+        icon: Icons.grade_outlined,
+        value: '$starCount/3',
+        valueColor: context.customColors.warning,
+      ),
+    ],
+    extraContent: Column(
+      children: [
+        MatchStarRating(starCount: starCount),
+        const SizedBox(height: SpacingTokens.lg),
+        SecondaryButton(
+          label: context.l10n.matchPlayAgainAction,
+          onPressed: onPlayAgain,
+        ),
+      ],
+    ),
+    primaryAction: SessionAction(label: context.l10n.doneAction, onTap: onDone),
+  );
+}
+
+String _elapsedLabel(DateTime startTime) {
+  final elapsed = DateTime.now().difference(startTime);
+  final minutes = elapsed.inMinutes;
+  final seconds = elapsed.inSeconds.remainder(60).toString().padLeft(2, '0');
+  return '$minutes:$seconds';
+}
+
+int _starCount(int mistakes) {
+  if (mistakes == 0) {
+    return 3;
+  }
+
+  if (mistakes <= 2) {
+    return 2;
+  }
+
+  return 1;
+}

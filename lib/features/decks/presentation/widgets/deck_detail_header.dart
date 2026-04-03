@@ -26,6 +26,7 @@ class DeckDetailHeader extends StatelessWidget {
     required this.masteryPercentage,
     required this.showMasteryBar,
     required this.showCollapsedTitle,
+    required this.onEdit,
     required this.onDelete,
     super.key,
   });
@@ -36,6 +37,7 @@ class DeckDetailHeader extends StatelessWidget {
   final double masteryPercentage;
   final bool showMasteryBar;
   final bool showCollapsedTitle;
+  final VoidCallback onEdit;
   final VoidCallback onDelete;
 
   @override
@@ -59,6 +61,12 @@ class DeckDetailHeader extends StatelessWidget {
           : null,
       actionsPadding: EdgeInsets.zero,
       actions: [
+        TopBarIconButton(
+          tooltip: context.l10n.editAction,
+          onPressed: onEdit,
+          icon: Icons.edit_outlined,
+          alignment: Alignment.centerRight,
+        ),
         TopBarIconButton(
           tooltip: context.l10n.deleteDeckAction,
           onPressed: onDelete,

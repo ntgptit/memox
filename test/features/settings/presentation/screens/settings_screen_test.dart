@@ -1,61 +1,60 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/core/providers/service_providers.dart';
-import 'package:memox/core/services/database_export_service.dart';
+import 'package:memox/core/services/notification_service.dart';
 import 'package:memox/features/settings/presentation/screens/settings_screen.dart';
-import 'package:memox/features/settings/presentation/widgets/theme_preview/theme_mode_selector.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../test_helpers/test_app.dart';
 
 void main() {
-  testWidgets('settings screen renders theme controls', (tester) async {
-    await tester.pumpWidget(
-      ProviderScope(child: buildTestApp(home: const SettingsScreen())),
-    );
-    await tester.pumpAndSettle();
-
-    expect(find.byType(ThemeModeSelector), findsOneWidget);
-  });
-
-  testWidgets('settings screen exports database when supported', (
+  testWidgets('settings screen renders settings sections and actions', (
     tester,
   ) async {
-    final service = _FakeDatabaseExportService(
-      result: const DatabaseExportSuccess(fileName: 'memox_database.sqlite'),
-    );
+    SharedPreferences.setMockInitialValues(const <String, Object>{});
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [databaseExportServiceProvider.overrideWithValue(service)],
+        overrides: [
+          notificationServiceProvider.overrideWithValue(
+            const NoopNotificationService(),
+          ),
+        ],
         child: buildTestApp(home: const SettingsScreen()),
       ),
     );
     await tester.pumpAndSettle();
+    final scrollable = find.byType(Scrollable).first;
 
-    expect(find.text('Data'), findsOneWidget);
-    expect(find.text('Export SQLite database'), findsOneWidget);
+    expect(find.text('Appearance'.toUpperCase()), findsOneWidget);
+    expect(find.text('Studying'.toUpperCase()), findsOneWidget);
 
-    await tester.tap(find.text('Export SQLite database'));
+    await tester.scrollUntilVisible(
+      find.text('Notifications'.toUpperCase()),
+      300,
+      scrollable: scrollable,
+    );
     await tester.pumpAndSettle();
 
-    expect(service.exportCallCount, 1);
-    expect(
-      find.text('Database exported as memox_database.sqlite'),
-      findsOneWidget,
+    expect(find.text('Notifications'.toUpperCase()), findsOneWidget);
+
+    await tester.scrollUntilVisible(
+      find.text('Data'.toUpperCase()),
+      300,
+      scrollable: scrollable,
     );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Data'.toUpperCase()), findsOneWidget);
+
+    await tester.scrollUntilVisible(
+      find.text('Export cards (JSON)'),
+      300,
+      scrollable: scrollable,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Export cards (JSON)'), findsOneWidget);
+    expect(find.text('Import from file'), findsOneWidget);
+    expect(find.text('Clear study history'), findsOneWidget);
   });
-}
-
-final class _FakeDatabaseExportService implements DatabaseExportService {
-  _FakeDatabaseExportService({required this.result});
-
-  @override
-  final bool isSupported = true;
-
-  final DatabaseExportResult result;
-  int exportCallCount = 0;
-
-  @override
-  Future<DatabaseExportResult> exportCurrentDatabase() async {
-    exportCallCount += 1;
-    return result;
-  }
 }

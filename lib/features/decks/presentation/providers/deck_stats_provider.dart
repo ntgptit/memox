@@ -5,6 +5,4 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'deck_stats_provider.g.dart';
 
 @riverpod
-Future<DeckStats> deckStats(Ref ref, int deckId) {
-  return ref.watch(getDeckStatsUseCaseProvider).call(deckId);
-}
+Future<DeckStats> deckStats(Ref ref, int deckId) => ref.watch(getDeckStatsUseCaseProvider).call(deckId);

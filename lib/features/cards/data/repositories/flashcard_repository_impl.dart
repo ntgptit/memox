@@ -34,13 +34,13 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
   @override
   Future<List<FlashcardEntity>> getAll() async {
     final rows = await _localDataSource.getAll();
-    return rows.map(FlashcardMapper.toEntity).toList();
+    return rows.map((row) => row.toEntity()).toList();
   }
 
   @override
   Future<List<FlashcardEntity>> getByDeck(int deckId) async {
     final rows = await _localDataSource.getByDeck(deckId);
-    return rows.map(FlashcardMapper.toEntity).toList();
+    return rows.map((row) => row.toEntity()).toList();
   }
 
   @override
@@ -51,7 +51,7 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
       return null;
     }
 
-    return FlashcardMapper.toEntity(row);
+    return row.toEntity();
   }
 
   @override
@@ -60,32 +60,26 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
     int limit = 20,
   }) async {
     final rows = await _localDataSource.getDueCards(deckId: deckId);
-    final cards = rows.map(FlashcardMapper.toEntity).toList()
+    final cards = rows.map((row) => row.toEntity()).toList()
       ..sort(_compareDueCards);
     return cards.take(limit).toList();
   }
 
   @override
   Future<FlashcardEntity> save(FlashcardEntity entity) async {
-    final savedRow = await _localDataSource.save(
-      FlashcardMapper.toCompanion(entity),
-    );
-    return FlashcardMapper.toEntity(savedRow);
+    final savedRow = await _localDataSource.save(entity.toCompanion());
+    return savedRow.toEntity();
   }
 
   @override
-  Stream<List<FlashcardEntity>> watchAll() {
-    return _localDataSource.watchAll().map(
-      (rows) => rows.map(FlashcardMapper.toEntity).toList(),
-    );
-  }
+  Stream<List<FlashcardEntity>> watchAll() => _localDataSource.watchAll().map(
+    (rows) => rows.map((row) => row.toEntity()).toList(),
+  );
 
   @override
-  Stream<List<FlashcardEntity>> watchByDeck(int deckId) {
-    return _localDataSource
-        .watchByDeck(deckId)
-        .map((rows) => rows.map(FlashcardMapper.toEntity).toList());
-  }
+  Stream<List<FlashcardEntity>> watchByDeck(int deckId) => _localDataSource
+      .watchByDeck(deckId)
+      .map((rows) => rows.map((row) => row.toEntity()).toList());
 
   @override
   Future<List<FlashcardEntity>> saveAll(List<FlashcardEntity> entities) async {
@@ -97,11 +91,11 @@ final class FlashcardRepositoryImpl implements FlashcardRepository {
       entities.first.deckId,
     )).map((row) => row.id).toSet();
     final rows = await _localDataSource.saveAll(
-      entities.map(FlashcardMapper.toCompanion).toList(),
+      entities.map((entity) => entity.toCompanion()).toList(),
     );
     return rows
         .where((row) => !existingIds.contains(row.id))
-        .map(FlashcardMapper.toEntity)
+        .map((row) => row.toEntity())
         .toList();
   }
 

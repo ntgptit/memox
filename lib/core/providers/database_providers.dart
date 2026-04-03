@@ -20,11 +20,7 @@ DeckDao deckDao(Ref ref) => ref.watch(appDatabaseProvider).deckDao;
 CardDao cardDao(Ref ref) => ref.watch(appDatabaseProvider).cardDao;
 
 @Riverpod(keepAlive: true)
-StudySessionDao studySessionDao(Ref ref) {
-  return ref.watch(appDatabaseProvider).studySessionDao;
-}
+StudySessionDao studySessionDao(Ref ref) => ref.watch(appDatabaseProvider).studySessionDao;
 
 @Riverpod(keepAlive: true)
-CardReviewDao cardReviewDao(Ref ref) {
-  return ref.watch(appDatabaseProvider).cardReviewDao;
-}
+CardReviewDao cardReviewDao(Ref ref) => ref.watch(appDatabaseProvider).cardReviewDao;

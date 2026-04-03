@@ -19,18 +19,36 @@ final class _MutableSettingsRepository implements SettingsRepository {
   int? seedColorValue;
 
   @override
-  Future<AppSettings> getSettings() async => const AppSettings();
+  Future<AppSettings> load() async => AppSettings.defaults;
 
   @override
-  Future<void> saveSettings(AppSettings settings) async {}
+  Future<void> save(AppSettings settings) async {}
+
+  @override
+  Future<void> updateAutoAdvanceDelay(double autoAdvanceDelay) async {}
+
+  @override
+  Future<void> updateDailyGoal(int dailyGoal) async {}
 
   @override
   Future<void> updateLocaleCode(String? localeCode) async {}
 
   @override
+  Future<void> updateReminderTime(TimeOfDay? reminderTime) async {}
+
+  @override
   Future<void> updateSeedColorValue(int nextSeedColorValue) async {
     seedColorValue = nextSeedColorValue;
   }
+
+  @override
+  Future<void> updateSessionLimitMinutes(int sessionLimitMinutes) async {}
+
+  @override
+  Future<void> updateStreakReminder({required bool streakReminder}) async {}
+
+  @override
+  Future<void> updateStudyReminder({required bool studyReminder}) async {}
 
   @override
   Future<void> updateThemeMode(ThemeMode themeMode) async {}

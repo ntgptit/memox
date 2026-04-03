@@ -48,7 +48,7 @@ final class FolderRepositoryImpl implements FolderRepository {
         ),
       ),
     );
-    final savedEntity = FolderMapper.toEntity(savedRow);
+    final savedEntity = savedRow.toEntity();
     _logger.info('Saved folder ${savedEntity.id}');
     return savedEntity;
   }
@@ -80,7 +80,7 @@ final class FolderRepositoryImpl implements FolderRepository {
   @override
   Future<List<FolderEntity>> getAll() async {
     final rows = await _localDataSource.getAll();
-    return rows.map(FolderMapper.toEntity).toList();
+    return rows.map((row) => row.toEntity()).toList();
   }
 
   @override
@@ -91,7 +91,7 @@ final class FolderRepositoryImpl implements FolderRepository {
       return null;
     }
 
-    return FolderMapper.toEntity(model);
+    return model.toEntity();
   }
 
   @override
@@ -112,9 +112,8 @@ final class FolderRepositoryImpl implements FolderRepository {
   }
 
   @override
-  Future<int> getNextSortOrder(int? parentId) {
-    return _localDataSource.getNextSortOrder(parentId);
-  }
+  Future<int> getNextSortOrder(int? parentId) =>
+      _localDataSource.getNextSortOrder(parentId);
 
   @override
   Future<FolderEntity> update({
@@ -127,7 +126,7 @@ final class FolderRepositoryImpl implements FolderRepository {
       name: name,
       colorValue: colorValue,
     );
-    final savedEntity = FolderMapper.toEntity(savedRow);
+    final savedEntity = savedRow.toEntity();
     _logger.info('Updated folder ${savedEntity.id}');
     return savedEntity;
   }
@@ -146,46 +145,38 @@ final class FolderRepositoryImpl implements FolderRepository {
   @override
   Future<List<FolderEntity>> getRootFolders() async {
     final rows = await _localDataSource.getByParent(null);
-    return rows.map(FolderMapper.toEntity).toList();
+    return rows.map((row) => row.toEntity()).toList();
   }
 
   @override
   Future<List<FolderEntity>> getSubfolders(int parentId) async {
     final rows = await _localDataSource.getByParent(parentId);
-    return rows.map(FolderMapper.toEntity).toList();
+    return rows.map((row) => row.toEntity()).toList();
   }
 
   @override
   Future<bool> hasDecks(int folderId) => _localDataSource.hasDecks(folderId);
 
   @override
-  Future<bool> hasSubfolders(int folderId) {
-    return _localDataSource.hasSubfolders(folderId);
-  }
+  Future<bool> hasSubfolders(int folderId) =>
+      _localDataSource.hasSubfolders(folderId);
 
   @override
-  Future<void> reorder({int? parentId, required List<int> folderIds}) {
-    return _localDataSource.reorder(parentId, folderIds);
-  }
+  Future<void> reorder({int? parentId, required List<int> folderIds}) =>
+      _localDataSource.reorder(parentId, folderIds);
 
   @override
-  Stream<List<FolderEntity>> watchAll() {
-    return _localDataSource.watchAll().map(
-      (rows) => rows.map(FolderMapper.toEntity).toList(),
-    );
-  }
+  Stream<List<FolderEntity>> watchAll() => _localDataSource.watchAll().map(
+    (rows) => rows.map((row) => row.toEntity()).toList(),
+  );
 
   @override
-  Stream<List<FolderEntity>> watchRootFolders() {
-    return _localDataSource
-        .watchByParent(null)
-        .map((rows) => rows.map(FolderMapper.toEntity).toList());
-  }
+  Stream<List<FolderEntity>> watchRootFolders() => _localDataSource
+      .watchByParent(null)
+      .map((rows) => rows.map((row) => row.toEntity()).toList());
 
   @override
-  Stream<List<FolderEntity>> watchSubfolders(int parentId) {
-    return _localDataSource
-        .watchByParent(parentId)
-        .map((rows) => rows.map(FolderMapper.toEntity).toList());
-  }
+  Stream<List<FolderEntity>> watchSubfolders(int parentId) => _localDataSource
+      .watchByParent(parentId)
+      .map((rows) => rows.map((row) => row.toEntity()).toList());
 }

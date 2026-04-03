@@ -1,5 +1,5 @@
-import 'package:memox/core/logging/app_logger.dart';
 import 'package:memox/core/design/study_mode.dart';
+import 'package:memox/core/logging/app_logger.dart';
 import 'package:memox/features/study/data/datasources/study_local_datasource.dart';
 import 'package:memox/features/study/data/mappers/study_session_mapper.dart';
 import 'package:memox/features/study/domain/entities/study_session.dart';
@@ -16,20 +16,33 @@ final class StudyRepositoryImpl implements StudyRepository {
   final AppLogger _logger;
 
   @override
-  Future<StudySession> startSession(StudyMode mode) async {
-    _logger.info('Starting study session in mode $mode');
-    final savedRow = await _localDataSource.save(
-      StudySessionMapper.toCompanion(
-        StudySession(id: 0, mode: mode, startedAt: DateTime.now()),
-      ),
+  Future<StudySession> completeSession(StudySession session) async {
+    _logger.info(
+      'Completing study session ${session.id} in mode ${session.mode}',
     );
-    return StudySessionMapper.toEntity(savedRow);
+    final savedRow = await _localDataSource.save(session.toCompanion());
+    return savedRow.toEntity();
   }
 
   @override
-  Stream<List<StudySession>> watchAll() {
-    return _localDataSource.watchAll().map(
-      (rows) => rows.map(StudySessionMapper.toEntity).toList(),
+  Future<StudySession> startSession({
+    required int deckId,
+    StudyMode mode = StudyMode.review,
+  }) async {
+    _logger.info('Starting study session for deck $deckId in mode $mode');
+    final savedRow = await _localDataSource.save(
+      StudySession(
+        id: 0,
+        deckId: deckId,
+        mode: mode,
+        startedAt: DateTime.now(),
+      ).toCompanion(),
     );
+    return savedRow.toEntity();
   }
+
+  @override
+  Stream<List<StudySession>> watchAll() => _localDataSource.watchAll().map(
+    (rows) => rows.map((row) => row.toEntity()).toList(),
+  );
 }

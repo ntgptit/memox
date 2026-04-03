@@ -32,9 +32,7 @@ final class CreateFolderUseCase {
     final siblings = parentId == null
         ? await _folderRepo.getRootFolders()
         : await _folderRepo.getSubfolders(parentId);
-    final duplicateExists = siblings.any((FolderEntity folder) {
-      return folder.name.trim().toLowerCase() == trimmedName.toLowerCase();
-    });
+    final duplicateExists = siblings.any((FolderEntity folder) => folder.name.trim().toLowerCase() == trimmedName.toLowerCase());
 
     if (duplicateExists) {
       return const Result.failure(

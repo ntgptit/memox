@@ -13,17 +13,11 @@ class GoogleSignInService {
 
   GoogleSignInAccount? get currentUser => _googleSignIn.currentUser;
 
-  Future<GoogleSignInAccount?> signInSilently() {
-    return _googleSignIn.signInSilently();
-  }
+  Future<GoogleSignInAccount?> signInSilently() => _googleSignIn.signInSilently();
 
-  Future<GoogleSignInAccount?> signIn() {
-    return _googleSignIn.signIn();
-  }
+  Future<GoogleSignInAccount?> signIn() => _googleSignIn.signIn();
 
-  Future<void> signOut() {
-    return _googleSignIn.signOut();
-  }
+  Future<void> signOut() => _googleSignIn.signOut();
 
   Future<http.BaseClient?> getAuthClient() async {
     final user = _googleSignIn.currentUser ?? await signInSilently();

@@ -11,7 +11,7 @@ import '../../../../test_helpers/fakes/fake_folder_repository.dart';
 import '../../../../test_helpers/test_app.dart';
 
 void main() {
-  testWidgets('HomeScreen renders root folders', (tester) async {
+  testWidgets('HomeScreen toggles folder sort mode', (tester) async {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
@@ -35,7 +35,16 @@ void main() {
     expect(find.text('Japanese N5'), findsOneWidget);
     expect(find.text('MY FOLDERS'), findsOneWidget);
     expect(find.byIcon(Icons.more_vert), findsOneWidget);
+    expect(find.byTooltip('Reorder'), findsOneWidget);
     expect(find.byTooltip('Create folder'), findsOneWidget);
     expect(find.text('Create folder'), findsNothing);
+
+    await tester.tap(find.byTooltip('Reorder'));
+    await tester.pumpAndSettle();
+
+    expect(find.byTooltip('Done'), findsOneWidget);
+    expect(find.text('Done'), findsOneWidget);
+    expect(find.byIcon(Icons.more_vert), findsNothing);
+    expect(find.text('Drag items to change their order.'), findsOneWidget);
   });
 }

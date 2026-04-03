@@ -10,6 +10,8 @@
   "undoAction": "Undo",
   "submitAction": "Submit",
   "exitAction": "Exit",
+  "doneAction": "Done",
+  "reorderAction": "Reorder",
   "exitSessionTitle": "Exit study session?",
   "exitSessionMessage": "Progress won't be saved.",
   "navHome": "Home",
@@ -64,12 +66,189 @@
   "cardsSubtitle": "Card feature scaffold is ready for implementation.",
   "studyTitle": "Study",
   "studySubtitle": "Study feature scaffold is ready for implementation.",
+  "matchPairsLeft": "{count, plural, =0{All pairs matched} =1{1 pair left} other{{count} pairs left}}",
+  "@matchPairsLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "matchCompleteTitle": "All matched!",
+  "matchTimeLabel": "Time",
+  "matchMistakesLabel": "Mistakes",
+  "matchStarsLabel": "Stars",
+  "matchPlayAgainAction": "Play again",
+  "matchEmptySubtitle": "Add cards to this deck before starting Match mode.",
+  "guessPromptLabel": "What is this?",
+  "guessSkipAction": "Skip",
+  "guessContinueAction": "Continue",
+  "guessCorrectLabel": "Correct",
+  "guessAccuracyLabel": "Accuracy",
+  "guessBestStreakLabel": "Best streak",
+  "guessCompleteTitle": "Guess complete",
+  "guessPlayAgainAction": "Play again",
+  "guessEmptySubtitle": "Add cards to this deck before starting Guess mode.",
+  "guessCompletionSummary": "{correct}/{total} correct ({accuracy}%)",
+  "@guessCompletionSummary": {
+    "placeholders": {
+      "correct": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "accuracy": {
+        "type": "int"
+      }
+    }
+  },
+  "guessOptionPrefixA": "A.",
+  "guessOptionPrefixB": "B.",
+  "guessOptionPrefixC": "C.",
+  "guessOptionPrefixD": "D.",
   "statisticsTitle": "Statistics",
   "statisticsSubtitle": "Statistics feature scaffold is ready for implementation.",
+  "progressHeaderTitle": "Your Progress",
+  "statisticsPeriodWeek": "Week",
+  "statisticsPeriodMonth": "Month",
+  "statisticsPeriodAllTime": "All time",
+  "statisticsTodayPrefix": "Today:",
+  "statisticsCardsUnit": "cards",
+  "statisticsMinutesUnit": "min",
+  "statisticsStreakLabel": "day streak",
+  "statisticsDayStreak": "{count} day streak",
+  "@statisticsDayStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "statisticsWeeklyActivityTitle": "Weekly activity",
+  "statisticsMasteryTitle": "Mastery",
+  "statisticsModeUsageTitle": "Mode usage",
+  "statisticsCardsToFocusTitle": "Cards to focus on",
+  "statisticsNoHistoryTitle": "No study history yet",
+  "statisticsNoHistorySubtitle": "Complete a study session to start building your progress.",
+  "statisticsPracticeTheseAction": "Practice these",
+  "statisticsNoDifficultCards": "You have no difficult cards right now.",
+  "statisticsPracticeDeckTitle": "Choose a deck to practice",
+  "statisticsPracticeDeckSubtitle": "{count, plural, =1{1 focus card} other{{count} focus cards}}",
+  "@statisticsPracticeDeckSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "statisticsWeekdayMondayShort": "M",
+  "statisticsWeekdayTuesdayShort": "T",
+  "statisticsWeekdayWednesdayShort": "W",
+  "statisticsWeekdayThursdayShort": "T",
+  "statisticsWeekdayFridayShort": "F",
+  "statisticsWeekdaySaturdayShort": "S",
+  "statisticsWeekdaySundayShort": "S",
+  "statisticsBarTooltip": "{count, plural, =1{1 card} other{{count} cards}}",
+  "@statisticsBarTooltip": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "settingsTitle": "Settings",
   "settingsSubtitle": "Settings feature scaffold is ready for implementation.",
+  "settingsAppearanceSection": "Appearance",
+  "settingsStudyingSection": "Studying",
+  "settingsNotificationsSection": "Notifications",
   "settingsDataTitle": "Data",
   "settingsDataSubtitle": "Export the current local database as a SQLite file.",
+  "settingsThemePreferenceTitle": "Theme",
+  "settingsAppColorTitle": "App color",
+  "settingsDailyGoalTitle": "Daily goal",
+  "settingsSessionLimitTitle": "Session limit",
+  "settingsAutoAdvanceTitle": "Auto-advance",
+  "settingsAutoAdvancePickerTitle": "Choose auto-advance delay",
+  "settingsStudyReminderTitle": "Study reminder",
+  "settingsReminderTimeTitle": "Reminder time",
+  "settingsStreakReminderTitle": "Streak reminder",
+  "settingsExportCardsAction": "Export cards (JSON)",
+  "settingsImportFromFileAction": "Import from file",
+  "settingsClearHistoryAction": "Clear study history",
+  "settingsGoalValue": "{count} cards/day",
+  "@settingsGoalValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsSessionLimitValue": "{minutes} minutes",
+  "@settingsSessionLimitValue": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsAutoAdvanceValue": "{seconds}s",
+  "@settingsAutoAdvanceValue": {
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsReminderTimePlaceholder": "Choose time",
+  "settingsExportShareSubject": "MemoX cards export",
+  "settingsExportSuccess": "Exported {fileName}",
+  "@settingsExportSuccess": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsExportFailed": "Couldn't export your cards.",
+  "settingsImportSuccess": "Imported {folders} folders · {decks} decks · {cards} cards",
+  "@settingsImportSuccess": {
+    "placeholders": {
+      "folders": {
+        "type": "int"
+      },
+      "decks": {
+        "type": "int"
+      },
+      "cards": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsImportFailed": "Couldn't import that file.",
+  "settingsClearHistoryMessage": "This clears all study sessions and review logs, but keeps your folders, decks, and cards.",
+  "settingsClearHistorySuccess": "Cleared {sessions} sessions · {reviews} reviews",
+  "@settingsClearHistorySuccess": {
+    "placeholders": {
+      "sessions": {
+        "type": "int"
+      },
+      "reviews": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsStudyReminderNotificationTitle": "Time to study",
+  "settingsStudyReminderNotificationBody": "Your goal is {count} cards today.",
+  "@settingsStudyReminderNotificationBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsStreakReminderNotificationTitle": "Protect your streak",
+  "settingsStreakReminderNotificationBody": "Study a few cards today to keep your streak going.",
   "exportDatabaseAction": "Export SQLite database",
   "databaseExportSuccess": "Database exported as {fileName}",
   "@databaseExportSuccess": {
@@ -241,6 +420,7 @@
   "sortDateLabel": "Date",
   "sortAlphaLabel": "A-Z",
   "sortStatusLabel": "Status",
+  "reorderModeHint": "Drag items to change their order.",
   "createCardAction": "Create card",
   "studyDueCardsAction": "Study {count, plural, =0{0 due cards} =1{1 due card} other{{count} due cards}}",
   "@studyDueCardsAction": {
@@ -324,5 +504,90 @@
   "cardFrontEmptyError": "Front can't be empty",
   "cardBackEmptyError": "Back can't be empty",
   "cardMissingTitle": "Card not found",
-  "cardMissingSubtitle": "This card may have been deleted already."
+  "cardMissingSubtitle": "This card may have been deleted already.",
+  "recallPromptLabel": "What do you know about:",
+  "recallYourAnswerLabel": "Your answer",
+  "recallAnswerHint": "Write everything you remember...",
+  "recallRevealAction": "Show answer",
+  "recallCompleteAnswerLabel": "Complete answer",
+  "recallSelfAssessmentLabel": "How well did you recall?",
+  "recallRatingMissed": "Missed",
+  "recallRatingPartial": "Partial",
+  "recallRatingGotIt": "Got it",
+  "recallEmptySubtitle": "Add cards to this deck before starting Recall mode.",
+  "recallCompleteTitle": "{count} cards recalled",
+  "@recallCompleteTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recallCompletionSummary": "Got it: {gotIt} · Partial: {partial} · Missed: {missed}",
+  "@recallCompletionSummary": {
+    "placeholders": {
+      "gotIt": {
+        "type": "int"
+      },
+      "partial": {
+        "type": "int"
+      },
+      "missed": {
+        "type": "int"
+      }
+    }
+  },
+  "recallReviewMissedAction": "Review missed cards",
+  "fillPromptLabel": "Complete the blank",
+  "fillShowHintAction": "Show hint",
+  "fillHintValue": "Hint: {hint}",
+  "@fillHintValue": {
+    "placeholders": {
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "fillAnswerLabel": "Your answer",
+  "fillAnswerHint": "Type your answer...",
+  "fillRetryInputHint": "Type the correct answer to continue",
+  "fillAlmostTitle": "Almost! Correct spelling:",
+  "fillCorrectAnswerTitle": "The correct answer is:",
+  "fillAcceptCloseAction": "Accept anyway",
+  "fillRejectCloseAction": "Mark as wrong",
+  "fillSkipAction": "Skip",
+  "fillEmptySubtitle": "Add cards to this deck before starting Fill mode.",
+  "fillCompleteTitle": "{count} cards completed",
+  "@fillCompleteTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "fillCorrectFirstTryLabel": "Correct first try",
+  "fillAcceptedCloseLabel": "Close matches accepted",
+  "fillRetryNeededLabel": "Needed retry",
+  "fillLongestStreakLabel": "Longest streak",
+  "fillCompletionSummary": "{count} correct first try ({accuracy}%)",
+  "@fillCompletionSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "accuracy": {
+        "type": "int"
+      }
+    }
+  },
+  "fillPracticeMistakesAction": "Practice mistakes",
+  "fillMistakesListAction": "Review mistakes",
+  "fillMistakeSummary": "{count, plural, =0{accepted after a close match} =1{1 retry needed} other{{count} retries needed}}",
+  "@fillMistakeSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

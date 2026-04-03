@@ -1,8 +1,6 @@
 sealed class Failure {
   const Failure(this.message);
 
-  final String message;
-
   const factory Failure.validation(String message) = ValidationFailure;
   const factory Failure.notFound(String message) = NotFoundFailure;
   const factory Failure.conflict(String message) = ConflictFailure;
@@ -10,6 +8,8 @@ sealed class Failure {
   const factory Failure.network(String message, {int? statusCode}) =
       NetworkFailure;
   const factory Failure.unknown(String message) = UnknownFailure;
+
+  final String message;
 }
 
 final class ValidationFailure extends Failure {

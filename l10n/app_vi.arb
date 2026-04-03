@@ -10,6 +10,8 @@
   "undoAction": "Hoàn tác",
   "submitAction": "Gửi",
   "exitAction": "Thoát",
+  "doneAction": "Xong",
+  "reorderAction": "Sắp xếp",
   "exitSessionTitle": "Thoát phiên học?",
   "exitSessionMessage": "Tiến trình sẽ không được lưu.",
   "navHome": "Trang chủ",
@@ -64,12 +66,189 @@
   "cardsSubtitle": "Khung tính năng thẻ đã sẵn sàng để triển khai.",
   "studyTitle": "Học",
   "studySubtitle": "Khung tính năng học đã sẵn sàng để triển khai.",
+  "matchPairsLeft": "{count, plural, =0{Đã ghép xong toàn bộ} =1{Còn 1 cặp} other{Còn {count} cặp}}",
+  "@matchPairsLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "matchCompleteTitle": "Ghép xong rồi!",
+  "matchTimeLabel": "Thời gian",
+  "matchMistakesLabel": "Lỗi",
+  "matchStarsLabel": "Sao",
+  "matchPlayAgainAction": "Chơi lại",
+  "matchEmptySubtitle": "Hãy thêm thẻ vào bộ này trước khi bắt đầu chế độ Ghép cặp.",
+  "guessPromptLabel": "Đây là gì?",
+  "guessSkipAction": "Bỏ qua",
+  "guessContinueAction": "Tiếp tục",
+  "guessCorrectLabel": "Đúng",
+  "guessAccuracyLabel": "Độ chính xác",
+  "guessBestStreakLabel": "Chuỗi tốt nhất",
+  "guessCompleteTitle": "Hoàn thành chế độ đoán",
+  "guessPlayAgainAction": "Chơi lại",
+  "guessEmptySubtitle": "Hãy thêm thẻ vào bộ này trước khi bắt đầu chế độ Đoán.",
+  "guessCompletionSummary": "{correct}/{total} câu đúng ({accuracy}%)",
+  "@guessCompletionSummary": {
+    "placeholders": {
+      "correct": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "accuracy": {
+        "type": "int"
+      }
+    }
+  },
+  "guessOptionPrefixA": "A.",
+  "guessOptionPrefixB": "B.",
+  "guessOptionPrefixC": "C.",
+  "guessOptionPrefixD": "D.",
   "statisticsTitle": "Thống kê",
   "statisticsSubtitle": "Khung tính năng thống kê đã sẵn sàng để triển khai.",
+  "progressHeaderTitle": "Tiến độ của bạn",
+  "statisticsPeriodWeek": "Tuần",
+  "statisticsPeriodMonth": "Tháng",
+  "statisticsPeriodAllTime": "Toàn thời gian",
+  "statisticsTodayPrefix": "Hôm nay:",
+  "statisticsCardsUnit": "thẻ",
+  "statisticsMinutesUnit": "phút",
+  "statisticsStreakLabel": "ngày liên tiếp",
+  "statisticsDayStreak": "Chuỗi {count} ngày",
+  "@statisticsDayStreak": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "statisticsWeeklyActivityTitle": "Hoạt động tuần này",
+  "statisticsMasteryTitle": "Mức độ thành thạo",
+  "statisticsModeUsageTitle": "Tỷ lệ dùng chế độ học",
+  "statisticsCardsToFocusTitle": "Những thẻ nên tập trung",
+  "statisticsNoHistoryTitle": "Chưa có lịch sử học",
+  "statisticsNoHistorySubtitle": "Hoàn thành một phiên học để bắt đầu tạo tiến độ của bạn.",
+  "statisticsPracticeTheseAction": "Luyện các thẻ này",
+  "statisticsNoDifficultCards": "Hiện chưa có thẻ khó nào.",
+  "statisticsPracticeDeckTitle": "Chọn bộ thẻ để luyện",
+  "statisticsPracticeDeckSubtitle": "{count, plural, =1{1 thẻ cần chú ý} other{{count} thẻ cần chú ý}}",
+  "@statisticsPracticeDeckSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "statisticsWeekdayMondayShort": "H",
+  "statisticsWeekdayTuesdayShort": "B",
+  "statisticsWeekdayWednesdayShort": "T",
+  "statisticsWeekdayThursdayShort": "N",
+  "statisticsWeekdayFridayShort": "S",
+  "statisticsWeekdaySaturdayShort": "B",
+  "statisticsWeekdaySundayShort": "C",
+  "statisticsBarTooltip": "{count, plural, =1{1 thẻ} other{{count} thẻ}}",
+  "@statisticsBarTooltip": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "settingsTitle": "Cài đặt",
   "settingsSubtitle": "Khung tính năng cài đặt đã sẵn sàng để triển khai.",
+  "settingsAppearanceSection": "Giao diện",
+  "settingsStudyingSection": "Học tập",
+  "settingsNotificationsSection": "Thông báo",
   "settingsDataTitle": "Dữ liệu",
   "settingsDataSubtitle": "Xuất cơ sở dữ liệu hiện tại trên thiết bị thành tệp SQLite.",
+  "settingsThemePreferenceTitle": "Chế độ giao diện",
+  "settingsAppColorTitle": "Màu ứng dụng",
+  "settingsDailyGoalTitle": "Mục tiêu hằng ngày",
+  "settingsSessionLimitTitle": "Giới hạn phiên học",
+  "settingsAutoAdvanceTitle": "Tự chuyển tiếp",
+  "settingsAutoAdvancePickerTitle": "Chọn thời gian tự chuyển tiếp",
+  "settingsStudyReminderTitle": "Nhắc học",
+  "settingsReminderTimeTitle": "Giờ nhắc",
+  "settingsStreakReminderTitle": "Nhắc giữ streak",
+  "settingsExportCardsAction": "Xuất thẻ (JSON)",
+  "settingsImportFromFileAction": "Nhập từ tệp",
+  "settingsClearHistoryAction": "Xoá lịch sử học",
+  "settingsGoalValue": "{count} thẻ/ngày",
+  "@settingsGoalValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsSessionLimitValue": "{minutes} phút",
+  "@settingsSessionLimitValue": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsAutoAdvanceValue": "{seconds} giây",
+  "@settingsAutoAdvanceValue": {
+    "placeholders": {
+      "seconds": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsReminderTimePlaceholder": "Chọn giờ",
+  "settingsExportShareSubject": "Xuất thẻ MemoX",
+  "settingsExportSuccess": "Đã xuất {fileName}",
+  "@settingsExportSuccess": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsExportFailed": "Không thể xuất thẻ.",
+  "settingsImportSuccess": "Đã nhập {folders} thư mục · {decks} bộ thẻ · {cards} thẻ",
+  "@settingsImportSuccess": {
+    "placeholders": {
+      "folders": {
+        "type": "int"
+      },
+      "decks": {
+        "type": "int"
+      },
+      "cards": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsImportFailed": "Không thể nhập tệp này.",
+  "settingsClearHistoryMessage": "Thao tác này sẽ xoá toàn bộ phiên học và lịch sử review, nhưng vẫn giữ nguyên thư mục, bộ thẻ và thẻ.",
+  "settingsClearHistorySuccess": "Đã xoá {sessions} phiên học · {reviews} lượt review",
+  "@settingsClearHistorySuccess": {
+    "placeholders": {
+      "sessions": {
+        "type": "int"
+      },
+      "reviews": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsStudyReminderNotificationTitle": "Đến giờ học rồi",
+  "settingsStudyReminderNotificationBody": "Mục tiêu hôm nay của bạn là {count} thẻ.",
+  "@settingsStudyReminderNotificationBody": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsStreakReminderNotificationTitle": "Giữ streak của bạn",
+  "settingsStreakReminderNotificationBody": "Hãy học vài thẻ hôm nay để giữ chuỗi streak.",
   "exportDatabaseAction": "Xuất DB SQLite",
   "databaseExportSuccess": "Đã xuất database thành {fileName}",
   "@databaseExportSuccess": {
@@ -241,6 +420,7 @@
   "sortDateLabel": "Ngày",
   "sortAlphaLabel": "A-Z",
   "sortStatusLabel": "Trạng thái",
+  "reorderModeHint": "Kéo thả để thay đổi thứ tự.",
   "createCardAction": "Tạo thẻ",
   "studyDueCardsAction": "Học {count, plural, =0{0 thẻ đến hạn} =1{1 thẻ đến hạn} other{{count} thẻ đến hạn}}",
   "@studyDueCardsAction": {
@@ -324,5 +504,90 @@
   "cardFrontEmptyError": "Mặt trước không được để trống",
   "cardBackEmptyError": "Mặt sau không được để trống",
   "cardMissingTitle": "Không tìm thấy thẻ",
-  "cardMissingSubtitle": "Có thể thẻ này đã bị xoá."
+  "cardMissingSubtitle": "Có thể thẻ này đã bị xoá.",
+  "recallPromptLabel": "Bạn nhớ gì về:",
+  "recallYourAnswerLabel": "Câu trả lời của bạn",
+  "recallAnswerHint": "Hãy viết ra mọi thứ bạn nhớ...",
+  "recallRevealAction": "Hiện đáp án",
+  "recallCompleteAnswerLabel": "Đáp án đầy đủ",
+  "recallSelfAssessmentLabel": "Bạn nhớ được đến mức nào?",
+  "recallRatingMissed": "Quên mất",
+  "recallRatingPartial": "Nhớ một phần",
+  "recallRatingGotIt": "Nhớ được",
+  "recallEmptySubtitle": "Hãy thêm thẻ vào bộ này trước khi bắt đầu chế độ Nhớ lại.",
+  "recallCompleteTitle": "Đã nhớ lại {count} thẻ",
+  "@recallCompleteTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recallCompletionSummary": "Nhớ được: {gotIt} · Một phần: {partial} · Bỏ lỡ: {missed}",
+  "@recallCompletionSummary": {
+    "placeholders": {
+      "gotIt": {
+        "type": "int"
+      },
+      "partial": {
+        "type": "int"
+      },
+      "missed": {
+        "type": "int"
+      }
+    }
+  },
+  "recallReviewMissedAction": "Ôn lại các thẻ bị lỡ",
+  "fillPromptLabel": "Điền vào chỗ trống",
+  "fillShowHintAction": "Hiện gợi ý",
+  "fillHintValue": "Gợi ý: {hint}",
+  "@fillHintValue": {
+    "placeholders": {
+      "hint": {
+        "type": "String"
+      }
+    }
+  },
+  "fillAnswerLabel": "Câu trả lời của bạn",
+  "fillAnswerHint": "Nhập đáp án...",
+  "fillRetryInputHint": "Hãy gõ đáp án đúng để tiếp tục",
+  "fillAlmostTitle": "Rất gần rồi! Chính tả đúng là:",
+  "fillCorrectAnswerTitle": "Đáp án đúng là:",
+  "fillAcceptCloseAction": "Chấp nhận",
+  "fillRejectCloseAction": "Đánh dấu sai",
+  "fillSkipAction": "Bỏ qua",
+  "fillEmptySubtitle": "Hãy thêm thẻ vào bộ này trước khi bắt đầu chế độ Điền từ.",
+  "fillCompleteTitle": "Đã hoàn thành {count} thẻ",
+  "@fillCompleteTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "fillCorrectFirstTryLabel": "Đúng ngay lần đầu",
+  "fillAcceptedCloseLabel": "Chấp nhận đáp án gần đúng",
+  "fillRetryNeededLabel": "Cần nhập lại",
+  "fillLongestStreakLabel": "Chuỗi dài nhất",
+  "fillCompletionSummary": "{count} đáp án đúng ngay lần đầu ({accuracy}%)",
+  "@fillCompletionSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "accuracy": {
+        "type": "int"
+      }
+    }
+  },
+  "fillPracticeMistakesAction": "Luyện lại lỗi sai",
+  "fillMistakesListAction": "Xem lại lỗi sai",
+  "fillMistakeSummary": "{count, plural, =0{được chấp nhận sau khi gần đúng} =1{cần nhập lại 1 lần} other{cần nhập lại {count} lần}}",
+  "@fillMistakeSummary": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

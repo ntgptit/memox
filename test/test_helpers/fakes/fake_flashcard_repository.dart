@@ -17,9 +17,8 @@ class FakeFlashcardRepository implements FlashcardRepository {
   Future<List<FlashcardEntity>> getAll() async => [..._cards];
 
   @override
-  Future<List<FlashcardEntity>> getByDeck(int deckId) async {
-    return _cards.where((card) => card.deckId == deckId).toList();
-  }
+  Future<List<FlashcardEntity>> getByDeck(int deckId) async =>
+      _cards.where((card) => card.deckId == deckId).toList();
 
   @override
   Future<FlashcardEntity?> getById(int id) async {
@@ -59,8 +58,9 @@ class FakeFlashcardRepository implements FlashcardRepository {
 
   @override
   Future<FlashcardEntity> save(FlashcardEntity entity) async {
-    _cards.removeWhere((card) => card.id == entity.id && entity.id != 0);
-    _cards.add(entity);
+    _cards
+      ..removeWhere((card) => card.id == entity.id && entity.id != 0)
+      ..add(entity);
     return entity;
   }
 

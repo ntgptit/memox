@@ -20,9 +20,8 @@ class FakeDeckRepository implements DeckRepository {
   Future<List<DeckEntity>> getAll() async => [..._decks];
 
   @override
-  Future<List<DeckEntity>> getByFolder(int folderId) async {
-    return _decks.where((deck) => deck.folderId == folderId).toList();
-  }
+  Future<List<DeckEntity>> getByFolder(int folderId) async =>
+      _decks.where((deck) => deck.folderId == folderId).toList();
 
   @override
   Future<DeckEntity?> getById(int id) async {
@@ -36,9 +35,8 @@ class FakeDeckRepository implements DeckRepository {
   }
 
   @override
-  Future<int> getNextSortOrder(int folderId) async {
-    return _decks.where((deck) => deck.folderId == folderId).length;
-  }
+  Future<int> getNextSortOrder(int folderId) async =>
+      _decks.where((deck) => deck.folderId == folderId).length;
 
   @override
   Future<void> reorder({
@@ -52,15 +50,17 @@ class FakeDeckRepository implements DeckRepository {
   @override
   Future<DeckEntity> save(DeckEntity entity) async {
     if (entity.id != 0) {
-      _decks.removeWhere((deck) => deck.id == entity.id);
-      _decks.add(entity);
+      _decks
+        ..removeWhere((deck) => deck.id == entity.id)
+        ..add(entity);
       return entity;
     }
 
     final nextId =
-        _decks.fold<int>(0, (maxId, deck) {
-          return deck.id > maxId ? deck.id : maxId;
-        }) +
+        _decks.fold<int>(
+          0,
+          (maxId, deck) => deck.id > maxId ? deck.id : maxId,
+        ) +
         1;
     final saved = entity.copyWith(id: nextId);
     _decks.add(saved);

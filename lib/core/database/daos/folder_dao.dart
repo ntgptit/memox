@@ -4,47 +4,37 @@ part of '../app_database.dart';
 class FolderDao extends DatabaseAccessor<AppDatabase> with _$FolderDaoMixin {
   FolderDao(super.db);
 
-  Stream<List<FoldersTableData>> watchAllFolders() {
-    return (select(foldersTable)..orderBy([
+  Stream<List<FoldersTableData>> watchAllFolders() => (select(foldersTable)..orderBy([
           (FoldersTable tbl) => OrderingTerm.asc(tbl.sortOrder),
           (FoldersTable tbl) => OrderingTerm.asc(tbl.createdAt),
         ]))
         .watch();
-  }
 
-  Stream<List<FoldersTableData>> watchRootFolders() {
-    return (select(foldersTable)
+  Stream<List<FoldersTableData>> watchRootFolders() => (select(foldersTable)
           ..where((FoldersTable tbl) => tbl.parentId.isNull())
           ..orderBy([
             (FoldersTable tbl) => OrderingTerm.asc(tbl.sortOrder),
             (FoldersTable tbl) => OrderingTerm.asc(tbl.createdAt),
           ]))
         .watch();
-  }
 
-  Stream<List<FoldersTableData>> watchByParent(int parentId) {
-    return (select(foldersTable)
+  Stream<List<FoldersTableData>> watchByParent(int parentId) => (select(foldersTable)
           ..where((FoldersTable tbl) => tbl.parentId.equals(parentId))
           ..orderBy([
             (FoldersTable tbl) => OrderingTerm.asc(tbl.sortOrder),
             (FoldersTable tbl) => OrderingTerm.asc(tbl.createdAt),
           ]))
         .watch();
-  }
 
-  Future<List<FoldersTableData>> getAll() {
-    return (select(foldersTable)..orderBy([
+  Future<List<FoldersTableData>> getAll() => (select(foldersTable)..orderBy([
           (FoldersTable tbl) => OrderingTerm.asc(tbl.sortOrder),
           (FoldersTable tbl) => OrderingTerm.asc(tbl.createdAt),
         ]))
         .get();
-  }
 
-  Future<FoldersTableData?> getById(int id) {
-    return (select(
+  Future<FoldersTableData?> getById(int id) => (select(
       foldersTable,
     )..where((FoldersTable tbl) => tbl.id.equals(id))).getSingleOrNull();
-  }
 
   Future<List<FoldersTableData>> getByParent(int? parentId) {
     final query = select(foldersTable)
@@ -62,13 +52,9 @@ class FolderDao extends DatabaseAccessor<AppDatabase> with _$FolderDaoMixin {
     return query.get();
   }
 
-  Future<int> insertFolder(FoldersTableCompanion folder) {
-    return into(foldersTable).insert(folder, mode: InsertMode.insertOrReplace);
-  }
+  Future<int> insertFolder(FoldersTableCompanion folder) => into(foldersTable).insert(folder, mode: InsertMode.insertOrReplace);
 
-  Future<bool> updateFolder(FoldersTableCompanion folder) {
-    return update(foldersTable).replace(folder);
-  }
+  Future<bool> updateFolder(FoldersTableCompanion folder) => update(foldersTable).replace(folder);
 
   Future<void> updateFolderPresentation({
     required int id,
@@ -83,11 +69,9 @@ class FolderDao extends DatabaseAccessor<AppDatabase> with _$FolderDaoMixin {
         ),
       );
 
-  Future<int> deleteById(int id) {
-    return (delete(
+  Future<int> deleteById(int id) => (delete(
       foldersTable,
     )..where((FoldersTable tbl) => tbl.id.equals(id))).go();
-  }
 
   Future<int> deleteByIds(List<int> folderIds) {
     if (folderIds.isEmpty) {
@@ -141,8 +125,7 @@ class FolderDao extends DatabaseAccessor<AppDatabase> with _$FolderDaoMixin {
     return (currentMax ?? -1) + 1;
   }
 
-  Future<void> reorderByParent(int? parentId, List<int> folderIds) {
-    return transaction(() async {
+  Future<void> reorderByParent(int? parentId, List<int> folderIds) => transaction(() async {
       for (var index = 0; index < folderIds.length; index++) {
         final folderId = folderIds[index];
         await (update(
@@ -156,7 +139,6 @@ class FolderDao extends DatabaseAccessor<AppDatabase> with _$FolderDaoMixin {
         );
       }
     });
-  }
 
   Future<List<int>> getDescendantIds(int folderId) async {
     final result = await customSelect(

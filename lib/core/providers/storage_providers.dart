@@ -5,11 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 part 'storage_providers.g.dart';
 
 @Riverpod(keepAlive: true)
-Future<SharedPreferences> sharedPreferences(Ref ref) async {
-  return SharedPreferences.getInstance();
-}
+Future<SharedPreferences> sharedPreferences(Ref ref) async => SharedPreferences.getInstance();
 
 @Riverpod(keepAlive: true)
-SecureStorageService secureStorageService(Ref ref) {
-  return const InMemorySecureStorageService();
-}
+SecureStorageService secureStorageService(Ref ref) => const InMemorySecureStorageService();

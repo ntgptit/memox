@@ -4,60 +4,60 @@ import 'package:drift/drift.dart';
 import 'package:memox/core/database/app_database.dart';
 import 'package:memox/features/cards/domain/entities/flashcard_entity.dart';
 
-abstract final class FlashcardMapper {
-  static FlashcardEntity toEntity(CardsTableData row) {
-    final tags = row.tags.isEmpty
+extension FlashcardRowMapper on CardsTableData {
+  FlashcardEntity toEntity() {
+    final decodedTags = tags.isEmpty
         ? const <String>[]
-        : List<String>.from(jsonDecode(row.tags) as List<dynamic>);
+        : List<String>.from(jsonDecode(tags) as List<dynamic>);
     return FlashcardEntity(
-      id: row.id,
-      deckId: row.deckId,
-      front: row.front,
-      back: row.back,
-      hint: row.hint,
-      example: row.example,
-      tags: tags,
-      imagePath: row.imagePath,
-      status: row.status,
-      easeFactor: row.easeFactor,
-      interval: row.interval,
-      repetitions: row.repetitions,
-      nextReviewDate: row.nextReviewDate,
-      lastReviewedAt: row.lastReviewedAt,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
+      id: id,
+      deckId: deckId,
+      front: front,
+      back: back,
+      hint: hint,
+      example: example,
+      tags: decodedTags,
+      imagePath: imagePath,
+      status: status,
+      easeFactor: easeFactor,
+      interval: interval,
+      repetitions: repetitions,
+      nextReviewDate: nextReviewDate,
+      lastReviewedAt: lastReviewedAt,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
     );
   }
+}
 
-  static CardsTableCompanion toCompanion(FlashcardEntity entity) {
-    final id = entity.id > 0
-        ? Value<int>(entity.id)
-        : const Value<int>.absent();
-    final nextReviewDate = entity.nextReviewDate == null
+extension FlashcardEntityMapper on FlashcardEntity {
+  CardsTableCompanion toCompanion() {
+    final id = this.id > 0 ? Value<int>(this.id) : const Value<int>.absent();
+    final nextReviewDate = this.nextReviewDate == null
         ? const Value<DateTime?>.absent()
-        : Value<DateTime?>(entity.nextReviewDate);
-    final lastReviewedAt = entity.lastReviewedAt == null
+        : Value<DateTime?>(this.nextReviewDate);
+    final lastReviewedAt = this.lastReviewedAt == null
         ? const Value<DateTime?>.absent()
-        : Value<DateTime?>(entity.lastReviewedAt);
-    final createdAt = entity.createdAt == null
+        : Value<DateTime?>(this.lastReviewedAt);
+    final createdAt = this.createdAt == null
         ? const Value<DateTime>.absent()
-        : Value<DateTime>(entity.createdAt!);
-    final updatedAt = entity.updatedAt == null
+        : Value<DateTime>(this.createdAt!);
+    final updatedAt = this.updatedAt == null
         ? const Value<DateTime>.absent()
-        : Value<DateTime>(entity.updatedAt!);
+        : Value<DateTime>(this.updatedAt!);
     return CardsTableCompanion(
       id: id,
-      deckId: Value<int>(entity.deckId),
-      front: Value<String>(entity.front),
-      back: Value<String>(entity.back),
-      hint: Value<String>(entity.hint),
-      example: Value<String>(entity.example),
-      tags: Value<String>(jsonEncode(entity.tags)),
-      imagePath: Value<String>(entity.imagePath),
-      status: Value(entity.status),
-      easeFactor: Value<double>(entity.easeFactor),
-      interval: Value<int>(entity.interval),
-      repetitions: Value<int>(entity.repetitions),
+      deckId: Value<int>(deckId),
+      front: Value<String>(front),
+      back: Value<String>(back),
+      hint: Value<String>(hint),
+      example: Value<String>(example),
+      tags: Value<String>(jsonEncode(tags)),
+      imagePath: Value<String>(imagePath),
+      status: Value(status),
+      easeFactor: Value<double>(easeFactor),
+      interval: Value<int>(interval),
+      repetitions: Value<int>(repetitions),
       nextReviewDate: nextReviewDate,
       lastReviewedAt: lastReviewedAt,
       createdAt: createdAt,

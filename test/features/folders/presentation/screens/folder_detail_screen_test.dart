@@ -43,4 +43,55 @@ void main() {
       expect(find.byIcon(Icons.edit_outlined), findsOneWidget);
     },
   );
+
+  testWidgets('shows deck edit and delete actions when folder contains decks', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          folderRepositoryProvider.overrideWithValue(
+            FakeFolderRepository(
+              folders: const [
+                FolderEntity(id: 1, name: 'Root'),
+                FolderEntity(id: 2, name: 'Languages', parentId: 1),
+              ],
+            ),
+          ),
+          deckRepositoryProvider.overrideWithValue(
+            FakeDeckRepository(
+              decks: const [
+                DeckEntity(
+                  id: 3,
+                  name: 'Korean Core',
+                  folderId: 2,
+                  description: 'First 50 phrases',
+                ),
+              ],
+            ),
+          ),
+          flashcardRepositoryProvider.overrideWithValue(
+            FakeFlashcardRepository(),
+          ),
+        ],
+        child: buildTestApp(home: const FolderDetailScreen(folderId: 2)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Korean Core'), findsOneWidget);
+    expect(find.text('First 50 phrases'), findsOneWidget);
+    expect(find.byTooltip('Reorder'), findsOneWidget);
+    expect(find.byTooltip('Edit'), findsOneWidget);
+    expect(find.byTooltip('Delete deck'), findsOneWidget);
+
+    await tester.tap(find.byTooltip('Reorder'));
+    await tester.pumpAndSettle();
+
+    expect(find.byTooltip('Done'), findsOneWidget);
+    expect(find.text('Done'), findsOneWidget);
+    expect(find.byTooltip('Edit'), findsNothing);
+    expect(find.byTooltip('Delete deck'), findsNothing);
+    expect(find.text('Drag items to change their order.'), findsOneWidget);
+  });
 }

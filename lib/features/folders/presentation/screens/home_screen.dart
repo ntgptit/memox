@@ -20,34 +20,33 @@ import 'package:memox/shared/widgets/buttons/app_fab.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
 import 'package:memox/shared/widgets/feedback/empty_state_view.dart';
 import 'package:memox/shared/widgets/layout/app_scaffold.dart';
+import 'package:memox/shared/widgets/lists/reorder_mode_banner.dart';
 import 'package:memox/shared/widgets/navigation/app_root_bottom_nav.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   static const String routeName = 'home';
   static const String routePath = '/';
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  var _isSortMode = false;
+
+  @override
+  Widget build(BuildContext context) {
     final foldersAsync = ref.watch(foldersProvider);
     final dueSummary = ref.watch(homeDueSummaryProvider);
+    final folders = _asyncValueOrNull(foldersAsync) ?? const <FolderEntity>[];
+    final showSortAction = folders.isNotEmpty;
 
     return AppScaffold(
       appBar: AppBar(
         title: Text(context.l10n.appName),
-        actions: [
-          IconButton(
-            tooltip: context.l10n.searchAction,
-            onPressed: () => context.push(SearchScreen.routePath),
-            icon: const Icon(Icons.search_outlined),
-          ),
-          IconButton(
-            tooltip: context.l10n.profileAction,
-            onPressed: () => context.go(SettingsScreen.routePath),
-            icon: const Icon(Icons.account_circle_outlined),
-          ),
-        ],
+        actions: _buildAppBarActions(context, showSortAction),
       ),
       fab: AppFab(
         icon: Icons.add_outlined,
@@ -75,6 +74,8 @@ class HomeScreen extends ConsumerWidget {
               value: foldersAsync,
               onData: (folders) => _HomeFolderSection(
                 folders: folders,
+                isSortMode: _isSortMode,
+                onToggleSort: _toggleSortMode,
                 onTap: (folder) =>
                     context.push(FolderDetailScreen.routeLocation(folder.id)),
                 onEdit: (folder) {
@@ -95,11 +96,43 @@ class HomeScreen extends ConsumerWidget {
       ),
     );
   }
+
+  void _toggleSortMode() {
+    setState(() {
+      _isSortMode = !_isSortMode;
+    });
+  }
+
+  List<Widget> _buildAppBarActions(BuildContext context, bool showSortAction) =>
+      [
+        if (showSortAction)
+          IconButton(
+            tooltip: _isSortMode
+                ? context.l10n.doneAction
+                : context.l10n.reorderAction,
+            onPressed: _toggleSortMode,
+            icon: Icon(
+              _isSortMode ? Icons.done_outline : Icons.drag_indicator_outlined,
+            ),
+          ),
+        IconButton(
+          tooltip: context.l10n.searchAction,
+          onPressed: () => context.push(SearchScreen.routePath),
+          icon: const Icon(Icons.search_outlined),
+        ),
+        IconButton(
+          tooltip: context.l10n.profileAction,
+          onPressed: () => context.go(SettingsScreen.routePath),
+          icon: const Icon(Icons.account_circle_outlined),
+        ),
+      ];
 }
 
 class _HomeFolderSection extends StatelessWidget {
   const _HomeFolderSection({
     required this.folders,
+    required this.isSortMode,
+    required this.onToggleSort,
     required this.onTap,
     required this.onEdit,
     required this.onDelete,
@@ -107,6 +140,8 @@ class _HomeFolderSection extends StatelessWidget {
   });
 
   final List<FolderEntity> folders;
+  final bool isSortMode;
+  final VoidCallback onToggleSort;
   final ValueChanged<FolderEntity> onTap;
   final ValueChanged<FolderEntity> onEdit;
   final ValueChanged<FolderEntity> onDelete;
@@ -136,9 +171,14 @@ class _HomeFolderSection extends StatelessWidget {
           ],
         ),
         const SizedBox(height: SpacingTokens.md),
+        if (isSortMode) ...[
+          ReorderModeBanner(onDone: onToggleSort),
+          const SizedBox(height: SpacingTokens.md),
+        ],
         Expanded(
           child: FolderListView(
             folders: folders,
+            isSortMode: isSortMode,
             onTap: onTap,
             onEdit: onEdit,
             onDelete: onDelete,
@@ -241,3 +281,8 @@ Future<void> _reorderRootFolders(
       .read(reorderFoldersUseCaseProvider)
       .call(folderIds: reordered.map((folder) => folder.id).toList());
 }
+
+T? _asyncValueOrNull<T>(AsyncValue<T> value) => switch (value) {
+  AsyncData<T>(:final value) => value,
+  _ => null,
+};

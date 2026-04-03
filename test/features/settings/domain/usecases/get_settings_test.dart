@@ -6,17 +6,16 @@ import 'package:memox/features/settings/domain/usecases/get_settings.dart';
 
 void main() {
   test('get settings use case returns settings from repository', () async {
-    final repository = _FakeSettingsRepository(
-      const AppSettings(
+    const repository = _FakeSettingsRepository(
+      AppSettings(
         themeMode: ThemeMode.dark,
         seedColorValue: 0xFF4DB6AC,
         localeCode: 'vi',
         syncEnabled: true,
         dailyGoal: 30,
-        sessionLimit: 15,
       ),
     );
-    final useCase = GetSettingsUseCase(repository);
+    const useCase = GetSettingsUseCase(repository);
 
     final settings = await useCase.call();
 
@@ -25,7 +24,7 @@ void main() {
     expect(settings.localeCode, 'vi');
     expect(settings.syncEnabled, isTrue);
     expect(settings.dailyGoal, 30);
-    expect(settings.sessionLimit, 15);
+    expect(settings.sessionLimitMinutes, 15);
   });
 }
 
@@ -35,16 +34,34 @@ final class _FakeSettingsRepository implements SettingsRepository {
   final AppSettings _settings;
 
   @override
-  Future<AppSettings> getSettings() async => _settings;
+  Future<AppSettings> load() async => _settings;
 
   @override
-  Future<void> saveSettings(AppSettings settings) async {}
+  Future<void> save(AppSettings settings) async {}
+
+  @override
+  Future<void> updateAutoAdvanceDelay(double autoAdvanceDelay) async {}
+
+  @override
+  Future<void> updateDailyGoal(int dailyGoal) async {}
 
   @override
   Future<void> updateLocaleCode(String? localeCode) async {}
 
   @override
+  Future<void> updateReminderTime(TimeOfDay? reminderTime) async {}
+
+  @override
   Future<void> updateSeedColorValue(int seedColorValue) async {}
+
+  @override
+  Future<void> updateSessionLimitMinutes(int sessionLimitMinutes) async {}
+
+  @override
+  Future<void> updateStreakReminder({required bool streakReminder}) async {}
+
+  @override
+  Future<void> updateStudyReminder({required bool studyReminder}) async {}
 
   @override
   Future<void> updateThemeMode(ThemeMode themeMode) async {}

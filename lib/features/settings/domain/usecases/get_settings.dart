@@ -6,5 +6,5 @@ final class GetSettingsUseCase {
 
   final SettingsRepository _repository;
 
-  Future<AppSettings> call() => _repository.getSettings();
+  Future<AppSettings> call() => _repository.load();
 }

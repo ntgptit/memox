@@ -5,9 +5,9 @@ part 'search_query.g.dart';
 
 @freezed
 abstract class SearchQuery with _$SearchQuery {
-  const SearchQuery._();
 
   const factory SearchQuery({required String value}) = _SearchQuery;
+  const SearchQuery._();
 
   factory SearchQuery.fromJson(Map<String, dynamic> json) =>
       _$SearchQueryFromJson(json);

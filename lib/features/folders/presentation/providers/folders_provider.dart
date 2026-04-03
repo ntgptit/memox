@@ -1,6 +1,6 @@
+import 'package:memox/core/design/card_status.dart';
 import 'package:memox/core/providers/repository_providers.dart';
 import 'package:memox/core/providers/usecase_providers.dart';
-import 'package:memox/core/design/card_status.dart';
 import 'package:memox/features/cards/domain/entities/flashcard_entity.dart';
 import 'package:memox/features/decks/domain/entities/deck_entity.dart';
 import 'package:memox/features/folders/domain/entities/folder_entity.dart';
@@ -11,29 +11,19 @@ part 'folders_provider.g.dart';
 typedef HomeDueSummary = ({int dueCardCount, DeckEntity? firstDueDeck});
 
 @riverpod
-Stream<List<FolderEntity>> folders(Ref ref) {
-  return ref.watch(getRootFoldersUseCaseProvider).call();
-}
+Stream<List<FolderEntity>> folders(Ref ref) => ref.watch(getRootFoldersUseCaseProvider).call();
 
 @riverpod
-Stream<List<FolderEntity>> allFolders(Ref ref) {
-  return ref.watch(folderRepositoryProvider).watchAll();
-}
+Stream<List<FolderEntity>> allFolders(Ref ref) => ref.watch(folderRepositoryProvider).watchAll();
 
 @riverpod
-Stream<List<FolderEntity>> subfolder(Ref ref, int parentId) {
-  return ref.watch(getSubfoldersUseCaseProvider).call(parentId);
-}
+Stream<List<FolderEntity>> subfolder(Ref ref, int parentId) => ref.watch(getSubfoldersUseCaseProvider).call(parentId);
 
 @riverpod
-Stream<List<DeckEntity>> allDecks(Ref ref) {
-  return ref.watch(getDecksUseCaseProvider).call();
-}
+Stream<List<DeckEntity>> allDecks(Ref ref) => ref.watch(getDecksUseCaseProvider).call();
 
 @riverpod
-Stream<List<FlashcardEntity>> allFlashcards(Ref ref) {
-  return ref.watch(getFlashcardsUseCaseProvider).call();
-}
+Stream<List<FlashcardEntity>> allFlashcards(Ref ref) => ref.watch(getFlashcardsUseCaseProvider).call();
 
 @riverpod
 AsyncValue<HomeDueSummary> homeDueSummary(Ref ref) {

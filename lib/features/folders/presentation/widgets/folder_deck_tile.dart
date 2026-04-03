@@ -22,8 +22,7 @@ class FolderDeckTile extends StatelessWidget {
   final VoidCallback? onTap;
 
   @override
-  Widget build(BuildContext context) {
-    return AppCard(
+  Widget build(BuildContext context) => AppCard(
       onTap: onTap,
       leftBorderColor: isHighlighted ? context.colors.primary : null,
       child: Row(
@@ -41,7 +40,6 @@ class FolderDeckTile extends StatelessWidget {
         ],
       ),
     );
-  }
 }
 
 class _DeckText extends StatelessWidget {

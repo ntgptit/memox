@@ -9,28 +9,21 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'datasource_providers.g.dart';
 
 @Riverpod(keepAlive: true)
-FolderLocalDataSource folderLocalDataSource(Ref ref) {
-  return FolderLocalDataSourceImpl(ref.watch(folderDaoProvider));
-}
+FolderLocalDataSource folderLocalDataSource(Ref ref) => FolderLocalDataSourceImpl(ref.watch(folderDaoProvider));
 
 @Riverpod(keepAlive: true)
-DeckLocalDataSource deckLocalDataSource(Ref ref) {
-  return DeckLocalDataSourceImpl(ref.watch(deckDaoProvider));
-}
+DeckLocalDataSource deckLocalDataSource(Ref ref) => DeckLocalDataSourceImpl(ref.watch(deckDaoProvider));
 
 @Riverpod(keepAlive: true)
-FlashcardLocalDataSource flashcardLocalDataSource(Ref ref) {
-  return FlashcardLocalDataSourceImpl(ref.watch(cardDaoProvider));
-}
+FlashcardLocalDataSource flashcardLocalDataSource(Ref ref) => FlashcardLocalDataSourceImpl(ref.watch(cardDaoProvider));
 
 @Riverpod(keepAlive: true)
-StudyLocalDataSource studyLocalDataSource(Ref ref) {
-  return StudyLocalDataSourceImpl(ref.watch(studySessionDaoProvider));
-}
+StudyLocalDataSource studyLocalDataSource(Ref ref) => StudyLocalDataSourceImpl(ref.watch(studySessionDaoProvider));
 
 @Riverpod(keepAlive: true)
-StatisticsLocalDataSource statisticsLocalDataSource(Ref ref) {
-  return StatisticsLocalDataSourceImpl(
-    () => ref.watch(cardReviewDaoProvider).watchTotalReviews(),
+StatisticsLocalDataSource statisticsLocalDataSource(Ref ref) => StatisticsLocalDataSourceImpl(
+    cardDao: ref.watch(cardDaoProvider),
+    cardReviewDao: ref.watch(cardReviewDaoProvider),
+    deckDao: ref.watch(deckDaoProvider),
+    studySessionDao: ref.watch(studySessionDaoProvider),
   );
-}

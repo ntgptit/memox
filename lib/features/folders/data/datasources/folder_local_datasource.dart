@@ -60,9 +60,7 @@ final class FolderLocalDataSourceImpl implements FolderLocalDataSource {
   Future<List<FoldersTableData>> getAll() => _folderDao.getAll();
 
   @override
-  Future<List<FoldersTableData>> getByParent(int? parentId) {
-    return _folderDao.getByParent(parentId);
-  }
+  Future<List<FoldersTableData>> getByParent(int? parentId) => _folderDao.getByParent(parentId);
 
   @override
   Future<FoldersTableData?> getById(int id) => _folderDao.getById(id);
@@ -70,27 +68,19 @@ final class FolderLocalDataSourceImpl implements FolderLocalDataSource {
   @override
   Future<({int subfolderCount, int deckCount, int cardCount})> getDeleteCounts(
     int folderId,
-  ) {
-    return _folderDao.getDeleteCounts(folderId);
-  }
+  ) => _folderDao.getDeleteCounts(folderId);
 
   @override
-  Future<List<int>> getDescendantIds(int folderId) {
-    return _folderDao.getDescendantIds(folderId);
-  }
+  Future<List<int>> getDescendantIds(int folderId) => _folderDao.getDescendantIds(folderId);
 
   @override
-  Future<int> getNextSortOrder(int? parentId) {
-    return _folderDao.getNextSortOrder(parentId);
-  }
+  Future<int> getNextSortOrder(int? parentId) => _folderDao.getNextSortOrder(parentId);
 
   @override
   Future<
     ({int subfolderCount, int deckCount, int totalCards, int masteredCards})
   >
-  getRecursiveStats(int folderId) {
-    return _folderDao.getRecursiveStats(folderId);
-  }
+  getRecursiveStats(int folderId) => _folderDao.getRecursiveStats(folderId);
 
   @override
   Future<bool> hasDecks(int folderId) => _folderDao.hasDecks(folderId);
@@ -100,9 +90,7 @@ final class FolderLocalDataSourceImpl implements FolderLocalDataSource {
       _folderDao.hasSubfolders(folderId);
 
   @override
-  Future<void> reorder(int? parentId, List<int> folderIds) {
-    return _folderDao.reorderByParent(parentId, folderIds);
-  }
+  Future<void> reorder(int? parentId, List<int> folderIds) => _folderDao.reorderByParent(parentId, folderIds);
 
   @override
   Future<FoldersTableData> save(FoldersTableCompanion companion) async {

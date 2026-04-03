@@ -4,15 +4,16 @@ import 'package:memox/features/cards/domain/usecases/create_card.dart';
 import 'package:memox/features/cards/domain/usecases/create_cards_batch.dart';
 import 'package:memox/features/cards/domain/usecases/delete_card.dart';
 import 'package:memox/features/cards/domain/usecases/get_cards_by_deck.dart';
-import 'package:memox/features/decks/domain/usecases/create_deck.dart';
 import 'package:memox/features/cards/domain/usecases/get_due_cards.dart';
 import 'package:memox/features/cards/domain/usecases/get_flashcards.dart';
 import 'package:memox/features/cards/domain/usecases/update_card.dart';
-import 'package:memox/features/decks/domain/usecases/get_decks.dart';
+import 'package:memox/features/decks/domain/usecases/create_deck.dart';
 import 'package:memox/features/decks/domain/usecases/delete_deck.dart';
 import 'package:memox/features/decks/domain/usecases/get_deck_stats.dart';
+import 'package:memox/features/decks/domain/usecases/get_decks.dart';
 import 'package:memox/features/decks/domain/usecases/get_decks_by_folder.dart';
 import 'package:memox/features/decks/domain/usecases/reorder_decks.dart';
+import 'package:memox/features/decks/domain/usecases/update_deck.dart';
 import 'package:memox/features/folders/domain/usecases/can_create_deck.dart';
 import 'package:memox/features/folders/domain/usecases/can_create_subfolder.dart';
 import 'package:memox/features/folders/domain/usecases/create_folder.dart';
@@ -27,57 +28,52 @@ import 'package:memox/features/settings/domain/usecases/get_settings.dart';
 import 'package:memox/features/settings/domain/usecases/update_locale.dart';
 import 'package:memox/features/settings/domain/usecases/update_seed_color.dart';
 import 'package:memox/features/settings/domain/usecases/update_theme_mode.dart';
-import 'package:memox/features/statistics/domain/usecases/get_statistics_overview.dart';
+import 'package:memox/features/statistics/domain/usecases/get_difficult_cards.dart';
+import 'package:memox/features/statistics/domain/usecases/get_mastery_breakdown.dart';
+import 'package:memox/features/statistics/domain/usecases/get_streak.dart';
+import 'package:memox/features/statistics/domain/usecases/get_study_stats.dart';
+import 'package:memox/features/statistics/domain/usecases/get_weekly_activity.dart';
+import 'package:memox/features/study/domain/usecases/complete_study_session.dart';
 import 'package:memox/features/study/domain/usecases/start_study_session.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'usecase_providers.g.dart';
 
 @riverpod
-GetSettingsUseCase getSettingsUseCase(Ref ref) {
-  return GetSettingsUseCase(ref.watch(settingsRepositoryProvider));
-}
+GetSettingsUseCase getSettingsUseCase(Ref ref) =>
+    GetSettingsUseCase(ref.watch(settingsRepositoryProvider));
 
 @riverpod
-UpdateThemeModeUseCase updateThemeModeUseCase(Ref ref) {
-  return UpdateThemeModeUseCase(ref.watch(settingsRepositoryProvider));
-}
+UpdateThemeModeUseCase updateThemeModeUseCase(Ref ref) =>
+    UpdateThemeModeUseCase(ref.watch(settingsRepositoryProvider));
 
 @riverpod
-UpdateSeedColorUseCase updateSeedColorUseCase(Ref ref) {
-  return UpdateSeedColorUseCase(ref.watch(settingsRepositoryProvider));
-}
+UpdateSeedColorUseCase updateSeedColorUseCase(Ref ref) =>
+    UpdateSeedColorUseCase(ref.watch(settingsRepositoryProvider));
 
 @riverpod
-UpdateLocaleUseCase updateLocaleUseCase(Ref ref) {
-  return UpdateLocaleUseCase(ref.watch(settingsRepositoryProvider));
-}
+UpdateLocaleUseCase updateLocaleUseCase(Ref ref) =>
+    UpdateLocaleUseCase(ref.watch(settingsRepositoryProvider));
 
 @riverpod
-GetRootFoldersUseCase getRootFoldersUseCase(Ref ref) {
-  return GetRootFoldersUseCase(ref.watch(folderRepositoryProvider));
-}
+GetRootFoldersUseCase getRootFoldersUseCase(Ref ref) =>
+    GetRootFoldersUseCase(ref.watch(folderRepositoryProvider));
 
 @riverpod
-GetSubfoldersUseCase getSubfoldersUseCase(Ref ref) {
-  return GetSubfoldersUseCase(ref.watch(folderRepositoryProvider));
-}
+GetSubfoldersUseCase getSubfoldersUseCase(Ref ref) =>
+    GetSubfoldersUseCase(ref.watch(folderRepositoryProvider));
 
 @riverpod
-CreateFolderUseCase createFolderUseCase(Ref ref) {
-  return CreateFolderUseCase(
-    folderRepo: ref.watch(folderRepositoryProvider),
-    logger: ref.watch(appLoggerProvider),
-  );
-}
+CreateFolderUseCase createFolderUseCase(Ref ref) => CreateFolderUseCase(
+  folderRepo: ref.watch(folderRepositoryProvider),
+  logger: ref.watch(appLoggerProvider),
+);
 
 @riverpod
-DeleteFolderUseCase deleteFolderUseCase(Ref ref) {
-  return DeleteFolderUseCase(
-    folderRepo: ref.watch(folderRepositoryProvider),
-    logger: ref.watch(appLoggerProvider),
-  );
-}
+DeleteFolderUseCase deleteFolderUseCase(Ref ref) => DeleteFolderUseCase(
+  folderRepo: ref.watch(folderRepositoryProvider),
+  logger: ref.watch(appLoggerProvider),
+);
 
 @riverpod
 UpdateFolderUseCase updateFolderUseCase(Ref ref) => UpdateFolderUseCase(
@@ -86,104 +82,114 @@ UpdateFolderUseCase updateFolderUseCase(Ref ref) => UpdateFolderUseCase(
 );
 
 @riverpod
-CanCreateSubfolderUseCase canCreateSubfolderUseCase(Ref ref) {
-  return CanCreateSubfolderUseCase(ref.watch(folderRepositoryProvider));
-}
+CanCreateSubfolderUseCase canCreateSubfolderUseCase(Ref ref) =>
+    CanCreateSubfolderUseCase(ref.watch(folderRepositoryProvider));
 
 @riverpod
-CanCreateDeckUseCase canCreateDeckUseCase(Ref ref) {
-  return CanCreateDeckUseCase(ref.watch(folderRepositoryProvider));
-}
+CanCreateDeckUseCase canCreateDeckUseCase(Ref ref) =>
+    CanCreateDeckUseCase(ref.watch(folderRepositoryProvider));
 
 @riverpod
-GetFolderBreadcrumbUseCase getFolderBreadcrumbUseCase(Ref ref) {
-  return GetFolderBreadcrumbUseCase(ref.watch(folderRepositoryProvider));
-}
+GetFolderBreadcrumbUseCase getFolderBreadcrumbUseCase(Ref ref) =>
+    GetFolderBreadcrumbUseCase(ref.watch(folderRepositoryProvider));
 
 @riverpod
-GetFolderDeleteSummaryUseCase getFolderDeleteSummaryUseCase(Ref ref) {
-  return GetFolderDeleteSummaryUseCase(ref.watch(folderRepositoryProvider));
-}
+GetFolderDeleteSummaryUseCase getFolderDeleteSummaryUseCase(Ref ref) =>
+    GetFolderDeleteSummaryUseCase(ref.watch(folderRepositoryProvider));
 
 @riverpod
-ReorderFoldersUseCase reorderFoldersUseCase(Ref ref) {
-  return ReorderFoldersUseCase(ref.watch(folderRepositoryProvider));
-}
+ReorderFoldersUseCase reorderFoldersUseCase(Ref ref) =>
+    ReorderFoldersUseCase(ref.watch(folderRepositoryProvider));
 
 @riverpod
-GetDecksUseCase getDecksUseCase(Ref ref) {
-  return GetDecksUseCase(ref.watch(deckRepositoryProvider));
-}
+GetDecksUseCase getDecksUseCase(Ref ref) =>
+    GetDecksUseCase(ref.watch(deckRepositoryProvider));
 
 @riverpod
-CreateDeckUseCase createDeckUseCase(Ref ref) {
-  return CreateDeckUseCase(
-    repository: ref.watch(deckRepositoryProvider),
-    canCreateDeckUseCase: ref.watch(canCreateDeckUseCaseProvider),
-  );
-}
+CreateDeckUseCase createDeckUseCase(Ref ref) => CreateDeckUseCase(
+  repository: ref.watch(deckRepositoryProvider),
+  canCreateDeckUseCase: ref.watch(canCreateDeckUseCaseProvider),
+);
 
 @riverpod
-ReorderDecksUseCase reorderDecksUseCase(Ref ref) {
-  return ReorderDecksUseCase(ref.watch(deckRepositoryProvider));
-}
+UpdateDeckUseCase updateDeckUseCase(Ref ref) => UpdateDeckUseCase(
+  repository: ref.watch(deckRepositoryProvider),
+  logger: ref.watch(appLoggerProvider),
+);
 
 @riverpod
-GetDecksByFolderUseCase getDecksByFolderUseCase(Ref ref) {
-  return GetDecksByFolderUseCase(ref.watch(deckRepositoryProvider));
-}
+ReorderDecksUseCase reorderDecksUseCase(Ref ref) =>
+    ReorderDecksUseCase(ref.watch(deckRepositoryProvider));
 
 @riverpod
-DeleteDeckUseCase deleteDeckUseCase(Ref ref) {
-  return DeleteDeckUseCase(ref.watch(deckRepositoryProvider));
-}
+GetDecksByFolderUseCase getDecksByFolderUseCase(Ref ref) =>
+    GetDecksByFolderUseCase(ref.watch(deckRepositoryProvider));
 
 @riverpod
-GetDeckStatsUseCase getDeckStatsUseCase(Ref ref) {
-  return GetDeckStatsUseCase(ref.watch(flashcardRepositoryProvider));
-}
+DeleteDeckUseCase deleteDeckUseCase(Ref ref) =>
+    DeleteDeckUseCase(ref.watch(deckRepositoryProvider));
 
 @riverpod
-GetFlashcardsUseCase getFlashcardsUseCase(Ref ref) {
-  return GetFlashcardsUseCase(ref.watch(flashcardRepositoryProvider));
-}
+GetDeckStatsUseCase getDeckStatsUseCase(Ref ref) =>
+    GetDeckStatsUseCase(ref.watch(flashcardRepositoryProvider));
 
 @riverpod
-GetDueCardsUseCase getDueCardsUseCase(Ref ref) {
-  return GetDueCardsUseCase(ref.watch(flashcardRepositoryProvider));
-}
+GetFlashcardsUseCase getFlashcardsUseCase(Ref ref) =>
+    GetFlashcardsUseCase(ref.watch(flashcardRepositoryProvider));
 
 @riverpod
-GetCardsByDeckUseCase getCardsByDeckUseCase(Ref ref) {
-  return GetCardsByDeckUseCase(ref.watch(flashcardRepositoryProvider));
-}
+GetDueCardsUseCase getDueCardsUseCase(Ref ref) =>
+    GetDueCardsUseCase(ref.watch(flashcardRepositoryProvider));
 
 @riverpod
-CreateCardUseCase createCardUseCase(Ref ref) {
-  return CreateCardUseCase(ref.watch(flashcardRepositoryProvider));
-}
+GetCardsByDeckUseCase getCardsByDeckUseCase(Ref ref) =>
+    GetCardsByDeckUseCase(ref.watch(flashcardRepositoryProvider));
 
 @riverpod
-CreateCardsBatchUseCase createCardsBatchUseCase(Ref ref) {
-  return CreateCardsBatchUseCase(ref.watch(flashcardRepositoryProvider));
-}
+CreateCardUseCase createCardUseCase(Ref ref) =>
+    CreateCardUseCase(ref.watch(flashcardRepositoryProvider));
 
 @riverpod
-UpdateCardUseCase updateCardUseCase(Ref ref) {
-  return UpdateCardUseCase(ref.watch(flashcardRepositoryProvider));
-}
+CreateCardsBatchUseCase createCardsBatchUseCase(Ref ref) =>
+    CreateCardsBatchUseCase(ref.watch(flashcardRepositoryProvider));
 
 @riverpod
-DeleteCardUseCase deleteCardUseCase(Ref ref) {
-  return DeleteCardUseCase(ref.watch(flashcardRepositoryProvider));
-}
+UpdateCardUseCase updateCardUseCase(Ref ref) =>
+    UpdateCardUseCase(ref.watch(flashcardRepositoryProvider));
 
 @riverpod
-StartStudySessionUseCase startStudySessionUseCase(Ref ref) {
-  return StartStudySessionUseCase(ref.watch(studyRepositoryProvider));
-}
+DeleteCardUseCase deleteCardUseCase(Ref ref) =>
+    DeleteCardUseCase(ref.watch(flashcardRepositoryProvider));
 
 @riverpod
-GetStatisticsOverviewUseCase getStatisticsOverviewUseCase(Ref ref) {
-  return GetStatisticsOverviewUseCase(ref.watch(statisticsRepositoryProvider));
-}
+CompleteStudySessionUseCase completeStudySessionUseCase(Ref ref) =>
+    CompleteStudySessionUseCase(ref.watch(studyRepositoryProvider));
+
+@riverpod
+StartStudySessionUseCase startStudySessionUseCase(Ref ref) =>
+    StartStudySessionUseCase(ref.watch(studyRepositoryProvider));
+
+@riverpod
+GetStreakUseCase getStreakUseCase(Ref ref) =>
+    GetStreakUseCase(ref.watch(statisticsRepositoryProvider));
+
+@riverpod
+GetWeeklyActivityUseCase getWeeklyActivityUseCase(Ref ref) =>
+    GetWeeklyActivityUseCase(ref.watch(statisticsRepositoryProvider));
+
+@riverpod
+GetMasteryBreakdownUseCase getMasteryBreakdownUseCase(Ref ref) =>
+    GetMasteryBreakdownUseCase(ref.watch(statisticsRepositoryProvider));
+
+@riverpod
+GetDifficultCardsUseCase getDifficultCardsUseCase(Ref ref) =>
+    GetDifficultCardsUseCase(ref.watch(statisticsRepositoryProvider));
+
+@riverpod
+GetStudyStatsUseCase getStudyStatsUseCase(Ref ref) => GetStudyStatsUseCase(
+  repository: ref.watch(statisticsRepositoryProvider),
+  getStreakUseCase: ref.watch(getStreakUseCaseProvider),
+  getWeeklyActivityUseCase: ref.watch(getWeeklyActivityUseCaseProvider),
+  getMasteryBreakdownUseCase: ref.watch(getMasteryBreakdownUseCaseProvider),
+  getDifficultCardsUseCase: ref.watch(getDifficultCardsUseCaseProvider),
+);

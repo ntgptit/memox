@@ -16,13 +16,13 @@ final class SettingsRepositoryImpl implements SettingsRepository {
   final AppLogger _logger;
 
   @override
-  Future<AppSettings> getSettings() async {
+  Future<AppSettings> load() async {
     final sharedPreferences = await _sharedPreferencesLoader();
     return AppSettingsMapper.fromPreferences(sharedPreferences);
   }
 
   @override
-  Future<void> saveSettings(AppSettings settings) async {
+  Future<void> save(AppSettings settings) async {
     final sharedPreferences = await _sharedPreferencesLoader();
     _logger.info('Persisting application settings');
     await AppSettingsMapper.toPreferences(sharedPreferences, settings);
@@ -30,19 +30,55 @@ final class SettingsRepositoryImpl implements SettingsRepository {
 
   @override
   Future<void> updateLocaleCode(String? localeCode) async {
-    final settings = await getSettings();
-    await saveSettings(settings.copyWith(localeCode: localeCode));
+    final settings = await load();
+    await save(settings.copyWith(localeCode: localeCode));
   }
 
   @override
   Future<void> updateSeedColorValue(int seedColorValue) async {
-    final settings = await getSettings();
-    await saveSettings(settings.copyWith(seedColorValue: seedColorValue));
+    final settings = await load();
+    await save(settings.copyWith(seedColorValue: seedColorValue));
   }
 
   @override
   Future<void> updateThemeMode(ThemeMode themeMode) async {
-    final settings = await getSettings();
-    await saveSettings(settings.copyWith(themeMode: themeMode));
+    final settings = await load();
+    await save(settings.copyWith(themeMode: themeMode));
+  }
+
+  @override
+  Future<void> updateDailyGoal(int dailyGoal) async {
+    final settings = await load();
+    await save(settings.copyWith(dailyGoal: dailyGoal));
+  }
+
+  @override
+  Future<void> updateSessionLimitMinutes(int sessionLimitMinutes) async {
+    final settings = await load();
+    await save(settings.copyWith(sessionLimitMinutes: sessionLimitMinutes));
+  }
+
+  @override
+  Future<void> updateAutoAdvanceDelay(double autoAdvanceDelay) async {
+    final settings = await load();
+    await save(settings.copyWith(autoAdvanceDelay: autoAdvanceDelay));
+  }
+
+  @override
+  Future<void> updateStudyReminder({required bool studyReminder}) async {
+    final settings = await load();
+    await save(settings.copyWith(studyReminder: studyReminder));
+  }
+
+  @override
+  Future<void> updateReminderTime(TimeOfDay? reminderTime) async {
+    final settings = await load();
+    await save(settings.copyWith(reminderTime: reminderTime));
+  }
+
+  @override
+  Future<void> updateStreakReminder({required bool streakReminder}) async {
+    final settings = await load();
+    await save(settings.copyWith(streakReminder: streakReminder));
   }
 }

@@ -13,9 +13,11 @@ import 'package:memox/features/cards/domain/entities/flashcard_entity.dart';
 import 'package:memox/features/cards/presentation/screens/card_create_screen.dart';
 import 'package:memox/features/cards/presentation/screens/card_edit_screen.dart';
 import 'package:memox/features/cards/presentation/widgets/card_list_tile.dart';
+import 'package:memox/features/decks/domain/entities/deck_entity.dart';
 import 'package:memox/features/decks/presentation/models/deck_card_sort.dart';
 import 'package:memox/features/decks/presentation/models/deck_detail_view_state.dart';
 import 'package:memox/features/decks/presentation/providers/deck_detail_provider.dart';
+import 'package:memox/features/decks/presentation/widgets/create_deck_dialog.dart';
 import 'package:memox/features/decks/presentation/widgets/deck_cards_toolbar.dart';
 import 'package:memox/features/decks/presentation/widgets/deck_cards_toolbar_delegate.dart';
 import 'package:memox/features/decks/presentation/widgets/deck_detail_header.dart';
@@ -87,14 +89,17 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
                 slivers: [
                   DeckDetailHeader(
                     deckName: detail.deck.name,
-                    summary: _headerSummary(context, detail, viewState),
-                    breadcrumb: _breadcrumbSegments(context, detail),
-                    masteryPercentage: detail.stats.mastery,
-                    showMasteryBar: detail.stats.total > 0,
-                    showCollapsedTitle: _showCollapsedTitle,
-                    onDelete: () {
-                      unawaited(_deleteDeck(detail.deck.id));
-                    },
+                  summary: _headerSummary(context, detail, viewState),
+                  breadcrumb: _breadcrumbSegments(context, detail),
+                  masteryPercentage: detail.stats.mastery,
+                  showMasteryBar: detail.stats.total > 0,
+                  showCollapsedTitle: _showCollapsedTitle,
+                  onEdit: () {
+                    unawaited(_editDeck(detail.deck));
+                  },
+                  onDelete: () {
+                    unawaited(_deleteDeck(detail.deck.id));
+                  },
                   ),
                   DeckDetailOverview(
                     stats: detail.stats,
@@ -370,6 +375,38 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
 
     if (result.isSuccess) {
       Navigator.of(context).pop();
+      return;
+    }
+
+    context.showSnackBar(result.failureOrNull?.message ?? '', isError: true);
+  }
+
+  Future<void> _editDeck(DeckEntity deck) async {
+    final draft = await showCreateDeckDialog(
+      context,
+      initialName: deck.name,
+      initialDescription: deck.description,
+      initialColorValue: deck.colorValue,
+      initialTags: deck.tags,
+      title: context.l10n.editAction,
+      submitLabel: context.l10n.saveAction,
+    );
+
+    if (draft == null || !mounted) {
+      return;
+    }
+
+    final result = await ref
+        .read(updateDeckUseCaseProvider)
+        .call(
+          id: deck.id,
+          name: draft.name,
+          description: draft.description,
+          colorValue: draft.colorValue,
+          tags: draft.tags,
+        );
+
+    if (!mounted || result.isSuccess) {
       return;
     }
 

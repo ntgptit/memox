@@ -11,6 +11,11 @@ abstract final class AppSettingsMapper {
   static const String syncEnabledKey = 'settings.sync_enabled';
   static const String dailyGoalKey = 'settings.daily_goal';
   static const String sessionLimitKey = 'settings.session_limit';
+  static const String autoAdvanceDelayKey = 'settings.auto_advance_delay';
+  static const String studyReminderKey = 'settings.study_reminder';
+  static const String reminderHourKey = 'settings.reminder_hour';
+  static const String reminderMinuteKey = 'settings.reminder_minute';
+  static const String streakReminderKey = 'settings.streak_reminder';
 
   static AppSettings fromPreferences(SharedPreferences sharedPreferences) =>
       AppSettings(
@@ -23,9 +28,19 @@ abstract final class AppSettingsMapper {
         dailyGoal:
             sharedPreferences.getInt(dailyGoalKey) ??
             AppSettings.defaults.dailyGoal,
-        sessionLimit:
+        sessionLimitMinutes:
             sharedPreferences.getInt(sessionLimitKey) ??
-            AppSettings.defaults.sessionLimit,
+            AppSettings.defaults.sessionLimitMinutes,
+        autoAdvanceDelay:
+            sharedPreferences.getDouble(autoAdvanceDelayKey) ??
+            AppSettings.defaults.autoAdvanceDelay,
+        studyReminder:
+            sharedPreferences.getBool(studyReminderKey) ??
+            AppSettings.defaults.studyReminder,
+        reminderTime: _readReminderTime(sharedPreferences),
+        streakReminder:
+            sharedPreferences.getBool(streakReminderKey) ??
+            AppSettings.defaults.streakReminder,
       );
 
   static Future<void> toPreferences(
@@ -37,7 +52,17 @@ abstract final class AppSettingsMapper {
     await _writeLocaleCode(sharedPreferences, settings.localeCode);
     await sharedPreferences.setBool(syncEnabledKey, settings.syncEnabled);
     await sharedPreferences.setInt(dailyGoalKey, settings.dailyGoal);
-    await sharedPreferences.setInt(sessionLimitKey, settings.sessionLimit);
+    await sharedPreferences.setInt(
+      sessionLimitKey,
+      settings.sessionLimitMinutes,
+    );
+    await sharedPreferences.setDouble(
+      autoAdvanceDelayKey,
+      settings.autoAdvanceDelay,
+    );
+    await sharedPreferences.setBool(studyReminderKey, settings.studyReminder);
+    await _writeReminderTime(sharedPreferences, settings.reminderTime);
+    await sharedPreferences.setBool(streakReminderKey, settings.streakReminder);
   }
 
   static ThemeMode parseThemeMode(String? value) => switch (value) {
@@ -56,5 +81,30 @@ abstract final class AppSettingsMapper {
     }
 
     await sharedPreferences.setString(localeCodeKey, localeCode);
+  }
+
+  static TimeOfDay? _readReminderTime(SharedPreferences sharedPreferences) {
+    final hour = sharedPreferences.getInt(reminderHourKey);
+    final minute = sharedPreferences.getInt(reminderMinuteKey);
+
+    if (hour == null || minute == null) {
+      return null;
+    }
+
+    return TimeOfDay(hour: hour, minute: minute);
+  }
+
+  static Future<void> _writeReminderTime(
+    SharedPreferences sharedPreferences,
+    TimeOfDay? reminderTime,
+  ) async {
+    if (reminderTime == null) {
+      await sharedPreferences.remove(reminderHourKey);
+      await sharedPreferences.remove(reminderMinuteKey);
+      return;
+    }
+
+    await sharedPreferences.setInt(reminderHourKey, reminderTime.hour);
+    await sharedPreferences.setInt(reminderMinuteKey, reminderTime.minute);
   }
 }

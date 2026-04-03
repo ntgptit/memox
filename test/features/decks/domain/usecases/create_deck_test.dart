@@ -33,7 +33,6 @@ void main() {
     final result = await useCase.call(
       name: 'core vocabulary',
       folderId: 1,
-      colorValue: 0xFF5C6BC0,
     );
 
     expect(result.isFailure, isTrue);

@@ -5,7 +5,5 @@ final class CanCreateDeckUseCase {
 
   final FolderRepository _repository;
 
-  Future<bool> call(int folderId) async {
-    return !(await _repository.hasSubfolders(folderId));
-  }
+  Future<bool> call(int folderId) async => !(await _repository.hasSubfolders(folderId));
 }

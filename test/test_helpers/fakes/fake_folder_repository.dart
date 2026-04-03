@@ -75,14 +75,10 @@ class FakeFolderRepository implements FolderRepository {
   }
 
   @override
-  Future<FolderDeleteSummary> getDeleteSummary(int folderId) async {
-    return _deleteSummaries[folderId] ?? const FolderDeleteSummary();
-  }
+  Future<FolderDeleteSummary> getDeleteSummary(int folderId) async => _deleteSummaries[folderId] ?? const FolderDeleteSummary();
 
   @override
-  Future<int> getNextSortOrder(int? parentId) async {
-    return _folders.where((folder) => folder.parentId == parentId).length;
-  }
+  Future<int> getNextSortOrder(int? parentId) async => _folders.where((folder) => folder.parentId == parentId).length;
 
   @override
   Future<FolderEntity> update({
@@ -103,19 +99,13 @@ class FakeFolderRepository implements FolderRepository {
   }
 
   @override
-  Future<FolderRecursiveStats> getRecursiveStats(int folderId) async {
-    return _recursiveStats[folderId] ?? const FolderRecursiveStats();
-  }
+  Future<FolderRecursiveStats> getRecursiveStats(int folderId) async => _recursiveStats[folderId] ?? const FolderRecursiveStats();
 
   @override
-  Future<List<FolderEntity>> getRootFolders() async {
-    return _folders.where((folder) => folder.parentId == null).toList();
-  }
+  Future<List<FolderEntity>> getRootFolders() async => _folders.where((folder) => folder.parentId == null).toList();
 
   @override
-  Future<List<FolderEntity>> getSubfolders(int parentId) async {
-    return _folders.where((folder) => folder.parentId == parentId).toList();
-  }
+  Future<List<FolderEntity>> getSubfolders(int parentId) async => _folders.where((folder) => folder.parentId == parentId).toList();
 
   @override
   Future<bool> hasDecks(int folderId) async =>

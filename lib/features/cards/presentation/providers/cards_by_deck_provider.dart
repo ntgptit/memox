@@ -5,6 +5,4 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'cards_by_deck_provider.g.dart';
 
 @riverpod
-Stream<List<FlashcardEntity>> cardsByDeck(Ref ref, int deckId) {
-  return ref.watch(getCardsByDeckUseCaseProvider).call(deckId);
-}
+Stream<List<FlashcardEntity>> cardsByDeck(Ref ref, int deckId) => ref.watch(getCardsByDeckUseCaseProvider).call(deckId);

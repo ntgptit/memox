@@ -5,7 +5,5 @@ final class UpdateSeedColorUseCase {
 
   final SettingsRepository _repository;
 
-  Future<void> call(int seedColorValue) {
-    return _repository.updateSeedColorValue(seedColorValue);
-  }
+  Future<void> call(int seedColorValue) => _repository.updateSeedColorValue(seedColorValue);
 }

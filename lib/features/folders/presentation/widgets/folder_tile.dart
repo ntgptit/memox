@@ -21,7 +21,7 @@ class FolderTile extends StatelessWidget {
   final FolderEntity folder;
   final String subtitle;
   final double masteryPercentage;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final VoidCallback? onLongPress;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
@@ -38,10 +38,7 @@ class FolderTile extends StatelessWidget {
           child: _FolderText(name: folder.name, subtitle: subtitle),
         ),
         const SizedBox(width: SpacingTokens.md),
-        MasteryRing(
-          percentage: masteryPercentage,
-          showZeroPercentText: true,
-        ),
+        MasteryRing(percentage: masteryPercentage, showZeroPercentText: true),
         if (onEdit != null || onDelete != null) ...[
           const SizedBox(width: SpacingTokens.xs),
           _FolderActionMenu(onEdit: onEdit, onDelete: onDelete),
@@ -133,8 +130,7 @@ class _FolderLeading extends StatelessWidget {
   final int colorValue;
 
   @override
-  Widget build(BuildContext context) {
-    return DecoratedBox(
+  Widget build(BuildContext context) => DecoratedBox(
       decoration: BoxDecoration(
         color: Color(colorValue).withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(SpacingTokens.md),
@@ -144,7 +140,6 @@ class _FolderLeading extends StatelessWidget {
         child: Icon(Icons.folder_outlined),
       ),
     );
-  }
 }
 
 class _FolderText extends StatelessWidget {

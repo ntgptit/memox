@@ -1,5 +1,5 @@
-import 'package:memox/core/guards/preconditions.dart';
 import 'package:memox/core/database/db_constants.dart';
+import 'package:memox/core/guards/preconditions.dart';
 import 'package:memox/core/types/failure.dart';
 import 'package:memox/core/types/result.dart';
 import 'package:memox/features/decks/domain/entities/deck_entity.dart';
@@ -41,9 +41,7 @@ final class CreateDeckUseCase {
     }
 
     final decks = await _repository.getByFolder(folderId);
-    final duplicateExists = decks.any((DeckEntity deck) {
-      return deck.name.trim().toLowerCase() == trimmedName.toLowerCase();
-    });
+    final duplicateExists = decks.any((DeckEntity deck) => deck.name.trim().toLowerCase() == trimmedName.toLowerCase());
 
     if (duplicateExists) {
       return const Result.failure(

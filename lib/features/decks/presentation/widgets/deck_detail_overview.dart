@@ -110,7 +110,6 @@ class _DeckActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AppCard(
-    padding: const EdgeInsets.all(SpacingTokens.lg),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -139,7 +138,6 @@ class _DeckActionCard extends StatelessWidget {
           SecondaryButton(
             label: secondaryLabel!,
             onPressed: onSecondaryTap,
-            height: SizeTokens.buttonHeight,
           ),
         ],
       ],

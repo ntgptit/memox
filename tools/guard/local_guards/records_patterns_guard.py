@@ -31,6 +31,9 @@ class RecordsPatternsGuard(BaseGuard):
 
     def _collect_pair_like_violations(self, relative: str, lines: list[str]) -> list[Violation]:
         pair_like_patterns = self.project_rules.get(self.GUARD_ID, {}).get('pair_like_patterns', [])
+        pair_like_regexes = [
+            re.compile(rf'\b{re.escape(pattern)}\b') for pattern in pair_like_patterns
+        ]
         violations: list[Violation] = []
 
         for index, line in enumerate(lines, start=1):
@@ -50,7 +53,7 @@ class RecordsPatternsGuard(BaseGuard):
                 )
                 continue
 
-            if not any(pattern in line for pattern in pair_like_patterns):
+            if not any(pattern.search(line) for pattern in pair_like_regexes):
                 continue
 
             violations.append(

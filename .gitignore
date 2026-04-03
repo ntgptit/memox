@@ -53,3 +53,5 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+.codex_analyze.txt
+.codex_analyze_after_fix.txt

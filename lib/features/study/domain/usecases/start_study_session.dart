@@ -7,7 +7,8 @@ final class StartStudySessionUseCase {
 
   final StudyRepository _repository;
 
-  Future<StudySession> call({StudyMode mode = StudyMode.review}) {
-    return _repository.startSession(mode);
-  }
+  Future<StudySession> call({
+    required int deckId,
+    StudyMode mode = StudyMode.review,
+  }) => _repository.startSession(deckId: deckId, mode: mode);
 }

@@ -17,27 +17,50 @@ class StreakChip extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
+    final showGlow = count >= 5;
     return DecoratedBox(
-      decoration: BoxDecoration(
-        color: context.customColors.mastery.withValues(
-          alpha: OpacityTokens.press,
-        ),
-        borderRadius: BorderRadius.circular(RadiusTokens.chip),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: SpacingTokens.md,
-          vertical: SpacingTokens.xs,
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.local_fire_department_outlined),
-            const SizedBox(width: SpacingTokens.xs),
-            Text(count.toString(), style: context.appTextStyles.tagText),
-          ],
-        ),
-      ),
-    ).animate().scale(duration: DurationTokens.normal);
+          decoration: BoxDecoration(
+            color: context.customColors.mastery.withValues(
+              alpha: OpacityTokens.press,
+            ),
+            borderRadius: BorderRadius.circular(RadiusTokens.chip),
+            boxShadow: showGlow
+                ? [
+                    BoxShadow(
+                      color: context.customColors.mastery.withValues(
+                        alpha: OpacityTokens.focus,
+                      ),
+                      blurRadius: SpacingTokens.lg,
+                    ),
+                  ]
+                : null,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: SpacingTokens.md,
+              vertical: SpacingTokens.xs,
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.local_fire_department_outlined),
+                const SizedBox(width: SpacingTokens.xs),
+                Text(count.toString(), style: context.appTextStyles.tagText),
+              ],
+            ),
+          ),
+        )
+        .animate()
+        .scale(
+          begin: const Offset(1, 1),
+          end: const Offset(1.2, 1.2),
+          duration: DurationTokens.normal,
+        )
+        .then()
+        .scale(
+          begin: const Offset(1.2, 1.2),
+          end: const Offset(1, 1),
+          duration: DurationTokens.normal,
+        );
   }
 }

@@ -15,20 +15,17 @@ part 'service_providers.g.dart';
 AppLogger appLogger(Ref ref) => const LoggerImpl();
 
 @Riverpod(keepAlive: true)
-GlobalErrorHandler globalErrorHandler(Ref ref) {
-  return GlobalErrorHandler(ref.watch(appLoggerProvider));
-}
+GlobalErrorHandler globalErrorHandler(Ref ref) => GlobalErrorHandler(ref.watch(appLoggerProvider));
 
 @Riverpod(keepAlive: true)
-NotificationService notificationService(Ref ref) {
-  return const NoopNotificationService();
-}
+NotificationService notificationService(Ref ref) => LocalNotificationService();
 
 @Riverpod(keepAlive: true)
-ShareService shareService(Ref ref) => const NoopShareService();
+ShareService shareService(Ref ref) => const PlatformShareService();
 
 @Riverpod(keepAlive: true)
-FilePickerService filePickerService(Ref ref) => const NoopFilePickerService();
+FilePickerService filePickerService(Ref ref) =>
+    const PlatformFilePickerService();
 
 @Riverpod(keepAlive: true)
 DatabaseExportService databaseExportService(Ref ref) =>

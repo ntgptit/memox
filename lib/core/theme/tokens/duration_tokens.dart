@@ -15,6 +15,8 @@ abstract final class DurationTokens {
   static const Duration countUp = Duration(milliseconds: 400);
   static const Duration chartDraw = Duration(milliseconds: 600);
   static const Duration pulse = Duration(milliseconds: 1500);
+  static const Duration timerTick = Duration(seconds: 1);
+  static const Duration guessAutoAdvance = pulse;
 
   // ── Delays ──
   static const Duration staggerDelay = Duration(milliseconds: 50);
