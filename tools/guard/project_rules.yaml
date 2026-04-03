@@ -213,6 +213,21 @@ responsive_layout_test:
         - "setSurfaceSize("
         - "takeException()"
 
+responsive_text_scale:
+  cases:
+    - file: "lib/app.dart"
+      required_tokens:
+        - "MediaQuery("
+        - "textScaler:"
+        - "TextScaler.linear("
+        - "ScreenType.of(context).textScaleFactor"
+    - file: "test/test_helpers/test_app.dart"
+      required_tokens:
+        - "MediaQuery("
+        - "textScaler:"
+        - "TextScaler.linear("
+        - "ScreenType.of(context).textScaleFactor"
+
 refresh_retry:
   retry_path_patterns:
     - "features/*/presentation/screens/*_screen.dart"
@@ -268,6 +283,36 @@ touch_target:
     - "SizeTokens.inputHeight"
     - "SizeTokens.listItemHeight"
     - "SizeTokens.listItemTall"
+
+typography_scale:
+  cases:
+    - file: "lib/core/theme/tokens/typography_tokens.dart"
+      required_tokens:
+        - "48 / 32 / 24 / 20 / 16 / 14 / 12"
+        - "static const double displayLarge = 32;"
+        - "static const double displayMedium = 32;"
+        - "static const double statDisplay = 48;"
+        - "static const double headlineLarge = 24;"
+        - "static const double headlineMedium = 20;"
+        - "static const double titleLarge = 24;"
+        - "static const double titleMedium = 16;"
+        - "static const double titleSmall = 16;"
+        - "static const double bodyLarge = 16;"
+        - "static const double bodyMedium = 16;"
+        - "static const double bodySmall = 14;"
+        - "static const double labelLarge = 14;"
+        - "static const double labelMedium = 12;"
+        - "static const double labelSmall = 12;"
+        - "static const double caption = 12;"
+    - file: "AGENTS.md"
+      required_tokens:
+        - "48 / 32 / 24 / 20 / 16 / 14 / 12"
+        - "`20` (`headlineMedium`) is the bridge headline size"
+    - file: "docs/memox-typography-usage-rules.md"
+      required_tokens:
+        - "constrained app type scale only"
+        - "`20` — bridge headline"
+        - "`48 / 32 / 24 / 20 / 16 / 14 / 12`"
 
 test_coverage:
   screen_file_glob: "presentation/screens/*_screen.dart"

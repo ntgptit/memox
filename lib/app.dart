@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
+import 'package:memox/core/responsive/screen_type.dart';
 import 'package:memox/core/router/app_router.dart';
 import 'package:memox/core/theme/app_theme.dart';
 import 'package:memox/core/theme/tokens/duration_tokens.dart';
@@ -32,15 +33,24 @@ class MemoxApp extends ConsumerWidget {
       themeAnimationCurve: EasingTokens.standard,
       routerConfig: router,
       builder: (context, child) {
+        final mediaQuery = MediaQuery.of(context);
         final content = child ?? const SizedBox.shrink();
+        final responsiveContent = MediaQuery(
+          data: mediaQuery.copyWith(
+            textScaler: TextScaler.linear(
+              ScreenType.of(context).textScaleFactor,
+            ),
+          ),
+          child: content,
+        );
 
         if (!settingsAsync.isLoading) {
-          return content;
+          return responsiveContent;
         }
 
         return Stack(
           children: [
-            content,
+            responsiveContent,
             Positioned.fill(
               child: ColoredBox(
                 color: Theme.of(context).colorScheme.surface,

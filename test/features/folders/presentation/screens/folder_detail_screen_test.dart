@@ -8,6 +8,7 @@ import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/decks/domain/entities/deck_entity.dart';
 import 'package:memox/features/folders/domain/entities/folder_entity.dart';
 import 'package:memox/features/folders/presentation/screens/folder_detail_screen.dart';
+import 'package:memox/shared/widgets/navigation/breadcrumb_bar.dart';
 import 'package:memox/shared/widgets/navigation/top_bar_back_button.dart';
 import '../../../../test_helpers/fakes/fake_deck_repository.dart';
 import '../../../../test_helpers/fakes/fake_flashcard_repository.dart';
@@ -93,6 +94,8 @@ void main() {
 
     expect(find.text('Korean Core'), findsOneWidget);
     expect(find.text('First 50 phrases'), findsOneWidget);
+    expect(find.byType(BreadcrumbBar), findsOneWidget);
+    expect(find.textContaining('Contains'), findsNothing);
     expect(find.byTooltip('Reorder'), findsOneWidget);
     expect(find.byIcon(Icons.more_vert), findsOneWidget);
 
@@ -150,7 +153,12 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
-    final titleRect = tester.getRect(find.text('Korean1').first);
+    final titleRect = tester.getRect(
+      find.descendant(
+        of: find.byType(AppBar),
+        matching: find.text('Korean1'),
+      ),
+    );
     const expectedLeft =
         SpacingTokens.lg + SizeTokens.touchTarget + SpacingTokens.sm;
 

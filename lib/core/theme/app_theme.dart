@@ -109,7 +109,7 @@ mixin AppTheme {
           padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
             EdgeInsets.symmetric(horizontal: SpacingTokens.xl),
           ),
-          textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.labelLarge),
+          textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.bodyLarge),
           overlayColor: _stateLayer(
             hovered: onPrimaryHoverColor,
             focused: onPrimaryFocusColor,
@@ -130,7 +130,7 @@ mixin AppTheme {
           padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
             EdgeInsets.symmetric(horizontal: SpacingTokens.xl),
           ),
-          textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.labelLarge),
+          textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.bodyLarge),
           overlayColor: _stateLayer(
             hovered: accentHoverColor,
             focused: accentFocusColor,
@@ -151,7 +151,7 @@ mixin AppTheme {
           padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
             EdgeInsets.symmetric(horizontal: SpacingTokens.md),
           ),
-          textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.labelLarge),
+          textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.bodyLarge),
           overlayColor: _stateLayer(
             hovered: accentHoverColor,
             focused: accentFocusColor,
@@ -177,7 +177,7 @@ mixin AppTheme {
           padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
             EdgeInsets.symmetric(horizontal: SpacingTokens.xl),
           ),
-          textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.labelLarge),
+          textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.bodyLarge),
           overlayColor: _stateLayer(
             hovered: onPrimaryHoverColor,
             focused: onPrimaryFocusColor,

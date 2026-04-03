@@ -54,6 +54,7 @@ local_guards:
   records_patterns: true
   riverpod_syntax: true
   responsive_layout_test: true
+  responsive_text_scale: true
   refresh_retry: true
   safe_area_keyboard: true
   screen_scaffold: true
@@ -62,6 +63,7 @@ local_guards:
   test_coverage: true
   text_style: true
   touch_target: true
+  typography_scale: true
 
 severity_overrides:
   widget_length: "warning"

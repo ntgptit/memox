@@ -102,9 +102,22 @@ Recommended completion order:
 
 - Do NOT ship raw Flutter Material defaults in feature UI when the control is visually prominent or interactive. This includes `TextField`, `ChoiceChip`, `SegmentedButton`, `PopupMenuButton`, `SwitchListTile`, and similar controls unless they are already centralized in theme or wrapped in a shared widget.
 - If a new UI pattern is needed and no shared primitive exists yet, create or extend the shared/themed version first in `lib/shared/widgets/**` or `lib/core/theme/**`, then use that in the feature. Do not style ad hoc per screen.
+- Responsive typography is mandatory at the app shell level. `lib/app.dart` and `test/test_helpers/test_app.dart` must apply `ScreenType.of(context).textScaleFactor` through `MediaQuery.textScaler` so mobile rendering and widget tests stay aligned.
 - For UI tasks, passing logic tests is not enough. Review the screen for visual hierarchy, spacing rhythm, empty/loading/error states, selected states, multiline input behavior, and consistency with the rest of MemoX before marking the task complete.
 - If a screen still looks like default Flutter after implementation, treat that as incomplete even if functionality works.
 - If there is a reason to intentionally diverge from the existing design language, state that reason explicitly and get alignment instead of silently shipping the deviation.
+
+## Typography usage rules
+
+- MemoX uses a constrained app type scale only: `48 / 32 / 24 / 20 / 16 / 14 / 12`.
+- `48` (`statDisplay`) is reserved for one dominant numeric stat on a surface. Never use it for body copy or repeated labels.
+- `32` (`displayLarge`, `displayMedium`) is for a single hero title or hero term per screen or card. Do not stack multiple 32px texts in the same viewport.
+- `24` (`headlineLarge`, `titleLarge`) is for AppBar titles, dialog or bottom-sheet titles, and strong stat values that need navigation-level emphasis.
+- `20` (`headlineMedium`) is the bridge headline size for in-body headers and emphasized section titles that must sit between a 24px navigation title and 16px body text.
+- `16` (`titleMedium`, `titleSmall`, `bodyLarge`, `bodyMedium`) is the base reading and interaction size. Use it for long-form readable text, list item titles, form input text, and primary or secondary button labels.
+- `14` (`bodySmall`, `labelLarge`) is for subtitles, supporting copy directly under a 16px title, filter or tag text, and breadcrumb-level metadata that must remain readable.
+- `12` (`labelMedium`, `labelSmall`, `caption`) is for metadata, helper labels, section overlines, all-caps micro labels, timestamps, and compact badges only.
+- If a text role does not clearly fit one of the buckets above, adjust the shared theme mapping in `lib/core/theme/**` instead of inventing a one-off size in feature UI.
 
 ## Required shared widgets
 
@@ -149,4 +162,5 @@ Read relevant sections BEFORE implementing:
 - `docs/memox-folder-structure-and-codebase-foundation.md` → tokens, widget specs, responsive
 - `docs/memox-codebase-supplement-advanced.md` → SOLID, patterns, l10n, providers
 - `docs/memox-migration-isar-to-drift-gdrive-backup.md` → database, backup
+- `docs/memox-typography-usage-rules.md` → constrained app type scale and usage rules
 - `docs/claude-code-memox-development-prompts.md` → phase-by-phase prompts

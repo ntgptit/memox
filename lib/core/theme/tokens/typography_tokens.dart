@@ -23,22 +23,22 @@ abstract final class TypographyTokens {
   static const double captionHeight = 1.4;
   static const double relaxedHeight = 1.6;
 
-  // ── M3 Type Scale (custom sizes) ──
+  // ── Collapsed Type Scale (48 / 32 / 24 / 20 / 16 / 14 / 12) ──
   static const double displayLarge = 32;
-  static const double displayMedium = 28;
+  static const double displayMedium = 32;
   static const double statDisplay = 48;
   static const double headlineLarge = 24;
-  static const double headlineMedium = 22;
-  static const double titleLarge = 20;
-  static const double titleMedium = 18;
+  static const double headlineMedium = 20;
+  static const double titleLarge = 24;
+  static const double titleMedium = 16;
   static const double titleSmall = 16;
-  static const double bodyLarge = 17;
-  static const double bodyMedium = 15;
+  static const double bodyLarge = 16;
+  static const double bodyMedium = 16;
   static const double bodySmall = 14;
   static const double labelLarge = 14;
-  static const double labelMedium = 13;
+  static const double labelMedium = 12;
   static const double labelSmall = 12;
-  static const double caption = 11;
+  static const double caption = 12;
 
   // ── Max Line Width (readability) ──
   static const int maxCharsPerLine = 60;

@@ -47,7 +47,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(AppScaffold), findsOneWidget);
-    expect(find.byType(AppCard), findsOneWidget);
+    expect(find.byType(AppCard, skipOffstage: false), findsOneWidget);
     expect(find.byType(SectionContainer), findsOneWidget);
     expect(find.byType(AppListTile), findsOneWidget);
     expect(find.byType(TextLinkButton), findsOneWidget);

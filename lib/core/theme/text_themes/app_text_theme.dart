@@ -8,41 +8,81 @@ mixin AppTextTheme {
       ThemeData(brightness: colorScheme.brightness).textTheme,
     );
 
-    TextStyle? heading(TextStyle? style) => style?.copyWith(
+    TextStyle? heading(TextStyle? style, double fontSize) => style?.copyWith(
       color: colorScheme.onSurface,
+      fontSize: fontSize,
       fontWeight: TypographyTokens.semiBold,
+      height: TypographyTokens.headingHeight,
       letterSpacing: TypographyTokens.headingSpacing,
     );
 
-    TextStyle? body(TextStyle? style) => style?.copyWith(
+    TextStyle? body(TextStyle? style, double fontSize) => style?.copyWith(
       color: colorScheme.onSurface,
+      fontSize: fontSize,
       fontWeight: TypographyTokens.regular,
       height: TypographyTokens.bodyHeight,
     );
 
-    TextStyle? caption(TextStyle? style) => style?.copyWith(
+    TextStyle? label(
+      TextStyle? style,
+      double fontSize, {
+      required FontWeight fontWeight,
+      required Color color,
+      required double height,
+      double? letterSpacing,
+    }) => style?.copyWith(
+      color: color,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      height: height,
+      letterSpacing: letterSpacing,
+    );
+
+    TextStyle? caption(TextStyle? style, double fontSize) => style?.copyWith(
       color: colorScheme.onSurfaceVariant,
+      fontSize: fontSize,
       fontWeight: TypographyTokens.regular,
-      fontSize: TypographyTokens.caption,
       height: TypographyTokens.captionHeight,
     );
 
     return base.copyWith(
-      displayLarge: heading(base.displayLarge),
-      displayMedium: heading(base.displayMedium),
-      displaySmall: heading(base.displaySmall),
-      headlineLarge: heading(base.headlineLarge),
-      headlineMedium: heading(base.headlineMedium),
-      headlineSmall: heading(base.headlineSmall),
-      titleLarge: heading(base.titleLarge),
-      titleMedium: heading(base.titleMedium),
-      titleSmall: heading(base.titleSmall),
-      bodyLarge: body(base.bodyLarge),
-      bodyMedium: body(base.bodyMedium),
-      bodySmall: caption(base.bodySmall),
-      labelLarge: heading(base.labelLarge),
-      labelMedium: body(base.labelMedium),
-      labelSmall: caption(base.labelSmall),
+      displayLarge: heading(base.displayLarge, TypographyTokens.displayLarge),
+      displayMedium: heading(
+        base.displayMedium,
+        TypographyTokens.displayMedium,
+      ),
+      displaySmall: heading(base.displaySmall, TypographyTokens.headlineLarge),
+      headlineLarge: heading(
+        base.headlineLarge,
+        TypographyTokens.headlineLarge,
+      ),
+      headlineMedium: heading(
+        base.headlineMedium,
+        TypographyTokens.headlineMedium,
+      ),
+      headlineSmall: heading(base.headlineSmall, TypographyTokens.titleLarge),
+      titleLarge: heading(base.titleLarge, TypographyTokens.titleLarge),
+      titleMedium: heading(base.titleMedium, TypographyTokens.titleMedium),
+      titleSmall: heading(base.titleSmall, TypographyTokens.titleSmall),
+      bodyLarge: body(base.bodyLarge, TypographyTokens.bodyLarge),
+      bodyMedium: body(base.bodyMedium, TypographyTokens.bodyMedium),
+      bodySmall: caption(base.bodySmall, TypographyTokens.bodySmall),
+      labelLarge: label(
+        base.labelLarge,
+        TypographyTokens.labelLarge,
+        fontWeight: TypographyTokens.medium,
+        color: colorScheme.onSurface,
+        height: TypographyTokens.bodyHeight,
+        letterSpacing: TypographyTokens.labelSpacing,
+      ),
+      labelMedium: label(
+        base.labelMedium,
+        TypographyTokens.labelMedium,
+        fontWeight: TypographyTokens.regular,
+        color: colorScheme.onSurfaceVariant,
+        height: TypographyTokens.bodyHeight,
+      ),
+      labelSmall: caption(base.labelSmall, TypographyTokens.labelSmall),
     );
   }
 }

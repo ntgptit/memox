@@ -9,13 +9,16 @@ import 'package:memox/shared/widgets/navigation/top_bar_icon_button.dart';
 import 'package:memox/shared/widgets/progress/mastery_bar.dart';
 
 const double _compactMasteryHeightCompensation = SpacingTokens.md;
+const double _regularHeaderHeightCompensation = SpacingTokens.xs;
 
 double deckDetailHeaderExpandedHeight(
   BuildContext context, {
   required bool showMasteryBar,
 }) {
   if (!context.isCompact) {
-    return SizeTokens.deckDetailHeaderHeight + SpacingTokens.sm;
+    return SizeTokens.deckDetailHeaderHeight +
+        SpacingTokens.sm +
+        _regularHeaderHeightCompensation;
   }
 
   if (showMasteryBar) {

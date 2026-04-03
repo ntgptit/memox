@@ -19,7 +19,6 @@ import 'package:memox/features/folders/presentation/widgets/delete_folder_confir
 import 'package:memox/features/folders/presentation/widgets/folder_constraint_footer.dart';
 import 'package:memox/features/folders/presentation/widgets/folder_detail_app_bar_title.dart';
 import 'package:memox/features/folders/presentation/widgets/folder_list_view.dart';
-import 'package:memox/features/folders/presentation/widgets/folder_status_bar.dart';
 import 'package:memox/features/folders/presentation/widgets/folder_type_chooser_sheet.dart';
 import 'package:memox/shared/widgets/buttons/app_fab.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
@@ -82,7 +81,7 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            FolderStatusBar(detail: detail),
+            FolderDetailBreadcrumb(breadcrumb: breadcrumb),
             const SizedBox(height: SpacingTokens.lg),
             if (_isSortMode) ...[
               ReorderModeBanner(onDone: _toggleSortMode),
@@ -121,10 +120,7 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
       onPressed: () => Navigator.of(context).pop(),
       startPadding: context.screenType.screenPadding,
     ),
-    title: FolderDetailAppBarTitle(
-      title: detail.folder.name,
-      breadcrumb: breadcrumb,
-    ),
+    title: FolderDetailAppBarTitle(title: detail.folder.name),
     actionsPadding: EdgeInsets.zero,
     actions: [
       TopBarActionRow(

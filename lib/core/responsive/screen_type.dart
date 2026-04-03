@@ -40,9 +40,9 @@ enum ScreenType {
   };
 
   double get textScaleFactor => switch (this) {
-    ScreenType.compact => 1,
-    ScreenType.medium => 1.1,
-    ScreenType.expanded => 1.15,
+    ScreenType.compact => 0.9,
+    ScreenType.medium => 1,
+    ScreenType.expanded => 1,
   };
 
   double get flashcardWidth => switch (this) {

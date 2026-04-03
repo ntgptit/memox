@@ -541,21 +541,22 @@ abstract final class TypographyTokens {
   static const double bodyHeight     = 1.5;
   static const double captionHeight  = 1.4;
 
-  // ── M3 Type Scale (custom sizes) ──
+  // ── Collapsed Type Scale (48 / 32 / 24 / 20 / 16 / 14 / 12) ──
   static const double displayLarge   = 32.0;
-  static const double displayMedium  = 28.0;
+  static const double displayMedium  = 32.0;
+  static const double statDisplay    = 48.0;
   static const double headlineLarge  = 24.0;
-  static const double headlineMedium = 22.0;
-  static const double titleLarge     = 20.0;
-  static const double titleMedium    = 18.0;
+  static const double headlineMedium = 20.0;
+  static const double titleLarge     = 24.0;
+  static const double titleMedium    = 16.0;
   static const double titleSmall     = 16.0;
-  static const double bodyLarge      = 17.0;
-  static const double bodyMedium     = 15.0;
+  static const double bodyLarge      = 16.0;
+  static const double bodyMedium     = 16.0;
   static const double bodySmall      = 14.0;
   static const double labelLarge     = 14.0;
-  static const double labelMedium    = 13.0;
+  static const double labelMedium    = 12.0;
   static const double labelSmall     = 12.0;
-  static const double caption        = 11.0;
+  static const double caption        = 12.0;
 
   // ── Max Line Width (readability) ──
   static const int maxCharsPerLine   = 60;

@@ -13,15 +13,17 @@ void main() {
   ) async {
     CustomColors? customColors;
     AppTextStyles? appTextStyles;
+    ThemeData? theme;
 
     await tester.pumpWidget(
       MaterialApp(
         theme: AppTheme.light(),
         home: Builder(
           builder: (context) {
-            final theme = Theme.of(context);
-            customColors = theme.extension<CustomColors>();
-            appTextStyles = theme.extension<AppTextStyles>();
+            final currentTheme = Theme.of(context);
+            theme = currentTheme;
+            customColors = currentTheme.extension<CustomColors>();
+            appTextStyles = currentTheme.extension<AppTextStyles>();
             return const SizedBox.shrink();
           },
         ),
@@ -37,7 +39,7 @@ void main() {
     expect(appTextStyles, isNotNull);
     expect(
       appTextStyles!.flashcardFront.fontSize,
-      TypographyTokens.headlineMedium,
+      TypographyTokens.displayLarge,
     );
     expect(
       appTextStyles!.flashcardHint.color?.a,
@@ -48,6 +50,33 @@ void main() {
       appTextStyles!.sectionLabel.letterSpacing,
       TypographyTokens.sectionSpacing,
     );
+    expect(theme, isNotNull);
+    expect(
+      theme!.textTheme.displayLarge?.fontSize,
+      TypographyTokens.displayLarge,
+    );
+    expect(
+      theme!.textTheme.headlineMedium?.fontSize,
+      TypographyTokens.headlineMedium,
+    );
+    expect(theme!.textTheme.titleLarge?.fontSize, TypographyTokens.titleLarge);
+    expect(
+      theme!.textTheme.titleMedium?.fontSize,
+      TypographyTokens.titleMedium,
+    );
+    expect(theme!.textTheme.bodyMedium?.fontSize, TypographyTokens.bodyMedium);
+    expect(theme!.textTheme.bodySmall?.fontSize, TypographyTokens.bodySmall);
+    expect(
+      theme!.textTheme.labelMedium?.fontSize,
+      TypographyTokens.labelMedium,
+    );
+    expect(theme!.textTheme.labelSmall?.fontSize, TypographyTokens.labelSmall);
+    expect(
+      theme!.filledButtonTheme.style?.textStyle?.resolve({})?.fontSize,
+      TypographyTokens.bodyLarge,
+    );
+    expect(appTextStyles!.sectionLabel.fontSize, TypographyTokens.labelSmall);
+    expect(appTextStyles!.breadcrumb.fontSize, TypographyTokens.bodySmall);
   });
 
   testWidgets('dark theme maps dark custom colors', (tester) async {

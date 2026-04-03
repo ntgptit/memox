@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/core/responsive/screen_type.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
+import '../../test_helpers/test_app.dart';
 
 void main() {
   testWidgets('screen type resolves compact values', (tester) async {
@@ -22,7 +23,7 @@ void main() {
     expect(screenType, ScreenType.compact);
     expect(screenType!.screenPadding, SpacingTokens.lg);
     expect(screenType!.gridColumns, 1);
-    expect(screenType!.textScaleFactor, 1);
+    expect(screenType!.textScaleFactor, 0.9);
   });
 
   testWidgets('screen type resolves medium values', (tester) async {
@@ -66,6 +67,26 @@ void main() {
     expect(screenType!.screenPadding, SpacingTokens.xxl);
     expect(screenType!.gridColumns, 3);
     expect(screenType!.maxContentWidth, 840);
-    expect(screenType!.textScaleFactor, 1.15);
+    expect(screenType!.textScaleFactor, 1);
+  });
+
+  testWidgets('buildTestApp applies compact text scaling', (tester) async {
+    double? scaledValue;
+
+    await tester.pumpWidget(
+      MediaQuery(
+        data: const MediaQueryData(size: Size(390, 844)),
+        child: buildTestApp(
+          home: Builder(
+            builder: (context) {
+              scaledValue = MediaQuery.textScalerOf(context).scale(10);
+              return const SizedBox.shrink();
+            },
+          ),
+        ),
+      ),
+    );
+
+    expect(scaledValue, closeTo(9, 0.001));
   });
 }
