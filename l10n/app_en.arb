@@ -291,6 +291,7 @@
   "cardExampleHint": "Optional example sentence or note",
   "cardTagsLabel": "Tags",
   "addMoreDetailsAction": "Add more details +",
+  "hideMoreDetailsAction": "Hide extra details",
   "addAnotherAction": "Add another",
   "singleModeLabel": "Single",
   "batchModeLabel": "Batch",

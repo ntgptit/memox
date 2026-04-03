@@ -291,6 +291,7 @@
   "cardExampleHint": "Ví dụ câu hoặc ghi chú tuỳ chọn",
   "cardTagsLabel": "Thẻ nhãn",
   "addMoreDetailsAction": "Thêm chi tiết +",
+  "hideMoreDetailsAction": "Thu gọn chi tiết",
   "addAnotherAction": "Thêm tiếp",
   "singleModeLabel": "Một thẻ",
   "batchModeLabel": "Hàng loạt",

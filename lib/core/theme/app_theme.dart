@@ -126,6 +126,25 @@ mixin AppTheme {
           side: border,
         ),
       ),
+      segmentedButtonTheme: SegmentedButtonThemeData(
+        style: ButtonStyle(
+          minimumSize: const WidgetStatePropertyAll<Size>(
+            Size(0, SizeTokens.buttonHeightSm),
+          ),
+          padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
+            EdgeInsets.symmetric(horizontal: SpacingTokens.md),
+          ),
+          side: WidgetStatePropertyAll<BorderSide>(border),
+          shape: WidgetStatePropertyAll<OutlinedBorder>(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(RadiusTokens.full),
+            ),
+          ),
+          textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.labelLarge),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          visualDensity: VisualDensity.compact,
+        ),
+      ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: colorScheme.surface,
         elevation: ElevationTokens.level0,

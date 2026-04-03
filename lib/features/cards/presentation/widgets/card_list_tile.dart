@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
+import 'package:memox/core/theme/tokens/opacity_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/cards/domain/entities/flashcard_entity.dart';
 import 'package:memox/features/cards/presentation/widgets/card_status_dot.dart';
@@ -21,28 +22,16 @@ class CardListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AppCard(
+    borderColor: context.colors.outline.withValues(
+      alpha: OpacityTokens.borderSubtle,
+    ),
     child: ExpandableTile(
-      header: Row(
-        children: [
-          Expanded(
-            child: Text(
-              card.front,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: context.textTheme.titleMedium,
-            ),
-          ),
-          const SizedBox(width: SpacingTokens.md),
-          CardStatusDot(status: card.status),
-        ],
-      ),
+      header: _CardPreviewHeader(card: card),
       expandedContent: Padding(
         padding: const EdgeInsets.only(top: SpacingTokens.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _CopyBlock(label: context.l10n.cardFrontLabel, value: card.front),
-            const SizedBox(height: SpacingTokens.md),
             _CopyBlock(label: context.l10n.cardBackLabel, value: card.back),
             if (card.hint.isNotEmpty) ...[
               const SizedBox(height: SpacingTokens.md),
@@ -83,6 +72,43 @@ class CardListTile extends StatelessWidget {
         ),
       ),
     ),
+  );
+}
+
+class _CardPreviewHeader extends StatelessWidget {
+  const _CardPreviewHeader({required this.card});
+
+  final FlashcardEntity card;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Expanded(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              card.front,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: context.textTheme.titleMedium,
+            ),
+            const SizedBox(height: SpacingTokens.xs),
+            Text(
+              card.back,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: context.textTheme.bodyMedium?.copyWith(
+                color: context.colors.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+      ),
+      const SizedBox(width: SpacingTokens.md),
+      CardStatusDot(status: card.status),
+    ],
   );
 }
 

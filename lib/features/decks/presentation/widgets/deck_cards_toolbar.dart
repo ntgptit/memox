@@ -19,21 +19,25 @@ class DeckCardsToolbar extends StatelessWidget {
 
   static double get height =>
       SizeTokens.searchBarHeight +
-      SizeTokens.buttonHeight +
-      (SpacingTokens.md * 3);
+      SizeTokens.buttonHeightSm +
+      SpacingTokens.md +
+      SpacingTokens.sm;
 
   @override
   Widget build(BuildContext context) => ColoredBox(
     color: context.colors.surface,
     child: Padding(
-      padding: const EdgeInsets.symmetric(vertical: SpacingTokens.md),
+      padding: const EdgeInsets.only(
+        top: SpacingTokens.xs,
+        bottom: SpacingTokens.sm,
+      ),
       child: Column(
         children: [
           AppSearchBar(
             hint: context.l10n.searchCardsHint,
             onChanged: onQueryChanged,
           ),
-          const SizedBox(height: SpacingTokens.md),
+          const SizedBox(height: SpacingTokens.sm),
           Align(
             alignment: Alignment.centerLeft,
             child: SegmentedButton<DeckCardSort>(

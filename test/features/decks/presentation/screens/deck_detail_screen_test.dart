@@ -65,6 +65,7 @@ void main() {
     await tester.drag(find.byType(CustomScrollView), const Offset(0, -400));
     await tester.pumpAndSettle();
     expect(find.text('안녕하세요'), findsOneWidget);
+    expect(find.text('Hello'), findsOneWidget);
     expect(find.byTooltip('Create card'), findsOneWidget);
   });
 
@@ -103,5 +104,56 @@ void main() {
     expect(find.text('Import batch'), findsOneWidget);
     expect(find.text('Cards'), findsNothing);
     expect(find.text('Search cards'), findsNothing);
+  });
+
+  testWidgets('DeckDetailScreen loads more cards while scrolling', (
+    tester,
+  ) async {
+    final cards = List.generate(
+      25,
+      (index) => FlashcardEntity(
+        id: index + 1,
+        deckId: 3,
+        front: 'Card ${index + 1}',
+        back: 'Back ${index + 1}',
+      ),
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          folderRepositoryProvider.overrideWithValue(
+            FakeFolderRepository(
+              folders: const [
+                FolderEntity(id: 1, name: 'Root'),
+                FolderEntity(id: 2, name: 'Languages', parentId: 1),
+              ],
+            ),
+          ),
+          deckRepositoryProvider.overrideWithValue(
+            FakeDeckRepository(
+              decks: const [
+                DeckEntity(id: 3, name: 'Korean Core', folderId: 2),
+              ],
+            ),
+          ),
+          flashcardRepositoryProvider.overrideWithValue(
+            FakeFlashcardRepository(cards: cards),
+          ),
+        ],
+        child: buildTestApp(home: const DeckDetailScreen(deckId: 3)),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 200));
+
+    await tester.scrollUntilVisible(
+      find.text('Card 25'),
+      400,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pump(const Duration(milliseconds: 200));
+
+    expect(find.text('Card 25'), findsOneWidget);
   });
 }

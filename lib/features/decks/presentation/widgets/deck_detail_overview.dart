@@ -52,7 +52,7 @@ class DeckDetailOverview extends StatelessWidget {
 
     final children = <Widget>[
       DeckStatsGrid(stats: stats),
-      const SizedBox(height: SpacingTokens.xl),
+      const SizedBox(height: SpacingTokens.lg),
     ];
 
     if (viewState == DeckDetailViewState.caughtUp) {
@@ -110,6 +110,7 @@ class _DeckActionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AppCard(
+    padding: const EdgeInsets.all(SpacingTokens.lg),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -119,19 +120,27 @@ class _DeckActionCard extends StatelessWidget {
             shape: BoxShape.circle,
           ),
           child: SizedBox.square(
-            dimension: SizeTokens.avatarLg,
-            child: Icon(icon, size: SizeTokens.iconLg),
+            dimension: SizeTokens.avatarMd,
+            child: Icon(icon, size: SizeTokens.iconMd),
           ),
         ),
-        const SizedBox(height: SpacingTokens.lg),
+        const SizedBox(height: SpacingTokens.md),
         Text(title, style: context.textTheme.titleMedium),
         const SizedBox(height: SpacingTokens.sm),
         Text(subtitle, style: context.textTheme.bodyMedium),
-        const SizedBox(height: SpacingTokens.xl),
-        PrimaryButton(label: primaryLabel, onPressed: onPrimaryTap),
+        const SizedBox(height: SpacingTokens.lg),
+        PrimaryButton(
+          label: primaryLabel,
+          onPressed: onPrimaryTap,
+          height: SizeTokens.buttonHeight,
+        ),
         if (secondaryLabel != null && onSecondaryTap != null) ...[
           const SizedBox(height: SpacingTokens.sm),
-          SecondaryButton(label: secondaryLabel!, onPressed: onSecondaryTap),
+          SecondaryButton(
+            label: secondaryLabel!,
+            onPressed: onSecondaryTap,
+            height: SizeTokens.buttonHeight,
+          ),
         ],
       ],
     ),

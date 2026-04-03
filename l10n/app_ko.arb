@@ -291,6 +291,7 @@
   "cardExampleHint": "선택 사항 예문 또는 메모",
   "cardTagsLabel": "태그",
   "addMoreDetailsAction": "추가 정보 +",
+  "hideMoreDetailsAction": "추가 정보 접기",
   "addAnotherAction": "하나 더 추가",
   "singleModeLabel": "단일",
   "batchModeLabel": "일괄",

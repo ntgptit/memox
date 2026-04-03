@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
-import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/cards/domain/entities/flashcard_entity.dart';
 import 'package:memox/features/cards/presentation/providers/cards_by_deck_provider.dart';
 import 'package:memox/features/cards/presentation/widgets/card_editor_view.dart';
-import 'package:memox/shared/widgets/buttons/text_link_button.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
 import 'package:memox/shared/widgets/feedback/empty_state_view.dart';
+import 'package:memox/shared/widgets/navigation/editor_top_bar.dart';
 
 class CardEditScreen extends ConsumerWidget {
   const CardEditScreen({required this.deckId, required this.cardId, super.key});
@@ -38,7 +37,10 @@ class CardEditScreen extends ConsumerWidget {
 
         if (card == null) {
           return Scaffold(
-            appBar: AppBar(title: Text(context.l10n.editCardTitle)),
+            appBar: EditorTopBar(
+              title: context.l10n.editCardTitle,
+              onClose: () => context.pop<void>(),
+            ),
             body: EmptyStateView(
               icon: Icons.style_outlined,
               title: context.l10n.cardMissingTitle,
@@ -68,27 +70,10 @@ class _CardEditScaffoldState extends State<_CardEditScaffold> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      leadingWidth: 88,
-      leading: Align(
-        alignment: Alignment.centerLeft,
-        child: TextLinkButton(
-          label: context.l10n.cancelAction,
-          onTap: () => context.pop<void>(),
-        ),
-      ),
-      title: Text(context.l10n.editCardTitle),
-      actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: SpacingTokens.md),
-          child: Center(
-            child: TextLinkButton(
-              label: context.l10n.saveAction,
-              onTap: () => _editorKey.currentState?.save(),
-            ),
-          ),
-        ),
-      ],
+    appBar: EditorTopBar(
+      title: context.l10n.editCardTitle,
+      onClose: () => context.pop<void>(),
+      onSave: () => _editorKey.currentState?.save(),
     ),
     body: CardEditBody(
       key: _editorKey,

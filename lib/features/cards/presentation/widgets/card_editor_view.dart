@@ -8,6 +8,7 @@ import 'package:memox/features/cards/domain/entities/card_batch_parse_result.dar
 import 'package:memox/features/cards/domain/entities/flashcard_entity.dart';
 import 'package:memox/shared/widgets/buttons/text_link_button.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
+import 'package:memox/shared/widgets/inputs/app_switch_tile.dart';
 import 'package:memox/shared/widgets/inputs/app_text_field.dart';
 import 'package:memox/shared/widgets/inputs/tag_input_field.dart';
 
@@ -108,11 +109,12 @@ class CardEditorViewState extends ConsumerState<CardEditorView> {
         Align(
           alignment: Alignment.centerLeft,
           child: TextLinkButton(
-            label: context.l10n.addMoreDetailsAction,
+            label: _detailsToggleLabel(context),
             onTap: () => setState(() => _showDetails = !_showDetails),
           ),
         ),
         if (_showDetails) ...[
+          const SizedBox(height: SpacingTokens.lg),
           AppTextField(
             controller: _hintController,
             label: context.l10n.cardHintLabel,
@@ -137,10 +139,10 @@ class CardEditorViewState extends ConsumerState<CardEditorView> {
         ],
         if (!widget.isEditing) ...[
           const SizedBox(height: SpacingTokens.fieldGap),
-          SwitchListTile.adaptive(
+          AppSwitchTile(
+            label: context.l10n.addAnotherAction,
             value: _addAnother,
             onChanged: (value) => setState(() => _addAnother = value),
-            title: Text(context.l10n.addAnotherAction),
           ),
         ],
       ],
@@ -163,6 +165,10 @@ class CardEditorViewState extends ConsumerState<CardEditorView> {
   void _setSeparator(String value) {
     setState(() => _separator = value);
   }
+
+  String _detailsToggleLabel(BuildContext context) => _showDetails
+      ? context.l10n.hideMoreDetailsAction
+      : context.l10n.addMoreDetailsAction;
 
   Future<bool> save() async {
     if (_mode == CardEditorMode.batch) {

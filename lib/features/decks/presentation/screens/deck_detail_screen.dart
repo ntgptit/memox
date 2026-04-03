@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -25,6 +26,7 @@ import 'package:memox/features/folders/presentation/screens/home_screen.dart';
 import 'package:memox/features/study/presentation/screens/study_screen.dart';
 import 'package:memox/shared/widgets/buttons/app_fab.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
+import 'package:memox/shared/widgets/feedback/loading_indicator.dart';
 import 'package:memox/shared/widgets/navigation/breadcrumb_bar.dart';
 
 class DeckDetailScreen extends ConsumerStatefulWidget {
@@ -42,9 +44,11 @@ class DeckDetailScreen extends ConsumerStatefulWidget {
 }
 
 class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
+  static const int _cardsPageSize = 20;
   var _query = '';
   var _sort = DeckCardSort.date;
   var _showCollapsedTitle = false;
+  var _visibleCardCount = _cardsPageSize;
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +60,8 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
   }
 
   Widget _buildScaffold(BuildContext context, DeckDetailData detail) {
-    final cards = _sortedCards(_filteredCards(detail.cards));
+    final allCards = _sortedCards(_filteredCards(detail.cards));
+    final cards = _visibleCards(allCards);
     final viewState = _viewState(detail);
     return Scaffold(
       floatingActionButton: AppFab(
@@ -73,8 +78,11 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
               maxWidth: context.screenType.maxContentWidth,
             ),
             child: NotificationListener<ScrollNotification>(
-              onNotification: (notification) =>
-                  _handleScrollNotification(context, notification),
+              onNotification: (notification) => _handleScrollNotification(
+                context,
+                notification,
+                allCards.length,
+              ),
               child: CustomScrollView(
                 slivers: [
                   DeckDetailHeader(
@@ -118,6 +126,8 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
                     _buildToolbar(context),
                   if (viewState != DeckDetailViewState.empty)
                     _buildCardsSliver(context, detail, cards),
+                  if (cards.length < allCards.length)
+                    _buildLoadingMoreSliver(context),
                 ],
               ),
             ),
@@ -130,10 +140,13 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
   bool _handleScrollNotification(
     BuildContext context,
     ScrollNotification notification,
+    int totalCards,
   ) {
     if (notification.metrics.axis != Axis.vertical) {
       return false;
     }
+
+    _maybeLoadMoreCards(notification, totalCards);
 
     final nextValue =
         notification.metrics.pixels >= _collapsedTitleThreshold(context);
@@ -144,6 +157,24 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
 
     setState(() => _showCollapsedTitle = nextValue);
     return false;
+  }
+
+  void _maybeLoadMoreCards(ScrollNotification notification, int totalCards) {
+    if (_visibleCardCount >= totalCards) {
+      return;
+    }
+
+    if (notification.metrics.extentAfter > SizeTokens.listItemTall * 4) {
+      return;
+    }
+
+    final nextCount = math.min(_visibleCardCount + _cardsPageSize, totalCards);
+
+    if (nextCount == _visibleCardCount) {
+      return;
+    }
+
+    setState(() => _visibleCardCount = nextCount);
   }
 
   double _collapsedTitleThreshold(BuildContext context) {
@@ -174,7 +205,7 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
     sliver: SliverToBoxAdapter(
       child: Padding(
         padding: const EdgeInsets.only(
-          top: SpacingTokens.xl,
+          top: SpacingTokens.lg,
           bottom: SpacingTokens.sm,
         ),
         child: Text(
@@ -193,10 +224,28 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
         padding: ResponsivePadding.horizontal(context),
         child: DeckCardsToolbar(
           sort: _sort,
-          onQueryChanged: (value) => setState(() => _query = value),
-          onSortChanged: (value) => setState(() => _sort = value),
+          onQueryChanged: (value) => setState(() {
+            _query = value;
+            _visibleCardCount = _cardsPageSize;
+          }),
+          onSortChanged: (value) => setState(() {
+            _sort = value;
+            _visibleCardCount = _cardsPageSize;
+          }),
         ),
       ),
+    ),
+  );
+
+  Widget _buildLoadingMoreSliver(BuildContext context) => SliverToBoxAdapter(
+    child: Padding(
+      padding: ResponsivePadding.horizontal(context).add(
+        const EdgeInsets.only(
+          top: SpacingTokens.md,
+          bottom: SpacingTokens.xxxl,
+        ),
+      ),
+      child: const LoadingIndicator(size: SizeTokens.iconSm),
     ),
   );
 
@@ -270,6 +319,11 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
       ].join(' ').toLowerCase();
       return haystack.contains(normalized);
     }).toList();
+  }
+
+  List<FlashcardEntity> _visibleCards(List<FlashcardEntity> cards) {
+    final clampedCount = math.min(_visibleCardCount, cards.length);
+    return cards.take(clampedCount).toList();
   }
 
   List<FlashcardEntity> _sortedCards(List<FlashcardEntity> cards) {

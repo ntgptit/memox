@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
-import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/cards/presentation/widgets/card_editor_view.dart';
-import 'package:memox/shared/widgets/buttons/text_link_button.dart';
+import 'package:memox/shared/widgets/navigation/editor_top_bar.dart';
 
 class CardCreateScreen extends StatefulWidget {
   const CardCreateScreen({
@@ -42,27 +41,10 @@ class _CardCreateScreenState extends State<CardCreateScreen> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(
-      leadingWidth: 88,
-      leading: Align(
-        alignment: Alignment.centerLeft,
-        child: TextLinkButton(
-          label: context.l10n.cancelAction,
-          onTap: () => context.pop<void>(),
-        ),
-      ),
-      title: Text(context.l10n.newCardTitle),
-      actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: SpacingTokens.md),
-          child: Center(
-            child: TextLinkButton(
-              label: context.l10n.saveAction,
-              onTap: () => _editorKey.currentState?.save(),
-            ),
-          ),
-        ),
-      ],
+    appBar: EditorTopBar(
+      title: context.l10n.newCardTitle,
+      onClose: () => context.pop<void>(),
+      onSave: () => _editorKey.currentState?.save(),
     ),
     body: CardCreateScreenBody(
       key: _editorKey,

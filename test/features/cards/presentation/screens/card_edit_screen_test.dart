@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/core/providers/repository_providers.dart';
@@ -30,6 +31,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Edit Card'), findsOneWidget);
+    expect(find.byIcon(Icons.arrow_back_outlined), findsOneWidget);
+    expect(find.text('Cancel'), findsNothing);
     expect(find.text('Question'), findsOneWidget);
     expect(find.text('Answer'), findsOneWidget);
     expect(find.text('Save'), findsOneWidget);
