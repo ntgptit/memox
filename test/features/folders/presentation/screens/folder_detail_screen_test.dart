@@ -6,6 +6,7 @@ import 'package:memox/core/providers/repository_providers.dart';
 import 'package:memox/features/decks/domain/entities/deck_entity.dart';
 import 'package:memox/features/folders/domain/entities/folder_entity.dart';
 import 'package:memox/features/folders/presentation/screens/folder_detail_screen.dart';
+import 'package:memox/shared/widgets/navigation/top_bar_back_button.dart';
 import '../../../../test_helpers/fakes/fake_deck_repository.dart';
 import '../../../../test_helpers/fakes/fake_flashcard_repository.dart';
 import '../../../../test_helpers/fakes/fake_folder_repository.dart';
@@ -41,6 +42,7 @@ void main() {
       expect(find.byTooltip('Create subfolder'), findsOneWidget);
       expect(find.text('Create subfolder'), findsNothing);
       expect(find.text('Create deck'), findsNothing);
+      expect(find.byType(TopBarBackButton), findsOneWidget);
       expect(find.byIcon(Icons.edit_outlined), findsOneWidget);
     },
   );

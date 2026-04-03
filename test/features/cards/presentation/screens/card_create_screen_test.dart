@@ -5,7 +5,6 @@ import 'package:memox/features/cards/presentation/screens/card_create_screen.dar
 import 'package:memox/features/cards/presentation/widgets/card_editor_view.dart';
 import 'package:memox/shared/widgets/inputs/app_switch_tile.dart';
 import 'package:memox/shared/widgets/inputs/app_text_field.dart';
-import 'package:memox/shared/widgets/navigation/top_bar_back_button.dart';
 import '../../../../test_helpers/test_app.dart';
 
 void main() {
@@ -98,7 +97,11 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final backRect = tester.getRect(find.byType(TopBarBackButton));
+    final backButton = find.ancestor(
+      of: find.byIcon(Icons.arrow_back_outlined),
+      matching: find.byType(IconButton),
+    );
+    final backRect = tester.getRect(backButton);
     final fieldRect = tester.getRect(find.byType(AppTextField).first);
 
     expect(backRect.left, closeTo(fieldRect.left, 0.01));

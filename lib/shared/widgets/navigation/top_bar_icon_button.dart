@@ -27,6 +27,11 @@ class TopBarIconButton extends StatelessWidget {
     child: Align(
       alignment: alignment,
       child: IconButton(
+        padding: EdgeInsets.zero,
+        constraints: const BoxConstraints.tightFor(
+          width: SizeTokens.touchTarget,
+          height: SizeTokens.touchTarget,
+        ),
         tooltip: tooltip,
         onPressed: onPressed,
         icon: Icon(icon),

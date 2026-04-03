@@ -25,6 +25,7 @@ import 'package:memox/shared/widgets/feedback/empty_state_view.dart';
 import 'package:memox/shared/widgets/layout/app_scaffold.dart';
 import 'package:memox/shared/widgets/lists/reorder_mode_banner.dart';
 import 'package:memox/shared/widgets/navigation/top_bar_action_row.dart';
+import 'package:memox/shared/widgets/navigation/top_bar_back_button.dart';
 import 'package:memox/shared/widgets/navigation/top_bar_icon_button.dart';
 
 class FolderDetailScreen extends ConsumerStatefulWidget {
@@ -109,6 +110,12 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
     List<FolderEntity> breadcrumb,
     FolderDetailData detail,
   ) => AppBar(
+    automaticallyImplyLeading: false,
+    leadingWidth: TopBarBackButton.balancedSlotWidth,
+    leading: TopBarBackButton(
+      onPressed: () => Navigator.of(context).pop(),
+      startPadding: context.screenType.screenPadding,
+    ),
     title: FolderDetailAppBarTitle(
       title: detail.folder.name,
       breadcrumb: breadcrumb,

@@ -35,7 +35,11 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final actionRect = tester.getRect(find.byType(TopBarIconButton));
+    final actionButton = find.ancestor(
+      of: find.byIcon(Icons.search_outlined),
+      matching: find.byType(IconButton),
+    );
+    final actionRect = tester.getRect(actionButton);
     expect(actionRect.right, closeTo(390 - SpacingTokens.lg, 0.01));
   });
 }

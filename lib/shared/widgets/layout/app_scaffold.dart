@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
-import 'package:memox/core/responsive/responsive_padding.dart';
+import 'package:memox/core/theme/tokens/size_tokens.dart';
+import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 
 class AppScaffold extends StatelessWidget {
   const AppScaffold({
@@ -20,8 +21,27 @@ class AppScaffold extends StatelessWidget {
   final bool useSafeArea;
   final bool extendBehindAppBar;
 
+  static double contentBottomPadding({
+    required bool hasBottomNav,
+    required bool hasFab,
+  }) {
+    if (hasBottomNav) {
+      return 0;
+    }
+
+    if (hasFab) {
+      return SizeTokens.fabSize + SpacingTokens.lg;
+    }
+
+    return SpacingTokens.xl;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final bottomPadding = contentBottomPadding(
+      hasBottomNav: bottomNavigationBar != null,
+      hasFab: fab != null,
+    );
     final content = Align(
       alignment: Alignment.topCenter,
       child: ConstrainedBox(
@@ -29,7 +49,12 @@ class AppScaffold extends StatelessWidget {
           maxWidth: context.screenType.maxContentWidth,
         ),
         child: Padding(
-          padding: ResponsivePadding.horizontal(context),
+          padding: EdgeInsets.fromLTRB(
+            context.screenType.screenPadding,
+            0,
+            context.screenType.screenPadding,
+            bottomPadding,
+          ),
           child: body,
         ),
       ),
