@@ -24,8 +24,17 @@ lib/
 - UI: Material 3, Google Fonts "Plus Jakarta Sans", `flutter_animate`
 - Models: freezed + json_serializable
 
+## OpenSpace preference
+- When OpenSpace is available, prefer using the `delegate-task` skill for non-trivial MemoX work.
+- Use OpenSpace first for multi-step implementation, cross-file changes, repo-wide analysis, web research, automation, and tasks the user explicitly wants delegated.
+- Keep work local when the task is trivial, a tiny read-only lookup is enough, the change is a very small single-file edit, or OpenSpace is unavailable or blocked.
+- Treat this as a preference, not an absolute rule.
+
 ## Build & verify
 ```bash
+# Always run the guard gate before marking a code task complete
+python tools/guard/run.py --scope <scope>
+
 # Always run after code changes
 flutter analyze
 flutter test
@@ -39,6 +48,28 @@ flutter gen-l10n
 # Run specific test file
 flutter test test/path/to/test_file.dart
 ```
+
+## Guard gate
+Before marking any task complete, always run the smallest guard scope that
+covers the changed area:
+
+- `lib/core/**` -> `python tools/guard/run.py --scope core`
+- `lib/shared/**` -> `python tools/guard/run.py --scope shared`
+- `lib/features/**` or any feature scaffold -> `python tools/guard/run.py --scope features`
+- `test/**` only -> `python tools/guard/run.py --scope test`
+- touching multiple areas, root config, or unsure scope -> `python tools/guard/run.py --scope all`
+
+Guard execution is mandatory for any task that changes Dart source, tests,
+guard rules, or repo architecture instructions. Do not claim completion if the
+guard command was skipped or failed. If Python dependencies are missing, report
+the exact blocked command and missing package.
+
+Recommended completion order:
+1. Run `dart run build_runner build --delete-conflicting-outputs` when freezed, Drift, or Riverpod files changed.
+2. Run `flutter gen-l10n` when `.arb` files changed.
+3. Run `python tools/guard/run.py --scope <derived_scope>`.
+4. Run `flutter analyze`.
+5. Run relevant tests, or `flutter test` for cross-cutting work.
 
 ## Coding rules
 - NO `else`. Use early return, guard clause, switch expression, or value reassign.
@@ -75,13 +106,15 @@ Do NOT recreate these. Import from `shared/widgets/`:
 
 ## Validation checklist
 Before considering any task complete:
-1. `flutter analyze` passes with zero warnings.
-2. `dart run build_runner build --delete-conflicting-outputs` succeeds.
-3. Relevant tests pass.
-4. No `else` keyword in new code.
-5. No hardcoded values — all from tokens or l10n.
-6. All new widgets use shared components listed above.
-7. New files follow the feature folder structure.
+1. `python tools/guard/run.py --scope <derived_scope>` passes for the affected area.
+2. `flutter analyze` passes with zero warnings.
+3. `dart run build_runner build --delete-conflicting-outputs` succeeds when freezed, Drift, or Riverpod files changed.
+4. `flutter gen-l10n` succeeds when `.arb` files changed.
+5. Relevant tests pass.
+6. No `else` keyword in new code.
+7. No hardcoded values — all from tokens or l10n.
+8. All new widgets use shared components listed above.
+9. New files follow the feature folder structure.
 
 ## Reference docs
 Read relevant sections BEFORE implementing:

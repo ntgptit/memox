@@ -3,8 +3,10 @@
   "appName": "MemoX",
   "confirmAction": "Xác nhận",
   "cancelAction": "Huỷ",
+  "editAction": "Sửa",
   "retryAction": "Thử lại",
   "deleteAction": "Xoá",
+  "saveAction": "Lưu",
   "undoAction": "Hoàn tác",
   "submitAction": "Gửi",
   "exitAction": "Thoát",
@@ -34,6 +36,7 @@
   "themeDisplayLabel": "Display",
   "themeHeadlineLabel": "Headline",
   "themeModeTitle": "Giao diện",
+  "themeModeSubtitle": "Chọn để MemoX dùng giao diện hệ thống hoặc một giao diện cố định.",
   "themeModeSystem": "Hệ thống",
   "themeModeLight": "Sáng",
   "themeModeDark": "Tối",
@@ -51,6 +54,8 @@
   "themePrimaryAction": "Bắt đầu phiên",
   "themeSecondaryAction": "Xem thống kê",
   "themeFabLabel": "Thêm thẻ",
+  "searchAction": "Tìm kiếm",
+  "profileAction": "Hồ sơ",
   "foldersTitle": "Thư mục",
   "foldersSubtitle": "Khung tính năng thư mục đã sẵn sàng để triển khai.",
   "decksTitle": "Bộ thẻ",
@@ -63,6 +68,20 @@
   "statisticsSubtitle": "Khung tính năng thống kê đã sẵn sàng để triển khai.",
   "settingsTitle": "Cài đặt",
   "settingsSubtitle": "Khung tính năng cài đặt đã sẵn sàng để triển khai.",
+  "settingsDataTitle": "Dữ liệu",
+  "settingsDataSubtitle": "Xuất cơ sở dữ liệu hiện tại trên thiết bị thành tệp SQLite.",
+  "exportDatabaseAction": "Xuất DB SQLite",
+  "databaseExportSuccess": "Đã xuất database thành {fileName}",
+  "@databaseExportSuccess": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      }
+    }
+  },
+  "databaseExportUnsupported": "Chỉ có thể xuất database khi chạy trên web.",
+  "databaseExportUnavailable": "Không tìm thấy web database đã được lưu.",
+  "databaseExportFailed": "Xuất database thất bại.",
   "homeGreeting": "Chào {timeOfDay}, {name}",
   "@homeGreeting": {
     "placeholders": {
@@ -81,5 +100,116 @@
         "type": "int"
       }
     }
-  }
+  },
+  "homeDefaultName": "người học",
+  "timeOfDayMorning": "buổi sáng",
+  "timeOfDayAfternoon": "buổi chiều",
+  "timeOfDayEvening": "buổi tối",
+  "reviewNowAction": "Ôn ngay",
+  "homeFoldersEmptyTitle": "Tạo thư mục đầu tiên",
+  "homeFoldersEmptySubtitle": "Các thư mục gốc sẽ xuất hiện ở đây và tổ chức toàn bộ bộ thẻ bên dưới.",
+  "folderSectionTitle": "Thư mục của tôi",
+  "createFolder": "Tạo thư mục",
+  "editFolder": "Sửa thư mục",
+  "createSubfolder": "Tạo thư mục con",
+  "createDeck": "Tạo bộ thẻ",
+  "createAction": "Tạo",
+  "folderNameLabel": "Tên thư mục",
+  "folderNameHint": "ví dụ: Japanese N5",
+  "folderNameEmptyError": "Tên thư mục không được để trống",
+  "folderColorLabel": "Màu thư mục",
+  "folderTypeChooserTitle": "Chọn nội dung của thư mục này",
+  "folderTypeSubfolderDescription": "Tiếp tục tổ chức bằng một tầng thư mục nữa",
+  "folderTypeDeckDescription": "Bắt đầu thêm bộ thẻ trực tiếp trong thư mục này",
+  "deleteFolder": "Xoá thư mục",
+  "deleteFolderConfirm": "{itemCount, plural, =0{Thư mục này đang trống.} =1{Hành động này sẽ xoá vĩnh viễn 1 mục trong thư mục này.} other{Hành động này sẽ xoá vĩnh viễn {itemCount} mục trong thư mục này.}}",
+  "@deleteFolderConfirm": {
+    "placeholders": {
+      "itemCount": {
+        "type": "int"
+      }
+    }
+  },
+  "folderDeleteBreakdown": "Thư mục con: {subfolders} · Bộ thẻ: {decks} · Thẻ: {cards} · Lượt ôn: {reviews}",
+  "@folderDeleteBreakdown": {
+    "placeholders": {
+      "subfolders": {
+        "type": "int"
+      },
+      "decks": {
+        "type": "int"
+      },
+      "cards": {
+        "type": "int"
+      },
+      "reviews": {
+        "type": "int"
+      }
+    }
+  },
+  "folderSubfolderCount": "{count, plural, =0{Không có thư mục con} =1{1 thư mục con} other{{count} thư mục con}}",
+  "@folderSubfolderCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "folderDeckSubtitle": "{deckCount, plural, =0{Không có bộ thẻ} =1{1 bộ thẻ} other{{deckCount} bộ thẻ}} · {cardCount, plural, =0{Không có thẻ} =1{1 thẻ} other{{cardCount} thẻ}}",
+  "@folderDeckSubtitle": {
+    "placeholders": {
+      "deckCount": {
+        "type": "int"
+      },
+      "cardCount": {
+        "type": "int"
+      }
+    }
+  },
+  "folderEmptyStatus": "Thư mục trống",
+  "deckSubtitle": "{dueCount, plural, =0{Không có thẻ đến hạn} =1{1 thẻ đến hạn} other{{dueCount} thẻ đến hạn}} · {cardCount, plural, =0{Không có thẻ} =1{1 thẻ} other{{cardCount} thẻ}}",
+  "@deckSubtitle": {
+    "placeholders": {
+      "dueCount": {
+        "type": "int"
+      },
+      "cardCount": {
+        "type": "int"
+      }
+    }
+  },
+  "folderContainsSubfolders": "{count, plural, =0{Chưa có thư mục con} =1{Chứa 1 thư mục con} other{Chứa {count} thư mục con}}",
+  "@folderContainsSubfolders": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "folderContainsDecks": "Chứa {deckCount, plural, =0{không có bộ thẻ} =1{1 bộ thẻ} other{{deckCount} bộ thẻ}} · {cardCount, plural, =0{không có thẻ} =1{1 thẻ} other{{cardCount} thẻ}}",
+  "@folderContainsDecks": {
+    "placeholders": {
+      "deckCount": {
+        "type": "int"
+      },
+      "cardCount": {
+        "type": "int"
+      }
+    }
+  },
+  "folderStatusEmpty": "Thư mục này đang trống",
+  "folderConstraintDecks": "Thư mục này đã chứa thư mục con. Hãy tạo thêm thư mục con ở đây.",
+  "folderConstraintSubfolders": "Thư mục này đã chứa bộ thẻ. Hãy tạo thêm bộ thẻ ở đây.",
+  "folderDepthWarning": "Thư mục này đang ở độ sâu {depth}. Hãy cân nhắc đơn giản hóa cấu trúc.",
+  "@folderDepthWarning": {
+    "placeholders": {
+      "depth": {
+        "type": "int"
+      }
+    }
+  },
+  "folderEmptyTitle": "Chưa có gì ở đây",
+  "folderEmptySubtitle": "Tạo thư mục con hoặc bộ thẻ để xác định loại nội dung của thư mục này.",
+  "deckNameHint": "ví dụ: Từ vựng cốt lõi",
+  "deckNameEmptyError": "Tên bộ thẻ không được để trống"
 }

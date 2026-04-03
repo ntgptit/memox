@@ -7,6 +7,7 @@ class AppScaffold extends StatelessWidget {
     required this.body,
     this.appBar,
     this.fab,
+    this.bottomNavigationBar,
     this.useSafeArea = true,
     this.extendBehindAppBar = false,
     super.key,
@@ -15,6 +16,7 @@ class AppScaffold extends StatelessWidget {
   final Widget body;
   final PreferredSizeWidget? appBar;
   final Widget? fab;
+  final Widget? bottomNavigationBar;
   final bool useSafeArea;
   final bool extendBehindAppBar;
 
@@ -37,6 +39,7 @@ class AppScaffold extends StatelessWidget {
       appBar: appBar,
       extendBodyBehindAppBar: extendBehindAppBar,
       floatingActionButton: fab,
+      bottomNavigationBar: bottomNavigationBar,
       body: useSafeArea ? SafeArea(child: content) : content,
     );
   }

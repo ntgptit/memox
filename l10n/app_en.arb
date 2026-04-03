@@ -3,8 +3,10 @@
   "appName": "MemoX",
   "confirmAction": "Confirm",
   "cancelAction": "Cancel",
+  "editAction": "Edit",
   "retryAction": "Try again",
   "deleteAction": "Delete",
+  "saveAction": "Save",
   "undoAction": "Undo",
   "submitAction": "Submit",
   "exitAction": "Exit",
@@ -34,6 +36,7 @@
   "themeDisplayLabel": "Display",
   "themeHeadlineLabel": "Headline",
   "themeModeTitle": "Appearance",
+  "themeModeSubtitle": "Choose whether MemoX follows the system appearance or uses a fixed theme.",
   "themeModeSystem": "System",
   "themeModeLight": "Light",
   "themeModeDark": "Dark",
@@ -51,6 +54,8 @@
   "themePrimaryAction": "Start Session",
   "themeSecondaryAction": "View Stats",
   "themeFabLabel": "Add Card",
+  "searchAction": "Search",
+  "profileAction": "Profile",
   "foldersTitle": "Folders",
   "foldersSubtitle": "Folder feature scaffold is ready for implementation.",
   "decksTitle": "Decks",
@@ -63,6 +68,20 @@
   "statisticsSubtitle": "Statistics feature scaffold is ready for implementation.",
   "settingsTitle": "Settings",
   "settingsSubtitle": "Settings feature scaffold is ready for implementation.",
+  "settingsDataTitle": "Data",
+  "settingsDataSubtitle": "Export the current local database as a SQLite file.",
+  "exportDatabaseAction": "Export SQLite database",
+  "databaseExportSuccess": "Database exported as {fileName}",
+  "@databaseExportSuccess": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      }
+    }
+  },
+  "databaseExportUnsupported": "Database export is only available on web.",
+  "databaseExportUnavailable": "No persisted web database was found.",
+  "databaseExportFailed": "Database export failed.",
   "homeGreeting": "Good {timeOfDay}, {name}",
   "@homeGreeting": {
     "placeholders": {
@@ -81,5 +100,116 @@
         "type": "int"
       }
     }
-  }
+  },
+  "homeDefaultName": "learner",
+  "timeOfDayMorning": "morning",
+  "timeOfDayAfternoon": "afternoon",
+  "timeOfDayEvening": "evening",
+  "reviewNowAction": "Review now",
+  "homeFoldersEmptyTitle": "Create your first folder",
+  "homeFoldersEmptySubtitle": "Root folders appear here and organize every deck below them.",
+  "folderSectionTitle": "My folders",
+  "createFolder": "Create folder",
+  "editFolder": "Edit folder",
+  "createSubfolder": "Create subfolder",
+  "createDeck": "Create deck",
+  "createAction": "Create",
+  "folderNameLabel": "Folder name",
+  "folderNameHint": "e.g. Japanese N5",
+  "folderNameEmptyError": "Folder name can't be empty",
+  "folderColorLabel": "Folder color",
+  "folderTypeChooserTitle": "Choose what this folder should contain",
+  "folderTypeSubfolderDescription": "Keep organizing with another level of folders",
+  "folderTypeDeckDescription": "Start adding decks directly in this folder",
+  "deleteFolder": "Delete folder",
+  "deleteFolderConfirm": "{itemCount, plural, =0{This folder is empty.} =1{This will permanently delete 1 item inside this folder.} other{This will permanently delete {itemCount} items inside this folder.}}",
+  "@deleteFolderConfirm": {
+    "placeholders": {
+      "itemCount": {
+        "type": "int"
+      }
+    }
+  },
+  "folderDeleteBreakdown": "Subfolders: {subfolders} · Decks: {decks} · Cards: {cards} · Reviews: {reviews}",
+  "@folderDeleteBreakdown": {
+    "placeholders": {
+      "subfolders": {
+        "type": "int"
+      },
+      "decks": {
+        "type": "int"
+      },
+      "cards": {
+        "type": "int"
+      },
+      "reviews": {
+        "type": "int"
+      }
+    }
+  },
+  "folderSubfolderCount": "{count, plural, =0{No subfolders} =1{1 subfolder} other{{count} subfolders}}",
+  "@folderSubfolderCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "folderDeckSubtitle": "{deckCount, plural, =0{No decks} =1{1 deck} other{{deckCount} decks}} · {cardCount, plural, =0{No cards} =1{1 card} other{{cardCount} cards}}",
+  "@folderDeckSubtitle": {
+    "placeholders": {
+      "deckCount": {
+        "type": "int"
+      },
+      "cardCount": {
+        "type": "int"
+      }
+    }
+  },
+  "folderEmptyStatus": "Empty folder",
+  "deckSubtitle": "{dueCount, plural, =0{No cards due} =1{1 card due} other{{dueCount} cards due}} · {cardCount, plural, =0{No cards} =1{1 card} other{{cardCount} cards}}",
+  "@deckSubtitle": {
+    "placeholders": {
+      "dueCount": {
+        "type": "int"
+      },
+      "cardCount": {
+        "type": "int"
+      }
+    }
+  },
+  "folderContainsSubfolders": "{count, plural, =0{No subfolders yet} =1{Contains 1 subfolder} other{Contains {count} subfolders}}",
+  "@folderContainsSubfolders": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "folderContainsDecks": "Contains {deckCount, plural, =0{no decks} =1{1 deck} other{{deckCount} decks}} · {cardCount, plural, =0{no cards} =1{1 card} other{{cardCount} cards}}",
+  "@folderContainsDecks": {
+    "placeholders": {
+      "deckCount": {
+        "type": "int"
+      },
+      "cardCount": {
+        "type": "int"
+      }
+    }
+  },
+  "folderStatusEmpty": "This folder is empty",
+  "folderConstraintDecks": "This folder already contains subfolders. Create another subfolder here.",
+  "folderConstraintSubfolders": "This folder already contains decks. Create another deck here.",
+  "folderDepthWarning": "This folder is {depth} levels deep. Consider simplifying the hierarchy.",
+  "@folderDepthWarning": {
+    "placeholders": {
+      "depth": {
+        "type": "int"
+      }
+    }
+  },
+  "folderEmptyTitle": "Nothing here yet",
+  "folderEmptySubtitle": "Create a subfolder or a deck to define this folder's content type.",
+  "deckNameHint": "e.g. Core Vocabulary",
+  "deckNameEmptyError": "Deck name can't be empty"
 }

@@ -5,9 +5,40 @@ abstract interface class FolderLocalDataSource {
 
   Future<List<FoldersTableData>> getAll();
 
+  Stream<List<FoldersTableData>> watchByParent(int? parentId);
+
+  Future<List<FoldersTableData>> getByParent(int? parentId);
+
   Future<FoldersTableData?> getById(int id);
 
   Future<FoldersTableData> save(FoldersTableCompanion companion);
+
+  Future<FoldersTableData> update({
+    required int id,
+    required String name,
+    required int colorValue,
+  });
+
+  Future<int> getNextSortOrder(int? parentId);
+
+  Future<void> reorder(int? parentId, List<int> folderIds);
+
+  Future<bool> hasSubfolders(int folderId);
+
+  Future<bool> hasDecks(int folderId);
+
+  Future<List<int>> getDescendantIds(int folderId);
+
+  Future<
+    ({int subfolderCount, int deckCount, int totalCards, int masteredCards})
+  >
+  getRecursiveStats(int folderId);
+
+  Future<({int subfolderCount, int deckCount, int cardCount})> getDeleteCounts(
+    int folderId,
+  );
+
+  Future<void> deleteByIds(List<int> folderIds);
 
   Future<void> delete(int id);
 }
@@ -21,10 +52,57 @@ final class FolderLocalDataSourceImpl implements FolderLocalDataSource {
   Future<void> delete(int id) => _folderDao.deleteById(id);
 
   @override
+  Future<void> deleteByIds(List<int> folderIds) async {
+    await _folderDao.deleteByIds(folderIds);
+  }
+
+  @override
   Future<List<FoldersTableData>> getAll() => _folderDao.getAll();
 
   @override
+  Future<List<FoldersTableData>> getByParent(int? parentId) {
+    return _folderDao.getByParent(parentId);
+  }
+
+  @override
   Future<FoldersTableData?> getById(int id) => _folderDao.getById(id);
+
+  @override
+  Future<({int subfolderCount, int deckCount, int cardCount})> getDeleteCounts(
+    int folderId,
+  ) {
+    return _folderDao.getDeleteCounts(folderId);
+  }
+
+  @override
+  Future<List<int>> getDescendantIds(int folderId) {
+    return _folderDao.getDescendantIds(folderId);
+  }
+
+  @override
+  Future<int> getNextSortOrder(int? parentId) {
+    return _folderDao.getNextSortOrder(parentId);
+  }
+
+  @override
+  Future<
+    ({int subfolderCount, int deckCount, int totalCards, int masteredCards})
+  >
+  getRecursiveStats(int folderId) {
+    return _folderDao.getRecursiveStats(folderId);
+  }
+
+  @override
+  Future<bool> hasDecks(int folderId) => _folderDao.hasDecks(folderId);
+
+  @override
+  Future<bool> hasSubfolders(int folderId) =>
+      _folderDao.hasSubfolders(folderId);
+
+  @override
+  Future<void> reorder(int? parentId, List<int> folderIds) {
+    return _folderDao.reorderByParent(parentId, folderIds);
+  }
 
   @override
   Future<FoldersTableData> save(FoldersTableCompanion companion) async {
@@ -35,5 +113,29 @@ final class FolderLocalDataSourceImpl implements FolderLocalDataSource {
   }
 
   @override
-  Stream<List<FoldersTableData>> watchAll() => _folderDao.watchRootFolders();
+  Future<FoldersTableData> update({
+    required int id,
+    required String name,
+    required int colorValue,
+  }) async {
+    await _folderDao.updateFolderPresentation(
+      id: id,
+      name: name,
+      colorValue: colorValue,
+    );
+    final saved = await _folderDao.getById(id);
+    return saved!;
+  }
+
+  @override
+  Stream<List<FoldersTableData>> watchAll() => _folderDao.watchAllFolders();
+
+  @override
+  Stream<List<FoldersTableData>> watchByParent(int? parentId) {
+    if (parentId == null) {
+      return _folderDao.watchRootFolders();
+    }
+
+    return _folderDao.watchByParent(parentId);
+  }
 }

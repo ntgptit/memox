@@ -5,6 +5,18 @@ abstract interface class DeckLocalDataSource {
 
   Future<List<DecksTableData>> getAll();
 
+  Future<List<DecksTableData>> getByFolder(int folderId);
+
+  Future<DecksTableData?> getById(int id);
+
+  Future<List<int>> getIdsByFolderIds(List<int> folderIds);
+
+  Future<int> getNextSortOrder(int folderId);
+
+  Future<void> reorder(int folderId, List<int> deckIds);
+
+  Future<void> deleteByFolderIds(List<int> folderIds);
+
   Future<DecksTableData> save(DecksTableCompanion companion);
 
   Future<void> delete(int id);
@@ -19,7 +31,35 @@ final class DeckLocalDataSourceImpl implements DeckLocalDataSource {
   Future<void> delete(int id) => _deckDao.deleteById(id);
 
   @override
+  Future<void> deleteByFolderIds(List<int> folderIds) {
+    return _deckDao.deleteByFolderIds(folderIds);
+  }
+
+  @override
   Future<List<DecksTableData>> getAll() => _deckDao.getAll();
+
+  @override
+  Future<List<DecksTableData>> getByFolder(int folderId) {
+    return _deckDao.getByFolder(folderId);
+  }
+
+  @override
+  Future<DecksTableData?> getById(int id) => _deckDao.getById(id);
+
+  @override
+  Future<List<int>> getIdsByFolderIds(List<int> folderIds) {
+    return _deckDao.getIdsByFolderIds(folderIds);
+  }
+
+  @override
+  Future<int> getNextSortOrder(int folderId) {
+    return _deckDao.getNextSortOrder(folderId);
+  }
+
+  @override
+  Future<void> reorder(int folderId, List<int> deckIds) {
+    return _deckDao.reorder(folderId, deckIds);
+  }
 
   @override
   Future<DecksTableData> save(DecksTableCompanion companion) async {

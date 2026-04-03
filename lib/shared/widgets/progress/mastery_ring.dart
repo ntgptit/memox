@@ -11,6 +11,7 @@ class MasteryRing extends StatelessWidget {
     this.size = SizeTokens.masteryRingSize,
     this.strokeWidth = SizeTokens.masteryRingStroke,
     this.showPercentText = false,
+    this.showZeroPercentText = false,
     super.key,
   });
 
@@ -18,10 +19,13 @@ class MasteryRing extends StatelessWidget {
   final double size;
   final double strokeWidth;
   final bool showPercentText;
+  final bool showZeroPercentText;
 
   @override
   Widget build(BuildContext context) {
     final safePercentage = percentage.clamp(0.0, 1.0);
+    final shouldShowPercentText =
+        showPercentText || (showZeroPercentText && safePercentage == 0);
 
     return SizedBox.square(
       dimension: size,
@@ -40,10 +44,12 @@ class MasteryRing extends StatelessWidget {
                 progressColor: context.colors.primary,
               ),
             ),
-            if (showPercentText)
+            if (shouldShowPercentText)
               Text(
                 '${(value * 100).round()}%',
-                style: context.appTextStyles.nextReviewTime,
+                style: context.textTheme.labelSmall?.copyWith(
+                  color: context.colors.onSurfaceVariant,
+                ),
               ),
           ],
         ),

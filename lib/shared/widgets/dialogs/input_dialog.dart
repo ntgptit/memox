@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/shared/widgets/buttons/primary_button.dart';
 import 'package:memox/shared/widgets/buttons/secondary_button.dart';
+import 'package:memox/shared/widgets/dialogs/app_dialog.dart';
 
 class InputDialog extends StatefulWidget {
   const InputDialog({
@@ -50,7 +51,7 @@ class _InputDialogState extends State<InputDialog> {
   }
 
   @override
-  Widget build(BuildContext context) => AlertDialog(
+  Widget build(BuildContext context) => AppDialog(
     title: Text(widget.title),
     content: TextField(
       controller: _controller,

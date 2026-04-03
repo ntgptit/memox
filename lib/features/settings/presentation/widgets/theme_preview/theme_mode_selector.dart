@@ -26,6 +26,13 @@ class ThemeModeSelector extends ConsumerWidget {
             context.l10n.themeModeTitle,
             style: context.textTheme.titleMedium,
           ),
+          const SizedBox(height: SpacingTokens.sm),
+          Text(
+            context.l10n.themeModeSubtitle,
+            style: context.textTheme.bodyMedium?.copyWith(
+              color: context.colors.onSurfaceVariant,
+            ),
+          ),
           const SizedBox(height: SpacingTokens.lg),
           SegmentedButton<ThemeMode>(
             segments: <ButtonSegment<ThemeMode>>[

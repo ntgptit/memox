@@ -6,6 +6,9 @@ import 'package:memox/shared/widgets/inputs/app_search_bar.dart';
 class SearchScreen extends StatelessWidget {
   const SearchScreen({super.key});
 
+  static const String routeName = 'search';
+  static const String routePath = '/search';
+
   @override
   Widget build(BuildContext context) => Scaffold(
     body: Column(

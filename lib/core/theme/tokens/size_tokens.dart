@@ -30,6 +30,10 @@ abstract final class SizeTokens {
   static const double inputHeight = 52; // outlined text field
   static const double searchBarHeight = 48;
 
+  // ── Dialogs ──
+  static const double dialogWidthMd = 420;
+  static const double dialogWidthLg = 480;
+
   // ── List Items ──
   static const double listItemHeight = 56; // standard row (folder, deck, card)
   static const double listItemCompact =
@@ -50,8 +54,8 @@ abstract final class SizeTokens {
   // ── Progress ──
   static const double progressBarHeight = 3; // study mode top bar
   static const double masteryBarHeight = 4; // deck mastery bar
-  static const double masteryRingSize = 32; // circular progress in folder list
-  static const double masteryRingStroke = 2;
+  static const double masteryRingSize = 40; // circular progress in list tiles
+  static const double masteryRingStroke = 3;
 
   // ── Cards (study modes) ──
   static const double flashcardMinHeight = 300;

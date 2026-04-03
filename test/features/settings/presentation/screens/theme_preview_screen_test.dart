@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/features/settings/presentation/screens/theme_preview_screen.dart';
@@ -15,6 +16,12 @@ void main() {
 
     expect(find.byType(ThemeModeSelector), findsOneWidget);
     expect(find.byType(ThemeTypographySection), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.byType(ThemeComponentsSection),
+      200,
+      scrollable: find.byType(Scrollable),
+    );
+    await tester.pumpAndSettle();
     expect(find.byType(ThemeComponentsSection), findsOneWidget);
   });
 }

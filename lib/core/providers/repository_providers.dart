@@ -1,3 +1,4 @@
+import 'package:memox/core/providers/database_providers.dart';
 import 'package:memox/core/providers/datasource_providers.dart';
 import 'package:memox/core/providers/service_providers.dart';
 import 'package:memox/core/providers/storage_providers.dart';
@@ -28,7 +29,11 @@ SettingsRepository settingsRepository(Ref ref) {
 @Riverpod(keepAlive: true)
 FolderRepository folderRepository(Ref ref) {
   return FolderRepositoryImpl(
+    database: ref.watch(appDatabaseProvider),
     localDataSource: ref.watch(folderLocalDataSourceProvider),
+    deckLocalDataSource: ref.watch(deckLocalDataSourceProvider),
+    flashcardLocalDataSource: ref.watch(flashcardLocalDataSourceProvider),
+    cardReviewDao: ref.watch(cardReviewDaoProvider),
     logger: ref.watch(appLoggerProvider),
   );
 }

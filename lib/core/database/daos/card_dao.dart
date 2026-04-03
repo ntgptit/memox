@@ -40,6 +40,16 @@ class CardDao extends DatabaseAccessor<AppDatabase> with _$CardDaoMixin {
     )..where((CardsTable tbl) => tbl.id.equals(id))).go();
   }
 
+  Future<int> deleteByDeckIds(List<int> deckIds) {
+    if (deckIds.isEmpty) {
+      return Future<int>.value(0);
+    }
+
+    return (delete(
+      cardsTable,
+    )..where((CardsTable tbl) => tbl.deckId.isIn(deckIds))).go();
+  }
+
   Future<int> deleteAll() => delete(cardsTable).go();
 
   Future<List<CardsTableData>> getDueCards({
@@ -93,5 +103,20 @@ class CardDao extends DatabaseAccessor<AppDatabase> with _$CardDaoMixin {
       (Batch batch) =>
           batch.insertAll(cardsTable, cards, mode: InsertMode.insertOrReplace),
     );
+  }
+
+  Future<List<int>> getIdsByDeckIds(List<int> deckIds) async {
+    if (deckIds.isEmpty) {
+      return <int>[];
+    }
+
+    final rows =
+        await (selectOnly(cardsTable)
+              ..addColumns([cardsTable.id])
+              ..where(cardsTable.deckId.isIn(deckIds)))
+            .get();
+    return rows
+        .map((TypedResult row) => row.read<int>(cardsTable.id)!)
+        .toList();
   }
 }

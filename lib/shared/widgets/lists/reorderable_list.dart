@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 
 class ReorderableListWidget<T extends Object> extends StatelessWidget {
@@ -12,7 +13,7 @@ class ReorderableListWidget<T extends Object> extends StatelessWidget {
 
   final List<T> items;
   final ReorderCallback onReorder;
-  final Widget Function(BuildContext context, T item) itemBuilder;
+  final Widget Function(BuildContext context, T item, int index) itemBuilder;
 
   @override
   Widget build(BuildContext context) => ReorderableListView.builder(
@@ -30,13 +31,20 @@ class ReorderableListWidget<T extends Object> extends StatelessWidget {
             onPointerDown: (_) => HapticFeedback.selectionClick(),
             child: ReorderableDragStartListener(
               index: index,
-              child: const Padding(
-                padding: EdgeInsets.only(right: SpacingTokens.md),
-                child: Icon(Icons.drag_handle),
+              child: Padding(
+                padding: const EdgeInsets.only(right: SpacingTokens.sm),
+                child: SizedBox.square(
+                  dimension: SizeTokens.avatarMd,
+                  child: Icon(
+                    Icons.drag_indicator_outlined,
+                    size: SizeTokens.iconSm,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
+                ),
               ),
             ),
           ),
-          Expanded(child: itemBuilder(context, item)),
+          Expanded(child: itemBuilder(context, item, index)),
         ],
       );
     },

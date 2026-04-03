@@ -1,6 +1,7 @@
 abstract final class DbConstants {
   static const String databaseName = 'memox_database';
   static const String sqliteFileName = 'memox_database.sqlite';
+  static const String sqliteMimeType = 'application/vnd.sqlite3';
   static const String webSqliteWasmFileName = 'sqlite3.wasm';
   static const String webDriftWorkerFileName = 'drift_worker.dart.js';
   static const int defaultColorValue = 0xFF5C6BC0;

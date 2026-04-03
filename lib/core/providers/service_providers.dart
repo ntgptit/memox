@@ -1,6 +1,8 @@
 import 'package:memox/core/errors/global_error_handler.dart';
 import 'package:memox/core/logging/app_logger.dart';
 import 'package:memox/core/logging/logger_impl.dart';
+import 'package:memox/core/services/database_export_service.dart';
+import 'package:memox/core/services/database_export_service_factory.dart';
 import 'package:memox/core/services/file_picker_service.dart';
 import 'package:memox/core/services/haptic_service.dart';
 import 'package:memox/core/services/notification_service.dart';
@@ -27,6 +29,10 @@ ShareService shareService(Ref ref) => const NoopShareService();
 
 @Riverpod(keepAlive: true)
 FilePickerService filePickerService(Ref ref) => const NoopFilePickerService();
+
+@Riverpod(keepAlive: true)
+DatabaseExportService databaseExportService(Ref ref) =>
+    createDatabaseExportService(ref.watch(appLoggerProvider));
 
 @Riverpod(keepAlive: true)
 HapticService hapticService(Ref ref) => const SystemHapticService();

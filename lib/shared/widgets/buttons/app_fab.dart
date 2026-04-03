@@ -6,6 +6,7 @@ class AppFab extends StatelessWidget {
     required this.icon,
     required this.onTap,
     this.label,
+    this.tooltip,
     this.heroTag,
     super.key,
   });
@@ -13,6 +14,7 @@ class AppFab extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
   final String? label;
+  final String? tooltip;
   final Object? heroTag;
 
   @override
@@ -24,6 +26,7 @@ class AppFab extends StatelessWidget {
     if (label == null) {
       return FloatingActionButton(
         onPressed: onTap,
+        tooltip: tooltip,
         heroTag: heroTag,
         shape: shape,
         child: Icon(icon),
@@ -32,6 +35,7 @@ class AppFab extends StatelessWidget {
 
     return FloatingActionButton.extended(
       onPressed: onTap,
+      tooltip: tooltip,
       heroTag: heroTag,
       shape: shape,
       icon: Icon(icon),

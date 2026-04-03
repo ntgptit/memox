@@ -3,8 +3,10 @@
   "appName": "MemoX",
   "confirmAction": "확인",
   "cancelAction": "취소",
+  "editAction": "수정",
   "retryAction": "다시 시도",
   "deleteAction": "삭제",
+  "saveAction": "저장",
   "undoAction": "실행 취소",
   "submitAction": "제출",
   "exitAction": "종료",
@@ -34,6 +36,7 @@
   "themeDisplayLabel": "Display",
   "themeHeadlineLabel": "Headline",
   "themeModeTitle": "모양",
+  "themeModeSubtitle": "MemoX가 시스템 화면 모드를 따를지, 고정 테마를 사용할지 선택하세요.",
   "themeModeSystem": "시스템",
   "themeModeLight": "라이트",
   "themeModeDark": "다크",
@@ -51,6 +54,8 @@
   "themePrimaryAction": "세션 시작",
   "themeSecondaryAction": "통계 보기",
   "themeFabLabel": "카드 추가",
+  "searchAction": "검색",
+  "profileAction": "프로필",
   "foldersTitle": "폴더",
   "foldersSubtitle": "폴더 기능 스캐폴드가 구현 준비를 마쳤습니다.",
   "decksTitle": "덱",
@@ -63,6 +68,20 @@
   "statisticsSubtitle": "통계 기능 스캐폴드가 구현 준비를 마쳤습니다.",
   "settingsTitle": "설정",
   "settingsSubtitle": "설정 기능 스캐폴드가 구현 준비를 마쳤습니다.",
+  "settingsDataTitle": "데이터",
+  "settingsDataSubtitle": "현재 로컬 데이터베이스를 SQLite 파일로 내보냅니다.",
+  "exportDatabaseAction": "SQLite DB 내보내기",
+  "databaseExportSuccess": "{fileName} 파일로 데이터베이스를 내보냈습니다",
+  "@databaseExportSuccess": {
+    "placeholders": {
+      "fileName": {
+        "type": "String"
+      }
+    }
+  },
+  "databaseExportUnsupported": "데이터베이스 내보내기는 웹에서만 사용할 수 있습니다.",
+  "databaseExportUnavailable": "저장된 웹 데이터베이스를 찾을 수 없습니다.",
+  "databaseExportFailed": "데이터베이스 내보내기에 실패했습니다.",
   "homeGreeting": "{timeOfDay}, {name}님 안녕하세요",
   "@homeGreeting": {
     "placeholders": {
@@ -81,5 +100,116 @@
         "type": "int"
       }
     }
-  }
+  },
+  "homeDefaultName": "학습자",
+  "timeOfDayMorning": "아침",
+  "timeOfDayAfternoon": "오후",
+  "timeOfDayEvening": "저녁",
+  "reviewNowAction": "지금 복습",
+  "homeFoldersEmptyTitle": "첫 번째 폴더를 만들어 보세요",
+  "homeFoldersEmptySubtitle": "루트 폴더는 여기 표시되며 아래의 모든 덱을 정리합니다.",
+  "folderSectionTitle": "내 폴더",
+  "createFolder": "폴더 만들기",
+  "editFolder": "폴더 수정",
+  "createSubfolder": "하위 폴더 만들기",
+  "createDeck": "덱 만들기",
+  "createAction": "만들기",
+  "folderNameLabel": "폴더 이름",
+  "folderNameHint": "예: Japanese N5",
+  "folderNameEmptyError": "폴더 이름은 비워둘 수 없습니다",
+  "folderColorLabel": "폴더 색상",
+  "folderTypeChooserTitle": "이 폴더에 무엇을 담을지 선택하세요",
+  "folderTypeSubfolderDescription": "한 단계 더 폴더로 정리합니다",
+  "folderTypeDeckDescription": "이 폴더 안에 바로 덱을 추가합니다",
+  "deleteFolder": "폴더 삭제",
+  "deleteFolderConfirm": "{itemCount, plural, =0{이 폴더는 비어 있습니다.} =1{이 작업은 이 폴더 안의 항목 1개를 영구 삭제합니다.} other{이 작업은 이 폴더 안의 항목 {itemCount}개를 영구 삭제합니다.}}",
+  "@deleteFolderConfirm": {
+    "placeholders": {
+      "itemCount": {
+        "type": "int"
+      }
+    }
+  },
+  "folderDeleteBreakdown": "하위 폴더: {subfolders} · 덱: {decks} · 카드: {cards} · 복습 기록: {reviews}",
+  "@folderDeleteBreakdown": {
+    "placeholders": {
+      "subfolders": {
+        "type": "int"
+      },
+      "decks": {
+        "type": "int"
+      },
+      "cards": {
+        "type": "int"
+      },
+      "reviews": {
+        "type": "int"
+      }
+    }
+  },
+  "folderSubfolderCount": "{count, plural, =0{하위 폴더 없음} =1{하위 폴더 1개} other{하위 폴더 {count}개}}",
+  "@folderSubfolderCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "folderDeckSubtitle": "{deckCount, plural, =0{덱 없음} =1{덱 1개} other{덱 {deckCount}개}} · {cardCount, plural, =0{카드 없음} =1{카드 1장} other{카드 {cardCount}장}}",
+  "@folderDeckSubtitle": {
+    "placeholders": {
+      "deckCount": {
+        "type": "int"
+      },
+      "cardCount": {
+        "type": "int"
+      }
+    }
+  },
+  "folderEmptyStatus": "비어 있는 폴더",
+  "deckSubtitle": "{dueCount, plural, =0{복습할 카드 없음} =1{복습할 카드 1장} other{복습할 카드 {dueCount}장}} · {cardCount, plural, =0{카드 없음} =1{카드 1장} other{카드 {cardCount}장}}",
+  "@deckSubtitle": {
+    "placeholders": {
+      "dueCount": {
+        "type": "int"
+      },
+      "cardCount": {
+        "type": "int"
+      }
+    }
+  },
+  "folderContainsSubfolders": "{count, plural, =0{아직 하위 폴더가 없습니다} =1{하위 폴더 1개 포함} other{하위 폴더 {count}개 포함}}",
+  "@folderContainsSubfolders": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "folderContainsDecks": "{deckCount, plural, =0{덱 없음} =1{덱 1개 포함} other{덱 {deckCount}개 포함}} · {cardCount, plural, =0{카드 없음} =1{카드 1장} other{카드 {cardCount}장}}",
+  "@folderContainsDecks": {
+    "placeholders": {
+      "deckCount": {
+        "type": "int"
+      },
+      "cardCount": {
+        "type": "int"
+      }
+    }
+  },
+  "folderStatusEmpty": "이 폴더는 비어 있습니다",
+  "folderConstraintDecks": "이 폴더에는 이미 하위 폴더가 있습니다. 여기서는 하위 폴더만 만들 수 있습니다.",
+  "folderConstraintSubfolders": "이 폴더에는 이미 덱이 있습니다. 여기서는 덱만 만들 수 있습니다.",
+  "folderDepthWarning": "이 폴더의 깊이는 {depth}단계입니다. 구조를 단순화하는 것을 고려해 보세요.",
+  "@folderDepthWarning": {
+    "placeholders": {
+      "depth": {
+        "type": "int"
+      }
+    }
+  },
+  "folderEmptyTitle": "아직 아무 것도 없습니다",
+  "folderEmptySubtitle": "이 폴더의 콘텐츠 타입을 정하려면 하위 폴더나 덱을 만들어 주세요.",
+  "deckNameHint": "예: 핵심 어휘",
+  "deckNameEmptyError": "덱 이름은 비워둘 수 없습니다"
 }

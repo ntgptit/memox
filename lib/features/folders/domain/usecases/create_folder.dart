@@ -15,13 +15,38 @@ final class CreateFolderUseCase {
   final FolderRepository _folderRepo;
   final AppLogger _logger;
 
-  Future<Result<FolderEntity>> call(String name) async {
-    if (name.trim().isEmpty) {
-      return const Result.failure(Failure.validation('name must not be empty'));
+  Future<Result<FolderEntity>> call({
+    required String name,
+    int? parentId,
+    required int colorValue,
+  }) async {
+    final trimmedName = name.trim();
+
+    if (trimmedName.isEmpty) {
+      return const Result.failure(
+        Failure.validation('Folder name must not be empty'),
+      );
     }
 
-    Preconditions.requireNotEmpty(name, name: 'name');
-    final saved = await _folderRepo.save(FolderEntity(id: 0, name: name));
+    Preconditions.requireNotEmpty(trimmedName, name: 'name');
+    final siblings = parentId == null
+        ? await _folderRepo.getRootFolders()
+        : await _folderRepo.getSubfolders(parentId);
+    final duplicateExists = siblings.any((FolderEntity folder) {
+      return folder.name.trim().toLowerCase() == trimmedName.toLowerCase();
+    });
+
+    if (duplicateExists) {
+      return const Result.failure(
+        Failure.conflict('A folder with this name already exists here'),
+      );
+    }
+
+    final saved = await _folderRepo.create(
+      name: trimmedName,
+      parentId: parentId,
+      colorValue: colorValue,
+    );
     _logger.info('Folder created: ${saved.id}');
     return Result.success(saved);
   }

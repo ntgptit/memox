@@ -1,0 +1,27 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:memox/core/theme/tokens/size_tokens.dart';
+import 'package:memox/shared/widgets/lists/reorderable_list.dart';
+import '../../test_helpers/test_app.dart';
+
+void main() {
+  testWidgets('ReorderableListWidget uses compact drag handle visuals', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      buildTestApp(
+        home: ReorderableListWidget<String>(
+          items: const <String>['A'],
+          onReorder: (oldIndex, newIndex) {},
+          itemBuilder: (context, item, index) => Text(item),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final icon = tester.widget<Icon>(
+      find.byIcon(Icons.drag_indicator_outlined),
+    );
+    expect(icon.size, SizeTokens.iconSm);
+  });
+}

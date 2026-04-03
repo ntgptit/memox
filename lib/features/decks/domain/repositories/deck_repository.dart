@@ -5,6 +5,14 @@ abstract interface class DeckRepository {
 
   Future<List<DeckEntity>> getAll();
 
+  Future<List<DeckEntity>> getByFolder(int folderId);
+
+  Future<DeckEntity?> getById(int id);
+
+  Future<int> getNextSortOrder(int folderId);
+
+  Future<void> reorder({required int folderId, required List<int> deckIds});
+
   Future<DeckEntity> save(DeckEntity entity);
 
   Future<void> delete(int id);

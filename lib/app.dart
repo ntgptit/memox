@@ -5,6 +5,7 @@ import 'package:memox/core/router/app_router.dart';
 import 'package:memox/core/theme/app_theme.dart';
 import 'package:memox/core/theme/tokens/duration_tokens.dart';
 import 'package:memox/core/theme/tokens/easing_tokens.dart';
+import 'package:memox/features/settings/domain/entities/app_setting.dart';
 import 'package:memox/features/settings/presentation/providers/settings_provider.dart';
 import 'package:memox/l10n/generated/app_localizations.dart';
 import 'package:memox/shared/widgets/feedback/loading_indicator.dart';
@@ -16,22 +17,7 @@ class MemoxApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(appRouterProvider);
     final settingsAsync = ref.watch(settingsProvider);
-
-    if (settingsAsync.isLoading) {
-      return const MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(body: LoadingIndicator()),
-      );
-    }
-
-    final settings = settingsAsync.asData?.value;
-
-    if (settings == null) {
-      return const MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home: Scaffold(body: LoadingIndicator()),
-      );
-    }
+    final settings = settingsAsync.asData?.value ?? AppSettings.defaults;
 
     return MaterialApp.router(
       onGenerateTitle: (context) => context.l10n.appName,
@@ -45,6 +31,25 @@ class MemoxApp extends ConsumerWidget {
       themeAnimationDuration: DurationTokens.slow,
       themeAnimationCurve: EasingTokens.standard,
       routerConfig: router,
+      builder: (context, child) {
+        final content = child ?? const SizedBox.shrink();
+
+        if (!settingsAsync.isLoading) {
+          return content;
+        }
+
+        return Stack(
+          children: [
+            content,
+            Positioned.fill(
+              child: ColoredBox(
+                color: Theme.of(context).colorScheme.surface,
+                child: const LoadingIndicator(),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }

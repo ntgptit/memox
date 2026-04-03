@@ -55,6 +55,19 @@ mixin AppTheme {
           side: border,
         ),
       ),
+      popupMenuTheme: PopupMenuThemeData(
+        color: colorScheme.surface,
+        surfaceTintColor: transparentSurface,
+        elevation: ElevationTokens.level3,
+        shadowColor: colorScheme.shadow.withValues(
+          alpha: ElevationTokens.shadowOpacity,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(RadiusTokens.card),
+          side: border,
+        ),
+        textStyle: textTheme.bodyMedium,
+      ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(
           elevation: const WidgetStatePropertyAll<double>(

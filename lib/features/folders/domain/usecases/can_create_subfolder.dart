@@ -5,8 +5,7 @@ final class CanCreateSubfolderUseCase {
 
   final FolderRepository _repository;
 
-  Future<bool> call() async {
-    final folders = await _repository.getRootFolders();
-    return folders.length < 100;
+  Future<bool> call(int folderId) async {
+    return !(await _repository.hasDecks(folderId));
   }
 }

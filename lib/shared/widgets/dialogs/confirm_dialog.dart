@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/shared/widgets/buttons/primary_button.dart';
 import 'package:memox/shared/widgets/buttons/secondary_button.dart';
+import 'package:memox/shared/widgets/dialogs/app_dialog.dart';
 
 class ConfirmDialog extends StatelessWidget {
   const ConfirmDialog({
@@ -23,7 +24,7 @@ class ConfirmDialog extends StatelessWidget {
         ? Theme.of(context).colorScheme.error
         : Theme.of(context).colorScheme.primary;
 
-    return AlertDialog(
+    return AppDialog(
       title: Text(title),
       content: Text(message),
       actions: [

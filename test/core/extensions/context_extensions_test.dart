@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/core/constants/app_strings.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
+import 'package:memox/core/theme/tokens/size_tokens.dart';
 import '../../test_helpers/test_app.dart';
 
 void main() {
@@ -82,5 +83,12 @@ void main() {
     expect(find.text('Confirm delete?'), findsOneWidget);
     expect(find.text(AppStrings.confirmAction), findsOneWidget);
     expect(find.text(AppStrings.cancelAction), findsOneWidget);
+    expect(
+      tester
+          .widget<AlertDialog>(find.byType(AlertDialog))
+          .constraints
+          ?.maxWidth,
+      SizeTokens.dialogWidthMd,
+    );
   });
 }
