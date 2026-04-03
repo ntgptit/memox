@@ -3,11 +3,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/core/providers/repository_providers.dart';
-import 'package:memox/core/theme/tokens/size_tokens.dart';
-import 'package:memox/core/theme/tokens/spacing_tokens.dart';
+import 'package:memox/core/theme/tokens/typography_tokens.dart';
 import 'package:memox/features/decks/domain/entities/deck_entity.dart';
 import 'package:memox/features/folders/domain/entities/folder_entity.dart';
 import 'package:memox/features/folders/presentation/screens/folder_detail_screen.dart';
+import 'package:memox/features/folders/presentation/widgets/folder_detail_app_bar_title.dart';
 import 'package:memox/shared/widgets/navigation/breadcrumb_bar.dart';
 import 'package:memox/shared/widgets/navigation/top_bar_back_button.dart';
 import '../../../../test_helpers/fakes/fake_deck_repository.dart';
@@ -153,16 +153,28 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
-    final titleRect = tester.getRect(
+    expect(
       find.descendant(
         of: find.byType(AppBar),
         matching: find.text('Korean1'),
       ),
+      findsNothing,
     );
-    const expectedLeft =
-        SpacingTokens.lg + SizeTokens.touchTarget + SpacingTokens.sm;
+    final bodyTitle = find.byWidgetPredicate(
+      (widget) =>
+          widget is Text &&
+          widget.data == 'Korean1' &&
+          widget.style?.fontSize == TypographyTokens.headlineMedium,
+    );
+    final titleRect = tester.getRect(
+      find.descendant(
+        of: find.byType(FolderDetailHeader),
+        matching: bodyTitle,
+      ),
+    );
+    final breadcrumbRect = tester.getRect(find.text('Home'));
 
-    expect(titleRect.left, closeTo(expectedLeft, 0.01));
+    expect(titleRect.left, closeTo(breadcrumbRect.left, 0.01));
   });
 
   testWidgets('shows depth warning only for deep folder hierarchies', (

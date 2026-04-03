@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/providers/usecase_providers.dart';
-import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/decks/domain/entities/deck_entity.dart';
 import 'package:memox/features/decks/presentation/screens/deck_detail_screen.dart';
@@ -70,7 +69,7 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
         unawaited(_refreshFolderDetailData(ref, widget.folderId));
       },
       onData: (detail) => AppScaffold(
-        appBar: _buildAppBar(context, breadcrumb, detail),
+        appBar: _buildAppBar(context, detail),
         fab: AppFab(
           icon: Icons.add_outlined,
           tooltip: _folderFabLabel(context, detail.contentType),
@@ -81,7 +80,10 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            FolderDetailBreadcrumb(breadcrumb: breadcrumb),
+            FolderDetailHeader(
+              title: detail.folder.name,
+              breadcrumb: breadcrumb,
+            ),
             const SizedBox(height: SpacingTokens.lg),
             if (_isSortMode) ...[
               ReorderModeBanner(onDone: _toggleSortMode),
@@ -110,17 +112,14 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
 
   PreferredSizeWidget _buildAppBar(
     BuildContext context,
-    List<FolderEntity> breadcrumb,
     FolderDetailData detail,
   ) => AppBar(
     automaticallyImplyLeading: false,
-    leadingWidth: context.screenType.screenPadding + SizeTokens.touchTarget,
-    titleSpacing: 0,
+    leadingWidth: TopBarBackButton.balancedSlotWidth,
     leading: TopBarBackButton(
       onPressed: () => Navigator.of(context).pop(),
       startPadding: context.screenType.screenPadding,
     ),
-    title: FolderDetailAppBarTitle(title: detail.folder.name),
     actionsPadding: EdgeInsets.zero,
     actions: [
       TopBarActionRow(
