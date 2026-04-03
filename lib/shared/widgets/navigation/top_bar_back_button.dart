@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/shared/widgets/navigation/top_bar_icon_button.dart';
 
 class TopBarBackButton extends StatelessWidget {
   const TopBarBackButton({
     required this.onPressed,
     this.startPadding = 0,
+    this.slotWidth = SizeTokens.touchTarget,
     super.key,
   });
 
@@ -12,6 +14,7 @@ class TopBarBackButton extends StatelessWidget {
 
   final VoidCallback onPressed;
   final double startPadding;
+  final double slotWidth;
 
   @override
   Widget build(BuildContext context) => Padding(
@@ -21,6 +24,7 @@ class TopBarBackButton extends StatelessWidget {
       onPressed: onPressed,
       icon: Icons.arrow_back_outlined,
       alignment: Alignment.centerLeft,
+      slotWidth: slotWidth,
     ),
   );
 }

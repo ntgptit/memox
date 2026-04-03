@@ -71,4 +71,60 @@ void main() {
     expect(customColors!.surfaceDim, ColorTokens.surfaceDimDark);
     expect(customColors!.mastery, ColorTokens.masteryDark);
   });
+
+  testWidgets('theme centralizes hover and focus interactions', (tester) async {
+    ThemeData? theme;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.light(),
+        home: Builder(
+          builder: (context) {
+            theme = Theme.of(context);
+            return const SizedBox.shrink();
+          },
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      theme!.hoverColor,
+      theme!.colorScheme.onSurface.withValues(alpha: OpacityTokens.hover),
+    );
+    expect(
+      theme!.focusColor,
+      theme!.colorScheme.primary.withValues(alpha: OpacityTokens.focus),
+    );
+    expect(
+      theme!.iconButtonTheme.style?.backgroundColor?.resolve({
+        WidgetState.hovered,
+      }),
+      theme!.colorScheme.onSurface.withValues(alpha: OpacityTokens.hover),
+    );
+    expect(
+      theme!.iconButtonTheme.style?.backgroundColor?.resolve({
+        WidgetState.focused,
+      }),
+      theme!.colorScheme.primary.withValues(alpha: OpacityTokens.focus),
+    );
+    expect(
+      theme!.filledButtonTheme.style?.overlayColor?.resolve({
+        WidgetState.hovered,
+      }),
+      theme!.colorScheme.onPrimary.withValues(alpha: OpacityTokens.hover),
+    );
+    expect(
+      theme!.outlinedButtonTheme.style?.overlayColor?.resolve({
+        WidgetState.focused,
+      }),
+      theme!.colorScheme.primary.withValues(alpha: OpacityTokens.focus),
+    );
+    expect(
+      theme!.segmentedButtonTheme.style?.overlayColor?.resolve({
+        WidgetState.pressed,
+      }),
+      theme!.colorScheme.primary.withValues(alpha: OpacityTokens.press),
+    );
+  });
 }

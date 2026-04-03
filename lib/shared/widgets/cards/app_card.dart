@@ -32,19 +32,21 @@ class AppCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final radius = borderRadius ?? RadiusTokens.card;
+    final background = backgroundColor ?? Theme.of(context).colorScheme.surface;
     final outlineColor =
         borderColor ??
         Theme.of(
           context,
         ).colorScheme.outline.withValues(alpha: OpacityTokens.borderSubtle);
+    final shape = RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(radius),
+      side: BorderSide(color: outlineColor),
+    );
     final content = AnimatedOpacity(
       opacity: enabled ? 1 : OpacityTokens.disabled,
       duration: DurationTokens.fast,
       child: _AppCardSurface(
         padding: padding,
-        backgroundColor:
-            backgroundColor ?? Theme.of(context).colorScheme.surface,
-        outlineColor: outlineColor,
         radius: radius,
         leftBorderColor: leftBorderColor,
         child: child,
@@ -52,13 +54,20 @@ class AppCard extends StatelessWidget {
     );
 
     if (!enabled) {
-      return content;
+      return Material(
+        color: background,
+        shape: shape,
+        clipBehavior: Clip.antiAlias,
+        child: content,
+      );
     }
 
     return Material(
-      type: MaterialType.transparency,
+      color: background,
+      shape: shape,
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
-        borderRadius: BorderRadius.circular(radius),
+        customBorder: shape,
         onTap: onTap,
         onLongPress: onLongPress,
         child: content,
@@ -71,41 +80,23 @@ class _AppCardSurface extends StatelessWidget {
   const _AppCardSurface({
     required this.child,
     required this.padding,
-    required this.backgroundColor,
-    required this.outlineColor,
     required this.radius,
     required this.leftBorderColor,
   });
 
   final Widget child;
   final EdgeInsetsGeometry padding;
-  final Color backgroundColor;
-  final Color outlineColor;
   final double radius;
   final Color? leftBorderColor;
 
   @override
-  Widget build(BuildContext context) {
-    final decoration = BoxDecoration(
-      color: backgroundColor,
-      borderRadius: BorderRadius.circular(radius),
-      border: Border.all(color: outlineColor),
-    );
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(radius),
-      child: DecoratedBox(
-        decoration: decoration,
-        child: Stack(
-          children: [
-            if (leftBorderColor != null)
-              _AppCardAccentStripe(color: leftBorderColor!, radius: radius),
-            Padding(padding: padding, child: child),
-          ],
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => Stack(
+    children: [
+      if (leftBorderColor != null)
+        _AppCardAccentStripe(color: leftBorderColor!, radius: radius),
+      Padding(padding: padding, child: child),
+    ],
+  );
 }
 
 class _AppCardAccentStripe extends StatelessWidget {

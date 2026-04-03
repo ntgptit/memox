@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/providers/usecase_providers.dart';
+import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/decks/domain/entities/deck_entity.dart';
 import 'package:memox/features/decks/presentation/screens/deck_detail_screen.dart';
@@ -89,10 +90,7 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
                 isSortMode: _isSortMode,
               ),
             ),
-            FolderConstraintFooter(
-              contentType: detail.contentType,
-              depth: breadcrumb.length,
-            ),
+            FolderConstraintFooter(depth: breadcrumb.length),
           ],
         ),
       ),
@@ -111,7 +109,8 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
     FolderDetailData detail,
   ) => AppBar(
     automaticallyImplyLeading: false,
-    leadingWidth: TopBarBackButton.balancedSlotWidth,
+    leadingWidth: context.screenType.screenPadding + SizeTokens.touchTarget,
+    titleSpacing: 0,
     leading: TopBarBackButton(
       onPressed: () => Navigator.of(context).pop(),
       startPadding: context.screenType.screenPadding,

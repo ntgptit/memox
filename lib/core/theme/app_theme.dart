@@ -23,6 +23,30 @@ mixin AppTheme {
     final appTextStyles = AppTextStyles.fromTextTheme(textTheme);
     final border = BorderSide(color: colorScheme.outline);
     final transparentSurface = colorScheme.surface.withValues(alpha: 0);
+    final neutralHoverColor = colorScheme.onSurface.withValues(
+      alpha: OpacityTokens.hover,
+    );
+    final neutralPressColor = colorScheme.onSurface.withValues(
+      alpha: OpacityTokens.press,
+    );
+    final accentHoverColor = colorScheme.primary.withValues(
+      alpha: OpacityTokens.hover,
+    );
+    final accentFocusColor = colorScheme.primary.withValues(
+      alpha: OpacityTokens.focus,
+    );
+    final accentPressColor = colorScheme.primary.withValues(
+      alpha: OpacityTokens.press,
+    );
+    final onPrimaryHoverColor = colorScheme.onPrimary.withValues(
+      alpha: OpacityTokens.hover,
+    );
+    final onPrimaryFocusColor = colorScheme.onPrimary.withValues(
+      alpha: OpacityTokens.focus,
+    );
+    final onPrimaryPressColor = colorScheme.onPrimary.withValues(
+      alpha: OpacityTokens.press,
+    );
     final inputBorder = OutlineInputBorder(
       borderRadius: const BorderRadius.all(Radius.circular(RadiusTokens.input)),
       borderSide: border,
@@ -33,6 +57,10 @@ mixin AppTheme {
       colorScheme: colorScheme,
       textTheme: textTheme,
       scaffoldBackgroundColor: colorScheme.surface,
+      hoverColor: neutralHoverColor,
+      focusColor: accentFocusColor,
+      highlightColor: neutralPressColor,
+      splashColor: accentPressColor,
       extensions: <ThemeExtension<dynamic>>[customColors, appTextStyles],
       appBarTheme: AppBarTheme(
         backgroundColor: transparentSurface,
@@ -68,6 +96,69 @@ mixin AppTheme {
         ),
         textStyle: textTheme.bodyMedium,
       ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: ButtonStyle(
+          minimumSize: const WidgetStatePropertyAll<Size>(
+            Size(0, SizeTokens.touchTarget),
+          ),
+          shape: WidgetStatePropertyAll<OutlinedBorder>(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(RadiusTokens.full),
+            ),
+          ),
+          padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
+            EdgeInsets.symmetric(horizontal: SpacingTokens.xl),
+          ),
+          textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.labelLarge),
+          overlayColor: _stateLayer(
+            hovered: onPrimaryHoverColor,
+            focused: onPrimaryFocusColor,
+            pressed: onPrimaryPressColor,
+          ),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: ButtonStyle(
+          minimumSize: const WidgetStatePropertyAll<Size>(
+            Size(0, SizeTokens.touchTarget),
+          ),
+          shape: WidgetStatePropertyAll<OutlinedBorder>(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(RadiusTokens.full),
+            ),
+          ),
+          padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
+            EdgeInsets.symmetric(horizontal: SpacingTokens.xl),
+          ),
+          textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.labelLarge),
+          overlayColor: _stateLayer(
+            hovered: accentHoverColor,
+            focused: accentFocusColor,
+            pressed: accentPressColor,
+          ),
+        ),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: ButtonStyle(
+          minimumSize: const WidgetStatePropertyAll<Size>(
+            Size(0, SizeTokens.touchTarget),
+          ),
+          shape: WidgetStatePropertyAll<OutlinedBorder>(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(RadiusTokens.full),
+            ),
+          ),
+          padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
+            EdgeInsets.symmetric(horizontal: SpacingTokens.md),
+          ),
+          textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.labelLarge),
+          overlayColor: _stateLayer(
+            hovered: accentHoverColor,
+            focused: accentFocusColor,
+            pressed: accentPressColor,
+          ),
+        ),
+      ),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ButtonStyle(
           elevation: const WidgetStatePropertyAll<double>(
@@ -87,11 +178,39 @@ mixin AppTheme {
             EdgeInsets.symmetric(horizontal: SpacingTokens.xl),
           ),
           textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.labelLarge),
+          overlayColor: _stateLayer(
+            hovered: onPrimaryHoverColor,
+            focused: onPrimaryFocusColor,
+            pressed: onPrimaryPressColor,
+          ),
+        ),
+      ),
+      iconButtonTheme: IconButtonThemeData(
+        style: ButtonStyle(
+          minimumSize: const WidgetStatePropertyAll<Size>(
+            Size(SizeTokens.touchTarget, SizeTokens.touchTarget),
+          ),
+          padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
+            EdgeInsets.zero,
+          ),
+          shape: const WidgetStatePropertyAll<OutlinedBorder>(CircleBorder()),
+          backgroundColor: _stateLayer(
+            hovered: neutralHoverColor,
+            focused: accentFocusColor,
+            pressed: neutralPressColor,
+          ),
+          overlayColor: _stateLayer(
+            hovered: transparentSurface,
+            focused: transparentSurface,
+            pressed: neutralPressColor,
+          ),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: customColors.surfaceDim,
+        hoverColor: neutralHoverColor,
+        focusColor: accentFocusColor,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: SpacingTokens.lg,
           vertical: SpacingTokens.lg,
@@ -141,6 +260,11 @@ mixin AppTheme {
             ),
           ),
           textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.labelLarge),
+          overlayColor: _stateLayer(
+            hovered: accentHoverColor,
+            focused: accentFocusColor,
+            pressed: accentPressColor,
+          ),
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           visualDensity: VisualDensity.compact,
         ),
@@ -182,6 +306,30 @@ mixin AppTheme {
       ),
     );
   }
+
+  static WidgetStateProperty<Color?> _stateLayer({
+    required Color hovered,
+    required Color focused,
+    required Color pressed,
+  }) => WidgetStateProperty.resolveWith<Color?>((states) {
+    if (states.contains(WidgetState.disabled)) {
+      return null;
+    }
+
+    if (states.contains(WidgetState.pressed)) {
+      return pressed;
+    }
+
+    if (states.contains(WidgetState.focused)) {
+      return focused;
+    }
+
+    if (states.contains(WidgetState.hovered)) {
+      return hovered;
+    }
+
+    return null;
+  });
 
   static SystemUiOverlayStyle _overlayStyle(ColorScheme colorScheme) {
     final isDark = colorScheme.brightness == Brightness.dark;

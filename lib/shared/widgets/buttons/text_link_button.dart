@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
-import 'package:memox/shared/widgets/animations/scale_tap.dart';
+import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 
 class TextLinkButton extends StatelessWidget {
   const TextLinkButton({
@@ -20,9 +20,16 @@ class TextLinkButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final accentColor = color ?? context.colors.primary;
 
-    return ScaleTap(
-      onTap: onTap,
-      scaleDown: 0.98,
+    return TextButton(
+      onPressed: onTap,
+      style: TextButton.styleFrom(
+        foregroundColor: accentColor,
+        padding: EdgeInsets.zero,
+        minimumSize: Size.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        visualDensity: VisualDensity.compact,
+        alignment: Alignment.centerLeft,
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -30,7 +37,10 @@ class TextLinkButton extends StatelessWidget {
             label,
             style: context.appTextStyles.tagText.copyWith(color: accentColor),
           ),
-          if (showTrailingArrow) Icon(Icons.arrow_forward, color: accentColor),
+          if (showTrailingArrow) ...[
+            const SizedBox(width: SpacingTokens.xs),
+            Icon(Icons.arrow_forward, color: accentColor),
+          ],
         ],
       ),
     );

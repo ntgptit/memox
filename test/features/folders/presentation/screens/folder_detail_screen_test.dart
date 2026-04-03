@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/core/providers/repository_providers.dart';
+import 'package:memox/core/theme/tokens/size_tokens.dart';
+import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/decks/domain/entities/deck_entity.dart';
 import 'package:memox/features/folders/domain/entities/folder_entity.dart';
 import 'package:memox/features/folders/presentation/screens/folder_detail_screen.dart';
@@ -44,6 +46,13 @@ void main() {
       expect(find.text('Create deck'), findsNothing);
       expect(find.byType(TopBarBackButton), findsOneWidget);
       expect(find.byIcon(Icons.edit_outlined), findsOneWidget);
+      expect(
+        find.text(
+          'This folder already contains subfolders. '
+          'Create another subfolder here.',
+        ),
+        findsNothing,
+      );
     },
   );
 
@@ -103,5 +112,84 @@ void main() {
     expect(find.text('Done'), findsOneWidget);
     expect(find.byIcon(Icons.more_vert), findsNothing);
     expect(find.text('Drag items to change their order.'), findsOneWidget);
+    expect(
+      find.text(
+        'This folder already contains decks. Create another deck here.',
+      ),
+      findsNothing,
+    );
+  });
+
+  testWidgets('keeps folder detail title close to the shared back slot', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(390, 844));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          folderRepositoryProvider.overrideWithValue(
+            FakeFolderRepository(
+              folders: const [
+                FolderEntity(id: 1, name: 'Root'),
+                FolderEntity(id: 2, name: 'Korean1', parentId: 1),
+              ],
+            ),
+          ),
+          deckRepositoryProvider.overrideWithValue(
+            FakeDeckRepository(decks: const <DeckEntity>[]),
+          ),
+          flashcardRepositoryProvider.overrideWithValue(
+            FakeFlashcardRepository(),
+          ),
+        ],
+        child: buildTestApp(home: const FolderDetailScreen(folderId: 2)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final titleRect = tester.getRect(find.text('Korean1').first);
+    const expectedLeft =
+        SpacingTokens.lg + SizeTokens.touchTarget + SpacingTokens.sm;
+
+    expect(titleRect.left, closeTo(expectedLeft, 0.01));
+  });
+
+  testWidgets('shows depth warning only for deep folder hierarchies', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          folderRepositoryProvider.overrideWithValue(
+            FakeFolderRepository(
+              folders: const [
+                FolderEntity(id: 1, name: 'Root'),
+                FolderEntity(id: 2, name: 'A', parentId: 1),
+                FolderEntity(id: 3, name: 'B', parentId: 2),
+                FolderEntity(id: 4, name: 'C', parentId: 3),
+                FolderEntity(id: 5, name: 'Deep', parentId: 4),
+              ],
+            ),
+          ),
+          deckRepositoryProvider.overrideWithValue(
+            FakeDeckRepository(decks: const <DeckEntity>[]),
+          ),
+          flashcardRepositoryProvider.overrideWithValue(
+            FakeFlashcardRepository(),
+          ),
+        ],
+        child: buildTestApp(home: const FolderDetailScreen(folderId: 5)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text(
+        'This folder is 5 levels deep. Consider simplifying the hierarchy.',
+      ),
+      findsOneWidget,
+    );
   });
 }

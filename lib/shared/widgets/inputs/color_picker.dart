@@ -50,12 +50,16 @@ class _ColorChoice extends StatelessWidget {
         ? context.colors.surface
         : context.colors.onSurface;
 
-    return InkWell(
-      onTap: onTap,
-      customBorder: const CircleBorder(),
-      child: SizedBox.square(
-        dimension: SizeTokens.avatarLg,
-        child: DecoratedBox(
+    return Material(
+      color: context.colors.surface.withValues(alpha: 0),
+      shape: const CircleBorder(),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        customBorder: const CircleBorder(),
+        child: Ink(
+          width: SizeTokens.avatarLg,
+          height: SizeTokens.avatarLg,
           decoration: BoxDecoration(color: color, shape: BoxShape.circle),
           child: isSelected
               ? Icon(Icons.check, color: iconColor)

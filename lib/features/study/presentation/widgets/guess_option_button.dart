@@ -35,44 +35,50 @@ class GuessOptionButton extends StatelessWidget {
       isCorrectAnswer: isCorrectAnswer,
       isWrongSelection: isWrongSelection,
     ),
-    child: Material(
-      type: MaterialType.transparency,
-      child: InkWell(
+    child: AnimatedContainer(
+      duration: DurationTokens.normal,
+      curve: Curves.easeInOut,
+      decoration: BoxDecoration(
+        color: _guessOptionHighlightColor(
+          context,
+          isCorrectAnswer: isCorrectAnswer,
+          isWrongSelection: isWrongSelection,
+          isSelected: isSelected,
+          isAnswered: isAnswered,
+        ),
         borderRadius: BorderRadius.circular(RadiusTokens.input),
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: DurationTokens.normal,
-          curve: Curves.easeInOut,
-          height: SizeTokens.inputHeight,
-          padding: const EdgeInsets.symmetric(horizontal: SpacingTokens.md),
-          decoration: BoxDecoration(
-            color: _guessOptionHighlightColor(
-              context,
-              isCorrectAnswer: isCorrectAnswer,
-              isWrongSelection: isWrongSelection,
-              isSelected: isSelected,
-              isAnswered: isAnswered,
-            ),
-            borderRadius: BorderRadius.circular(RadiusTokens.input),
-            border: Border.all(
-              color: _guessOptionBorderColor(
-                context,
-                isCorrectAnswer: isCorrectAnswer,
-                isWrongSelection: isWrongSelection,
-              ),
-            ),
+        border: Border.all(
+          color: _guessOptionBorderColor(
+            context,
+            isCorrectAnswer: isCorrectAnswer,
+            isWrongSelection: isWrongSelection,
           ),
-          child: _GuessOptionContent(
-            option: option,
-            prefixLabel: prefixLabel,
-            contentColor: _guessOptionContentColor(
-              context,
-              isCorrectAnswer: isCorrectAnswer,
-              isWrongSelection: isWrongSelection,
-            ),
-            trailingIcon: _guessOptionTrailingIcon(
-              isCorrectAnswer: isCorrectAnswer,
-              isWrongSelection: isWrongSelection,
+        ),
+      ),
+      child: Material(
+        color: context.colors.surface.withValues(alpha: 0),
+        borderRadius: BorderRadius.circular(RadiusTokens.input),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(RadiusTokens.input),
+          onTap: onTap,
+          child: SizedBox(
+            height: SizeTokens.inputHeight,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: SpacingTokens.md),
+              child: _GuessOptionContent(
+                option: option,
+                prefixLabel: prefixLabel,
+                contentColor: _guessOptionContentColor(
+                  context,
+                  isCorrectAnswer: isCorrectAnswer,
+                  isWrongSelection: isWrongSelection,
+                ),
+                trailingIcon: _guessOptionTrailingIcon(
+                  isCorrectAnswer: isCorrectAnswer,
+                  isWrongSelection: isWrongSelection,
+                ),
+              ),
             ),
           ),
         ),

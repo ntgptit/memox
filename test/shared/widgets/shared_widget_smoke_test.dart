@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:memox/shared/widgets/buttons/text_link_button.dart';
+import 'package:memox/shared/widgets/cards/app_card.dart';
 import 'package:memox/shared/widgets/chips/streak_chip.dart';
 import 'package:memox/shared/widgets/feedback/success_indicator.dart';
 import 'package:memox/shared/widgets/layout/app_scaffold.dart';
@@ -16,14 +18,17 @@ void main() {
       buildTestApp(
         home: AppScaffold(
           body: ListView(
-            children: const [
+            children: [
+              const AppCard(child: Text('Deck summary')),
               SectionContainer(
                 title: 'Stats',
-                child: AppListTile(title: 'Deck', subtitle: '12 cards'),
+                actionLabel: 'Details',
+                onAction: () {},
+                child: const AppListTile(title: 'Deck', subtitle: '12 cards'),
               ),
-              SuccessIndicator(),
-              StreakChip(count: 3),
-              CountUpText(endValue: 12, style: TextStyle(), suffix: '%'),
+              const SuccessIndicator(),
+              const StreakChip(count: 3),
+              const CountUpText(endValue: 12, style: TextStyle(), suffix: '%'),
             ],
           ),
         ),
@@ -32,8 +37,10 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(AppScaffold), findsOneWidget);
+    expect(find.byType(AppCard), findsOneWidget);
     expect(find.byType(SectionContainer), findsOneWidget);
     expect(find.byType(AppListTile), findsOneWidget);
+    expect(find.byType(TextLinkButton), findsOneWidget);
     expect(find.byType(SuccessIndicator), findsOneWidget);
     expect(find.byType(StreakChip), findsOneWidget);
     expect(find.text('12%'), findsOneWidget);
