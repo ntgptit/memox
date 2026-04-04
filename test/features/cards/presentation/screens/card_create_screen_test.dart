@@ -80,6 +80,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    expect(find.byType(AppCardSwitchTile), findsOneWidget);
     expect(find.byType(AppSwitchTile), findsOneWidget);
     expect(find.byType(SwitchListTile), findsNothing);
   });

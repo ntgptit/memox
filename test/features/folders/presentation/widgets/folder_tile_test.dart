@@ -88,4 +88,28 @@ void main() {
     await tester.pumpAndSettle();
     expect(deleted, isTrue);
   });
+
+  testWidgets('FolderTile renders reorder handle inside the card shell', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      buildTestApp(
+        home: FolderTile(
+          folder: const FolderEntity(id: 1, name: 'Japanese N5'),
+          subtitle: '2 decks · 24 cards',
+          masteryPercentage: 0.5,
+          reorderHandle: const Icon(Icons.drag_indicator_outlined),
+          onTap: () {},
+        ),
+      ),
+    );
+
+    expect(
+      find.descendant(
+        of: find.byType(AppCardListTile),
+        matching: find.byIcon(Icons.drag_indicator_outlined),
+      ),
+      findsOneWidget,
+    );
+  });
 }

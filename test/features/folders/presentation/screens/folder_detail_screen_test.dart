@@ -8,6 +8,7 @@ import 'package:memox/features/decks/domain/entities/deck_entity.dart';
 import 'package:memox/features/folders/domain/entities/folder_entity.dart';
 import 'package:memox/features/folders/presentation/screens/folder_detail_screen.dart';
 import 'package:memox/features/folders/presentation/widgets/folder_detail_app_bar_title.dart';
+import 'package:memox/shared/widgets/cards/app_card.dart';
 import 'package:memox/shared/widgets/navigation/breadcrumb_bar.dart';
 import 'package:memox/shared/widgets/navigation/top_bar_back_button.dart';
 import '../../../../test_helpers/fakes/fake_deck_repository.dart';
@@ -112,9 +113,20 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byTooltip('Done'), findsOneWidget);
-    expect(find.text('Done'), findsOneWidget);
+    expect(find.byIcon(Icons.check_outlined), findsOneWidget);
+    expect(find.text('Done'), findsNothing);
     expect(find.byIcon(Icons.more_vert), findsNothing);
     expect(find.text('Drag items to change their order.'), findsOneWidget);
+    final deckCard = find
+        .ancestor(of: find.text('Korean Core'), matching: find.byType(AppCard))
+        .first;
+    expect(
+      find.descendant(
+        of: deckCard,
+        matching: find.byIcon(Icons.drag_indicator_outlined),
+      ),
+      findsOneWidget,
+    );
     expect(
       find.text(
         'This folder already contains decks. Create another deck here.',
@@ -154,10 +166,7 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(
-      find.descendant(
-        of: find.byType(AppBar),
-        matching: find.text('Korean1'),
-      ),
+      find.descendant(of: find.byType(AppBar), matching: find.text('Korean1')),
       findsNothing,
     );
     final bodyTitle = find.byWidgetPredicate(
@@ -167,10 +176,7 @@ void main() {
           widget.style?.fontSize == TypographyTokens.headlineMedium,
     );
     final titleRect = tester.getRect(
-      find.descendant(
-        of: find.byType(FolderDetailHeader),
-        matching: bodyTitle,
-      ),
+      find.descendant(of: find.byType(FolderDetailHeader), matching: bodyTitle),
     );
     final breadcrumbRect = tester.getRect(find.text('Home'));
 

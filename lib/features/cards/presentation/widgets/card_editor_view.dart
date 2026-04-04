@@ -144,7 +144,7 @@ class CardEditorViewState extends ConsumerState<CardEditorView> {
         ],
         if (!widget.isEditing) ...[
           const SizedBox(height: SpacingTokens.fieldGap),
-          AppSwitchTile(
+          AppCardSwitchTile(
             label: context.l10n.addAnotherAction,
             value: _addAnother,
             onChanged: (value) => setState(() => _addAnother = value),

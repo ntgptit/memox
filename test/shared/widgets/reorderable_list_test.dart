@@ -13,7 +13,7 @@ void main() {
         home: ReorderableListWidget<String>(
           items: const <String>['A'],
           onReorder: (oldIndex, newIndex) {},
-          itemBuilder: (context, item, index) => Text(item),
+          itemBuilder: (context, item, index, reorderHandle) => Text(item),
         ),
       ),
     );
@@ -31,7 +31,15 @@ void main() {
           items: const <String>['A'],
           isReorderEnabled: true,
           onReorder: (oldIndex, newIndex) {},
-          itemBuilder: (context, item, index) => Text(item),
+          itemBuilder: (context, item, index, reorderHandle) => Row(
+            children: [
+              Text(item),
+              switch (reorderHandle) {
+                final handle? => handle,
+                null => const SizedBox.shrink(),
+              },
+            ],
+          ),
         ),
       ),
     );
@@ -41,6 +49,41 @@ void main() {
       find.byIcon(Icons.drag_indicator_outlined),
     );
     expect(icon.size, SizeTokens.iconSm);
+  });
+
+  testWidgets('ReorderableListWidget passes drag handle into the item', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      buildTestApp(
+        home: ReorderableListWidget<String>(
+          items: const <String>['A'],
+          isReorderEnabled: true,
+          onReorder: (oldIndex, newIndex) {},
+          itemBuilder: (context, item, index, reorderHandle) => Container(
+            key: const ValueKey('tile'),
+            child: Row(
+              children: [
+                Text(item),
+                switch (reorderHandle) {
+                  final handle? => handle,
+                  null => const SizedBox.shrink(),
+                },
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.descendant(
+        of: find.byKey(const ValueKey('tile')),
+        matching: find.byIcon(Icons.drag_indicator_outlined),
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('ReorderableListWidget supports pull-to-refresh in normal mode', (
@@ -56,7 +99,7 @@ void main() {
             items: const <String>['A', 'B', 'C'],
             onRefresh: () async => refreshed = true,
             onReorder: (oldIndex, newIndex) {},
-            itemBuilder: (context, item, index) =>
+            itemBuilder: (context, item, index, reorderHandle) =>
                 SizedBox(height: 80, child: Text(item)),
           ),
         ),

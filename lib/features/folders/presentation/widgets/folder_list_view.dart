@@ -36,7 +36,7 @@ class FolderListView extends ConsumerWidget {
         onReorder: onReorder,
         onRefresh: onRefresh,
         isReorderEnabled: isSortMode,
-        itemBuilder: (context, folder, index) {
+        itemBuilder: (context, folder, index, reorderHandle) {
           final detail = switch (ref.watch(folderDetailProvider(folder.id))) {
             AsyncData<FolderDetailData>(:final value) => value,
             _ => null,
@@ -56,6 +56,7 @@ class FolderListView extends ConsumerWidget {
                 folder: folder,
                 subtitle: subtitle,
                 masteryPercentage: detail?.masteryPercentage ?? 0,
+                reorderHandle: isSortMode ? reorderHandle : null,
                 onTap: isSortMode ? null : () => onTap(folder),
                 onEdit: isSortMode ? null : () => onEdit(folder),
                 onDelete: isSortMode ? null : () => onDelete(folder),

@@ -72,6 +72,41 @@ class SharedWidgetMappingGuardTest(unittest.TestCase):
             self.assertEqual(1, len(violations))
             self.assertIn('PopupMenuButton', violations[0].message)
 
+    def test_reports_card_shell_inside_settings_row(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            file_path = root / 'lib/features/settings/presentation/widgets/settings_choice_row.dart'
+            file_path.parent.mkdir(parents=True)
+            file_path.write_text(
+                '\n'.join(
+                    [
+                        'return AppPressable(',
+                        '  child: AppCard(child: Text("Auto advance")),',
+                        ');',
+                    ],
+                ),
+                encoding='utf-8',
+            )
+            guard = self._create_guard(root)
+
+            violations = guard.check_project([file_path])
+
+            self.assertEqual(1, len(violations))
+            self.assertIn('AppCard(', violations[0].message)
+
+    def test_reports_missing_standalone_switch_wrapper_in_card_editor(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            file_path = root / 'lib/features/cards/presentation/widgets/card_editor_view.dart'
+            file_path.parent.mkdir(parents=True)
+            file_path.write_text('return AppSwitchTile(label: "Add", value: false, onChanged: (_) {});', encoding='utf-8')
+            guard = self._create_guard(root)
+
+            violations = guard.check_project([file_path])
+
+            self.assertEqual(1, len(violations))
+            self.assertIn('AppCardSwitchTile(', violations[0].message)
+
     def _create_guard(
         self,
         root: Path,
@@ -112,6 +147,15 @@ class SharedWidgetMappingGuardTest(unittest.TestCase):
                             'AppEditDeleteMenu(',
                         ],
                         'forbidden_widgets': ['PopupMenuButton'],
+                    },
+                    'settings_choice_row': {
+                        'path_pattern': 'features/settings/presentation/widgets/settings_choice_row.dart',
+                        'required_widgets': ['AppPressable('],
+                        'forbidden_widgets': ['AppCard('],
+                    },
+                    'card_editor_switch': {
+                        'path_pattern': 'features/cards/presentation/widgets/card_editor_view.dart',
+                        'required_widgets': ['AppCardSwitchTile('],
                     },
                 },
             },

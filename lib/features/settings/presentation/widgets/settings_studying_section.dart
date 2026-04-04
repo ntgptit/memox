@@ -4,6 +4,7 @@ import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/features/settings/domain/entities/app_setting.dart';
 import 'package:memox/features/settings/presentation/providers/settings_provider.dart';
 import 'package:memox/features/settings/presentation/widgets/settings_choice_row.dart';
+import 'package:memox/features/settings/presentation/widgets/settings_group_card.dart';
 import 'package:memox/features/settings/presentation/widgets/settings_section_header.dart';
 import 'package:memox/features/settings/presentation/widgets/settings_stepper_row.dart';
 import 'package:memox/shared/widgets/dialogs/choice_bottom_sheet.dart';
@@ -20,38 +21,44 @@ class SettingsStudyingSection extends ConsumerWidget {
     children: [
       SettingsSectionHeader(label: context.l10n.settingsStudyingSection),
       const Gap.lg(),
-      SettingsStepperRow(
-        title: context.l10n.settingsDailyGoalTitle,
-        valueLabel: context.l10n.settingsGoalValue(settings.dailyGoal),
-        canDecrease: settings.dailyGoal > AppSettings.dailyGoalMin,
-        canIncrease: settings.dailyGoal < AppSettings.dailyGoalMax,
-        onDecrease: () => ref
-            .read(settingsProvider.notifier)
-            .updateDailyGoal(settings.dailyGoal - AppSettings.dailyGoalStep),
-        onIncrease: () => ref
-            .read(settingsProvider.notifier)
-            .updateDailyGoal(settings.dailyGoal + AppSettings.dailyGoalStep),
-      ),
-      const Gap.md(),
-      SettingsStepperRow(
-        title: context.l10n.settingsSessionLimitTitle,
-        valueLabel: context.l10n.settingsSessionLimitValue(
-          settings.sessionLimitMinutes,
-        ),
-        canDecrease: canDecreaseSessionLimit(settings.sessionLimitMinutes),
-        canIncrease: canIncreaseSessionLimit(settings.sessionLimitMinutes),
-        onDecrease: () =>
-            shiftSessionLimit(ref, settings.sessionLimitMinutes, -1),
-        onIncrease: () =>
-            shiftSessionLimit(ref, settings.sessionLimitMinutes, 1),
-      ),
-      const Gap.md(),
-      SettingsChoiceRow(
-        title: context.l10n.settingsAutoAdvanceTitle,
-        valueLabel: context.l10n.settingsAutoAdvanceValue(
-          settings.autoAdvanceDelay.toStringAsFixed(1),
-        ),
-        onTap: () => pickAutoAdvance(context, ref),
+      SettingsGroupCard(
+        children: [
+          SettingsStepperRow(
+            title: context.l10n.settingsDailyGoalTitle,
+            valueLabel: context.l10n.settingsGoalValue(settings.dailyGoal),
+            canDecrease: settings.dailyGoal > AppSettings.dailyGoalMin,
+            canIncrease: settings.dailyGoal < AppSettings.dailyGoalMax,
+            onDecrease: () => ref
+                .read(settingsProvider.notifier)
+                .updateDailyGoal(
+                  settings.dailyGoal - AppSettings.dailyGoalStep,
+                ),
+            onIncrease: () => ref
+                .read(settingsProvider.notifier)
+                .updateDailyGoal(
+                  settings.dailyGoal + AppSettings.dailyGoalStep,
+                ),
+          ),
+          SettingsStepperRow(
+            title: context.l10n.settingsSessionLimitTitle,
+            valueLabel: context.l10n.settingsSessionLimitValue(
+              settings.sessionLimitMinutes,
+            ),
+            canDecrease: canDecreaseSessionLimit(settings.sessionLimitMinutes),
+            canIncrease: canIncreaseSessionLimit(settings.sessionLimitMinutes),
+            onDecrease: () =>
+                shiftSessionLimit(ref, settings.sessionLimitMinutes, -1),
+            onIncrease: () =>
+                shiftSessionLimit(ref, settings.sessionLimitMinutes, 1),
+          ),
+          SettingsChoiceRow(
+            title: context.l10n.settingsAutoAdvanceTitle,
+            valueLabel: context.l10n.settingsAutoAdvanceValue(
+              settings.autoAdvanceDelay.toStringAsFixed(1),
+            ),
+            onTap: () => pickAutoAdvance(context, ref),
+          ),
+        ],
       ),
     ],
   );

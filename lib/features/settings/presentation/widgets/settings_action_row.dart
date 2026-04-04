@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
+import 'package:memox/core/theme/tokens/radius_tokens.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
-import 'package:memox/shared/widgets/cards/app_card.dart';
+import 'package:memox/shared/widgets/buttons/app_pressable.dart';
+import 'package:memox/shared/widgets/layout/spacing.dart';
 
 class SettingsActionRow extends StatelessWidget {
   const SettingsActionRow({
@@ -19,8 +21,9 @@ class SettingsActionRow extends StatelessWidget {
   final Color? titleColor;
 
   @override
-  Widget build(BuildContext context) => AppCard(
+  Widget build(BuildContext context) => AppPressable(
     onTap: onTap,
+    borderRadius: RadiusTokens.none,
     padding: const EdgeInsets.symmetric(
       horizontal: SpacingTokens.lg,
       vertical: SpacingTokens.md,
@@ -30,7 +33,7 @@ class SettingsActionRow extends StatelessWidget {
       child: Row(
         children: [
           Icon(icon, color: titleColor ?? context.colors.onSurfaceVariant),
-          const SizedBox(width: SpacingTokens.lg),
+          const Gap.lg(),
           Expanded(
             child: Text(
               title,

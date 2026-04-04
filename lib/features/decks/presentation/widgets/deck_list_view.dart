@@ -38,7 +38,7 @@ class DeckListView extends StatelessWidget {
     onReorder: onReorder,
     onRefresh: onRefresh,
     isReorderEnabled: isSortMode,
-    itemBuilder: (context, deck, index) => Padding(
+    itemBuilder: (context, deck, index, reorderHandle) => Padding(
       padding: const EdgeInsets.only(bottom: SpacingTokens.sm),
       child: FadeInWidget(
         delay: Duration(
@@ -62,6 +62,7 @@ class DeckListView extends StatelessWidget {
               masteryPercentage: mastery,
               dueCount: stats?.due ?? 0,
               isHighlighted: highlightedDeckId == deck.id,
+              reorderHandle: isSortMode ? reorderHandle : null,
               onTap: isSortMode ? null : () => onTap(deck),
               onEdit: isSortMode ? null : () => onEdit(deck),
               onDelete: isSortMode ? null : () => onDelete(deck),

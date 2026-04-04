@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/features/settings/presentation/providers/settings_provider.dart';
 import 'package:memox/features/settings/presentation/widgets/settings_action_row.dart';
+import 'package:memox/features/settings/presentation/widgets/settings_group_card.dart';
 import 'package:memox/features/settings/presentation/widgets/settings_section_header.dart';
 import 'package:memox/shared/widgets/layout/spacing.dart';
 
@@ -15,23 +16,25 @@ class SettingsDataSection extends ConsumerWidget {
     children: [
       SettingsSectionHeader(label: context.l10n.settingsDataTitle),
       const Gap.lg(),
-      SettingsActionRow(
-        title: context.l10n.settingsExportCardsAction,
-        icon: Icons.ios_share_outlined,
-        onTap: () => handleSettingsExport(context, ref),
-      ),
-      const Gap.md(),
-      SettingsActionRow(
-        title: context.l10n.settingsImportFromFileAction,
-        icon: Icons.file_upload_outlined,
-        onTap: () => handleSettingsImport(context, ref),
-      ),
-      const Gap.md(),
-      SettingsActionRow(
-        title: context.l10n.settingsClearHistoryAction,
-        icon: Icons.delete_outline,
-        titleColor: context.colors.error,
-        onTap: () => handleSettingsClearHistory(context, ref),
+      SettingsGroupCard(
+        children: [
+          SettingsActionRow(
+            title: context.l10n.settingsExportCardsAction,
+            icon: Icons.ios_share_outlined,
+            onTap: () => handleSettingsExport(context, ref),
+          ),
+          SettingsActionRow(
+            title: context.l10n.settingsImportFromFileAction,
+            icon: Icons.file_upload_outlined,
+            onTap: () => handleSettingsImport(context, ref),
+          ),
+          SettingsActionRow(
+            title: context.l10n.settingsClearHistoryAction,
+            icon: Icons.delete_outline,
+            titleColor: context.colors.error,
+            onTap: () => handleSettingsClearHistory(context, ref),
+          ),
+        ],
       ),
     ],
   );

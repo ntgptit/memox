@@ -76,4 +76,52 @@ void main() {
     await tester.pumpAndSettle();
     expect(deleted, isTrue);
   });
+
+  testWidgets('DeckTile keeps due pill vertically aligned with action menu', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      buildTestApp(
+        home: DeckTile(
+          deck: const DeckEntity(id: 1, name: 'Core Vocabulary'),
+          subtitle: '42 cards · 8 due today',
+          masteryPercentage: 0.5,
+          dueCount: 8,
+          onEdit: () {},
+          onDelete: () {},
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final dueCenter = tester.getCenter(find.text('8'));
+    final menuCenter = tester.getCenter(find.byIcon(Icons.more_vert));
+
+    expect(dueCenter.dy, closeTo(menuCenter.dy, 1));
+  });
+
+  testWidgets('DeckTile renders reorder handle inside the card shell', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      buildTestApp(
+        home: const DeckTile(
+          deck: DeckEntity(id: 1, name: 'Core Vocabulary'),
+          subtitle: '42 cards · 8 due today',
+          masteryPercentage: 0.5,
+          dueCount: 8,
+          reorderHandle: Icon(Icons.drag_indicator_outlined),
+        ),
+      ),
+    );
+
+    expect(
+      find.descendant(
+        of: find.byType(AppCardListTile),
+        matching: find.byIcon(Icons.drag_indicator_outlined),
+      ),
+      findsOneWidget,
+    );
+    expect(find.byType(AppEditDeleteMenu), findsNothing);
+  });
 }

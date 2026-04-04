@@ -9,6 +9,7 @@ import 'package:memox/shared/widgets/chips/streak_chip.dart';
 import 'package:memox/shared/widgets/feedback/offline_state_view.dart';
 import 'package:memox/shared/widgets/feedback/success_indicator.dart';
 import 'package:memox/shared/widgets/feedback/unauthorized_state_view.dart';
+import 'package:memox/shared/widgets/inputs/app_switch_tile.dart';
 import 'package:memox/shared/widgets/layout/app_scaffold.dart';
 import 'package:memox/shared/widgets/layout/section_container.dart';
 import 'package:memox/shared/widgets/lists/app_list_tile.dart';
@@ -25,6 +26,7 @@ void main() {
           body: ListView(
             children: [
               const AppCard(child: Text('Deck summary')),
+              AppCardSwitchTile(label: 'Sync', value: true, onChanged: (_) {}),
               SectionContainer(
                 title: 'Stats',
                 actionLabel: 'Details',
@@ -56,12 +58,16 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(AppScaffold), findsOneWidget);
-    expect(find.byType(AppCard, skipOffstage: false), findsOneWidget);
+    expect(find.byType(AppCard, skipOffstage: false), findsWidgets);
     expect(find.byType(SectionContainer, skipOffstage: false), findsOneWidget);
     expect(find.byType(AppListTile, skipOffstage: false), findsOneWidget);
+    expect(find.byType(AppCardSwitchTile, skipOffstage: false), findsOneWidget);
     expect(find.byType(AppPressable), findsWidgets);
     expect(find.byType(AppTapRegion), findsWidgets);
-    expect(find.byType(InlineTextLinkButton, skipOffstage: false), findsOneWidget);
+    expect(
+      find.byType(InlineTextLinkButton, skipOffstage: false),
+      findsOneWidget,
+    );
     expect(find.byType(TextLinkButton, skipOffstage: false), findsOneWidget);
     expect(find.byType(SuccessIndicator, skipOffstage: false), findsOneWidget);
     expect(find.byType(OfflineStateView, skipOffstage: false), findsOneWidget);

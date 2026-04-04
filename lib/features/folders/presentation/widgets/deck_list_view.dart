@@ -33,10 +33,14 @@ class DeckListView extends ConsumerWidget {
     return ReorderableListWidget<DeckEntity>(
       items: decks,
       onReorder: onReorder,
-      itemBuilder: (context, deck, index) {
-        final deckCards = cards.where((card) => card.deckId == deck.id).toList();
+      itemBuilder: (context, deck, index, reorderHandle) {
+        final deckCards = cards
+            .where((card) => card.deckId == deck.id)
+            .toList();
         final dueCards = deckCards.where(_isDue).length;
-        final masteredCards = deckCards.where((card) => card.status == CardStatus.mastered).length;
+        final masteredCards = deckCards
+            .where((card) => card.status == CardStatus.mastered)
+            .length;
         final subtitle = context.l10n.deckSubtitle(dueCards, deckCards.length);
         final mastery = deckCards.isEmpty
             ? 0.0

@@ -3,6 +3,7 @@ import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/features/decks/domain/entities/deck_entity.dart';
 import 'package:memox/features/decks/presentation/widgets/deck_tile_due_pill.dart';
 import 'package:memox/features/decks/presentation/widgets/deck_tile_supporting.dart';
+import 'package:memox/shared/widgets/layout/spacing.dart';
 import 'package:memox/shared/widgets/lists/app_card_list_tile.dart';
 import 'package:memox/shared/widgets/lists/app_edit_delete_menu.dart';
 import 'package:memox/shared/widgets/lists/app_tile_glyph.dart';
@@ -14,6 +15,7 @@ class DeckTile extends StatelessWidget {
     required this.masteryPercentage,
     required this.dueCount,
     this.isHighlighted = false,
+    this.reorderHandle,
     this.onTap,
     this.onEdit,
     this.onDelete,
@@ -25,6 +27,7 @@ class DeckTile extends StatelessWidget {
   final double masteryPercentage;
   final int dueCount;
   final bool isHighlighted;
+  final Widget? reorderHandle;
   final VoidCallback? onTap;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
@@ -44,8 +47,12 @@ class DeckTile extends StatelessWidget {
           color: context.colors.onSurfaceVariant,
         ),
       ),
-      titleTrailing: dueCount > 0 ? DeckTileDuePill(count: dueCount) : null,
-      trailing: _DeckTrailing(onEdit: onEdit, onDelete: onDelete),
+      trailing: _DeckTrailing(
+        dueCount: dueCount,
+        reorderHandle: reorderHandle,
+        onEdit: onEdit,
+        onDelete: onDelete,
+      ),
       supporting: DeckTileSupporting(
         deck: deck,
         masteryPercentage: masteryPercentage,
@@ -56,21 +63,47 @@ class DeckTile extends StatelessWidget {
 }
 
 class _DeckTrailing extends StatelessWidget {
-  const _DeckTrailing({this.onEdit, this.onDelete});
+  const _DeckTrailing({
+    required this.dueCount,
+    this.reorderHandle,
+    this.onEdit,
+    this.onDelete,
+  });
 
+  final int dueCount;
+  final Widget? reorderHandle;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
 
   @override
   Widget build(BuildContext context) {
-    if (onEdit == null && onDelete == null) {
+    if (dueCount == 0 &&
+        reorderHandle == null &&
+        onEdit == null &&
+        onDelete == null) {
       return const SizedBox.shrink();
     }
 
-    return AppEditDeleteMenu(
-      deleteLabel: context.l10n.deleteDeckAction,
-      onEdit: onEdit,
-      onDelete: onDelete,
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (dueCount > 0) DeckTileDuePill(count: dueCount),
+        if (onEdit != null || onDelete != null) ...[
+          if (dueCount > 0) const Gap.sm(),
+          AppEditDeleteMenu(
+            deleteLabel: context.l10n.deleteDeckAction,
+            onEdit: onEdit,
+            onDelete: onDelete,
+          ),
+        ],
+        if (reorderHandle != null &&
+            (dueCount > 0 || onEdit != null || onDelete != null))
+          const Gap.sm(),
+        switch (reorderHandle) {
+          final handle? => handle,
+          null => const SizedBox.shrink(),
+        },
+      ],
     );
   }
 }

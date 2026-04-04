@@ -86,7 +86,7 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
             ),
             const SizedBox(height: SpacingTokens.lg),
             if (_isSortMode) ...[
-              ReorderModeBanner(onDone: _toggleSortMode),
+              const ReorderModeBanner(),
               const SizedBox(height: SpacingTokens.lg),
             ],
             Expanded(
@@ -131,7 +131,7 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
                   : context.l10n.reorderAction,
               onPressed: _toggleSortMode,
               icon: _isSortMode
-                  ? Icons.done_outline
+                  ? Icons.check_outlined
                   : Icons.drag_indicator_outlined,
               alignment: Alignment.centerRight,
             ),

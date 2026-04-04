@@ -85,7 +85,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               onData: (folders) => _HomeFolderSection(
                 folders: folders,
                 isSortMode: _isSortMode,
-                onToggleSort: _toggleSortMode,
                 onRefresh: () => _refreshHomeData(ref),
                 onTap: (folder) =>
                     context.push(FolderDetailScreen.routeLocation(folder.id)),
@@ -125,7 +124,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     : context.l10n.reorderAction,
                 onPressed: _toggleSortMode,
                 icon: _isSortMode
-                    ? Icons.done_outline
+                    ? Icons.check_outlined
                     : Icons.drag_indicator_outlined,
                 alignment: Alignment.centerRight,
               ),
@@ -150,7 +149,6 @@ class _HomeFolderSection extends StatelessWidget {
   const _HomeFolderSection({
     required this.folders,
     required this.isSortMode,
-    required this.onToggleSort,
     required this.onRefresh,
     required this.onTap,
     required this.onEdit,
@@ -160,7 +158,6 @@ class _HomeFolderSection extends StatelessWidget {
 
   final List<FolderEntity> folders;
   final bool isSortMode;
-  final VoidCallback onToggleSort;
   final RefreshCallback onRefresh;
   final ValueChanged<FolderEntity> onTap;
   final ValueChanged<FolderEntity> onEdit;
@@ -195,7 +192,7 @@ class _HomeFolderSection extends StatelessWidget {
         ),
         const SizedBox(height: SpacingTokens.md),
         if (isSortMode) ...[
-          ReorderModeBanner(onDone: onToggleSort),
+          const ReorderModeBanner(),
           const SizedBox(height: SpacingTokens.md),
         ],
         Expanded(

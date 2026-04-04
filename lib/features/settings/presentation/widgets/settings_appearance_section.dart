@@ -6,6 +6,7 @@ import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/settings/domain/entities/app_setting.dart';
 import 'package:memox/features/settings/presentation/providers/settings_provider.dart';
+import 'package:memox/features/settings/presentation/widgets/settings_group_card.dart';
 import 'package:memox/features/settings/presentation/widgets/settings_section_header.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
 import 'package:memox/shared/widgets/inputs/color_picker.dart';
@@ -22,16 +23,11 @@ class SettingsAppearanceSection extends ConsumerWidget {
     children: [
       SettingsSectionHeader(label: context.l10n.settingsAppearanceSection),
       const Gap.lg(),
-      AppCard(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              context.l10n.settingsThemePreferenceTitle,
-              style: context.textTheme.titleMedium,
-            ),
-            const Gap.md(),
-            Row(
+      SettingsGroupCard(
+        children: [
+          _AppearanceBlock(
+            title: context.l10n.settingsThemePreferenceTitle,
+            child: Row(
               children: [
                 _ThemeModeCard(
                   icon: Icons.brightness_auto_outlined,
@@ -61,29 +57,39 @@ class SettingsAppearanceSection extends ConsumerWidget {
                 ),
               ],
             ),
-          ],
-        ),
-      ),
-      const Gap.md(),
-      AppCard(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              context.l10n.settingsAppColorTitle,
-              style: context.textTheme.titleMedium,
-            ),
-            const Gap.md(),
-            ColorPicker(
+          ),
+          _AppearanceBlock(
+            title: context.l10n.settingsAppColorTitle,
+            child: ColorPicker(
               selectedColor: settings.seedColor,
               onChanged: (color) => ref
                   .read(settingsProvider.notifier)
                   .updateSeedColor(color.toARGB32()),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     ],
+  );
+}
+
+class _AppearanceBlock extends StatelessWidget {
+  const _AppearanceBlock({required this.title, required this.child});
+
+  final String title;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.all(SpacingTokens.lg),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(title, style: context.textTheme.titleMedium),
+        const Gap.md(),
+        child,
+      ],
+    ),
   );
 }
 
@@ -117,13 +123,19 @@ class _ThemeModeCard extends StatelessWidget {
           horizontal: SpacingTokens.md,
           vertical: SpacingTokens.lg,
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: SizeTokens.iconMd),
-            const Gap.sm(),
-            Text(label, style: context.textTheme.titleSmall),
-          ],
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(icon, size: SizeTokens.iconMd),
+              const Gap.sm(),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                style: context.textTheme.titleSmall,
+              ),
+            ],
+          ),
         ),
       ),
     );

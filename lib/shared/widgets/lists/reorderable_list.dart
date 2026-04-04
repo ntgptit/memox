@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:memox/core/theme/tokens/size_tokens.dart';
-import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/shared/widgets/feedback/app_refresh_indicator.dart';
+import 'package:memox/shared/widgets/lists/app_reorder_drag_handle.dart';
+
+typedef ReorderableItemBuilder<T extends Object> =
+    Widget Function(
+      BuildContext context,
+      T item,
+      int index,
+      Widget? reorderHandle,
+    );
 
 class ReorderableListWidget<T extends Object> extends StatelessWidget {
   const ReorderableListWidget({
@@ -16,7 +22,7 @@ class ReorderableListWidget<T extends Object> extends StatelessWidget {
 
   final List<T> items;
   final ReorderCallback onReorder;
-  final Widget Function(BuildContext context, T item, int index) itemBuilder;
+  final ReorderableItemBuilder<T> itemBuilder;
   final RefreshCallback? onRefresh;
   final bool isReorderEnabled;
 
@@ -33,7 +39,7 @@ class ReorderableListWidget<T extends Object> extends StatelessWidget {
           final item = items[index];
           return KeyedSubtree(
             key: ObjectKey(item),
-            child: itemBuilder(context, item, index),
+            child: itemBuilder(context, item, index, null),
           );
         },
       );
@@ -54,28 +60,14 @@ class ReorderableListWidget<T extends Object> extends StatelessWidget {
       itemBuilder: (context, index) {
         final item = items[index];
 
-        return Row(
+        return KeyedSubtree(
           key: ObjectKey(item),
-          children: [
-            Listener(
-              onPointerDown: (_) => HapticFeedback.selectionClick(),
-              child: ReorderableDragStartListener(
-                index: index,
-                child: Padding(
-                  padding: const EdgeInsets.only(right: SpacingTokens.sm),
-                  child: SizedBox.square(
-                    dimension: SizeTokens.touchTarget,
-                    child: Icon(
-                      Icons.drag_indicator_outlined,
-                      size: SizeTokens.iconSm,
-                      color: Theme.of(context).colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Expanded(child: itemBuilder(context, item, index)),
-          ],
+          child: itemBuilder(
+            context,
+            item,
+            index,
+            AppReorderDragHandle(index: index),
+          ),
         );
       },
     );

@@ -43,7 +43,8 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byTooltip('Done'), findsOneWidget);
-    expect(find.text('Done'), findsOneWidget);
+    expect(find.byIcon(Icons.check_outlined), findsOneWidget);
+    expect(find.text('Done'), findsNothing);
     expect(find.byIcon(Icons.more_vert), findsNothing);
     expect(find.text('Drag items to change their order.'), findsOneWidget);
   });

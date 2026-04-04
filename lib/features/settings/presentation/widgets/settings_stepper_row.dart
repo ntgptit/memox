@@ -3,7 +3,7 @@ import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/shared/widgets/buttons/icon_action_button.dart';
-import 'package:memox/shared/widgets/cards/app_card.dart';
+import 'package:memox/shared/widgets/layout/spacing.dart';
 
 class SettingsStepperRow extends StatelessWidget {
   const SettingsStepperRow({
@@ -24,7 +24,7 @@ class SettingsStepperRow extends StatelessWidget {
   final bool canIncrease;
 
   @override
-  Widget build(BuildContext context) => AppCard(
+  Widget build(BuildContext context) => Padding(
     padding: const EdgeInsets.symmetric(
       horizontal: SpacingTokens.lg,
       vertical: SpacingTokens.md,
@@ -34,22 +34,14 @@ class SettingsStepperRow extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(title, style: context.textTheme.titleMedium),
-                const SizedBox(height: SpacingTokens.xs),
-                Text(valueLabel, style: context.textTheme.bodySmall),
-              ],
-            ),
+            child: _SettingsStepperLabel(title: title, value: valueLabel),
           ),
           IconActionButton(
             icon: Icons.remove_outlined,
             onTap: canDecrease ? onDecrease : null,
             size: SizeTokens.buttonHeightSm,
           ),
-          const SizedBox(width: SpacingTokens.sm),
+          const Gap.sm(),
           IconActionButton(
             icon: Icons.add_outlined,
             onTap: canIncrease ? onIncrease : null,
@@ -58,5 +50,23 @@ class SettingsStepperRow extends StatelessWidget {
         ],
       ),
     ),
+  );
+}
+
+class _SettingsStepperLabel extends StatelessWidget {
+  const _SettingsStepperLabel({required this.title, required this.value});
+
+  final String title;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: [
+      Text(title, style: context.textTheme.titleMedium),
+      const Gap.xs(),
+      Text(value, style: context.textTheme.bodySmall),
+    ],
   );
 }

@@ -13,6 +13,7 @@ class FolderTile extends StatelessWidget {
     required this.subtitle,
     required this.masteryPercentage,
     required this.onTap,
+    this.reorderHandle,
     this.onLongPress,
     this.onEdit,
     this.onDelete,
@@ -23,6 +24,7 @@ class FolderTile extends StatelessWidget {
   final String subtitle;
   final double masteryPercentage;
   final VoidCallback? onTap;
+  final Widget? reorderHandle;
   final VoidCallback? onLongPress;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
@@ -44,6 +46,7 @@ class FolderTile extends StatelessWidget {
     ),
     trailing: _FolderTrailing(
       masteryPercentage: masteryPercentage,
+      reorderHandle: reorderHandle,
       onEdit: onEdit,
       onDelete: onDelete,
     ),
@@ -53,11 +56,13 @@ class FolderTile extends StatelessWidget {
 class _FolderTrailing extends StatelessWidget {
   const _FolderTrailing({
     required this.masteryPercentage,
+    this.reorderHandle,
     this.onEdit,
     this.onDelete,
   });
 
   final double masteryPercentage;
+  final Widget? reorderHandle;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
 
@@ -66,6 +71,7 @@ class _FolderTrailing extends StatelessWidget {
     mainAxisSize: MainAxisSize.min,
     children: [
       MasteryRing(percentage: masteryPercentage, showZeroPercentText: true),
+      if (reorderHandle != null) ...[const Gap.sm(), reorderHandle!],
       if (onEdit != null || onDelete != null) ...[
         const Gap.sm(),
         AppEditDeleteMenu(
