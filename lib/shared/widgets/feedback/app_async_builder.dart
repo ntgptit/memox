@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/shared/widgets/animations/fade_in_widget.dart';
 import 'package:memox/shared/widgets/feedback/error_view.dart';
-import 'package:memox/shared/widgets/feedback/loading_indicator.dart';
 import 'package:memox/shared/widgets/feedback/loading_overlay.dart';
+import 'package:memox/shared/widgets/feedback/screen_skeleton_loader.dart';
 
 class AppAsyncBuilder<T> extends StatelessWidget {
   const AppAsyncBuilder({
@@ -13,7 +13,8 @@ class AppAsyncBuilder<T> extends StatelessWidget {
     this.onLoading,
     this.onError,
     this.showLoadingOverlay = false,
-    this.animate = true,
+    this.animate = false,
+    this.keepPreviousDataWhileLoading = true,
     super.key,
   });
 
@@ -25,18 +26,29 @@ class AppAsyncBuilder<T> extends StatelessWidget {
   final bool showLoadingOverlay;
   final bool animate;
 
+  /// When true, shows previous data during re-loading
+  /// instead of a loading indicator.
+  final bool keepPreviousDataWhileLoading;
+
   @override
   Widget build(BuildContext context) {
-    if (showLoadingOverlay && value.hasValue && value.isLoading) {
-      return LoadingOverlay(
-        isLoading: true,
-        child: _animatedChild(onData(value.requireValue)),
-      );
+    if (value.isLoading && value.hasValue) {
+      if (showLoadingOverlay) {
+        return LoadingOverlay(
+          isLoading: true,
+          child: _animatedChild(onData(value.requireValue)),
+        );
+      }
+
+      if (keepPreviousDataWhileLoading) {
+        return onData(value.requireValue);
+      }
     }
 
     return value.when(
       data: (data) => _animatedChild(onData(data)),
-      loading: () => onLoading?.call() ?? const LoadingIndicator(),
+      loading: () =>
+          onLoading?.call() ?? const ScreenSkeletonLoader(),
       error: (error, _) =>
           onError?.call(error) ??
           ErrorView(message: error.toString(), onRetry: onRetry),

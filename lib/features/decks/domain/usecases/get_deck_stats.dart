@@ -10,18 +10,34 @@ final class GetDeckStatsUseCase {
 
   Future<DeckStats> call(int deckId) async {
     final cards = await _repository.getByDeck(deckId);
-    final dueCards = await _repository.getDueCards(
-      deckId: deckId,
-      limit: cards.length,
-    );
+    final now = DateTime.now();
+    var due = 0;
     final known = cards.where((FlashcardEntity card) => card.status == CardStatus.mastered).length;
     final learning = cards.where((FlashcardEntity card) => card.status == CardStatus.learning ||
           card.status == CardStatus.reviewing).length;
     final newCards = cards.where((FlashcardEntity card) => card.status == CardStatus.newCard).length;
+
+    for (final card in cards) {
+      if (card.status == CardStatus.newCard) {
+        due++;
+        continue;
+      }
+
+      final nextReviewDate = card.nextReviewDate;
+
+      if (nextReviewDate == null) {
+        continue;
+      }
+
+      if (!nextReviewDate.isAfter(now)) {
+        due++;
+      }
+    }
+
     final mastery = cards.isEmpty ? 0.0 : known / cards.length;
     return (
       total: cards.length,
-      due: dueCards.length,
+      due: due,
       known: known,
       learning: learning,
       newCards: newCards,

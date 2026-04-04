@@ -18,6 +18,13 @@ class AppRootBottomNav extends StatelessWidget {
   );
 
   void _navigate(BuildContext context, int index) {
+    final shellState = StatefulNavigationShell.maybeOf(context);
+
+    if (shellState != null) {
+      shellState.goBranch(index, initialLocation: index == currentIndex);
+      return;
+    }
+
     final route = switch (index) {
       0 => HomeScreen.routePath,
       1 => DecksScreen.routePath,

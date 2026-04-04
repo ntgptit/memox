@@ -6,40 +6,31 @@ import 'package:memox/features/decks/domain/usecases/get_deck_stats.dart';
 
 void main() {
   test('computes deck stats from repository cards', () async {
-    const useCase = GetDeckStatsUseCase(
+    final useCase = GetDeckStatsUseCase(
       _FakeFlashcardRepository(
         cards: [
-          FlashcardEntity(id: 1, deckId: 4, front: 'A', back: 'a'),
+          const FlashcardEntity(id: 1, deckId: 4, front: 'A', back: 'a'),
           FlashcardEntity(
             id: 2,
             deckId: 4,
             front: 'B',
             back: 'b',
             status: CardStatus.learning,
+            nextReviewDate: DateTime(2020),
           ),
-          FlashcardEntity(
+          const FlashcardEntity(
             id: 3,
             deckId: 4,
             front: 'C',
             back: 'c',
             status: CardStatus.reviewing,
           ),
-          FlashcardEntity(
+          const FlashcardEntity(
             id: 4,
             deckId: 4,
             front: 'D',
             back: 'd',
             status: CardStatus.mastered,
-          ),
-        ],
-        dueCards: [
-          FlashcardEntity(id: 1, deckId: 4, front: 'A', back: 'a'),
-          FlashcardEntity(
-            id: 2,
-            deckId: 4,
-            front: 'B',
-            back: 'b',
-            status: CardStatus.learning,
           ),
         ],
       ),
@@ -57,10 +48,9 @@ void main() {
 }
 
 final class _FakeFlashcardRepository implements FlashcardRepository {
-  const _FakeFlashcardRepository({required this.cards, required this.dueCards});
+  const _FakeFlashcardRepository({required this.cards});
 
   final List<FlashcardEntity> cards;
-  final List<FlashcardEntity> dueCards;
 
   @override
   Future<void> delete(int id) async {}
@@ -80,12 +70,21 @@ final class _FakeFlashcardRepository implements FlashcardRepository {
     int? deckId,
     int limit = 20,
   }) async {
-    final filtered = dueCards.where((card) {
-      if (deckId == null) {
+    final filtered = cards.where((card) {
+      final matchesDeck = deckId == null || card.deckId == deckId;
+
+      if (!matchesDeck) {
+        return false;
+      }
+
+      if (card.status == CardStatus.newCard) {
         return true;
       }
 
-      return card.deckId == deckId;
+      return switch (card.nextReviewDate) {
+        null => false,
+        final nextReviewDate => !nextReviewDate.isAfter(DateTime.now()),
+      };
     }).toList();
     return filtered.take(limit).toList();
   }

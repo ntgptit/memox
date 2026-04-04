@@ -6,7 +6,7 @@ class FadeInWidget extends StatelessWidget {
   const FadeInWidget({
     required this.child,
     this.delay = Duration.zero,
-    this.duration = DurationTokens.normal,
+    this.duration = DurationTokens.fast,
     this.slideY = 0.05,
     super.key,
   });

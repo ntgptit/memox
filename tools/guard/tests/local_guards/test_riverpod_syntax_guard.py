@@ -83,6 +83,25 @@ class RiverpodSyntaxGuardTest(unittest.TestCase):
 
             self.assertEqual([], violations)
 
+    def test_ignores_non_provider_router_helper(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            file_path = root / 'lib/core/router/app_page_transition.dart'
+            file_path.parent.mkdir(parents=True)
+            file_path.write_text(
+                "import 'package:flutter/material.dart';\n"
+                "Widget buildPage() => const SizedBox.shrink();\n",
+                encoding='utf-8',
+            )
+            guard = self._create_guard(root)
+
+            violations = guard.check_file(
+                file_path,
+                file_path.read_text(encoding='utf-8').splitlines(),
+            )
+
+            self.assertEqual([], violations)
+
     def _create_guard(self, root: Path) -> RiverpodSyntaxGuard:
         config = {
             'source_root': 'lib',
@@ -99,7 +118,7 @@ class RiverpodSyntaxGuardTest(unittest.TestCase):
             'riverpod_syntax': {
                 'provider_file_patterns': [
                     'core/providers/*.dart',
-                    'core/router/*.dart',
+                    'core/router/app_router.dart',
                     'shared/providers/*.dart',
                     'features/*/presentation/providers/*.dart',
                 ],

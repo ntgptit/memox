@@ -12,6 +12,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
     required this.flashcardHint,
     required this.flashcardExample,
     required this.questionText,
+    required this.studyTerm,
     required this.recallTerm,
     required this.answerCorrect,
     required this.statNumber,
@@ -84,6 +85,12 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
         fontSize: TypographyTokens.titleMedium,
         fontWeight: TypographyTokens.regular,
         height: TypographyTokens.relaxedHeight,
+      ),
+      studyTerm: themed(
+        base: textTheme.headlineMedium,
+        fontSize: TypographyTokens.headlineMedium,
+        fontWeight: TypographyTokens.regular,
+        height: TypographyTokens.headingHeight,
       ),
       recallTerm: themed(
         base: textTheme.displayLarge,
@@ -183,6 +190,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
   final TextStyle flashcardHint;
   final TextStyle flashcardExample;
   final TextStyle questionText;
+  final TextStyle studyTerm;
   final TextStyle recallTerm;
   final TextStyle answerCorrect;
   final TextStyle statNumber;
@@ -204,6 +212,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
     TextStyle? flashcardHint,
     TextStyle? flashcardExample,
     TextStyle? questionText,
+    TextStyle? studyTerm,
     TextStyle? recallTerm,
     TextStyle? answerCorrect,
     TextStyle? statNumber,
@@ -223,6 +232,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
     flashcardHint: flashcardHint ?? this.flashcardHint,
     flashcardExample: flashcardExample ?? this.flashcardExample,
     questionText: questionText ?? this.questionText,
+    studyTerm: studyTerm ?? this.studyTerm,
     recallTerm: recallTerm ?? this.recallTerm,
     answerCorrect: answerCorrect ?? this.answerCorrect,
     statNumber: statNumber ?? this.statNumber,
@@ -259,6 +269,7 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
           flashcardExample,
       questionText:
           TextStyle.lerp(questionText, other.questionText, t) ?? questionText,
+      studyTerm: TextStyle.lerp(studyTerm, other.studyTerm, t) ?? studyTerm,
       recallTerm: TextStyle.lerp(recallTerm, other.recallTerm, t) ?? recallTerm,
       answerCorrect:
           TextStyle.lerp(answerCorrect, other.answerCorrect, t) ??

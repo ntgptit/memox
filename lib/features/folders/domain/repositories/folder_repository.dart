@@ -13,6 +13,8 @@ abstract interface class FolderRepository {
 
   Future<FolderEntity?> getById(int id);
 
+  Stream<FolderEntity?> watchById(int id);
+
   Future<List<FolderEntity>> getRootFolders();
 
   Future<List<FolderEntity>> getSubfolders(int parentId);
@@ -38,6 +40,8 @@ abstract interface class FolderRepository {
   Future<bool> hasDecks(int folderId);
 
   Future<FolderRecursiveStats> getRecursiveStats(int folderId);
+
+  Stream<FolderRecursiveStats> watchRecursiveStats(int folderId);
 
   Future<FolderDeleteSummary> getDeleteSummary(int folderId);
 

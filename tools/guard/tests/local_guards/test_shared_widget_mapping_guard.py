@@ -107,6 +107,24 @@ class SharedWidgetMappingGuardTest(unittest.TestCase):
             self.assertEqual(1, len(violations))
             self.assertIn('AppCardSwitchTile(', violations[0].message)
 
+    def test_reports_heavy_folder_detail_usage_in_home_folder_list(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            file_path = root / 'lib/features/folders/presentation/widgets/folder_list_view.dart'
+            file_path.parent.mkdir(parents=True)
+            file_path.write_text(
+                'return ref.watch(folderDetailProvider(folder.id));',
+                encoding='utf-8',
+            )
+            guard = self._create_guard(root)
+
+            violations = guard.check_project([file_path])
+
+            self.assertEqual(2, len(violations))
+            messages = [violation.message for violation in violations]
+            self.assertTrue(any('homeFolderTileDataProvider(' in message for message in messages))
+            self.assertTrue(any('folderDetailProvider(' in message for message in messages))
+
     def _create_guard(
         self,
         root: Path,
@@ -156,6 +174,11 @@ class SharedWidgetMappingGuardTest(unittest.TestCase):
                     'card_editor_switch': {
                         'path_pattern': 'features/cards/presentation/widgets/card_editor_view.dart',
                         'required_widgets': ['AppCardSwitchTile('],
+                    },
+                    'home_folder_list': {
+                        'path_pattern': 'features/folders/presentation/widgets/folder_list_view.dart',
+                        'required_widgets': ['homeFolderTileDataProvider('],
+                        'forbidden_widgets': ['folderDetailProvider('],
                     },
                 },
             },

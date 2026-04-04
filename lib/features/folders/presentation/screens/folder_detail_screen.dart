@@ -7,6 +7,7 @@ import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/providers/usecase_providers.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/decks/domain/entities/deck_entity.dart';
+import 'package:memox/features/decks/presentation/providers/deck_stats_provider.dart';
 import 'package:memox/features/decks/presentation/screens/deck_detail_screen.dart';
 import 'package:memox/features/decks/presentation/widgets/create_deck_dialog.dart';
 import 'package:memox/features/decks/presentation/widgets/deck_list_view.dart';
@@ -23,6 +24,7 @@ import 'package:memox/shared/widgets/buttons/app_fab.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
 import 'package:memox/shared/widgets/feedback/app_refresh_indicator.dart';
 import 'package:memox/shared/widgets/feedback/empty_state_view.dart';
+import 'package:memox/shared/widgets/feedback/screen_loading_view.dart';
 import 'package:memox/shared/widgets/layout/app_scaffold.dart';
 import 'package:memox/shared/widgets/lists/reorder_mode_banner.dart';
 import 'package:memox/shared/widgets/navigation/top_bar_action_row.dart';
@@ -68,6 +70,7 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
       onRetry: () {
         unawaited(_refreshFolderDetailData(ref, widget.folderId));
       },
+      onLoading: () => ScreenLoadingView(appBar: _buildLoadingAppBar(context)),
       onData: (detail) => AppScaffold(
         appBar: _buildAppBar(context, detail),
         fab: AppFab(
@@ -94,7 +97,8 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
                 detail: detail,
                 focusDeckId: widget.focusDeckId,
                 isSortMode: _isSortMode,
-                onRefresh: () => _refreshFolderDetailData(ref, widget.folderId),
+                onRefresh: () =>
+                    _refreshFolderDetailData(ref, widget.folderId, detail),
               ),
             ),
             FolderConstraintFooter(depth: breadcrumb.length),
@@ -103,6 +107,15 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
       ),
     );
   }
+
+  PreferredSizeWidget _buildLoadingAppBar(BuildContext context) => AppBar(
+    automaticallyImplyLeading: false,
+    leadingWidth: TopBarBackButton.balancedSlotWidth,
+    leading: TopBarBackButton(
+      onPressed: () => Navigator.of(context).pop(),
+      startPadding: context.screenType.screenPadding,
+    ),
+  );
 
   void _toggleSortMode() {
     setState(() {
@@ -509,17 +522,34 @@ bool _canSort(FolderDetailData detail) {
   return false;
 }
 
-Future<void> _refreshFolderDetailData(WidgetRef ref, int folderId) async {
+Future<void> _refreshFolderDetailData(
+  WidgetRef ref,
+  int folderId, [
+  FolderDetailData? detail,
+]) async {
   ref
-    ..invalidate(allFoldersProvider)
-    ..invalidate(allDecksProvider)
-    ..invalidate(allFlashcardsProvider)
+    ..invalidate(folderByIdProvider(folderId))
+    ..invalidate(subfolderProvider(folderId))
+    ..invalidate(decksByFolderProvider(folderId))
+    ..invalidate(folderRecursiveStatsProvider(folderId))
     ..invalidate(folderDetailProvider(folderId))
     ..invalidate(folderBreadcrumbProvider(folderId));
-  await Future.wait<Object?>([
-    ref.read(allFoldersProvider.future),
-    ref.read(allDecksProvider.future),
-    ref.read(allFlashcardsProvider.future),
+
+  if (detail != null) {
+    for (final folder in detail.subfolders) {
+      ref.invalidate(homeFolderTileDataProvider(folder.id));
+    }
+
+    for (final deck in detail.decks) {
+      ref.invalidate(deckStatsProvider(deck.id));
+    }
+  }
+
+  await Future.wait([
+    ref.read(folderByIdProvider(folderId).future),
+    ref.read(subfolderProvider(folderId).future),
+    ref.read(decksByFolderProvider(folderId).future),
+    ref.read(folderRecursiveStatsProvider(folderId).future),
     ref.read(folderBreadcrumbProvider(folderId).future),
   ]);
 }

@@ -66,6 +66,10 @@ final class DeckRepositoryImpl implements DeckRepository {
   }
 
   @override
+  Stream<DeckEntity?> watchById(int id) =>
+      _localDataSource.watchById(id).map((row) => row?.toEntity());
+
+  @override
   Future<int> getNextSortOrder(int folderId) =>
       _localDataSource.getNextSortOrder(folderId);
 

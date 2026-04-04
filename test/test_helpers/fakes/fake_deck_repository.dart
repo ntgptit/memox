@@ -35,6 +35,11 @@ class FakeDeckRepository implements DeckRepository {
   }
 
   @override
+  Stream<DeckEntity?> watchById(int id) async* {
+    yield await getById(id);
+  }
+
+  @override
   Future<int> getNextSortOrder(int folderId) async =>
       _decks.where((deck) => deck.folderId == folderId).length;
 

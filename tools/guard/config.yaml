@@ -51,6 +51,7 @@ local_guards:
   feature_completeness: true
   drift_table: true
   provider_naming: true
+  performance_contract: true
   records_patterns: true
   riverpod_syntax: true
   responsive_layout_test: true

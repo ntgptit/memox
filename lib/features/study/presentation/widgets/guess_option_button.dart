@@ -39,7 +39,7 @@ class GuessOptionButton extends StatelessWidget {
     child: AnimatedContainer(
       duration: DurationTokens.normal,
       curve: Curves.easeInOut,
-      height: SizeTokens.inputHeight,
+      constraints: const BoxConstraints(minHeight: SizeTokens.listItemTall),
       decoration: BoxDecoration(
         color: _guessOptionHighlightColor(
           context,
@@ -109,7 +109,7 @@ class _GuessOptionContent extends StatelessWidget {
           option.text,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: context.textTheme.titleSmall?.copyWith(color: contentColor),
+          style: context.appTextStyles.studyTerm.copyWith(color: contentColor),
         ),
       ),
       if (trailingIcon != null) ...[

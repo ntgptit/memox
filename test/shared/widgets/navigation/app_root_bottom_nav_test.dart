@@ -36,24 +36,46 @@ void main() {
     final router = GoRouter(
       initialLocation: HomeScreen.routePath,
       routes: [
-        GoRoute(
-          path: HomeScreen.routePath,
-          builder: (context, state) => const Scaffold(
-            bottomNavigationBar: AppRootBottomNav(currentIndex: 0),
-            body: Text('Home'),
-          ),
-        ),
-        GoRoute(
-          path: DecksScreen.routePath,
-          builder: (context, state) => const Scaffold(body: Text('Decks')),
-        ),
-        GoRoute(
-          path: StatisticsScreen.routePath,
-          builder: (context, state) => const Scaffold(body: Text('Stats')),
-        ),
-        GoRoute(
-          path: SettingsScreen.routePath,
-          builder: (context, state) => const Scaffold(body: Text('Settings')),
+        StatefulShellRoute.indexedStack(
+          builder: (context, state, navigationShell) => navigationShell,
+          branches: [
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: HomeScreen.routePath,
+                  builder: (context, state) =>
+                      const _CounterScreen(currentIndex: 0, label: 'Home'),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: DecksScreen.routePath,
+                  builder: (context, state) =>
+                      const _StaticScreen(currentIndex: 1, label: 'Decks'),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: StatisticsScreen.routePath,
+                  builder: (context, state) =>
+                      const _StaticScreen(currentIndex: 2, label: 'Stats'),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: SettingsScreen.routePath,
+                  builder: (context, state) =>
+                      const _StaticScreen(currentIndex: 3, label: 'Settings'),
+                ),
+              ],
+            ),
+          ],
         ),
       ],
     );
@@ -67,9 +89,64 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    await tester.tap(find.text('Increment'));
+    await tester.pumpAndSettle();
+    expect(find.text('Count: 1'), findsOneWidget);
+
     await tester.tap(find.text('Library'));
     await tester.pumpAndSettle();
 
     expect(find.text('Decks'), findsOneWidget);
+
+    await tester.tap(find.text('Home'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Count: 1'), findsOneWidget);
   });
+}
+
+class _CounterScreen extends StatefulWidget {
+  const _CounterScreen({required this.currentIndex, required this.label});
+
+  final int currentIndex;
+  final String label;
+
+  @override
+  State<_CounterScreen> createState() => _CounterScreenState();
+}
+
+class _CounterScreenState extends State<_CounterScreen> {
+  var _count = 0;
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    bottomNavigationBar: AppRootBottomNav(currentIndex: widget.currentIndex),
+    body: Column(
+      children: [
+        Text(widget.label),
+        Text('Count: $_count'),
+        TextButton(
+          onPressed: () {
+            setState(() {
+              _count++;
+            });
+          },
+          child: const Text('Increment'),
+        ),
+      ],
+    ),
+  );
+}
+
+class _StaticScreen extends StatelessWidget {
+  const _StaticScreen({required this.currentIndex, required this.label});
+
+  final int currentIndex;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    bottomNavigationBar: AppRootBottomNav(currentIndex: currentIndex),
+    body: Text(label),
+  );
 }

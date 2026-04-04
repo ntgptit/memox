@@ -20,6 +20,7 @@ import 'package:memox/shared/widgets/buttons/app_fab.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
 import 'package:memox/shared/widgets/feedback/app_refresh_indicator.dart';
 import 'package:memox/shared/widgets/feedback/empty_state_view.dart';
+import 'package:memox/shared/widgets/feedback/loading_indicator.dart';
 import 'package:memox/shared/widgets/layout/app_scaffold.dart';
 import 'package:memox/shared/widgets/lists/reorder_mode_banner.dart';
 import 'package:memox/shared/widgets/navigation/app_root_bottom_nav.dart';
@@ -82,6 +83,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               onRetry: () {
                 unawaited(_refreshHomeData(ref));
               },
+              onLoading: () => _HomeFolderLoadingState(isSortMode: _isSortMode),
               onData: (folders) => _HomeFolderSection(
                 folders: folders,
                 isSortMode: _isSortMode,
@@ -180,24 +182,10 @@ class _HomeFolderSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          children: [
-            Expanded(
-              child: Text(
-                context.l10n.folderSectionTitle.toUpperCase(),
-                style: context.appTextStyles.sectionLabel,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: SpacingTokens.md),
-        if (isSortMode) ...[
-          const ReorderModeBanner(),
-          const SizedBox(height: SpacingTokens.md),
-        ],
         Expanded(
           child: FolderListView(
             folders: folders,
+            header: _HomeFolderHeader(isSortMode: isSortMode),
             isSortMode: isSortMode,
             onRefresh: onRefresh,
             onTap: onTap,
@@ -209,6 +197,49 @@ class _HomeFolderSection extends StatelessWidget {
       ],
     );
   }
+}
+
+class _HomeFolderLoadingState extends StatelessWidget {
+  const _HomeFolderLoadingState({required this.isSortMode});
+
+  final bool isSortMode;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      _HomeFolderHeader(isSortMode: isSortMode),
+      const Expanded(child: LoadingIndicator()),
+    ],
+  );
+}
+
+class _HomeFolderHeader extends StatelessWidget {
+  const _HomeFolderHeader({required this.isSortMode});
+
+  final bool isSortMode;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      Row(
+        children: [
+          Expanded(
+            child: Text(
+              context.l10n.folderSectionTitle.toUpperCase(),
+              style: context.appTextStyles.sectionLabel,
+            ),
+          ),
+        ],
+      ),
+      const SizedBox(height: SpacingTokens.md),
+      if (isSortMode) ...[
+        const ReorderModeBanner(),
+        const SizedBox(height: SpacingTokens.md),
+      ],
+    ],
+  );
 }
 
 Future<void> _createRootFolder(BuildContext context, WidgetRef ref) async {

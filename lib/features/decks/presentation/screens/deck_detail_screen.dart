@@ -18,7 +18,6 @@ import 'package:memox/features/decks/domain/entities/deck_entity.dart';
 import 'package:memox/features/decks/presentation/models/deck_card_sort.dart';
 import 'package:memox/features/decks/presentation/models/deck_detail_view_state.dart';
 import 'package:memox/features/decks/presentation/providers/deck_detail_provider.dart';
-import 'package:memox/features/decks/presentation/providers/deck_stats_provider.dart';
 import 'package:memox/features/decks/presentation/widgets/create_deck_dialog.dart';
 import 'package:memox/features/decks/presentation/widgets/deck_cards_toolbar.dart';
 import 'package:memox/features/decks/presentation/widgets/deck_cards_toolbar_delegate.dart';
@@ -26,7 +25,6 @@ import 'package:memox/features/decks/presentation/widgets/deck_detail_header.dar
 import 'package:memox/features/decks/presentation/widgets/deck_detail_overview.dart';
 import 'package:memox/features/decks/presentation/widgets/study_mode_sheet.dart';
 import 'package:memox/features/folders/presentation/providers/folder_detail_provider.dart';
-import 'package:memox/features/folders/presentation/providers/folders_provider.dart';
 import 'package:memox/features/folders/presentation/screens/folder_detail_screen.dart';
 import 'package:memox/features/folders/presentation/screens/home_screen.dart';
 import 'package:memox/features/study/presentation/screens/study_screen.dart';
@@ -34,8 +32,10 @@ import 'package:memox/shared/widgets/buttons/app_fab.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
 import 'package:memox/shared/widgets/feedback/app_refresh_indicator.dart';
 import 'package:memox/shared/widgets/feedback/loading_indicator.dart';
+import 'package:memox/shared/widgets/feedback/screen_loading_view.dart';
 import 'package:memox/shared/widgets/layout/app_scaffold.dart';
 import 'package:memox/shared/widgets/navigation/breadcrumb_bar.dart';
+import 'package:memox/shared/widgets/navigation/top_bar_back_button.dart';
 
 class DeckDetailScreen extends ConsumerStatefulWidget {
   const DeckDetailScreen({required this.deckId, super.key});
@@ -66,9 +66,22 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
       onRetry: () {
         unawaited(_refreshDeckDetail());
       },
+      onLoading: () => ScreenLoadingView(
+        appBar: _buildLoadingAppBar(context),
+        applyHorizontalPadding: false,
+      ),
       onData: (detail) => _buildScaffold(context, detail),
     );
   }
+
+  PreferredSizeWidget _buildLoadingAppBar(BuildContext context) => AppBar(
+    automaticallyImplyLeading: false,
+    leadingWidth: TopBarBackButton.balancedSlotWidth,
+    leading: TopBarBackButton(
+      onPressed: () => Navigator.of(context).pop(),
+      startPadding: context.screenType.screenPadding,
+    ),
+  );
 
   Widget _buildScaffold(BuildContext context, DeckDetailData detail) {
     final allCards = _sortedCards(_filteredCards(detail.cards));
@@ -458,24 +471,15 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
     }
 
     ref
-      ..invalidate(allDecksProvider)
+      ..invalidate(deckByIdProvider(widget.deckId))
       ..invalidate(cardsByDeckProvider(widget.deckId))
-      ..invalidate(deckStatsProvider(widget.deckId))
       ..invalidate(deckDetailProvider(widget.deckId));
-    final decks = await ref.read(allDecksProvider.future);
-    await Future.wait<Object?>([
-      ref.read(cardsByDeckProvider(widget.deckId).future),
-      ref.read(deckStatsProvider(widget.deckId).future),
-    ]);
+    final deck = await ref.read(deckByIdProvider(widget.deckId).future);
+    await ref.read(cardsByDeckProvider(widget.deckId).future);
 
-    for (final deck in decks) {
-      if (deck.id != widget.deckId) {
-        continue;
-      }
-
+    if (deck != null) {
       ref.invalidate(folderBreadcrumbProvider(deck.folderId));
       await ref.read(folderBreadcrumbProvider(deck.folderId).future);
-      return;
     }
   }
 }

@@ -76,6 +76,15 @@ abstract final class SizeTokens {
   static const double maxBodyWidth = 720;
   static const double emptyStateTextWidth = 280;
 
+  // ── Skeleton loaders ──
+  static const double skeletonTitleWidth = 180;
+  static const double skeletonSubtitleWidth = 240;
+  static const double skeletonChipWidth = 80;
+  static const double skeletonBodyLineWidth = 120;
+  static const double skeletonTitleHeight = 24;
+  static const double skeletonSubtitleHeight = 14;
+  static const double skeletonBodyLineHeight = 12;
+
   // ── Status Dot ──
   static const double statusDotSize = 8; // card status indicator
   static const double statusDotSizeLg = 12; // legend dots in charts

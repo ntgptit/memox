@@ -11,6 +11,8 @@ abstract interface class DeckLocalDataSource {
 
   Future<DecksTableData?> getById(int id);
 
+  Stream<DecksTableData?> watchById(int id);
+
   Future<List<int>> getIdsByFolderIds(List<int> folderIds);
 
   Future<int> getNextSortOrder(int folderId);
@@ -43,6 +45,9 @@ final class DeckLocalDataSourceImpl implements DeckLocalDataSource {
 
   @override
   Future<DecksTableData?> getById(int id) => _deckDao.getById(id);
+
+  @override
+  Stream<DecksTableData?> watchById(int id) => _deckDao.watchById(id);
 
   @override
   Future<List<int>> getIdsByFolderIds(List<int> folderIds) => _deckDao.getIdsByFolderIds(folderIds);

@@ -11,6 +11,8 @@ class MatchItemCard extends StatelessWidget {
   const MatchItemCard({
     required this.text,
     required this.onTap,
+    required this.textStyle,
+    this.maxLines,
     this.isSelected = false,
     this.isMatched = false,
     this.isWrong = false,
@@ -19,6 +21,8 @@ class MatchItemCard extends StatelessWidget {
 
   final String text;
   final VoidCallback? onTap;
+  final TextStyle textStyle;
+  final int? maxLines;
   final bool isSelected;
   final bool isMatched;
   final bool isWrong;
@@ -47,9 +51,16 @@ class MatchItemCard extends StatelessWidget {
         borderColor: borderColor,
         borderRadius: RadiusTokens.md,
         padding: const EdgeInsets.all(SpacingTokens.md),
-        child: Text(
-          text,
-          style: context.textTheme.bodyMedium?.copyWith(color: textColor),
+        child: SizedBox.expand(
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              text,
+              maxLines: maxLines,
+              overflow: maxLines == null ? null : TextOverflow.ellipsis,
+              style: textStyle.copyWith(color: textColor),
+            ),
+          ),
         ),
       ),
     );

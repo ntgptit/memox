@@ -47,6 +47,10 @@ void main() {
     );
     expect(appTextStyles!.statNumber.fontSize, TypographyTokens.statDisplay);
     expect(
+      appTextStyles!.studyTerm.fontSize,
+      TypographyTokens.headlineMedium,
+    );
+    expect(
       appTextStyles!.sectionLabel.letterSpacing,
       TypographyTokens.sectionSpacing,
     );

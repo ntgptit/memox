@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -7,12 +9,51 @@ import 'package:memox/features/cards/domain/entities/flashcard_entity.dart';
 import 'package:memox/features/decks/domain/entities/deck_entity.dart';
 import 'package:memox/features/decks/presentation/screens/deck_detail_screen.dart';
 import 'package:memox/features/folders/domain/entities/folder_entity.dart';
+import 'package:memox/shared/widgets/feedback/loading_indicator.dart';
 import '../../../../test_helpers/fakes/fake_deck_repository.dart';
 import '../../../../test_helpers/fakes/fake_flashcard_repository.dart';
 import '../../../../test_helpers/fakes/fake_folder_repository.dart';
 import '../../../../test_helpers/test_app.dart';
 
 void main() {
+  testWidgets('DeckDetailScreen shows loading indicator while data loads', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          folderRepositoryProvider.overrideWithValue(
+            FakeFolderRepository(
+              folders: const [
+                FolderEntity(id: 1, name: 'Root'),
+                FolderEntity(id: 2, name: 'Languages', parentId: 1),
+              ],
+            ),
+          ),
+          deckRepositoryProvider.overrideWithValue(
+            _DelayedDeckRepository(
+              decks: const [
+                DeckEntity(id: 3, name: 'Korean Core', folderId: 2),
+              ],
+            ),
+          ),
+          flashcardRepositoryProvider.overrideWithValue(
+            FakeFlashcardRepository(),
+          ),
+        ],
+        child: buildTestApp(home: const DeckDetailScreen(deckId: 3)),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byType(LoadingIndicator), findsOneWidget);
+    expect(find.byTooltip('Back'), findsOneWidget);
+
+    await tester.pumpAndSettle();
+
+    expect(find.text('Korean Core'), findsOneWidget);
+  });
+
   testWidgets('DeckDetailScreen renders stats and cards', (tester) async {
     await tester.pumpWidget(
       ProviderScope(
@@ -217,4 +258,14 @@ void main() {
 
     expect(find.text('Card 25'), findsOneWidget);
   });
+}
+
+class _DelayedDeckRepository extends FakeDeckRepository {
+  _DelayedDeckRepository({super.decks});
+
+  @override
+  Stream<DeckEntity?> watchById(int id) async* {
+    await Future<void>.delayed(const Duration(milliseconds: 100));
+    yield await getById(id);
+  }
 }

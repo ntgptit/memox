@@ -95,6 +95,11 @@ final class FolderRepositoryImpl implements FolderRepository {
   }
 
   @override
+  Stream<FolderEntity?> watchById(int id) => _localDataSource
+      .watchById(id)
+      .map((model) => model?.toEntity());
+
+  @override
   Future<FolderDeleteSummary> getDeleteSummary(int folderId) async {
     final counts = await _localDataSource.getDeleteCounts(folderId);
     final descendantIds = await _localDataSource.getDescendantIds(folderId);
@@ -141,6 +146,19 @@ final class FolderRepositoryImpl implements FolderRepository {
       masteredCards: stats.masteredCards,
     );
   }
+
+  @override
+  Stream<FolderRecursiveStats> watchRecursiveStats(int folderId) =>
+      _localDataSource
+          .watchRecursiveStats(folderId)
+          .map(
+            (stats) => FolderRecursiveStats(
+              subfolderCount: stats.subfolderCount,
+              deckCount: stats.deckCount,
+              totalCards: stats.totalCards,
+              masteredCards: stats.masteredCards,
+            ),
+          );
 
   @override
   Future<List<FolderEntity>> getRootFolders() async {

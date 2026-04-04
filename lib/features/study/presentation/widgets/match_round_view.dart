@@ -4,7 +4,7 @@ import 'package:memox/core/responsive/responsive_padding.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/study/domain/match/match_engine.dart';
 import 'package:memox/features/study/presentation/providers/match_provider.dart';
-import 'package:memox/features/study/presentation/widgets/match_item_column.dart';
+import 'package:memox/features/study/presentation/widgets/match_item_board.dart';
 import 'package:memox/shared/widgets/feedback/empty_state_view.dart';
 
 class MatchRoundView extends StatelessWidget {
@@ -27,30 +27,11 @@ class MatchRoundView extends StatelessWidget {
       );
     }
 
-    return SingleChildScrollView(
+    return Padding(
       padding: ResponsivePadding.horizontal(
         context,
       ).add(const EdgeInsets.symmetric(vertical: SpacingTokens.lg)),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: MatchItemColumn(
-              items: state.game.terms,
-              state: state,
-              onSelect: onSelect,
-            ),
-          ),
-          const SizedBox(width: SpacingTokens.md),
-          Expanded(
-            child: MatchItemColumn(
-              items: state.game.definitions,
-              state: state,
-              onSelect: onSelect,
-            ),
-          ),
-        ],
-      ),
+      child: MatchItemBoard(state: state, onSelect: onSelect),
     );
   }
 }

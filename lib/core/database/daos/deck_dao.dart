@@ -28,6 +28,10 @@ class DeckDao extends DatabaseAccessor<AppDatabase> with _$DeckDaoMixin {
       decksTable,
     )..where((DecksTable tbl) => tbl.id.equals(id))).getSingleOrNull();
 
+  Stream<DecksTableData?> watchById(int id) => (select(
+    decksTable,
+  )..where((DecksTable tbl) => tbl.id.equals(id))).watchSingleOrNull();
+
   Future<List<DecksTableData>> getByFolder(int folderId) => (select(decksTable)
           ..where((DecksTable tbl) => tbl.folderId.equals(folderId))
           ..orderBy([

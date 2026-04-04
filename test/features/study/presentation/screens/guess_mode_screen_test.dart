@@ -1,16 +1,19 @@
 import 'dart:math';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/core/design/study_mode.dart';
 import 'package:memox/core/providers/database_providers.dart';
 import 'package:memox/core/providers/repository_providers.dart';
+import 'package:memox/core/theme/tokens/typography_tokens.dart';
 import 'package:memox/features/cards/domain/entities/flashcard_entity.dart';
 import 'package:memox/features/study/domain/entities/study_session.dart';
 import 'package:memox/features/study/domain/guess/guess_engine.dart';
 import 'package:memox/features/study/domain/repositories/study_repository.dart';
 import 'package:memox/features/study/presentation/providers/guess_provider.dart';
 import 'package:memox/features/study/presentation/screens/guess_mode_screen.dart';
+import 'package:memox/features/study/presentation/widgets/guess_option_button.dart';
 import '../../../../test_helpers/fakes/fake_card_review_dao.dart';
 import '../../../../test_helpers/fakes/fake_flashcard_repository.dart';
 import '../../../../test_helpers/test_app.dart';
@@ -49,6 +52,9 @@ void main() {
     expect(find.text('Hello'), findsOneWidget);
     expect(find.text('안녕하세요'), findsOneWidget);
     expect(find.text('Skip'), findsOneWidget);
+
+    final termText = tester.widget<Text>(find.text('안녕하세요'));
+    expect(termText.style?.fontSize, TypographyTokens.headlineMedium);
   });
 
   testWidgets('GuessModeScreen shows completion after a correct answer', (
@@ -83,7 +89,14 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('안녕하세요'));
+    final optionButton = find
+        .ancestor(
+          of: find.text('안녕하세요'),
+          matching: find.byType(GuessOptionButton),
+        )
+        .first;
+    await tester.ensureVisible(optionButton);
+    await tester.tap(optionButton);
     await tester.pumpAndSettle();
 
     expect(find.text('Guess complete'), findsOneWidget);

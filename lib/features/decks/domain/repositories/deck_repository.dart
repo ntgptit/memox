@@ -11,6 +11,8 @@ abstract interface class DeckRepository {
 
   Future<DeckEntity?> getById(int id);
 
+  Stream<DeckEntity?> watchById(int id);
+
   Future<int> getNextSortOrder(int folderId);
 
   Future<void> reorder({required int folderId, required List<int> deckIds});

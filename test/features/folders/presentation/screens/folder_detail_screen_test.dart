@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,6 +11,7 @@ import 'package:memox/features/folders/domain/entities/folder_entity.dart';
 import 'package:memox/features/folders/presentation/screens/folder_detail_screen.dart';
 import 'package:memox/features/folders/presentation/widgets/folder_detail_app_bar_title.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
+import 'package:memox/shared/widgets/feedback/loading_indicator.dart';
 import 'package:memox/shared/widgets/navigation/breadcrumb_bar.dart';
 import 'package:memox/shared/widgets/navigation/top_bar_back_button.dart';
 import '../../../../test_helpers/fakes/fake_deck_repository.dart';
@@ -17,6 +20,40 @@ import '../../../../test_helpers/fakes/fake_folder_repository.dart';
 import '../../../../test_helpers/test_app.dart';
 
 void main() {
+  testWidgets('shows loading indicator while folder detail loads', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          folderRepositoryProvider.overrideWithValue(
+            _DelayedFolderRepository(
+              folders: const [
+                FolderEntity(id: 1, name: 'Root'),
+                FolderEntity(id: 2, name: 'Korean1', parentId: 1),
+              ],
+            ),
+          ),
+          deckRepositoryProvider.overrideWithValue(
+            FakeDeckRepository(decks: const <DeckEntity>[]),
+          ),
+          flashcardRepositoryProvider.overrideWithValue(
+            FakeFlashcardRepository(),
+          ),
+        ],
+        child: buildTestApp(home: const FolderDetailScreen(folderId: 2)),
+      ),
+    );
+    await tester.pump();
+
+    expect(find.byType(LoadingIndicator), findsOneWidget);
+    expect(find.byType(TopBarBackButton), findsOneWidget);
+
+    await tester.pumpAndSettle();
+
+    expect(find.text('Korean1'), findsWidgets);
+  });
+
   testWidgets(
     'does not offer deck creation when folder already has subfolders',
     (tester) async {
@@ -219,4 +256,14 @@ void main() {
       findsOneWidget,
     );
   });
+}
+
+class _DelayedFolderRepository extends FakeFolderRepository {
+  _DelayedFolderRepository({super.folders});
+
+  @override
+  Stream<FolderEntity?> watchById(int id) async* {
+    await Future<void>.delayed(const Duration(milliseconds: 100));
+    yield await getById(id);
+  }
 }

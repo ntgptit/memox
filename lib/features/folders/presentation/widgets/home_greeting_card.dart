@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
+import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/features/decks/domain/entities/deck_entity.dart';
 import 'package:memox/features/folders/presentation/providers/folders_provider.dart';
 import 'package:memox/shared/widgets/buttons/text_link_button.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
+import 'package:memox/shared/widgets/feedback/loading_indicator.dart';
 import 'package:memox/shared/widgets/layout/spacing.dart';
 
 class HomeGreetingCard extends StatelessWidget {
@@ -35,7 +37,8 @@ class HomeGreetingCard extends StatelessWidget {
         const Gap.sm(),
         AppAsyncBuilder<HomeDueSummary>(
           value: summary,
-          animate: false,
+          onLoading: () => const _GreetingLoadingBody(),
+          onError: (_) => _GreetingErrorBody(onRetry: onRetry),
           onRetry: onRetry,
           onData: (data) => _GreetingBody(data: data, onReviewNow: onReviewNow),
         ),
@@ -78,6 +81,36 @@ class _GreetingBody extends StatelessWidget {
           onTap: () => onReviewNow(dueDeck),
           showTrailingArrow: true,
         ),
+    ],
+  );
+}
+
+class _GreetingLoadingBody extends StatelessWidget {
+  const _GreetingLoadingBody();
+
+  @override
+  Widget build(BuildContext context) => const Align(
+    alignment: Alignment.centerLeft,
+    child: LoadingIndicator(size: SizeTokens.iconSm),
+  );
+}
+
+class _GreetingErrorBody extends StatelessWidget {
+  const _GreetingErrorBody({required this.onRetry});
+
+  final VoidCallback? onRetry;
+
+  @override
+  Widget build(BuildContext context) => Row(
+    children: [
+      Expanded(
+        child: Text(
+          context.l10n.homeDueCards(0),
+          style: context.textTheme.bodyLarge,
+        ),
+      ),
+      if (onRetry != null)
+        TextLinkButton(label: context.l10n.retryAction, onTap: onRetry),
     ],
   );
 }

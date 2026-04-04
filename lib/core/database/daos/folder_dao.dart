@@ -4,37 +4,45 @@ part of '../app_database.dart';
 class FolderDao extends DatabaseAccessor<AppDatabase> with _$FolderDaoMixin {
   FolderDao(super.db);
 
-  Stream<List<FoldersTableData>> watchAllFolders() => (select(foldersTable)..orderBy([
-          (FoldersTable tbl) => OrderingTerm.asc(tbl.sortOrder),
-          (FoldersTable tbl) => OrderingTerm.asc(tbl.createdAt),
-        ]))
-        .watch();
-
-  Stream<List<FoldersTableData>> watchRootFolders() => (select(foldersTable)
-          ..where((FoldersTable tbl) => tbl.parentId.isNull())
-          ..orderBy([
+  Stream<List<FoldersTableData>> watchAllFolders() =>
+      (select(foldersTable)..orderBy([
             (FoldersTable tbl) => OrderingTerm.asc(tbl.sortOrder),
             (FoldersTable tbl) => OrderingTerm.asc(tbl.createdAt),
           ]))
-        .watch();
+          .watch();
 
-  Stream<List<FoldersTableData>> watchByParent(int parentId) => (select(foldersTable)
-          ..where((FoldersTable tbl) => tbl.parentId.equals(parentId))
-          ..orderBy([
+  Stream<List<FoldersTableData>> watchRootFolders() =>
+      (select(foldersTable)
+            ..where((FoldersTable tbl) => tbl.parentId.isNull())
+            ..orderBy([
+              (FoldersTable tbl) => OrderingTerm.asc(tbl.sortOrder),
+              (FoldersTable tbl) => OrderingTerm.asc(tbl.createdAt),
+            ]))
+          .watch();
+
+  Stream<List<FoldersTableData>> watchByParent(int parentId) =>
+      (select(foldersTable)
+            ..where((FoldersTable tbl) => tbl.parentId.equals(parentId))
+            ..orderBy([
+              (FoldersTable tbl) => OrderingTerm.asc(tbl.sortOrder),
+              (FoldersTable tbl) => OrderingTerm.asc(tbl.createdAt),
+            ]))
+          .watch();
+
+  Future<List<FoldersTableData>> getAll() =>
+      (select(foldersTable)..orderBy([
             (FoldersTable tbl) => OrderingTerm.asc(tbl.sortOrder),
             (FoldersTable tbl) => OrderingTerm.asc(tbl.createdAt),
           ]))
-        .watch();
-
-  Future<List<FoldersTableData>> getAll() => (select(foldersTable)..orderBy([
-          (FoldersTable tbl) => OrderingTerm.asc(tbl.sortOrder),
-          (FoldersTable tbl) => OrderingTerm.asc(tbl.createdAt),
-        ]))
-        .get();
+          .get();
 
   Future<FoldersTableData?> getById(int id) => (select(
       foldersTable,
     )..where((FoldersTable tbl) => tbl.id.equals(id))).getSingleOrNull();
+
+  Stream<FoldersTableData?> watchById(int id) => (select(
+    foldersTable,
+  )..where((FoldersTable tbl) => tbl.id.equals(id))).watchSingleOrNull();
 
   Future<List<FoldersTableData>> getByParent(int? parentId) {
     final query = select(foldersTable)
@@ -52,9 +60,11 @@ class FolderDao extends DatabaseAccessor<AppDatabase> with _$FolderDaoMixin {
     return query.get();
   }
 
-  Future<int> insertFolder(FoldersTableCompanion folder) => into(foldersTable).insert(folder, mode: InsertMode.insertOrReplace);
+  Future<int> insertFolder(FoldersTableCompanion folder) =>
+      into(foldersTable).insert(folder, mode: InsertMode.insertOrReplace);
 
-  Future<bool> updateFolder(FoldersTableCompanion folder) => update(foldersTable).replace(folder);
+  Future<bool> updateFolder(FoldersTableCompanion folder) =>
+      update(foldersTable).replace(folder);
 
   Future<void> updateFolderPresentation({
     required int id,
@@ -70,8 +80,8 @@ class FolderDao extends DatabaseAccessor<AppDatabase> with _$FolderDaoMixin {
       );
 
   Future<int> deleteById(int id) => (delete(
-      foldersTable,
-    )..where((FoldersTable tbl) => tbl.id.equals(id))).go();
+    foldersTable,
+  )..where((FoldersTable tbl) => tbl.id.equals(id))).go();
 
   Future<int> deleteByIds(List<int> folderIds) {
     if (folderIds.isEmpty) {
@@ -125,20 +135,21 @@ class FolderDao extends DatabaseAccessor<AppDatabase> with _$FolderDaoMixin {
     return (currentMax ?? -1) + 1;
   }
 
-  Future<void> reorderByParent(int? parentId, List<int> folderIds) => transaction(() async {
-      for (var index = 0; index < folderIds.length; index++) {
-        final folderId = folderIds[index];
-        await (update(
-          foldersTable,
-        )..where((FoldersTable tbl) => tbl.id.equals(folderId))).write(
-          FoldersTableCompanion(
-            parentId: Value<int?>(parentId),
-            sortOrder: Value<int>(index),
-            updatedAt: Value<DateTime>(DateTime.now()),
-          ),
-        );
-      }
-    });
+  Future<void> reorderByParent(int? parentId, List<int> folderIds) =>
+      transaction(() async {
+        for (var index = 0; index < folderIds.length; index++) {
+          final folderId = folderIds[index];
+          await (update(
+            foldersTable,
+          )..where((FoldersTable tbl) => tbl.id.equals(folderId))).write(
+            FoldersTableCompanion(
+              parentId: Value<int?>(parentId),
+              sortOrder: Value<int>(index),
+              updatedAt: Value<DateTime>(DateTime.now()),
+            ),
+          );
+        }
+      });
 
   Future<List<int>> getDescendantIds(int folderId) async {
     final result = await customSelect(
@@ -194,6 +205,44 @@ class FolderDao extends DatabaseAccessor<AppDatabase> with _$FolderDaoMixin {
       masteredCards: result.read<int>('mastered_cards'),
     );
   }
+
+  Stream<
+    ({int subfolderCount, int deckCount, int totalCards, int masteredCards})
+  >
+  watchRecursiveStats(int folderId) =>
+      customSelect(
+        [
+          'WITH RECURSIVE sub AS (',
+          'SELECT id FROM folders_table WHERE id = ?1',
+          'UNION ALL',
+          'SELECT f.id FROM folders_table f',
+          'JOIN sub s ON f.parent_id = s.id',
+          ')',
+          'SELECT',
+          '(SELECT COUNT(*) FROM sub WHERE id != ?1) AS subfolder_count,',
+          '(SELECT COUNT(*) FROM decks_table',
+          '  WHERE folder_id IN (SELECT id FROM sub)) AS deck_count,',
+          '(SELECT COUNT(*) FROM cards_table',
+          '  WHERE deck_id IN (SELECT id FROM decks_table',
+          '    WHERE folder_id IN (SELECT id FROM sub))) AS total_cards,',
+          '(SELECT COUNT(*) FROM cards_table',
+          '  WHERE status = ?2',
+          '    AND deck_id IN (SELECT id FROM decks_table',
+          '      WHERE folder_id IN (SELECT id FROM sub))) AS mastered_cards',
+        ].join(' '),
+        variables: [
+          Variable<int>(folderId),
+          Variable<int>(CardStatus.mastered.index),
+        ],
+        readsFrom: {foldersTable, decksTable, cardsTable},
+      ).watchSingle().map(
+        (result) => (
+          subfolderCount: result.read<int>('subfolder_count'),
+          deckCount: result.read<int>('deck_count'),
+          totalCards: result.read<int>('total_cards'),
+          masteredCards: result.read<int>('mastered_cards'),
+        ),
+      );
 
   Future<({int subfolderCount, int deckCount, int cardCount})> getDeleteCounts(
     int folderId,

@@ -4,7 +4,7 @@ import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/duration_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/folders/domain/entities/folder_entity.dart';
-import 'package:memox/features/folders/presentation/providers/folder_detail_provider.dart';
+import 'package:memox/features/folders/presentation/providers/folders_provider.dart';
 import 'package:memox/features/folders/presentation/widgets/folder_tile.dart';
 import 'package:memox/shared/widgets/animations/fade_in_widget.dart';
 import 'package:memox/shared/widgets/lists/reorderable_list.dart';
@@ -16,6 +16,7 @@ class FolderListView extends ConsumerWidget {
     required this.onEdit,
     required this.onDelete,
     required this.onReorder,
+    this.header,
     this.onRefresh,
     this.isSortMode = false,
     super.key,
@@ -26,6 +27,7 @@ class FolderListView extends ConsumerWidget {
   final ValueChanged<FolderEntity> onEdit;
   final ValueChanged<FolderEntity> onDelete;
   final ReorderCallback onReorder;
+  final Widget? header;
   final RefreshCallback? onRefresh;
   final bool isSortMode;
 
@@ -34,16 +36,19 @@ class FolderListView extends ConsumerWidget {
       ReorderableListWidget<FolderEntity>(
         items: folders,
         onReorder: onReorder,
+        header: header,
         onRefresh: onRefresh,
         isReorderEnabled: isSortMode,
         itemBuilder: (context, folder, index, reorderHandle) {
-          final detail = switch (ref.watch(folderDetailProvider(folder.id))) {
-            AsyncData<FolderDetailData>(:final value) => value,
+          final summary = switch (ref.watch(
+            homeFolderTileDataProvider(folder.id),
+          )) {
+            AsyncData<HomeFolderTileData>(:final value) => value,
             _ => null,
           };
-          final subtitle = detail == null
+          final subtitle = summary == null
               ? context.l10n.folderEmptyStatus
-              : _subtitle(context, detail);
+              : _subtitle(context, summary);
 
           return Padding(
             padding: const EdgeInsets.only(bottom: SpacingTokens.sm),
@@ -55,7 +60,7 @@ class FolderListView extends ConsumerWidget {
               child: FolderTile(
                 folder: folder,
                 subtitle: subtitle,
-                masteryPercentage: detail?.masteryPercentage ?? 0,
+                masteryPercentage: summary?.masteryPercentage ?? 0,
                 reorderHandle: isSortMode ? reorderHandle : null,
                 onTap: isSortMode ? null : () => onTap(folder),
                 onEdit: isSortMode ? null : () => onEdit(folder),
@@ -66,15 +71,15 @@ class FolderListView extends ConsumerWidget {
         },
       );
 
-  String _subtitle(BuildContext context, FolderDetailData detail) =>
-      switch (detail.contentType) {
-        ContentType.subfolders => context.l10n.folderSubfolderCount(
-          detail.subfolderCount,
+  String _subtitle(BuildContext context, HomeFolderTileData summary) =>
+      switch ((summary.directSubfolderCount > 0, summary.directDeckCount > 0)) {
+        (true, _) => context.l10n.folderSubfolderCount(
+          summary.directSubfolderCount,
         ),
-        ContentType.decks => context.l10n.folderDeckSubtitle(
-          detail.deckCount,
-          detail.totalCards,
+        (false, true) => context.l10n.folderDeckSubtitle(
+          summary.directDeckCount,
+          summary.totalCards,
         ),
-        ContentType.empty => context.l10n.folderEmptyStatus,
+        _ => context.l10n.folderEmptyStatus,
       };
 }

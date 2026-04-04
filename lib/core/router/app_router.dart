@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:memox/core/design/study_mode.dart';
+import 'package:memox/core/router/app_page_transition.dart';
 import 'package:memox/features/cards/presentation/screens/card_create_screen.dart';
 import 'package:memox/features/cards/presentation/screens/card_edit_screen.dart';
 import 'package:memox/features/cards/presentation/screens/cards_screen.dart';
@@ -22,37 +22,75 @@ part 'app_router.g.dart';
 GoRouter appRouter(Ref ref) => GoRouter(
   initialLocation: HomeScreen.routePath,
   routes: [
-    GoRoute(
-      path: HomeScreen.routePath,
-      name: HomeScreen.routeName,
-      builder: (context, state) => const HomeScreen(),
-    ),
-    GoRoute(
-      path: DecksScreen.routePath,
-      name: DecksScreen.routeName,
-      builder: (context, state) => const DecksScreen(),
+    StatefulShellRoute.indexedStack(
+      builder: (context, state, navigationShell) => navigationShell,
+      branches: [
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: HomeScreen.routePath,
+              name: HomeScreen.routeName,
+              builder: (context, state) => const HomeScreen(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: DecksScreen.routePath,
+              name: DecksScreen.routeName,
+              builder: (context, state) => const DecksScreen(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: StatisticsScreen.routePath,
+              name: StatisticsScreen.routeName,
+              builder: (context, state) => const StatisticsScreen(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: SettingsScreen.routePath,
+              name: SettingsScreen.routeName,
+              builder: (context, state) => const SettingsScreen(),
+            ),
+          ],
+        ),
+      ],
     ),
     GoRoute(
       path: DeckDetailScreen.routePath,
       name: DeckDetailScreen.routeName,
-      builder: (context, state) =>
-          DeckDetailScreen(deckId: int.parse(state.pathParameters['deckId']!)),
+      pageBuilder: (context, state) => appFadeTransitionPage(
+        state: state,
+        child: DeckDetailScreen(
+          deckId: int.parse(state.pathParameters['deckId']!),
+        ),
+      ),
     ),
     GoRoute(
       path: CardCreateScreen.routePath,
       name: CardCreateScreen.routeName,
-      pageBuilder: (context, state) => MaterialPage<void>(
+      pageBuilder: (context, state) => appFadeTransitionPage(
+        state: state,
         fullscreenDialog: true,
         child: CardCreateScreen(
           deckId: int.parse(state.pathParameters['deckId']!),
-          initialMode: _editorModeFromName(state.uri.queryParameters['mode']),
+          initialMode:
+              _editorModeFromName(state.uri.queryParameters['mode']),
         ),
       ),
     ),
     GoRoute(
       path: CardEditScreen.routePath,
       name: CardEditScreen.routeName,
-      pageBuilder: (context, state) => MaterialPage<void>(
+      pageBuilder: (context, state) => appFadeTransitionPage(
+        state: state,
         fullscreenDialog: true,
         child: CardEditScreen(
           deckId: int.parse(state.pathParameters['deckId']!),
@@ -61,50 +99,59 @@ GoRouter appRouter(Ref ref) => GoRouter(
       ),
     ),
     GoRoute(
-      path: StatisticsScreen.routePath,
-      name: StatisticsScreen.routeName,
-      builder: (context, state) => const StatisticsScreen(),
-    ),
-    GoRoute(
-      path: SettingsScreen.routePath,
-      name: SettingsScreen.routeName,
-      builder: (context, state) => const SettingsScreen(),
-    ),
-    GoRoute(
       path: FolderDetailScreen.routePath,
       name: FolderDetailScreen.routeName,
-      builder: (context, state) => FolderDetailScreen(
-        folderId: int.parse(state.pathParameters['folderId']!),
-        focusDeckId: int.tryParse(state.uri.queryParameters['deck'] ?? ''),
+      pageBuilder: (context, state) => appFadeTransitionPage(
+        state: state,
+        child: FolderDetailScreen(
+          folderId: int.parse(state.pathParameters['folderId']!),
+          focusDeckId:
+              int.tryParse(state.uri.queryParameters['deck'] ?? ''),
+        ),
       ),
     ),
     GoRoute(
       path: SearchScreen.routePath,
       name: SearchScreen.routeName,
-      builder: (context, state) => const SearchScreen(),
+      pageBuilder: (context, state) => appFadeTransitionPage(
+        state: state,
+        child: const SearchScreen(),
+      ),
     ),
     GoRoute(
       path: CardsScreen.routePath,
       name: CardsScreen.routeName,
-      builder: (context, state) => const CardsScreen(),
+      pageBuilder: (context, state) => appFadeTransitionPage(
+        state: state,
+        child: const CardsScreen(),
+      ),
     ),
     GoRoute(
       path: StudyScreen.routePath,
       name: StudyScreen.routeName,
-      builder: (context, state) => const StudyScreen(),
+      pageBuilder: (context, state) => appFadeTransitionPage(
+        state: state,
+        child: const StudyScreen(),
+      ),
     ),
     GoRoute(
       path: StudyScreen.deckRoutePath,
       name: 'deck-study',
-      builder: (context, state) => StudyScreen(
-        deckId: int.parse(state.pathParameters['deckId']!),
-        mode: _studyModeFromName(state.pathParameters['mode']),
+      pageBuilder: (context, state) => appFadeTransitionPage(
+        state: state,
+        child: StudyScreen(
+          deckId: int.parse(state.pathParameters['deckId']!),
+          mode: _studyModeFromName(state.pathParameters['mode']),
+        ),
       ),
     ),
     GoRoute(
       path: ThemePreviewScreen.routePath,
       name: ThemePreviewScreen.routeName,
-      builder: (context, state) => const ThemePreviewScreen(),
+      pageBuilder: (context, state) => appFadeTransitionPage(
+        state: state,
+        child: const ThemePreviewScreen(),
+      ),
     ),
   ],
 );

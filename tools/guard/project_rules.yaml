@@ -194,11 +194,60 @@ shared_widget_mapping:
     path_pattern: "features/cards/presentation/widgets/card_editor_view.dart"
     required_widgets:
       - "AppCardSwitchTile("
+  home_folder_list:
+    path_pattern: "features/folders/presentation/widgets/folder_list_view.dart"
+    required_widgets:
+      - "homeFolderTileDataProvider("
+    forbidden_widgets:
+      - "folderDetailProvider("
 
 provider_naming:
   repository_pattern: "^\\w+RepositoryProvider$"
   usecase_pattern: "^\\w+UseCaseProvider$"
   controller_pattern: "^\\w+ControllerProvider$"
+
+performance_contract:
+  cases:
+    - file: "lib/core/router/app_router.dart"
+      required_tokens:
+        - "StatefulShellRoute.indexedStack("
+        - "StatefulShellBranch("
+    - file: "lib/shared/widgets/navigation/app_root_bottom_nav.dart"
+      required_tokens:
+        - "StatefulNavigationShell.maybeOf(context)"
+        - "shellState.goBranch("
+    - file: "lib/features/folders/presentation/providers/folders_provider.dart"
+      required_patterns:
+        - "@Riverpod\\(keepAlive: true\\)\\s+Stream<List<FolderEntity>> folders\\(Ref ref\\)"
+        - "@Riverpod\\(keepAlive: true\\)\\s+Stream<List<FolderEntity>> allFolders\\(Ref ref\\)"
+        - "@Riverpod\\(keepAlive: true\\)\\s+Stream<List<DeckEntity>> allDecks\\(Ref ref\\)"
+        - "@Riverpod\\(keepAlive: true\\)\\s+Stream<List<FlashcardEntity>> allFlashcards\\(Ref ref\\)"
+        - "@Riverpod\\(keepAlive: true\\)\\s+AsyncValue<HomeDueSummary> homeDueSummary\\(Ref ref\\)"
+    - file: "lib/features/folders/presentation/providers/folder_detail_provider.dart"
+      required_tokens:
+        - "folderByIdProvider("
+        - "subfolderProvider("
+        - "decksByFolderProvider("
+        - "folderRecursiveStatsProvider("
+      forbidden_tokens:
+        - "allFoldersProvider"
+        - "allDecksProvider"
+        - "allFlashcardsProvider"
+    - file: "lib/features/decks/presentation/providers/deck_detail_provider.dart"
+      required_tokens:
+        - "deckByIdProvider("
+        - "cardsByDeckProvider("
+        - "folderBreadcrumbProvider("
+        - "_deckStats(cards)"
+      forbidden_tokens:
+        - "allDecksProvider"
+        - "deckStatsProvider("
+    - file: "lib/shared/widgets/feedback/app_async_builder.dart"
+      required_tokens:
+        - "this.animate = false,"
+    - file: "lib/shared/widgets/animations/fade_in_widget.dart"
+      required_tokens:
+        - "this.duration = DurationTokens.fast,"
 
 legacy_state_notifier:
   forbidden_patterns:
@@ -216,7 +265,7 @@ records_patterns:
 riverpod_syntax:
   provider_file_patterns:
     - "core/providers/*.dart"
-    - "core/router/*.dart"
+    - "core/router/app_router.dart"
     - "shared/providers/*.dart"
     - "features/*/presentation/providers/*.dart"
   infrastructure_provider_files:

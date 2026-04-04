@@ -1,8 +1,9 @@
-import 'package:memox/core/design/card_status.dart';
+import 'package:memox/core/providers/repository_providers.dart';
 import 'package:memox/core/providers/usecase_providers.dart';
 import 'package:memox/features/decks/domain/entities/deck_entity.dart';
 import 'package:memox/features/folders/domain/entities/folder_delete_summary.dart';
 import 'package:memox/features/folders/domain/entities/folder_entity.dart';
+import 'package:memox/features/folders/domain/entities/folder_recursive_stats.dart';
 import 'package:memox/features/folders/presentation/providers/folders_provider.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -24,21 +25,28 @@ typedef FolderDetailData =
 
 @riverpod
 AsyncValue<FolderDetailData> folderDetail(Ref ref, int folderId) {
-  final foldersAsync = ref.watch(allFoldersProvider);
-  final decksAsync = ref.watch(allDecksProvider);
-  final cardsAsync = ref.watch(allFlashcardsProvider);
-  final error = foldersAsync.asError ?? decksAsync.asError ?? cardsAsync.asError;
+  final folderAsync = ref.watch(folderByIdProvider(folderId));
+  final subfoldersAsync = ref.watch(subfolderProvider(folderId));
+  final decksAsync = ref.watch(decksByFolderProvider(folderId));
+  final statsAsync = ref.watch(folderRecursiveStatsProvider(folderId));
+  final error =
+      folderAsync.asError ??
+      subfoldersAsync.asError ??
+      decksAsync.asError ??
+      statsAsync.asError;
 
   if (error != null) {
     return AsyncValue<FolderDetailData>.error(error.error, error.stackTrace);
   }
 
-  if (foldersAsync.isLoading || decksAsync.isLoading || cardsAsync.isLoading) {
+  if (folderAsync.isLoading ||
+      subfoldersAsync.isLoading ||
+      decksAsync.isLoading ||
+      statsAsync.isLoading) {
     return const AsyncValue<FolderDetailData>.loading();
   }
 
-  final folders = foldersAsync.requireValue;
-  final folder = _folderById(folders, folderId);
+  final folder = folderAsync.requireValue;
 
   if (folder == null) {
     return AsyncValue<FolderDetailData>.error(
@@ -47,17 +55,9 @@ AsyncValue<FolderDetailData> folderDetail(Ref ref, int folderId) {
     );
   }
 
-  final decks = decksAsync.requireValue;
-  final subfolders = _subfoldersFor(folders, folderId);
-  final directDecks = decks.where((DeckEntity deck) => deck.folderId == folderId).toList();
-  final descendantIds = _descendantIds(folders, folderId);
-  final folderIdsInTree = <int>{folderId, ...descendantIds};
-  final deckIdsInTree = decks
-      .where((DeckEntity deck) => folderIdsInTree.contains(deck.folderId))
-      .map((DeckEntity deck) => deck.id)
-      .toSet();
-  final cards = cardsAsync.requireValue.where((card) => deckIdsInTree.contains(card.deckId)).toList();
-  final masteredCards = cards.where((card) => card.status == CardStatus.mastered).length;
+  final subfolders = subfoldersAsync.requireValue;
+  final directDecks = decksAsync.requireValue;
+  final stats = statsAsync.requireValue;
   final contentType = switch ((subfolders.isNotEmpty, directDecks.isNotEmpty)) {
     (true, _) => ContentType.subfolders,
     (false, true) => ContentType.decks,
@@ -68,8 +68,8 @@ AsyncValue<FolderDetailData> folderDetail(Ref ref, int folderId) {
     (
       folder: folder,
       contentType: contentType,
-      totalCards: cards.length,
-      masteryPercentage: cards.isEmpty ? 0 : masteredCards / cards.length,
+      totalCards: stats.totalCards,
+      masteryPercentage: stats.masteryPercentage,
       subfolderCount: subfolders.length,
       deckCount: directDecks.length,
       subfolders: subfolders,
@@ -77,6 +77,10 @@ AsyncValue<FolderDetailData> folderDetail(Ref ref, int folderId) {
     ),
   );
 }
+
+@riverpod
+Stream<FolderEntity?> folderById(Ref ref, int folderId) =>
+    ref.watch(folderRepositoryProvider).watchById(folderId);
 
 @riverpod
 Future<List<FolderEntity>> folderBreadcrumb(Ref ref, int folderId) => ref.watch(getFolderBreadcrumbUseCaseProvider).call(folderId);
@@ -100,31 +104,3 @@ T? _valueOrNull<T>(AsyncValue<T> value) => switch (value) {
     AsyncData<T>(:final value) => value,
     _ => null,
   };
-
-List<int> _descendantIds(List<FolderEntity> folders, int folderId) {
-  final descendantIds = <int>[];
-  final queue = <int>[folderId];
-
-  while (queue.isNotEmpty) {
-    final currentId = queue.removeAt(0);
-    final children = _subfoldersFor(folders, currentId);
-    for (final child in children) {
-      descendantIds.add(child.id);
-      queue.add(child.id);
-    }
-  }
-
-  return descendantIds;
-}
-
-FolderEntity? _folderById(List<FolderEntity> folders, int folderId) {
-  for (final folder in folders) {
-    if (folder.id == folderId) {
-      return folder;
-    }
-  }
-
-  return null;
-}
-
-List<FolderEntity> _subfoldersFor(List<FolderEntity> folders, int folderId) => folders.where((FolderEntity folder) => folder.parentId == folderId).toList();
