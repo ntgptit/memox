@@ -421,6 +421,38 @@
   "modeGuessDescription": "See one side and guess the hidden answer",
   "modeRecallDescription": "Recall the answer from memory before revealing it",
   "modeFillDescription": "Type the missing answer to reinforce recall",
+  "reviewTapToReveal": "Tap the card to reveal the answer",
+  "reviewRateLabel": "How well did you remember it?",
+  "reviewRatingAgain": "Again",
+  "reviewRatingHard": "Hard",
+  "reviewRatingGood": "Good",
+  "reviewRatingEasy": "Easy",
+  "reviewEmptySubtitle": "No cards are due in this deck right now.",
+  "reviewCompleteTitle": "{count} cards reviewed",
+  "@reviewCompleteTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewCompletionSummary": "Again: {again} · Hard: {hard} · Good: {good} · Easy: {easy}",
+  "@reviewCompletionSummary": {
+    "placeholders": {
+      "again": {
+        "type": "int"
+      },
+      "hard": {
+        "type": "int"
+      },
+      "good": {
+        "type": "int"
+      },
+      "easy": {
+        "type": "int"
+      }
+    }
+  },
   "searchCardsHint": "Search cards",
   "sortDateLabel": "Date",
   "sortAlphaLabel": "A-Z",

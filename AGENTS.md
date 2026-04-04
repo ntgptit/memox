@@ -27,13 +27,6 @@ lib/
 - UI: Material 3, Google Fonts "Plus Jakarta Sans", `flutter_animate`
 - Models: freezed + json_serializable
 
-## OpenSpace preference
-
-- When OpenSpace is available, prefer using the `delegate-task` skill for non-trivial MemoX work.
-- Use OpenSpace first for multi-step implementation, cross-file changes, repo-wide analysis, web research, automation, and tasks the user explicitly wants delegated.
-- Keep work local when the task is trivial, a tiny read-only lookup is enough, the change is a very small single-file edit, or OpenSpace is unavailable or blocked.
-- Treat this as a preference, not an absolute rule.
-
 ## Build & verify
 
 ```bash
@@ -163,8 +156,6 @@ Before considering any task complete:
 
 Read relevant sections BEFORE implementing:
 
-- `docs/memox-folder-structure-and-codebase-foundation.md` → tokens, widget specs, responsive
-- `docs/memox-codebase-supplement-advanced.md` → SOLID, patterns, l10n, providers
-- `docs/memox-migration-isar-to-drift-gdrive-backup.md` → database, backup
-- `docs/memox-typography-usage-rules.md` → constrained app type scale and usage rules
-- `docs/claude-code-memox-development-prompts.md` → phase-by-phase prompts
+- `docs/memox-reference.md` → architecture, tokens, widgets, database, backup, DI, patterns, typography
+- `docs/memox-guard-spec.md` → guard tool architecture, all guards, config, CLI usage
+- `docs/claude-code-memox-development-prompts.md` → bugs, missing features, architecture improvements, test gaps

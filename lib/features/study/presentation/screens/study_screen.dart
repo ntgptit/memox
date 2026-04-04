@@ -5,6 +5,7 @@ import 'package:memox/features/study/presentation/screens/fill_mode_screen.dart'
 import 'package:memox/features/study/presentation/screens/guess_mode_screen.dart';
 import 'package:memox/features/study/presentation/screens/match_mode_screen.dart';
 import 'package:memox/features/study/presentation/screens/recall_mode_screen.dart';
+import 'package:memox/features/study/presentation/screens/review_mode_screen.dart';
 import 'package:memox/features/study/presentation/widgets/study_placeholder_view.dart';
 import 'package:memox/shared/widgets/layout/app_scaffold.dart';
 
@@ -23,6 +24,10 @@ class StudyScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (mode == StudyMode.review && deckId != null) {
+      return ReviewModeScreen(deckId: deckId!);
+    }
+
     if (mode == StudyMode.match && deckId != null) {
       return MatchModeScreen(deckId: deckId!);
     }

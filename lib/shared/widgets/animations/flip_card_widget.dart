@@ -26,11 +26,7 @@ class FlipCardWidget extends StatelessWidget {
       final angle = showingBack ? value * math.pi - math.pi : value * math.pi;
       final scale = 1 - (0.04 * (1 - ((value - 0.5).abs() * 2)));
       final child = showingBack
-          ? Transform(
-              alignment: Alignment.center,
-              transform: Matrix4.identity()..rotateY(math.pi),
-              child: back,
-            )
+          ? back
           : front;
 
       return Transform.scale(

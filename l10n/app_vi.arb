@@ -421,6 +421,38 @@
   "modeGuessDescription": "Nhìn một mặt và đoán phần còn lại",
   "modeRecallDescription": "Tự nhớ câu trả lời trước khi lật ra",
   "modeFillDescription": "Gõ đáp án còn thiếu để tăng ghi nhớ",
+  "reviewTapToReveal": "Chạm vào thẻ để hiện đáp án",
+  "reviewRateLabel": "Bạn nhớ tốt đến mức nào?",
+  "reviewRatingAgain": "Lại",
+  "reviewRatingHard": "Khó",
+  "reviewRatingGood": "Tốt",
+  "reviewRatingEasy": "Dễ",
+  "reviewEmptySubtitle": "Hiện không có thẻ đến hạn trong bộ này.",
+  "reviewCompleteTitle": "Đã ôn {count} thẻ",
+  "@reviewCompleteTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewCompletionSummary": "Lại: {again} · Khó: {hard} · Tốt: {good} · Dễ: {easy}",
+  "@reviewCompletionSummary": {
+    "placeholders": {
+      "again": {
+        "type": "int"
+      },
+      "hard": {
+        "type": "int"
+      },
+      "good": {
+        "type": "int"
+      },
+      "easy": {
+        "type": "int"
+      }
+    }
+  },
   "searchCardsHint": "Tìm thẻ",
   "sortDateLabel": "Ngày",
   "sortAlphaLabel": "A-Z",

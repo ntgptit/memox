@@ -63,6 +63,39 @@ void main() {
     expect(find.byType(StudyPlaceholderView), findsNothing);
   });
 
+  testWidgets('study screen renders review mode when requested', (tester) async {
+    final cardReviewDao = FakeCardReviewDao();
+    addTearDown(cardReviewDao.dispose);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          flashcardRepositoryProvider.overrideWithValue(
+            FakeFlashcardRepository(
+              cards: const [
+                FlashcardEntity(
+                  id: 1,
+                  deckId: 3,
+                  front: '안녕하세요',
+                  back: 'Hello',
+                ),
+              ],
+            ),
+          ),
+          studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
+          cardReviewDaoProvider.overrideWithValue(cardReviewDao),
+        ],
+        child: buildTestApp(
+          home: const StudyScreen(deckId: 3, mode: StudyMode.review),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text('Review'), findsOneWidget);
+    expect(find.text('안녕하세요'), findsOneWidget);
+    expect(find.byType(StudyPlaceholderView), findsNothing);
+  });
+
   testWidgets('study screen renders guess mode when requested', (tester) async {
     await tester.pumpWidget(
       ProviderScope(

@@ -421,6 +421,38 @@
   "modeGuessDescription": "한 면을 보고 숨겨진 답을 추측합니다",
   "modeRecallDescription": "답을 먼저 떠올린 뒤 확인합니다",
   "modeFillDescription": "빠진 답을 직접 입력해 기억을 강화합니다",
+  "reviewTapToReveal": "카드를 눌러 정답을 확인하세요",
+  "reviewRateLabel": "얼마나 잘 기억했나요?",
+  "reviewRatingAgain": "다시",
+  "reviewRatingHard": "어려움",
+  "reviewRatingGood": "좋음",
+  "reviewRatingEasy": "쉬움",
+  "reviewEmptySubtitle": "이 덱에는 지금 복습할 카드가 없습니다.",
+  "reviewCompleteTitle": "{count}장 복습 완료",
+  "@reviewCompleteTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reviewCompletionSummary": "다시: {again} · 어려움: {hard} · 좋음: {good} · 쉬움: {easy}",
+  "@reviewCompletionSummary": {
+    "placeholders": {
+      "again": {
+        "type": "int"
+      },
+      "hard": {
+        "type": "int"
+      },
+      "good": {
+        "type": "int"
+      },
+      "easy": {
+        "type": "int"
+      }
+    }
+  },
   "searchCardsHint": "카드 검색",
   "sortDateLabel": "날짜",
   "sortAlphaLabel": "A-Z",

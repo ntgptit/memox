@@ -236,6 +236,7 @@ class BackupService {
       hint: Value<String>(json['hint'] as String),
       example: Value<String>(json['example'] as String),
       imagePath: Value<String>(json['imagePath'] as String),
+      tags: Value<String>(json['tags'] as String? ?? ''),
       status: Value(CardStatus.values.byName(json['status'] as String)),
       easeFactor: Value<double>((json['easeFactor'] as num).toDouble()),
       interval: Value<int>(json['interval'] as int),
