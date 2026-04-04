@@ -6,6 +6,7 @@ import 'package:memox/core/theme/tokens/radius_tokens.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/statistics/domain/value_objects/date_range.dart';
+import 'package:memox/shared/widgets/buttons/app_pressable.dart';
 
 class StatisticsPeriodTabs extends StatelessWidget {
   const StatisticsPeriodTabs({
@@ -54,35 +55,33 @@ class _StatisticsPeriodTab extends StatelessWidget {
   Widget build(BuildContext context) {
     final transparent = context.colors.surface.withValues(alpha: 0);
 
-    return Material(
+    return AppPressable(
       color: transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(RadiusTokens.chip),
-        onTap: onTap,
-        child: SizedBox(
-          height: SizeTokens.touchTarget,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                label,
-                style: context.textTheme.titleSmall?.copyWith(
-                  color: isSelected
-                      ? context.colors.primary
-                      : context.colors.onSurface.withValues(
-                          alpha: OpacityTokens.disabled,
-                        ),
-                ),
+      borderRadius: RadiusTokens.chip,
+      onTap: onTap,
+      child: SizedBox(
+        height: SizeTokens.touchTarget,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              label,
+              style: context.textTheme.titleSmall?.copyWith(
+                color: isSelected
+                    ? context.colors.primary
+                    : context.colors.onSurface.withValues(
+                        alpha: OpacityTokens.disabled,
+                      ),
               ),
-              const SizedBox(height: SpacingTokens.xs),
-              AnimatedContainer(
-                duration: DurationTokens.normal,
-                height: SizeTokens.progressBarHeight,
-                width: double.infinity,
-                color: isSelected ? context.colors.primary : transparent,
-              ),
-            ],
-          ),
+            ),
+            const SizedBox(height: SpacingTokens.xs),
+            AnimatedContainer(
+              duration: DurationTokens.normal,
+              height: SizeTokens.progressBarHeight,
+              width: double.infinity,
+              color: isSelected ? context.colors.primary : transparent,
+            ),
+          ],
         ),
       ),
     );

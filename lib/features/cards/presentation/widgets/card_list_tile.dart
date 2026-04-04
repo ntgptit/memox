@@ -5,6 +5,7 @@ import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/cards/domain/entities/flashcard_entity.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
 import 'package:memox/shared/widgets/chips/tag_chip.dart';
+import 'package:memox/shared/widgets/layout/spacing.dart';
 import 'package:memox/shared/widgets/lists/expandable_tile.dart';
 
 class CardListTile extends StatelessWidget {
@@ -21,55 +22,60 @@ class CardListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AppCard(
+    padding: EdgeInsets.zero,
     borderColor: context.colors.outline.withValues(
       alpha: OpacityTokens.borderSubtle,
     ),
     child: ExpandableTile(
+      headerPadding: const EdgeInsets.all(SpacingTokens.cardPadding),
+      expandedContentPadding: const EdgeInsets.fromLTRB(
+        SpacingTokens.cardPadding,
+        SpacingTokens.md,
+        SpacingTokens.cardPadding,
+        SpacingTokens.cardPadding,
+      ),
       headerBuilder: (context, {required expanded}) =>
           _CardPreviewHeader(card: card, expanded: expanded),
-      expandedContent: Padding(
-        padding: const EdgeInsets.only(top: SpacingTokens.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(card.back, style: context.textTheme.bodyMedium),
-            if (card.hint.isNotEmpty) ...[
-              const SizedBox(height: SpacingTokens.md),
-              _CopyBlock(label: context.l10n.cardHintLabel, value: card.hint),
-            ],
-            if (card.example.isNotEmpty) ...[
-              const SizedBox(height: SpacingTokens.md),
-              _CopyBlock(
-                label: context.l10n.cardExampleLabel,
-                value: card.example,
-              ),
-            ],
-            if (card.tags.isNotEmpty) ...[
-              const SizedBox(height: SpacingTokens.md),
-              Wrap(
-                spacing: SpacingTokens.chipGap,
-                runSpacing: SpacingTokens.chipGap,
-                children: card.tags.map((tag) => TagChip(label: tag)).toList(),
-              ),
-            ],
-            const SizedBox(height: SpacingTokens.md),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                IconButton(
-                  tooltip: context.l10n.editAction,
-                  onPressed: onEdit,
-                  icon: const Icon(Icons.edit_outlined),
-                ),
-                IconButton(
-                  tooltip: context.l10n.deleteAction,
-                  onPressed: onDelete,
-                  icon: const Icon(Icons.delete_outline),
-                ),
-              ],
+      expandedContent: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(card.back, style: context.textTheme.bodyMedium),
+          if (card.hint.isNotEmpty) ...[
+            const Gap.md(),
+            _CopyBlock(label: context.l10n.cardHintLabel, value: card.hint),
+          ],
+          if (card.example.isNotEmpty) ...[
+            const Gap.md(),
+            _CopyBlock(
+              label: context.l10n.cardExampleLabel,
+              value: card.example,
             ),
           ],
-        ),
+          if (card.tags.isNotEmpty) ...[
+            const Gap.md(),
+            Wrap(
+              spacing: SpacingTokens.chipGap,
+              runSpacing: SpacingTokens.chipGap,
+              children: card.tags.map((tag) => TagChip(label: tag)).toList(),
+            ),
+          ],
+          const Gap.md(),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              IconButton(
+                tooltip: context.l10n.editAction,
+                onPressed: onEdit,
+                icon: const Icon(Icons.edit_outlined),
+              ),
+              IconButton(
+                tooltip: context.l10n.deleteAction,
+                onPressed: onDelete,
+                icon: const Icon(Icons.delete_outline),
+              ),
+            ],
+          ),
+        ],
       ),
     ),
   );
@@ -92,7 +98,7 @@ class _CardPreviewHeader extends StatelessWidget {
         style: context.textTheme.titleMedium,
       ),
       if (!expanded) ...[
-        const SizedBox(height: SpacingTokens.xs),
+        const Gap.xs(),
         Text(
           card.back,
           maxLines: 2,
@@ -117,7 +123,7 @@ class _CopyBlock extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Text(label, style: context.textTheme.labelLarge),
-      const SizedBox(height: SpacingTokens.xs),
+      const Gap.xs(),
       Text(value, style: context.textTheme.bodyMedium),
     ],
   );

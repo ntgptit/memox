@@ -46,6 +46,57 @@ class TouchTargetGuardTest(unittest.TestCase):
 
             self.assertEqual([], violations)
 
+    def test_allows_app_pressable_wrapper(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            file_path = root / 'lib/shared/widgets/buttons/text_link_button.dart'
+            file_path.parent.mkdir(parents=True)
+            file_path.write_text('return AppPressable(child: Text("x"));', encoding='utf-8')
+            guard = self._create_guard(root)
+
+            violations = guard.check_file(
+                file_path,
+                file_path.read_text(encoding='utf-8').splitlines(),
+            )
+
+            self.assertEqual([], violations)
+
+    def test_allows_expandable_tile_wrapper(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            file_path = root / 'lib/shared/widgets/buttons/text_link_button.dart'
+            file_path.parent.mkdir(parents=True)
+            file_path.write_text(
+                'return ExpandableTile(headerBuilder: builder, expandedContent: child);',
+                encoding='utf-8',
+            )
+            guard = self._create_guard(root)
+
+            violations = guard.check_file(
+                file_path,
+                file_path.read_text(encoding='utf-8').splitlines(),
+            )
+
+            self.assertEqual([], violations)
+
+    def test_allows_inline_text_link_button_wrapper(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            file_path = root / 'lib/shared/widgets/buttons/text_link_button.dart'
+            file_path.parent.mkdir(parents=True)
+            file_path.write_text(
+                'return InlineTextLinkButton(label: "Home");',
+                encoding='utf-8',
+            )
+            guard = self._create_guard(root)
+
+            violations = guard.check_file(
+                file_path,
+                file_path.read_text(encoding='utf-8').splitlines(),
+            )
+
+            self.assertEqual([], violations)
+
     def _create_guard(self, root: Path) -> TouchTargetGuard:
         config = {
             'source_root': 'lib',
@@ -62,6 +113,9 @@ class TouchTargetGuardTest(unittest.TestCase):
             'touch_target': {
                 'path_patterns': ['shared/widgets/buttons/text_link_button.dart'],
                 'required_tokens': [
+                    'AppPressable(',
+                    'InlineTextLinkButton(',
+                    'ExpandableTile(',
                     'SizeTokens.touchTarget',
                     'minimumSize:',
                     'minHeight:',

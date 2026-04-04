@@ -101,6 +101,7 @@ Recommended completion order:
 ## UI design language rules
 
 - Do NOT ship raw Flutter Material defaults in feature UI when the control is visually prominent or interactive. This includes `TextField`, `ChoiceChip`, `SegmentedButton`, `PopupMenuButton`, `SwitchListTile`, and similar controls unless they are already centralized in theme or wrapped in a shared widget.
+- Do NOT use raw `InkWell` or `GestureDetector` in feature UI. If a tappable pattern is needed, route it through a shared wrapper such as `AppCard`, `TextLinkButton`, `AppPressable`, or `AppTapRegion` so focus, hover, splash shape, and touch target stay consistent.
 - If a new UI pattern is needed and no shared primitive exists yet, create or extend the shared/themed version first in `lib/shared/widgets/**` or `lib/core/theme/**`, then use that in the feature. Do not style ad hoc per screen.
 - Responsive typography is mandatory at the app shell level. `lib/app.dart` and `test/test_helpers/test_app.dart` must apply `ScreenType.of(context).textScaleFactor` through `MediaQuery.textScaler` so mobile rendering and widget tests stay aligned.
 - For UI tasks, passing logic tests is not enough. Review the screen for visual hierarchy, spacing rhythm, empty/loading/error states, selected states, multiline input behavior, and consistency with the rest of MemoX before marking the task complete.

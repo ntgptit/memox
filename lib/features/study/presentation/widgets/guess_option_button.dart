@@ -6,6 +6,7 @@ import 'package:memox/core/theme/tokens/radius_tokens.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/study/domain/guess/guess_engine.dart';
+import 'package:memox/shared/widgets/buttons/app_pressable.dart';
 
 class GuessOptionButton extends StatelessWidget {
   const GuessOptionButton({
@@ -56,27 +57,22 @@ class GuessOptionButton extends StatelessWidget {
           ),
         ),
       ),
-      child: Material(
-        color: context.colors.surface.withValues(alpha: 0),
-        borderRadius: BorderRadius.circular(RadiusTokens.input),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(RadiusTokens.input),
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: SpacingTokens.md),
-            child: _GuessOptionContent(
-              option: option,
-              prefixLabel: prefixLabel,
-              contentColor: _guessOptionContentColor(
-                context,
-                isCorrectAnswer: isCorrectAnswer,
-                isWrongSelection: isWrongSelection,
-              ),
-              trailingIcon: _guessOptionTrailingIcon(
-                isCorrectAnswer: isCorrectAnswer,
-                isWrongSelection: isWrongSelection,
-              ),
+      child: AppPressable(
+        borderRadius: RadiusTokens.input,
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: SpacingTokens.md),
+          child: _GuessOptionContent(
+            option: option,
+            prefixLabel: prefixLabel,
+            contentColor: _guessOptionContentColor(
+              context,
+              isCorrectAnswer: isCorrectAnswer,
+              isWrongSelection: isWrongSelection,
+            ),
+            trailingIcon: _guessOptionTrailingIcon(
+              isCorrectAnswer: isCorrectAnswer,
+              isWrongSelection: isWrongSelection,
             ),
           ),
         ),

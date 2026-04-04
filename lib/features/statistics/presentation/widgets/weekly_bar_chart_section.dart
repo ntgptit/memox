@@ -6,6 +6,7 @@ import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/statistics/domain/entities/daily_activity.dart';
 import 'package:memox/features/statistics/presentation/widgets/weekly_bar_chart_painter.dart';
+import 'package:memox/shared/widgets/buttons/app_tap_region.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
 
 class WeeklyBarChartSection extends StatefulWidget {
@@ -55,7 +56,7 @@ class _WeeklyBarChartBody extends StatelessWidget {
   Widget build(BuildContext context) => LayoutBuilder(
     builder: (context, constraints) => Stack(
       children: [
-        GestureDetector(
+        AppTapRegion(
           behavior: HitTestBehavior.opaque,
           onTapDown: (details) {
             final rawIndex =

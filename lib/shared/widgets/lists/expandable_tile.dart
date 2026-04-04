@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:memox/core/theme/tokens/duration_tokens.dart';
+import 'package:memox/core/theme/tokens/radius_tokens.dart';
+import 'package:memox/shared/widgets/buttons/app_pressable.dart';
 
 typedef ExpandableTileHeaderBuilder =
     Widget Function(BuildContext context, {required bool expanded});
@@ -9,12 +11,16 @@ class ExpandableTile extends StatefulWidget {
     required this.headerBuilder,
     required this.expandedContent,
     this.initiallyExpanded = false,
+    this.headerPadding = EdgeInsets.zero,
+    this.expandedContentPadding = EdgeInsets.zero,
     super.key,
   });
 
   final ExpandableTileHeaderBuilder headerBuilder;
   final Widget expandedContent;
   final bool initiallyExpanded;
+  final EdgeInsetsGeometry headerPadding;
+  final EdgeInsetsGeometry expandedContentPadding;
 
   @override
   State<ExpandableTile> createState() => _ExpandableTileState();
@@ -27,8 +33,10 @@ class _ExpandableTileState extends State<ExpandableTile> {
   Widget build(BuildContext context) => Column(
     mainAxisSize: MainAxisSize.min,
     children: [
-      InkWell(
+      AppPressable(
         onTap: () => setState(() => _expanded = !_expanded),
+        padding: widget.headerPadding,
+        borderRadiusGeometry: _headerBorderRadius(_expanded),
         child: Row(
           children: [
             Expanded(child: widget.headerBuilder(context, expanded: _expanded)),
@@ -42,8 +50,24 @@ class _ExpandableTileState extends State<ExpandableTile> {
       ),
       AnimatedSize(
         duration: DurationTokens.normal,
-        child: _expanded ? widget.expandedContent : const SizedBox.shrink(),
+        child: _expanded
+            ? Padding(
+                padding: widget.expandedContentPadding,
+                child: widget.expandedContent,
+              )
+            : const SizedBox.shrink(),
       ),
     ],
+  );
+}
+
+BorderRadius _headerBorderRadius(bool expanded) {
+  if (!expanded) {
+    return BorderRadius.circular(RadiusTokens.card);
+  }
+
+  return const BorderRadius.only(
+    topLeft: Radius.circular(RadiusTokens.card),
+    topRight: Radius.circular(RadiusTokens.card),
   );
 }

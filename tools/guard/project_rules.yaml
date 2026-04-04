@@ -287,11 +287,15 @@ screen_scaffold:
 touch_target:
   path_patterns:
     - "shared/widgets/buttons/text_link_button.dart"
+    - "shared/widgets/buttons/inline_text_link_button.dart"
     - "shared/widgets/inputs/color_picker.dart"
     - "shared/widgets/navigation/breadcrumb_bar.dart"
     - "features/statistics/presentation/widgets/difficult_cards_section.dart"
     - "features/study/presentation/widgets/fill_submit_button.dart"
   required_tokens:
+    - "AppPressable("
+    - "InlineTextLinkButton("
+    - "ExpandableTile("
     - "SizeTokens.touchTarget"
     - "minimumSize:"
     - "minHeight:"

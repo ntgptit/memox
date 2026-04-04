@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
-import 'package:memox/core/theme/tokens/duration_tokens.dart';
-import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/statistics/domain/entities/difficult_card.dart';
 import 'package:memox/shared/widgets/buttons/text_link_button.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
+import 'package:memox/shared/widgets/layout/spacing.dart';
 import 'package:memox/shared/widgets/lists/app_list_tile.dart';
+import 'package:memox/shared/widgets/lists/expandable_tile.dart';
 
-class DifficultCardsSection extends StatefulWidget {
+class DifficultCardsSection extends StatelessWidget {
   const DifficultCardsSection({
     required this.cards,
     required this.onPractice,
@@ -19,83 +19,51 @@ class DifficultCardsSection extends StatefulWidget {
   final VoidCallback onPractice;
 
   @override
-  State<DifficultCardsSection> createState() => _DifficultCardsSectionState();
-}
-
-class _DifficultCardsSectionState extends State<DifficultCardsSection> {
-  var _isExpanded = false;
-
-  @override
   Widget build(BuildContext context) => AppCard(
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        InkWell(
-          onTap: () => setState(() => _isExpanded = !_isExpanded),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              minHeight: SizeTokens.touchTarget,
-            ),
-            child: Row(
+    padding: EdgeInsets.zero,
+    child: ExpandableTile(
+      headerPadding: const EdgeInsets.all(SpacingTokens.cardPadding),
+      expandedContentPadding: const EdgeInsets.fromLTRB(
+        SpacingTokens.cardPadding,
+        SpacingTokens.md,
+        SpacingTokens.cardPadding,
+        SpacingTokens.cardPadding,
+      ),
+      headerBuilder: (context, {required expanded}) => Text(
+        context.l10n.statisticsCardsToFocusTitle,
+        style: context.textTheme.titleMedium,
+      ),
+      expandedContent: cards.isEmpty
+          ? Text(
+              context.l10n.statisticsNoDifficultCards,
+              style: context.textTheme.bodySmall,
+            )
+          : Column(
               children: [
-                Expanded(
-                  child: Text(
-                    context.l10n.statisticsCardsToFocusTitle,
-                    style: context.textTheme.titleMedium,
+                ...cards.map(
+                  (card) => AppListTile(
+                    title: card.card.front,
+                    subtitle: card.deckName,
+                    trailing: Text(
+                      '${card.accuracy.round()}%',
+                      style: context.textTheme.titleSmall?.copyWith(
+                        color: card.accuracy < 50
+                            ? context.customColors.ratingAgain
+                            : context.colors.onSurface,
+                      ),
+                    ),
                   ),
                 ),
-                Icon(
-                  _isExpanded
-                      ? Icons.expand_less_outlined
-                      : Icons.expand_more_outlined,
-                  color: context.colors.onSurfaceVariant,
+                const Gap.md(),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TextLinkButton(
+                    label: context.l10n.statisticsPracticeTheseAction,
+                    onTap: onPractice,
+                  ),
                 ),
               ],
             ),
-          ),
-        ),
-        AnimatedCrossFade(
-          firstChild: const SizedBox.shrink(),
-          secondChild: Padding(
-            padding: const EdgeInsets.only(top: SpacingTokens.md),
-            child: widget.cards.isEmpty
-                ? Text(
-                    context.l10n.statisticsNoDifficultCards,
-                    style: context.textTheme.bodySmall,
-                  )
-                : Column(
-                    children: [
-                      ...widget.cards.map(
-                        (card) => AppListTile(
-                          title: card.card.front,
-                          subtitle: card.deckName,
-                          trailing: Text(
-                            '${card.accuracy.round()}%',
-                            style: context.textTheme.titleSmall?.copyWith(
-                              color: card.accuracy < 50
-                                  ? context.customColors.ratingAgain
-                                  : context.colors.onSurface,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: SpacingTokens.md),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: TextLinkButton(
-                          label: context.l10n.statisticsPracticeTheseAction,
-                          onTap: widget.onPractice,
-                        ),
-                      ),
-                    ],
-                  ),
-          ),
-          crossFadeState: _isExpanded
-              ? CrossFadeState.showSecond
-              : CrossFadeState.showFirst,
-          duration: DurationTokens.normal,
-        ),
-      ],
     ),
   );
 }

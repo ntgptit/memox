@@ -22,6 +22,8 @@ class SharedWidgetGuard(BaseGuard):
         r'\bListTile\(': 'Dùng AppListTile thay vì raw ListTile()',
         r'\bSwitchListTile\(': 'Dùng AppSwitchTile thay vì raw SwitchListTile()',
         r'\bPopupMenuButton(?:<[^>]+>)?\s*\(': 'Dùng AppEditDeleteMenu hoặc shared popup wrapper thay vì raw PopupMenuButton()',
+        r'\bInkWell\(': 'Dùng AppPressable, AppCard, TextLinkButton, hoặc shared wrapper thay vì raw InkWell()',
+        r'\bGestureDetector\(': 'Dùng AppTapRegion hoặc shared gesture wrapper thay vì raw GestureDetector()',
         r'ScaffoldMessenger\.of\(': 'Dùng Toast thay vì raw ScaffoldMessenger',
         r'\bDismissible\(': 'Dùng AppSlidableRow thay vì raw Dismissible()',
     }

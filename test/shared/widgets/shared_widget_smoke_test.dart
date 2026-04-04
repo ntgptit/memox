@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:memox/shared/widgets/buttons/app_pressable.dart';
+import 'package:memox/shared/widgets/buttons/app_tap_region.dart';
+import 'package:memox/shared/widgets/buttons/inline_text_link_button.dart';
 import 'package:memox/shared/widgets/buttons/text_link_button.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
 import 'package:memox/shared/widgets/chips/streak_chip.dart';
@@ -28,6 +31,12 @@ void main() {
                 onAction: () {},
                 child: const AppListTile(title: 'Deck', subtitle: '12 cards'),
               ),
+              AppPressable(onTap: () {}, child: const Text('Open')),
+              AppTapRegion(
+                onTap: () {},
+                child: const SizedBox(width: 16, height: 16),
+              ),
+              InlineTextLinkButton(label: 'Home', onTap: () {}),
               const SuccessIndicator(),
               const OfflineStateView(),
               const UnauthorizedStateView(),
@@ -48,13 +57,19 @@ void main() {
 
     expect(find.byType(AppScaffold), findsOneWidget);
     expect(find.byType(AppCard, skipOffstage: false), findsOneWidget);
-    expect(find.byType(SectionContainer), findsOneWidget);
-    expect(find.byType(AppListTile), findsOneWidget);
-    expect(find.byType(TextLinkButton), findsOneWidget);
-    expect(find.byType(SuccessIndicator), findsOneWidget);
-    expect(find.byType(OfflineStateView), findsOneWidget);
-    expect(find.byType(UnauthorizedStateView), findsOneWidget);
-    expect(find.byType(StreakChip), findsOneWidget);
+    expect(find.byType(SectionContainer, skipOffstage: false), findsOneWidget);
+    expect(find.byType(AppListTile, skipOffstage: false), findsOneWidget);
+    expect(find.byType(AppPressable), findsWidgets);
+    expect(find.byType(AppTapRegion), findsWidgets);
+    expect(find.byType(InlineTextLinkButton, skipOffstage: false), findsOneWidget);
+    expect(find.byType(TextLinkButton, skipOffstage: false), findsOneWidget);
+    expect(find.byType(SuccessIndicator, skipOffstage: false), findsOneWidget);
+    expect(find.byType(OfflineStateView, skipOffstage: false), findsOneWidget);
+    expect(
+      find.byType(UnauthorizedStateView, skipOffstage: false),
+      findsOneWidget,
+    );
+    expect(find.byType(StreakChip, skipOffstage: false), findsOneWidget);
     expect(find.text('12%', skipOffstage: false), findsOneWidget);
   });
 }

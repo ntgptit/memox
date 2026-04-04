@@ -23,4 +23,25 @@ void main() {
     );
     expect(size.height, greaterThanOrEqualTo(SizeTokens.touchTarget));
   });
+
+  testWidgets('TextLinkButton keeps CTA width wider than its height', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      buildTestApp(
+        home: Center(
+          child: TextLinkButton(label: 'Retry', onTap: () {}),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final size = tester.getSize(
+      find.descendant(
+        of: find.byType(TextLinkButton),
+        matching: find.byType(InkWell),
+      ),
+    );
+    expect(size.width, greaterThan(size.height));
+  });
 }

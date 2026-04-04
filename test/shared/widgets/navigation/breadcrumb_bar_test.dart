@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
+import 'package:memox/shared/widgets/buttons/inline_text_link_button.dart';
 import 'package:memox/shared/widgets/navigation/breadcrumb_bar.dart';
 import '../../../test_helpers/test_app.dart';
 
@@ -18,11 +19,9 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    final size = tester.getSize(
-      find
-          .ancestor(of: find.text('Home'), matching: find.byType(SizedBox))
-          .first,
-    );
-    expect(size.height, SizeTokens.touchTarget);
+    expect(find.byType(InlineTextLinkButton), findsNWidgets(2));
+    expect(find.byType(InkWell), findsNothing);
+    final size = tester.getSize(find.byType(InlineTextLinkButton).first);
+    expect(size.height, greaterThanOrEqualTo(SizeTokens.touchTarget));
   });
 }

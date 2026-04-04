@@ -3,6 +3,7 @@ import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/core/theme/tokens/typography_tokens.dart';
+import 'package:memox/shared/widgets/buttons/inline_text_link_button.dart';
 
 class BreadcrumbSegment {
   const BreadcrumbSegment({required this.label, this.onTap});
@@ -43,17 +44,14 @@ class BreadcrumbBar extends StatelessWidget {
               : TypographyTokens.regular,
         );
 
-        return Material(
-          type: MaterialType.transparency,
-          child: InkWell(
+        return Align(
+          alignment: Alignment.centerLeft,
+          child: InlineTextLinkButton(
+            label: segment.label,
             onTap: isCurrent ? null : segment.onTap,
-            child: SizedBox(
-              height: SizeTokens.touchTarget,
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(segment.label, style: style),
-              ),
-            ),
+            color: style.color,
+            activeColor: context.colors.primary,
+            textStyle: style,
           ),
         );
       }),
