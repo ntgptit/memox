@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/features/decks/domain/entities/deck_entity.dart';
 import 'package:memox/features/decks/presentation/widgets/deck_tile.dart';
+import 'package:memox/shared/widgets/cards/app_card.dart';
+import 'package:memox/shared/widgets/lists/app_card_list_tile.dart';
+import 'package:memox/shared/widgets/lists/app_edit_delete_menu.dart';
 import '../../../../test_helpers/test_app.dart';
 
 void main() {
@@ -27,9 +30,14 @@ void main() {
     expect(find.text('Daily phrases and verbs'), findsOneWidget);
     expect(find.text('topik'), findsOneWidget);
     expect(find.text('verbs'), findsOneWidget);
+    expect(find.byType(AppCardListTile), findsOneWidget);
     expect(find.byType(LinearProgressIndicator), findsNothing);
     expect(find.byIcon(Icons.style_outlined), findsOneWidget);
     expect(find.text('8'), findsOneWidget);
+
+    final card = tester.widget<AppCard>(find.byType(AppCard));
+    expect(card.backgroundColor, isNull);
+    expect(card.borderRadius, isNull);
   });
 
   testWidgets('DeckTile shows popup edit and delete actions', (tester) async {
@@ -49,6 +57,7 @@ void main() {
       ),
     );
 
+    expect(find.byType(AppEditDeleteMenu), findsOneWidget);
     await tester.tap(find.byIcon(Icons.more_vert));
     await tester.pumpAndSettle();
 

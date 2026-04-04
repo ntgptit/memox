@@ -21,6 +21,7 @@ class SharedWidgetGuard(BaseGuard):
         r'\bTextField\(': 'Dùng AppTextField thay vì raw TextField()',
         r'\bListTile\(': 'Dùng AppListTile thay vì raw ListTile()',
         r'\bSwitchListTile\(': 'Dùng AppSwitchTile thay vì raw SwitchListTile()',
+        r'\bPopupMenuButton(?:<[^>]+>)?\s*\(': 'Dùng AppEditDeleteMenu hoặc shared popup wrapper thay vì raw PopupMenuButton()',
         r'ScaffoldMessenger\.of\(': 'Dùng Toast thay vì raw ScaffoldMessenger',
         r'\bDismissible\(': 'Dùng AppSlidableRow thay vì raw Dismissible()',
     }

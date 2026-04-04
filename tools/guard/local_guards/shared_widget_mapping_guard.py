@@ -9,7 +9,7 @@ from tools.guard.core.guard_result import GuardScope, Severity, Violation
 class SharedWidgetMappingGuard(BaseGuard):
     GUARD_ID = 'shared_widget_mapping'
     GUARD_NAME = 'Shared widget mapping'
-    DESCRIPTION = 'Screens must use project-approved shared widgets for specific contexts.'
+    DESCRIPTION = 'Feature UI files must use project-approved shared widgets for specific contexts.'
     DEFAULT_SEVERITY = Severity.ERROR
     SCOPE = GuardScope.LOCAL
 
@@ -44,6 +44,19 @@ class SharedWidgetMappingGuard(BaseGuard):
 
                     violations.append(
                         self._violation(relative, f'{relative} phải dùng widget `{widget_name}`.'),
+                    )
+
+                required_any_widgets = rule.get('required_any_widgets', [])
+
+                if required_any_widgets and not any(
+                    widget_name in content for widget_name in required_any_widgets
+                ):
+                    joined = ', '.join(f'`{widget_name}`' for widget_name in required_any_widgets)
+                    violations.append(
+                        self._violation(
+                            relative,
+                            f'{relative} phải dùng ít nhất một shared widget trong nhóm {joined}.',
+                        ),
                     )
 
                 for forbidden in rule.get('forbidden_widgets', []):

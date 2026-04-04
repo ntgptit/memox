@@ -2,14 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/features/folders/domain/entities/folder_entity.dart';
 import 'package:memox/features/folders/presentation/widgets/folder_tile.dart';
+import 'package:memox/shared/widgets/lists/app_card_list_tile.dart';
+import 'package:memox/shared/widgets/lists/app_edit_delete_menu.dart';
 import '../../../../test_helpers/test_app.dart';
 
 void main() {
   testWidgets('FolderTile displays folder data', (tester) async {
+    const folder = FolderEntity(
+      id: 1,
+      name: 'Japanese N5',
+      colorValue: 0xFF4CAF50,
+    );
     await tester.pumpWidget(
       buildTestApp(
         home: FolderTile(
-          folder: const FolderEntity(id: 1, name: 'Japanese N5'),
+          folder: folder,
           subtitle: '2 decks · 24 cards',
           masteryPercentage: 0.5,
           onTap: () {},
@@ -20,7 +27,12 @@ void main() {
     expect(find.text('Japanese N5'), findsOneWidget);
     expect(find.text('2 decks · 24 cards'), findsOneWidget);
     expect(find.byIcon(Icons.folder_outlined), findsOneWidget);
+    expect(find.byType(AppCardListTile), findsOneWidget);
     expect(find.text('50%'), findsNothing);
+    expect(
+      tester.widget<Icon>(find.byIcon(Icons.folder_outlined)).color,
+      Color(folder.colorValue),
+    );
   });
 
   testWidgets('FolderTile shows 0 percent for empty mastery', (tester) async {
@@ -58,6 +70,7 @@ void main() {
       ),
     );
 
+    expect(find.byType(AppEditDeleteMenu), findsOneWidget);
     await tester.tap(find.byIcon(Icons.more_vert));
     await tester.pumpAndSettle();
     expect(find.byIcon(Icons.edit_outlined), findsOneWidget);

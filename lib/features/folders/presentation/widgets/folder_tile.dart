@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
-import 'package:memox/core/theme/tokens/opacity_tokens.dart';
-import 'package:memox/core/theme/tokens/radius_tokens.dart';
-import 'package:memox/core/theme/tokens/size_tokens.dart';
-import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/folders/domain/entities/folder_entity.dart';
-import 'package:memox/shared/widgets/cards/app_card.dart';
 import 'package:memox/shared/widgets/layout/spacing.dart';
+import 'package:memox/shared/widgets/lists/app_card_list_tile.dart';
+import 'package:memox/shared/widgets/lists/app_edit_delete_menu.dart';
+import 'package:memox/shared/widgets/lists/app_tile_glyph.dart';
 import 'package:memox/shared/widgets/progress/mastery_ring.dart';
 
 class FolderTile extends StatelessWidget {
@@ -30,133 +28,52 @@ class FolderTile extends StatelessWidget {
   final VoidCallback? onDelete;
 
   @override
-  Widget build(BuildContext context) => AppCard(
+  Widget build(BuildContext context) => AppCardListTile(
     onTap: onTap,
     onLongPress: onLongPress,
-    child: Row(
-      children: [
-        _FolderLeading(colorValue: folder.colorValue),
-        const Gap.lg(),
-        Expanded(
-          child: _FolderText(name: folder.name, subtitle: subtitle),
-        ),
-        const Gap.md(),
-        MasteryRing(percentage: masteryPercentage, showZeroPercentText: true),
-        if (onEdit != null || onDelete != null) ...[
-          const Gap.xs(),
-          _FolderActionMenu(onEdit: onEdit, onDelete: onDelete),
-        ],
-      ],
+    leading: AppTileGlyph(
+      icon: Icons.folder_outlined,
+      color: Color(folder.colorValue),
+    ),
+    title: Text(folder.name, style: context.textTheme.titleMedium),
+    subtitle: Text(
+      subtitle,
+      style: context.textTheme.bodySmall?.copyWith(
+        color: context.colors.onSurfaceVariant,
+      ),
+    ),
+    trailing: _FolderTrailing(
+      masteryPercentage: masteryPercentage,
+      onEdit: onEdit,
+      onDelete: onDelete,
     ),
   );
 }
 
-enum _FolderAction { edit, delete }
+class _FolderTrailing extends StatelessWidget {
+  const _FolderTrailing({
+    required this.masteryPercentage,
+    this.onEdit,
+    this.onDelete,
+  });
 
-class _FolderActionMenu extends StatelessWidget {
-  const _FolderActionMenu({this.onEdit, this.onDelete});
-
+  final double masteryPercentage;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
 
   @override
-  Widget build(BuildContext context) => PopupMenuButton<_FolderAction>(
-    icon: const Icon(Icons.more_vert),
-    padding: EdgeInsets.zero,
-    position: PopupMenuPosition.under,
-    menuPadding: const EdgeInsets.symmetric(vertical: SpacingTokens.xs),
-    onSelected: (_FolderAction action) {
-      if (action == _FolderAction.edit) {
-        onEdit?.call();
-        return;
-      }
-
-      onDelete?.call();
-    },
-    itemBuilder: (BuildContext context) => <PopupMenuEntry<_FolderAction>>[
-      if (onEdit != null)
-        PopupMenuItem<_FolderAction>(
-          value: _FolderAction.edit,
-          height: SizeTokens.listItemCompact,
-          padding: const EdgeInsets.symmetric(horizontal: SpacingTokens.md),
-          child: _FolderActionItem(
-            icon: Icons.edit_outlined,
-            label: context.l10n.editAction,
-          ),
-        ),
-      if (onDelete != null)
-        PopupMenuItem<_FolderAction>(
-          value: _FolderAction.delete,
-          height: SizeTokens.listItemCompact,
-          padding: const EdgeInsets.symmetric(horizontal: SpacingTokens.md),
-          child: _FolderActionItem(
-            icon: Icons.delete_outline,
-            label: context.l10n.deleteFolder,
-            color: context.customColors.ratingAgain,
-          ),
-        ),
-    ],
-  );
-}
-
-class _FolderActionItem extends StatelessWidget {
-  const _FolderActionItem({
-    required this.icon,
-    required this.label,
-    this.color,
-  });
-
-  final IconData icon;
-  final String label;
-  final Color? color;
-
-  @override
-  Widget build(BuildContext context) {
-    final foregroundColor = color ?? context.colors.onSurface;
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: SizeTokens.iconSm, color: foregroundColor),
-        const Gap.md(),
-        Text(
-          label,
-          style: context.textTheme.bodyMedium?.copyWith(color: foregroundColor),
+  Widget build(BuildContext context) => Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      MasteryRing(percentage: masteryPercentage, showZeroPercentText: true),
+      if (onEdit != null || onDelete != null) ...[
+        const Gap.sm(),
+        AppEditDeleteMenu(
+          deleteLabel: context.l10n.deleteFolder,
+          onEdit: onEdit,
+          onDelete: onDelete,
         ),
       ],
-    );
-  }
-}
-
-class _FolderLeading extends StatelessWidget {
-  const _FolderLeading({required this.colorValue});
-
-  final int colorValue;
-
-  @override
-  Widget build(BuildContext context) => DecoratedBox(
-    decoration: BoxDecoration(
-      color: Color(colorValue).withValues(alpha: OpacityTokens.focus),
-      borderRadius: BorderRadius.circular(RadiusTokens.md),
-    ),
-    child: const SizedBox.square(
-      dimension: SizeTokens.avatarLg,
-      child: Icon(Icons.folder_outlined),
-    ),
-  );
-}
-
-class _FolderText extends StatelessWidget {
-  const _FolderText({required this.name, required this.subtitle});
-
-  final String name;
-  final String subtitle;
-
-  @override
-  Widget build(BuildContext context) => Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(name, style: context.textTheme.titleMedium),
-      Text(subtitle, style: context.textTheme.bodySmall),
     ],
   );
 }

@@ -156,6 +156,22 @@ shared_widget_mapping:
     required_widgets: []
     forbidden_in_list_context:
       - "Dismissible("
+  folder_tile:
+    path_pattern: "features/folders/presentation/widgets/folder_tile.dart"
+    required_widgets:
+      - "AppCardListTile("
+      - "AppTileGlyph("
+      - "AppEditDeleteMenu("
+    forbidden_widgets:
+      - "PopupMenuButton"
+  deck_tile:
+    path_pattern: "features/decks/presentation/widgets/deck_tile.dart"
+    required_widgets:
+      - "AppCardListTile("
+      - "AppTileGlyph("
+      - "AppEditDeleteMenu("
+    forbidden_widgets:
+      - "PopupMenuButton"
 
 provider_naming:
   repository_pattern: "^\\w+RepositoryProvider$"

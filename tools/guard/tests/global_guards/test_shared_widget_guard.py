@@ -41,6 +41,25 @@ class SharedWidgetGuardTest(unittest.TestCase):
             self.assertEqual(1, len(violations))
             self.assertIn('AppListTile', violations[0].message)
 
+    def test_reports_raw_popup_menu_outside_shared_widgets(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            file_path = root / 'lib/features/decks/presentation/widgets/sample.dart'
+            file_path.parent.mkdir(parents=True)
+            file_path.write_text(
+                'return PopupMenuButton<int>(itemBuilder: (_) => []);',
+                encoding='utf-8',
+            )
+            guard = self._create_guard(root)
+
+            violations = guard.check_file(
+                file_path,
+                file_path.read_text(encoding='utf-8').splitlines(),
+            )
+
+            self.assertEqual(1, len(violations))
+            self.assertIn('AppEditDeleteMenu', violations[0].message)
+
     def test_skips_shared_widget_implementations(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             root = Path(temp_dir)
