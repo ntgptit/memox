@@ -14,6 +14,7 @@ abstract class BackupPayload with _$BackupPayload {
     required List<Map<String, dynamic>> studySessions,
     required List<Map<String, dynamic>> cardReviews,
   }) = _BackupPayload;
+  const BackupPayload._();
 
   factory BackupPayload.fromJson(Map<String, dynamic> json) => BackupPayload(
     version: json['version'] as int,
@@ -69,6 +70,7 @@ abstract class BackupInfo with _$BackupInfo {
     DateTime? modifiedTime,
     required int sizeBytes,
   }) = _BackupInfo;
+  const BackupInfo._();
 
   factory BackupInfo.fromJson(Map<String, dynamic> json) => BackupInfo(
     fileId: json['fileId'] as String,

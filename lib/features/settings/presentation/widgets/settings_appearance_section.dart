@@ -7,6 +7,7 @@ import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/settings/domain/entities/app_setting.dart';
 import 'package:memox/features/settings/presentation/providers/settings_provider.dart';
 import 'package:memox/features/settings/presentation/widgets/settings_group_card.dart';
+import 'package:memox/features/settings/presentation/widgets/settings_language_row.dart';
 import 'package:memox/features/settings/presentation/widgets/settings_section_header.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
 import 'package:memox/shared/widgets/inputs/color_picker.dart';
@@ -58,6 +59,7 @@ class SettingsAppearanceSection extends ConsumerWidget {
               ],
             ),
           ),
+          SettingsLanguageRow(settings: settings),
           _AppearanceBlock(
             title: context.l10n.settingsAppColorTitle,
             child: ColorPicker(

@@ -163,6 +163,7 @@ class BackupService {
     'back': row.back,
     'hint': row.hint,
     'example': row.example,
+    'tags': row.tags,
     'imagePath': row.imagePath,
     'status': row.status.name,
     'easeFactor': row.easeFactor,

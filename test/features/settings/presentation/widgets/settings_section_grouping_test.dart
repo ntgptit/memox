@@ -48,7 +48,7 @@ void main() {
     );
 
     expect(find.byType(SettingsGroupCard), findsOneWidget);
-    expect(find.byType(Divider), findsOneWidget);
+    expect(find.byType(Divider), findsNWidgets(2));
   });
 
   testWidgets('theme mode cards center their labels', (tester) async {

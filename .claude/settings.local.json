@@ -14,7 +14,8 @@
       "Bash(D:/workspace/memox/lib/core/providers/usecase_providers.dart:*)",
       "Bash(flutter gen-l10n:*)",
       "Bash(python tools/guard/run.py --scope all)",
-      "Bash(python tools/guard/run.py --scope shared)"
+      "Bash(python tools/guard/run.py --scope shared)",
+      "Bash(xargs basename:*)"
     ]
   }
 }

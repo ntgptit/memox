@@ -4,8 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/core/database/app_database.dart';
 import 'package:memox/core/providers/database_providers.dart';
-import 'package:memox/core/providers/repository_providers.dart';
-import 'package:memox/core/providers/usecase_providers.dart';
 import 'package:memox/features/search/presentation/providers/search_query_provider.dart';
 
 void main() {
