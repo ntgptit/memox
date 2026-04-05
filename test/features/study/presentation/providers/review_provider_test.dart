@@ -29,7 +29,7 @@ void main() {
     ],
   );
 
-  test('revealAnswer flips the current card', () async {
+  test('toggleFlip flips the current card', () async {
     final cardReviewDao = FakeCardReviewDao();
     final container = buildContainer(
       flashcardRepository: FakeFlashcardRepository(cards: _cards(1)),
@@ -42,7 +42,7 @@ void main() {
     final initial = await container.read(reviewSessionProvider(1).future);
     expect(initial.isFlipped, isFalse);
 
-    await notifier.revealAnswer();
+    await notifier.toggleFlip();
 
     final updated = container.read(reviewSessionProvider(1)).requireValue;
     expect(updated.isFlipped, isTrue);
@@ -67,7 +67,7 @@ void main() {
       ReviewRating.good,
     );
 
-    await notifier.revealAnswer();
+    await notifier.toggleFlip();
     await notifier.rate(ReviewRating.good);
 
     final updated = container.read(reviewSessionProvider(1)).requireValue;
@@ -84,6 +84,45 @@ void main() {
     expect(savedCard?.status, expected.newStatus);
     expect(review.rating.value, ReviewRating.good.index);
     expect(review.isCorrect.value, isTrue);
+  });
+
+  test('empty deck produces empty state without session', () async {
+    final cardReviewDao = FakeCardReviewDao();
+    final studyRepository = _FakeStudyRepository();
+    final container = buildContainer(
+      flashcardRepository: FakeFlashcardRepository(),
+      cardReviewDao: cardReviewDao,
+      studyRepository: studyRepository,
+    );
+    addTearDown(cardReviewDao.dispose);
+    addTearDown(container.dispose);
+
+    final state = await container.read(reviewSessionProvider(1).future);
+
+    expect(state.cards, isEmpty);
+    expect(state.currentCard, isNull);
+    expect(state.totalCards, 0);
+    expect(state.isComplete, isFalse);
+    expect(studyRepository.startedSession, isFalse);
+  });
+
+  test('rate is ignored when card is not flipped', () async {
+    final cardReviewDao = FakeCardReviewDao();
+    final container = buildContainer(
+      flashcardRepository: FakeFlashcardRepository(cards: _cards(2)),
+      cardReviewDao: cardReviewDao,
+    );
+    addTearDown(cardReviewDao.dispose);
+    addTearDown(container.dispose);
+    final notifier = container.read(reviewSessionProvider(1).notifier);
+    await container.read(reviewSessionProvider(1).future);
+
+    await notifier.rate(ReviewRating.good);
+
+    final state = container.read(reviewSessionProvider(1)).requireValue;
+    expect(state.currentIndex, 0);
+    expect(state.results, isEmpty);
+    expect(cardReviewDao.insertedReviews, isEmpty);
   });
 
   test('completion stats reflect review ratings', () async {
@@ -119,7 +158,7 @@ Future<void> _revealAndRate(
   ReviewSession notifier,
   ReviewRating rating,
 ) async {
-  await notifier.revealAnswer();
+  await notifier.toggleFlip();
   await notifier.rate(rating);
 }
 
@@ -135,6 +174,7 @@ List<FlashcardEntity> _cards(int count) => List<FlashcardEntity>.generate(
 
 final class _FakeStudyRepository implements StudyRepository {
   StudySession? completedSession;
+  bool startedSession = false;
 
   @override
   Future<StudySession> completeSession(StudySession session) async =>
@@ -144,12 +184,15 @@ final class _FakeStudyRepository implements StudyRepository {
   Future<StudySession> startSession({
     required int deckId,
     StudyMode mode = StudyMode.review,
-  }) async => StudySession(
-    id: 91,
-    deckId: deckId,
-    mode: mode,
-    startedAt: DateTime(2026, 4, 5, 10),
-  );
+  }) async {
+    startedSession = true;
+    return StudySession(
+      id: 91,
+      deckId: deckId,
+      mode: mode,
+      startedAt: DateTime(2026, 4, 5, 10),
+    );
+  }
 
   @override
   Stream<List<StudySession>> watchAll() async* {

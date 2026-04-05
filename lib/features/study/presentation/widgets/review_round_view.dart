@@ -39,7 +39,7 @@ class ReviewRoundView extends StatelessWidget {
               onToggleFlip: onToggleFlip,
             ),
           ),
-          const Gap.lg(),
+          const Gap.xxl(),
           AnimatedSwitcher(
             duration: DurationTokens.contentSwitch,
             reverseDuration: DurationTokens.fast,

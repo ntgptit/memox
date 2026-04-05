@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C D:\\\\workspace\\\\memox diff lib/shared/widgets/progress/progress_bar.dart)",
+      "Bash(python tools/guard/run.py --scope features --guard shared_widget,no_else,no_hardcoded_color,no_hardcoded_duration,no_hardcoded_radius,no_hardcoded_size,no_hardcoded_font_size,no_hardcoded_string,import_direction,widget_length,widget_class_length,button_usage,text_style,riverpod_syntax,screen_scaffold,icon_style)",
+      "Bash(flutter analyze:*)",
+      "Bash(flutter test:*)",
+      "Bash(python tools/guard/run.py --scope features)",
+      "Bash(find D:/workspace/memox/lib/features/search -name *.dart -not -name *.g.dart -not -name *.freezed.dart)",
+      "Bash(find D:/workspace/memox/lib/domain/entities -name *.dart)",
+      "Bash(find D:/workspace/memox/lib/core/database/tables -name *.dart -not -name *.g.dart)",
+      "Bash(find D:/workspace/memox/lib/features -path */domain/entities/*.dart -not -name *.g.dart -not -name *.freezed.dart)",
+      "Bash(find D:/workspace/memox/lib/features -path */data/repositories/*_repository_impl.dart -type f)"
+    ]
+  }
+}

@@ -65,7 +65,7 @@ Widget _buildBody(
 ) {
   if (state.cards.isEmpty) {
     return EmptyStateView(
-      icon: Icons.autorenew_rounded,
+      icon: Icons.autorenew_outlined,
       title: context.l10n.modeReview,
       subtitle: context.l10n.reviewEmptySubtitle,
     );
@@ -77,7 +77,7 @@ Widget _buildBody(
       stats: [
         SessionStat(
           label: context.l10n.reviewRatingAgain,
-          icon: Icons.refresh_rounded,
+          icon: Icons.refresh_outlined,
           value: '${state.againCount}',
           valueColor: context.customColors.ratingAgain,
         ),

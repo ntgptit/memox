@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
+import 'package:memox/core/theme/tokens/opacity_tokens.dart';
+import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/core/theme/tokens/typography_tokens.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
@@ -26,33 +28,33 @@ class ReviewCardFace extends StatelessWidget {
     onTap: onTap,
     backgroundColor: context.colors.surfaceContainerHighest,
     padding: const EdgeInsets.all(SpacingTokens.xl),
-    child: SizedBox.expand(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          if (eyebrow != null)
-            Text(
-              eyebrow!,
-              style: context.textTheme.labelSmall?.copyWith(
-                letterSpacing: TypographyTokens.labelSpacing,
-                color: context.colors.onSurfaceVariant,
-              ),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-            ),
-          if (eyebrow != null) const Gap.md(),
-          Expanded(
-            child: Center(
-              child: SingleChildScrollView(
-                child: Text(
-                  text,
-                  style: context.appTextStyles.flashcardFront,
+    child: ConstrainedBox(
+      constraints: const BoxConstraints(
+        minHeight: SizeTokens.flashcardMinHeight,
+      ),
+      child: Center(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (eyebrow != null)
+                Text(
+                  eyebrow!,
+                  style: context.textTheme.titleMedium?.copyWith(
+                    letterSpacing: TypographyTokens.labelSpacing,
+                    color: context.colors.onSurfaceVariant.withValues(alpha: OpacityTokens.hintText),
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
                 ),
+              if (eyebrow != null) const Gap.sm(),
+              Text(
+                text,
+                style: context.appTextStyles.flashcardFront,
+                textAlign: TextAlign.center,
               ),
-            ),
-          ),
           if (hint != null) ...[
             const Gap.md(),
             Text(
@@ -72,5 +74,7 @@ class ReviewCardFace extends StatelessWidget {
         ],
       ),
     ),
-  );
+   ),
+ ),
+);
 }

@@ -36,7 +36,12 @@ class ProgressBar extends StatelessWidget {
               alignment: Alignment.centerLeft,
               widthFactor: safeProgress,
               duration: DurationTokens.slow,
-              child: ColoredBox(color: color ?? context.colors.primary),
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  color: color ?? context.colors.primary,
+                  borderRadius: BorderRadius.circular(RadiusTokens.full),
+                ),
+              ),
             ),
           ],
         ),

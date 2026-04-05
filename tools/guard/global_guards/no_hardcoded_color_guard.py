@@ -18,6 +18,8 @@ class NoHardcodedColorGuard(BaseGuard):
         re.compile(r'\bColors\.\w+'),
         re.compile(r'Color\.fromRGBO\('),
         re.compile(r'Color\.fromARGB\('),
+        re.compile(r'\.withValues\(\s*alpha:\s*(0\.\d+|1\.0*)\s*\)'),
+        re.compile(r'\.withOpacity\(\s*(0\.\d+|1\.0*)\s*\)'),
     )
     WHITELIST = (
         'lib/core/theme/tokens/color_tokens.dart',
@@ -48,7 +50,7 @@ class NoHardcodedColorGuard(BaseGuard):
                     file_path=relative,
                     line_number=index,
                     line_content=line,
-                    message='Hardcoded color detected. Dùng context.colors.* hoặc context.customColors.*',
+                    message='Hardcoded color/opacity detected. Dùng context.colors.*, context.customColors.* hoặc OpacityTokens.*',
                     guard_id=self.GUARD_ID,
                     severity=self.severity,
                 ),
