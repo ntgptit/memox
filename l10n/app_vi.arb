@@ -626,5 +626,22 @@
         "type": "int"
       }
     }
+  },
+  "searchTitle": "Tìm kiếm",
+  "searchHint": "Tìm thư mục, bộ thẻ, thẻ…",
+  "searchIdleTitle": "Tìm kiếm thư viện",
+  "searchIdleSubtitle": "Tìm thư mục, bộ thẻ và thẻ theo tên hoặc nội dung",
+  "searchNoResultsTitle": "Không tìm thấy",
+  "searchNoResultsSubtitle": "Thử từ khóa khác",
+  "searchFolderLabel": "Thư mục",
+  "searchDeckLabel": "Bộ thẻ",
+  "searchCardLabel": "Thẻ",
+  "searchResultCount": "{count, plural, =1{1 kết quả} other{{count} kết quả}}",
+  "@searchResultCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

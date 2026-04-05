@@ -8,6 +8,8 @@ import 'package:memox/features/decks/data/repositories/deck_repository_impl.dart
 import 'package:memox/features/decks/domain/repositories/deck_repository.dart';
 import 'package:memox/features/folders/data/repositories/folder_repository_impl.dart';
 import 'package:memox/features/folders/domain/repositories/folder_repository.dart';
+import 'package:memox/features/search/data/repositories/search_repository_impl.dart';
+import 'package:memox/features/search/domain/repositories/search_repository.dart';
 import 'package:memox/features/settings/data/repositories/settings_data_repository_impl.dart';
 import 'package:memox/features/settings/data/repositories/settings_repository_impl.dart';
 import 'package:memox/features/settings/domain/repositories/settings_data_repository.dart';
@@ -70,3 +72,7 @@ StatisticsRepository statisticsRepository(Ref ref) => StatisticsRepositoryImpl(
     localDataSource: ref.watch(statisticsLocalDataSourceProvider),
     logger: ref.watch(appLoggerProvider),
   );
+
+@Riverpod(keepAlive: true)
+SearchRepository searchRepository(Ref ref) =>
+    SearchRepositoryImpl(ref.watch(searchDaoProvider));

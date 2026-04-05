@@ -10,7 +10,11 @@
       "Bash(find D:/workspace/memox/lib/domain/entities -name *.dart)",
       "Bash(find D:/workspace/memox/lib/core/database/tables -name *.dart -not -name *.g.dart)",
       "Bash(find D:/workspace/memox/lib/features -path */domain/entities/*.dart -not -name *.g.dart -not -name *.freezed.dart)",
-      "Bash(find D:/workspace/memox/lib/features -path */data/repositories/*_repository_impl.dart -type f)"
+      "Bash(find D:/workspace/memox/lib/features -path */data/repositories/*_repository_impl.dart -type f)",
+      "Bash(D:/workspace/memox/lib/core/providers/usecase_providers.dart:*)",
+      "Bash(flutter gen-l10n:*)",
+      "Bash(python tools/guard/run.py --scope all)",
+      "Bash(python tools/guard/run.py --scope shared)"
     ]
   }
 }

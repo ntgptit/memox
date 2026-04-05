@@ -17,6 +17,7 @@ part 'daos/card_dao.dart';
 part 'daos/card_review_dao.dart';
 part 'daos/deck_dao.dart';
 part 'daos/folder_dao.dart';
+part 'daos/search_dao.dart';
 part 'daos/study_session_dao.dart';
 
 @DriftDatabase(
@@ -27,7 +28,7 @@ part 'daos/study_session_dao.dart';
     StudySessionsTable,
     CardReviewsTable,
   ],
-  daos: [FolderDao, DeckDao, CardDao, StudySessionDao, CardReviewDao],
+  daos: [FolderDao, DeckDao, CardDao, StudySessionDao, CardReviewDao, SearchDao],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());

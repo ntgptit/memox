@@ -24,6 +24,7 @@ import 'package:memox/features/folders/domain/usecases/get_root_folders.dart';
 import 'package:memox/features/folders/domain/usecases/get_subfolders.dart';
 import 'package:memox/features/folders/domain/usecases/reorder_folders.dart';
 import 'package:memox/features/folders/domain/usecases/update_folder.dart';
+import 'package:memox/features/search/domain/usecases/search_items.dart';
 import 'package:memox/features/settings/domain/usecases/get_settings.dart';
 import 'package:memox/features/settings/domain/usecases/update_locale.dart';
 import 'package:memox/features/settings/domain/usecases/update_seed_color.dart';
@@ -193,3 +194,7 @@ GetStudyStatsUseCase getStudyStatsUseCase(Ref ref) => GetStudyStatsUseCase(
   getMasteryBreakdownUseCase: ref.watch(getMasteryBreakdownUseCaseProvider),
   getDifficultCardsUseCase: ref.watch(getDifficultCardsUseCaseProvider),
 );
+
+@riverpod
+SearchItemsUseCase searchItemsUseCase(Ref ref) =>
+    SearchItemsUseCase(ref.watch(searchRepositoryProvider));

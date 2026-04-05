@@ -24,3 +24,6 @@ StudySessionDao studySessionDao(Ref ref) => ref.watch(appDatabaseProvider).study
 
 @Riverpod(keepAlive: true)
 CardReviewDao cardReviewDao(Ref ref) => ref.watch(appDatabaseProvider).cardReviewDao;
+
+@Riverpod(keepAlive: true)
+SearchDao searchDao(Ref ref) => ref.watch(appDatabaseProvider).searchDao;

@@ -626,5 +626,22 @@
         "type": "int"
       }
     }
+  },
+  "searchTitle": "Search",
+  "searchHint": "Search folders, decks, cards…",
+  "searchIdleTitle": "Search your library",
+  "searchIdleSubtitle": "Find folders, decks, and cards by name or content",
+  "searchNoResultsTitle": "No results",
+  "searchNoResultsSubtitle": "Try a different search term",
+  "searchFolderLabel": "Folder",
+  "searchDeckLabel": "Deck",
+  "searchCardLabel": "Card",
+  "searchResultCount": "{count, plural, =1{1 result} other{{count} results}}",
+  "@searchResultCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

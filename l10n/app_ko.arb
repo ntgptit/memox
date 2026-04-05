@@ -626,5 +626,22 @@
         "type": "int"
       }
     }
+  },
+  "searchTitle": "검색",
+  "searchHint": "폴더, 덱, 카드 검색…",
+  "searchIdleTitle": "라이브러리 검색",
+  "searchIdleSubtitle": "이름이나 내용으로 폴더, 덱, 카드를 찾아보세요",
+  "searchNoResultsTitle": "결과 없음",
+  "searchNoResultsSubtitle": "다른 검색어를 시도해 보세요",
+  "searchFolderLabel": "폴더",
+  "searchDeckLabel": "덱",
+  "searchCardLabel": "카드",
+  "searchResultCount": "{count, plural, =1{1개 결과} other{{count}개 결과}}",
+  "@searchResultCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

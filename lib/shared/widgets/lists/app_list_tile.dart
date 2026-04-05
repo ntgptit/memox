@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/opacity_tokens.dart';
+import 'package:memox/core/theme/tokens/radius_tokens.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 
@@ -27,6 +28,7 @@ class AppListTile extends StatelessWidget {
     final tile = Material(
       type: MaterialType.transparency,
       child: InkWell(
+        borderRadius: BorderRadius.circular(RadiusTokens.md),
         onTap: onTap,
         child: ConstrainedBox(
           constraints: BoxConstraints(

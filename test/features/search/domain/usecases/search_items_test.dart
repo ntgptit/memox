@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/features/search/domain/entities/search_query.dart';
 import 'package:memox/features/search/domain/repositories/search_repository.dart';
 import 'package:memox/features/search/domain/usecases/search_items.dart';
+import 'package:memox/features/search/domain/value_objects/search_result_item.dart';
 
 void main() {
   test(
@@ -12,7 +13,9 @@ void main() {
 
       final result = await useCase.call('  memo  ');
 
-      expect(result, ['memo']);
+      expect(result, hasLength(1));
+      expect(result.first, isA<FolderResult>());
+      expect(result.first.name, 'memo');
       expect(repository.lastQuery, const SearchQuery(value: 'memo'));
     },
   );
@@ -32,8 +35,8 @@ final class _FakeSearchRepository implements SearchRepository {
   SearchQuery? lastQuery;
 
   @override
-  Future<List<String>> search(SearchQuery query) async {
+  Future<List<SearchResultItem>> search(SearchQuery query) async {
     lastQuery = query;
-    return [query.value];
+    return [FolderResult(id: 1, name: query.value)];
   }
 }
