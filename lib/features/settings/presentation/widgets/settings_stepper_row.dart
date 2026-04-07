@@ -36,13 +36,11 @@ class SettingsStepperRow extends StatelessWidget {
           IconActionButton(
             icon: Icons.remove_outlined,
             onTap: canDecrease ? onDecrease : null,
-            size: SizeTokens.buttonHeightSm,
           ),
           const Gap.sm(),
           IconActionButton(
             icon: Icons.add_outlined,
             onTap: canIncrease ? onIncrease : null,
-            size: SizeTokens.buttonHeightSm,
           ),
         ],
       ),

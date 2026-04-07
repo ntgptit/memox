@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
-import 'package:memox/core/theme/tokens/opacity_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/cards/domain/entities/flashcard_entity.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
 import 'package:memox/shared/widgets/chips/tag_chip.dart';
 import 'package:memox/shared/widgets/layout/spacing.dart';
+import 'package:memox/shared/widgets/lists/app_edit_delete_menu.dart';
 import 'package:memox/shared/widgets/lists/expandable_tile.dart';
 
 class CardListTile extends StatelessWidget {
@@ -23,9 +23,8 @@ class CardListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) => AppCard(
     padding: EdgeInsets.zero,
-    borderColor: context.colors.outline.withValues(
-      alpha: OpacityTokens.borderSubtle,
-    ),
+    backgroundColor: context.colors.surfaceContainerLow,
+    borderColor: context.colors.outlineVariant,
     child: ExpandableTile(
       headerPadding: const EdgeInsets.all(SpacingTokens.cardPadding),
       expandedContentPadding: const EdgeInsets.fromLTRB(
@@ -59,21 +58,14 @@ class CardListTile extends StatelessWidget {
               children: card.tags.map((tag) => TagChip(label: tag)).toList(),
             ),
           ],
-          const Gap.md(),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              IconButton(
-                tooltip: context.l10n.editAction,
-                onPressed: onEdit,
-                icon: const Icon(Icons.edit_outlined),
-              ),
-              IconButton(
-                tooltip: context.l10n.deleteAction,
-                onPressed: onDelete,
-                icon: const Icon(Icons.delete_outline),
-              ),
-            ],
+          const Gap.sm(),
+          Align(
+            alignment: Alignment.centerRight,
+            child: AppEditDeleteMenu(
+              deleteLabel: context.l10n.deleteCardAction,
+              onEdit: onEdit,
+              onDelete: onDelete,
+            ),
           ),
         ],
       ),

@@ -12,6 +12,7 @@ import 'package:memox/features/settings/presentation/widgets/settings_notificati
 import 'package:memox/features/settings/presentation/widgets/settings_studying_section.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
 import 'package:memox/shared/widgets/feedback/app_refresh_indicator.dart';
+import 'package:memox/shared/widgets/layout/spacing.dart';
 
 class SettingsContentView extends ConsumerWidget {
   const SettingsContentView({super.key});
@@ -35,13 +36,13 @@ class SettingsContentView extends ConsumerWidget {
           ),
           children: [
             SettingsAppearanceSection(settings: settings),
-            const SizedBox(height: SpacingTokens.xl),
+            const Gap.section(),
             SettingsStudyingSection(settings: settings),
-            const SizedBox(height: SpacingTokens.xl),
+            const Gap.section(),
             SettingsNotificationsSection(settings: settings),
-            const SizedBox(height: SpacingTokens.xl),
+            const Gap.section(),
             const SettingsBackupSection(),
-            const SizedBox(height: SpacingTokens.xl),
+            const Gap.section(),
             const SettingsDataSection(),
           ],
         ),

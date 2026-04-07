@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
+import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 
 class SettingsSectionHeader extends StatelessWidget {
   const SettingsSectionHeader({required this.label, super.key});
@@ -7,10 +8,13 @@ class SettingsSectionHeader extends StatelessWidget {
   final String label;
 
   @override
-  Widget build(BuildContext context) => Text(
-    label,
-    style: context.textTheme.headlineMedium?.copyWith(
-      color: context.colors.onSurface,
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(horizontal: SpacingTokens.lg),
+    child: Text(
+      label,
+      style: context.textTheme.titleLarge?.copyWith(
+        color: context.colors.onSurface,
+      ),
     ),
   );
 }

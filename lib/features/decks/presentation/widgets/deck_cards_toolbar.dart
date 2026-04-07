@@ -24,14 +24,15 @@ class DeckCardsToolbar extends StatelessWidget {
   static double get height =>
       SizeTokens.searchBarHeight +
       SizeTokens.touchTarget +
-      (SpacingTokens.sm * 2);
+      (SpacingTokens.sm * 3);
 
   @override
-  Widget build(BuildContext context) => ColoredBox(
-    color: context.customColors.surfaceDim,
+  Widget build(BuildContext context) => DecoratedBox(
+    decoration: BoxDecoration(color: context.colors.surfaceContainerLow),
     child: Padding(
-      padding: const EdgeInsets.only(bottom: SpacingTokens.sm),
+      padding: const EdgeInsets.symmetric(vertical: SpacingTokens.sm),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _DeckCardsToolbarHeader(
             sort: sort,
@@ -63,7 +64,7 @@ class _DeckCardsToolbarHeader extends StatelessWidget {
       Expanded(
         child: Text(
           context.l10n.cardsTitle,
-          style: context.textTheme.titleMedium,
+          style: context.textTheme.titleLarge,
         ),
       ),
       SecondaryButton(

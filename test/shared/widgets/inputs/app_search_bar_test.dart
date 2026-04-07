@@ -52,6 +52,8 @@ void main() {
         Theme.of(context).colorScheme.surfaceContainerHighest,
       );
       expect(field.decoration?.contentPadding, isNotNull);
+      expect(field.decoration?.enabledBorder, isNotNull);
+      expect(field.decoration?.focusedBorder, isNotNull);
     },
   );
 }

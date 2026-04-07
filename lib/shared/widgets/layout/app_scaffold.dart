@@ -29,16 +29,19 @@ class AppScaffold extends StatelessWidget {
   final bool useSafeArea;
   final bool extendBehindAppBar;
 
+  static double get fabContentClearance =>
+      SizeTokens.fabSize + SpacingTokens.lg;
+
   static double contentBottomPadding({
     required bool hasBottomNav,
     required bool hasFab,
   }) {
-    if (hasBottomNav) {
-      return 0;
+    if (hasFab) {
+      return fabContentClearance;
     }
 
-    if (hasFab) {
-      return SizeTokens.fabSize + SpacingTokens.lg;
+    if (hasBottomNav) {
+      return 0;
     }
 
     return SpacingTokens.xl;

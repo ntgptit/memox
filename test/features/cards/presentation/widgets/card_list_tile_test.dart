@@ -4,6 +4,7 @@ import 'package:memox/features/cards/domain/entities/flashcard_entity.dart';
 import 'package:memox/features/cards/presentation/widgets/card_list_tile.dart';
 import 'package:memox/shared/widgets/buttons/app_pressable.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
+import 'package:memox/shared/widgets/lists/app_edit_delete_menu.dart';
 import '../../../../test_helpers/test_app.dart';
 
 void main() {
@@ -73,5 +74,14 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Greeting'), findsOneWidget);
+    expect(find.byType(AppEditDeleteMenu), findsOneWidget);
+
+    final context = tester.element(find.byType(CardListTile));
+    final card = tester.widget<AppCard>(find.byType(AppCard));
+    expect(
+      card.backgroundColor,
+      Theme.of(context).colorScheme.surfaceContainerLow,
+    );
+    expect(card.borderColor, Theme.of(context).colorScheme.outlineVariant);
   });
 }

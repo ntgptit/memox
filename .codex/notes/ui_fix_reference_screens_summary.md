@@ -368,3 +368,189 @@ remaining generic composition problem in statistics.
 11. Analytics drill-down rows should not default to the generic flat
     list-tile primitive when the content needs a calmer, more focused
     information row.
+
+## Follow-up Reference Screen Batch 3
+
+Date: 2026-04-08
+
+This micro-pass addressed one screenshot-visible layout defect that remained in
+the deck detail reference screen after the larger toolbar redesign.
+
+### 9. Deck cards toolbar top inset
+
+**Main issue fixed**
+
+- the pinned cards toolbar still let the `Cards` title row sit flush to the top
+  edge of the toolbar surface, so the section title, sort button, and search
+  field looked visually stuck together when pinned
+
+**Implemented**
+
+- added symmetric vertical padding in
+  [deck_cards_toolbar.dart](/D:/workspace/memox/lib/features/decks/presentation/widgets/deck_cards_toolbar.dart)
+  so the title/sort row gets the same top breathing room as the search field
+  gets below
+- updated `DeckCardsToolbar.height` to match the current compact header button
+  plus search-bar composition instead of the older taller control contract
+- added
+  [deck_cards_toolbar_test.dart](/D:/workspace/memox/test/features/decks/presentation/widgets/deck_cards_toolbar_test.dart)
+  to lock the top inset and header-to-search spacing with measured token-based
+  assertions
+
+**Before / after structural improvement**
+
+- before: the pinned toolbar left its spare space at the bottom, so the header
+  row looked glued to the top edge of the surface
+- after: the toolbar distributes its breathing room where the user actually
+  sees it, and the cards header now reads as a stable section control instead
+  of a cramped strip
+
+## Additional reusable patterns proven by follow-up batch 3
+
+12. Fixed-height pinned toolbars should align their extent contract with the
+    actual control sizes they contain instead of inheriting older, taller
+    control assumptions.
+13. When a pinned toolbar mixes a title row and a search field, it should own
+    explicit top and bottom inset rather than relying on leftover bottom slack.
+
+### Verification for follow-up batch 3
+
+- `python tools/guard/run.py --scope features`
+  - passed
+  - only the existing `feature_completeness` warnings remain
+- `flutter analyze`
+  - passed with no issues
+- `flutter test test/features/decks/presentation/widgets/deck_cards_toolbar_test.dart test/features/decks/presentation/screens/deck_detail_screen_test.dart`
+  - passed
+
+## Follow-up Reference Screen Batch 4
+
+Date: 2026-04-08
+
+This continuation finished the remaining visually weak parts of the deck-detail
+cards section after the earlier toolbar-structure pass.
+
+### 10. Deck detail cards section contrast and spacing
+
+**Main issues fixed**
+
+- the pinned cards toolbar still sat too close to the overview block and read
+  too flat against the screen in dark mode
+- the cards section title was too close in emphasis to the card titles below
+- card rows were separated by only `sm` spacing, which made the list feel tight
+  relative to the card interior spacing
+- expanded card actions still used raw icon buttons that did not match the
+  shared design language
+
+**Implemented**
+
+- moved the toolbar surface in
+  [deck_cards_toolbar.dart](/D:/workspace/memox/lib/features/decks/presentation/widgets/deck_cards_toolbar.dart)
+  onto `surfaceContainerLow`
+- promoted the `Cards` title to `titleLarge`
+- added a pinned-state bottom divider in
+  [deck_cards_toolbar_delegate.dart](/D:/workspace/memox/lib/features/decks/presentation/widgets/deck_cards_toolbar_delegate.dart)
+  so the sticky toolbar separates from scrolling content when overlapping
+- inserted a `SpacingTokens.lg` section break before the toolbar and increased
+  card-row separators to `SpacingTokens.md` in
+  [deck_detail_screen.dart](/D:/workspace/memox/lib/features/decks/presentation/screens/deck_detail_screen.dart)
+- rebuilt
+  [card_list_tile.dart](/D:/workspace/memox/lib/features/cards/presentation/widgets/card_list_tile.dart)
+  onto a filled neutral card surface with a clearer border and replaced the
+  expanded raw icon buttons with `AppEditDeleteMenu`
+
+**Before / after structural improvement**
+
+- before: the cards section arrived as a low-contrast strip, then fell into a
+  dense list of weakly separated card surfaces with ad hoc expanded actions
+- after: the section lands with clearer hierarchy, the toolbar reads as a real
+  sticky control band, and the list breathes more consistently below it
+
+## Additional reusable patterns proven by follow-up batch 4
+
+14. Sticky toolbars in dark mode should not rely on page-adjacent neutral
+    surfaces alone; they need either a higher surface tier or a pinned-state
+    edge indicator.
+15. When a card’s inner padding is `16dp`, the outer list separator should not
+    be smaller than `12dp` unless the list is intentionally ultra-dense.
+16. Expanded-state entity actions should reuse a shared overflow/menu pattern
+    instead of raw inline icon rows.
+
+### Verification for follow-up batch 4
+
+- `python tools/guard/run.py --scope all`
+  - passed
+  - only the existing `feature_completeness` warnings remain
+- `flutter analyze`
+  - passed with no issues
+- `flutter test test/features/decks/presentation/widgets/deck_cards_toolbar_test.dart test/shared/widgets/inputs/app_search_bar_test.dart test/features/cards/presentation/widgets/card_list_tile_test.dart test/features/decks/presentation/screens/deck_detail_screen_test.dart`
+  - passed
+
+## Follow-up Reference Screen Batch 5
+
+Date: 2026-04-08
+
+This continuation used the Settings screen as the next reference screen for
+vertical rhythm, grouped surfaces, and compact control affordance.
+
+### 11. Settings screen hierarchy and grouping cleanup
+
+**Main issues fixed**
+
+- section headers were too heavy and visually competed with the screen title
+- peer sections were separated by the same `24dp` rhythm used elsewhere for
+  smaller intra-screen breaks
+- the Appearance section split related controls across two weak cards, making
+  app color feel like a separate section
+- compact theme-mode cards and stepper buttons looked under-weight in dark mode
+
+**Implemented**
+
+- promoted inter-section spacing in
+  [settings_content_view.dart](/D:/workspace/memox/lib/features/settings/presentation/widgets/settings_content_view.dart)
+  from `SpacingTokens.xl` to `Gap.section()`
+- rebuilt
+  [settings_section_header.dart](/D:/workspace/memox/lib/features/settings/presentation/widgets/settings_section_header.dart)
+  onto the `titleLarge` tier and aligned it with the inner card-content
+  grammar instead of the raw card edge
+- merged theme, language, and color controls into one grouped surface in
+  [settings_appearance_section.dart](/D:/workspace/memox/lib/features/settings/presentation/widgets/settings_appearance_section.dart)
+- stabilized the theme chooser into a three-column row with clearer neutral
+  card surfaces and tighter card padding
+- upgraded stepper affordance through the shared
+  [icon_action_button.dart](/D:/workspace/memox/lib/shared/widgets/buttons/icon_action_button.dart)
+  contract used by
+  [settings_stepper_row.dart](/D:/workspace/memox/lib/features/settings/presentation/widgets/settings_stepper_row.dart)
+
+**Before / after structural improvement**
+
+- before: the screen read as a stack of heavy headings followed by faint cards,
+  with Appearance split into awkward sub-blocks and under-emphasized stepper
+  controls
+- after: sections land with a clearer header-to-card hierarchy, Appearance
+  reads as one cohesive group, and compact controls feel intentionally
+  interactive instead of incidental
+
+## Additional reusable patterns proven by follow-up batch 5
+
+17. When the app shell already owns screen padding, settings section headers
+    should align to the *inner* group-card content grammar, not duplicate the
+    outer screen gutter.
+18. Related appearance controls should stay inside one grouped settings surface
+    unless they truly need their own section-level break.
+19. Neutral compact icon-action controls in dark mode need visible filled
+    surfaces or clearer outlines; a bare faint circle is not enough.
+
+### Verification for follow-up batch 5
+
+- `dart run build_runner build --delete-conflicting-outputs`
+  - passed
+- `flutter gen-l10n`
+  - passed
+- `python tools/guard/run.py --scope all`
+  - passed
+  - only the existing `feature_completeness` warnings remain
+- `flutter analyze`
+  - passed with no issues
+- `flutter test`
+  - passed

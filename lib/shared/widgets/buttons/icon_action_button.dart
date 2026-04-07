@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:memox/core/extensions/context_extensions.dart';
+import 'package:memox/core/theme/tokens/opacity_tokens.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
 
 class IconActionButton extends StatelessWidget {
@@ -19,7 +21,39 @@ class IconActionButton extends StatelessWidget {
   Widget build(BuildContext context) => IconButton.outlined(
     onPressed: onTap,
     tooltip: tooltip,
-    style: IconButton.styleFrom(minimumSize: Size.square(size)),
+    style: IconButton.styleFrom(minimumSize: Size.square(size)).copyWith(
+      backgroundColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.disabled)) {
+          return context.colors.surfaceContainer;
+        }
+
+        return context.colors.surfaceContainerHigh;
+      }),
+      foregroundColor: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.disabled)) {
+          return context.colors.onSurface.withValues(
+            alpha: OpacityTokens.disabledText,
+          );
+        }
+
+        return context.colors.onSurface;
+      }),
+      side: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.disabled)) {
+          return BorderSide(
+            color: context.colors.onSurface.withValues(
+              alpha: OpacityTokens.borderSubtle,
+            ),
+          );
+        }
+
+        return BorderSide(
+          color: context.colors.onSurface.withValues(
+            alpha: OpacityTokens.focus,
+          ),
+        );
+      }),
+    ),
     icon: Icon(icon, size: SizeTokens.iconMd),
   );
 }

@@ -333,6 +333,133 @@ Why this improves downstream screens automatically:
 - `flutter analyze` passed
 - `flutter test` passed
 
+## Follow-up Batch: Toolbar Search Contrast
+
+Date: 2026-04-08
+
+This follow-up kept the scope narrow. It did not introduce a new search widget.
+It tightened the existing toolbar-search contract so pinned toolbars read more
+clearly in dark mode.
+
+### `AppSearchBar`
+
+Files:
+
+- [app_search_bar.dart](/D:/workspace/memox/lib/shared/widgets/inputs/app_search_bar.dart)
+- [app_search_bar_test.dart](/D:/workspace/memox/test/shared/widgets/inputs/app_search_bar_test.dart)
+
+Why it needed work:
+
+- the toolbar variant already used a stronger fill tier than the page variant,
+  but it still depended entirely on the global input theme for border presence
+- on darker neutral toolbar surfaces that left the search field too easy to
+  lose visually
+
+Change type:
+
+- default behavior improvement
+- API tightening of the toolbar variant contract
+
+What was implemented:
+
+- kept `AppSearchBarVariant.toolbar` on `surfaceContainerHighest`
+- added an explicit toolbar-only enabled border and focused border so the field
+  keeps a visible container edge even when the surrounding toolbar surface is
+  also neutral
+
+Why this improves downstream screens automatically:
+
+- pinned toolbar search fields no longer depend on implicit theme behavior for
+  their outline contrast
+- deck detail and any future toolbar-search consumer inherit a clearer search
+  container without local overrides
+
+### Verification for this follow-up
+
+- `python tools/guard/run.py --scope all` passed with only the existing
+  `feature_completeness` warnings
+- `flutter analyze` passed
+- `flutter test test/shared/widgets/inputs/app_search_bar_test.dart test/features/decks/presentation/widgets/deck_cards_toolbar_test.dart`
+  passed
+
+## Follow-up Batch: Settings Shared Surface and Control Cleanup
+
+Date: 2026-04-08
+
+This follow-up stayed in the existing settings/shared-control system and fixed
+the shared defaults that were making the Settings screen feel flat, heavy, and
+under-interactive.
+
+### `SettingsGroupCard`
+
+Files:
+
+- [settings_group_card.dart](/D:/workspace/memox/lib/features/settings/presentation/widgets/settings_group_card.dart)
+- [settings_section_grouping_test.dart](/D:/workspace/memox/test/features/settings/presentation/widgets/settings_section_grouping_test.dart)
+
+Why it needed work:
+
+- grouped settings cards still relied on the generic `AppCard` default surface,
+  which disappeared into the dark-mode page background
+- section grouping was structurally correct but visually weak because the
+  shared wrapper was too neutral for the settings context
+
+Change type:
+
+- default behavior improvement
+
+What was implemented:
+
+- moved `SettingsGroupCard` onto `surfaceContainerLow`
+- promoted its outline to an `onSurface` border at focus opacity for clearer
+  dark-mode separation
+- extended the settings grouping test to lock the new surface and outline
+  contract
+
+Why this improves downstream screens automatically:
+
+- every settings section that already uses `SettingsGroupCard` now gets clearer
+  surface separation without local overrides
+
+### `IconActionButton`
+
+Files:
+
+- [icon_action_button.dart](/D:/workspace/memox/lib/shared/widgets/buttons/icon_action_button.dart)
+- [icon_action_button_test.dart](/D:/workspace/memox/test/shared/widgets/buttons/icon_action_button_test.dart)
+
+Why it needed work:
+
+- the shared icon-action primitive was too faint for compact control clusters,
+  especially the `+/-` settings steppers
+- the settings problem was not a missing widget, but a weak shared default for
+  neutral outlined icon actions
+
+Change type:
+
+- default behavior improvement
+
+What was implemented:
+
+- kept the existing shared `IconButton.outlined` contract but restored a clearer
+  neutral surface, foreground, and outline treatment
+- preserved the MemoX shared-button contract tokens while locking the new
+  surface behavior in a focused widget test
+
+Why this improves downstream screens automatically:
+
+- settings steppers and any future compact icon-action clusters now read as
+  clearly interactive without inventing a second local button style
+
+### Verification for this follow-up
+
+- `dart run build_runner build --delete-conflicting-outputs` passed
+- `flutter gen-l10n` passed
+- `python tools/guard/run.py --scope all` passed with only the existing
+  `feature_completeness` warnings
+- `flutter analyze` passed
+- `flutter test` passed
+
 ## Follow-up Batch: Shared Overlay Consistency
 
 Date: 2026-04-08

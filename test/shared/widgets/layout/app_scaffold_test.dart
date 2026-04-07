@@ -38,7 +38,7 @@ void main() {
     await tester.pumpWidget(
       buildTestApp(
         home: AppScaffold(
-          fab: AppFab(icon: Icons.add_outlined, onTap: () {}),
+          fab: const AppFab(icon: Icons.add_outlined, onTap: _noop),
           body: Align(
             alignment: Alignment.bottomCenter,
             child: Container(key: const Key('fab-bottom-box'), height: 40),
@@ -49,11 +49,53 @@ void main() {
     await tester.pumpAndSettle();
 
     final boxRect = tester.getRect(find.byKey(const Key('fab-bottom-box')));
+    final fabRect = tester.getRect(find.byType(FloatingActionButton));
     expect(
       844 - boxRect.bottom,
       closeTo(SizeTokens.fabSize + SpacingTokens.lg, 0.01),
     );
+    expect(fabRect.top - boxRect.bottom, closeTo(0, 0.01));
   });
+
+  testWidgets(
+    'AppScaffold keeps the content baseline aligned to the fab above bottom nav',
+    (tester) async {
+      await tester.binding.setSurfaceSize(const Size(390, 844));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+
+      await tester.pumpWidget(
+        buildTestApp(
+          home: AppScaffold(
+            fab: const AppFab(icon: Icons.add_outlined, onTap: _noop),
+            bottomNavigationBar: const SizedBox(
+              key: Key('bottom-nav'),
+              height: SizeTokens.bottomNavHeight,
+            ),
+            body: Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                key: const Key('nav-fab-bottom-box'),
+                height: 40,
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final boxRect = tester.getRect(
+        find.byKey(const Key('nav-fab-bottom-box')),
+      );
+      final fabRect = tester.getRect(find.byType(FloatingActionButton));
+      final navRect = tester.getRect(find.byKey(const Key('bottom-nav')));
+
+      expect(fabRect.top - boxRect.bottom, closeTo(0, 0.01));
+      expect(
+        navRect.top - boxRect.bottom,
+        closeTo(AppScaffold.fabContentClearance, 0.01),
+      );
+    },
+  );
 
   testWidgets('AppScaffold can disable bottom breathing room', (tester) async {
     await tester.binding.setSurfaceSize(const Size(390, 844));
@@ -94,3 +136,5 @@ void main() {
     expect(scaffold.endDrawer, isNotNull);
   });
 }
+
+void _noop() {}

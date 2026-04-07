@@ -152,6 +152,10 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
                 },
               ),
               if (viewState != DeckDetailViewState.empty)
+                const SliverToBoxAdapter(
+                  child: SizedBox(height: SpacingTokens.lg),
+                ),
+              if (viewState != DeckDetailViewState.empty)
                 _buildToolbar(context),
               if (viewState != DeckDetailViewState.empty)
                 _buildCardsSliver(context, detail, cards),
@@ -280,7 +284,7 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
         },
       ),
       separatorBuilder: (context, index) =>
-          const SizedBox(height: SpacingTokens.sm),
+          const SizedBox(height: SpacingTokens.md),
       itemCount: cards.length,
     ),
   );

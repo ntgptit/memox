@@ -12,6 +12,10 @@ class SettingsGroupCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AppCard(
+    backgroundColor: context.colors.surfaceContainerLow,
+    borderColor: context.colors.onSurface.withValues(
+      alpha: OpacityTokens.focus,
+    ),
     padding: const EdgeInsets.symmetric(vertical: SpacingTokens.xs),
     child: Column(children: _buildChildren(context)),
   );
@@ -32,8 +36,8 @@ class SettingsGroupCard extends StatelessWidget {
           child: Divider(
             height: SizeTokens.dividerThickness,
             thickness: SizeTokens.dividerThickness,
-            color: context.colors.outline.withValues(
-              alpha: OpacityTokens.divider,
+            color: context.colors.onSurface.withValues(
+              alpha: OpacityTokens.borderSubtle,
             ),
           ),
         ),

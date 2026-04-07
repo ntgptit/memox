@@ -2,8 +2,9 @@
 
 ## Current phase
 
-Completed implementation batch. Progress note is up to date with code,
-verification, and summary-note sync.
+Completed Settings screen hierarchy, spacing-rhythm, group-surface, and
+stepper-affordance follow-up. Progress note is synced with the final verified
+tree and the relevant summary-note updates.
 
 ## Completed work
 
@@ -45,6 +46,70 @@ verification, and summary-note sync.
 - synced `home_screen_test.dart` to the new home section heading copy
 - wrapped the `ChoiceBottomSheet` test launch in `unawaited(...)` so the
   analyzer stays clean after the shared bottom-sheet API cleanup
+- fixed the pinned deck cards toolbar top inset in
+  [deck_cards_toolbar.dart](/D:/workspace/memox/lib/features/decks/presentation/widgets/deck_cards_toolbar.dart)
+  so the title/sort row no longer sticks to the toolbar edge on deck detail
+- updated the deck cards toolbar extent formula to match the current compact
+  button + search-bar composition instead of the older taller control contract
+- added a focused widget test for `DeckCardsToolbar` top spacing and internal
+  rhythm
+- normalized `AppScaffold` bottom breathing-room precedence so screens with a
+  FAB keep the same content baseline contract even when a bottom nav is present
+- added a shared `fabContentClearance` contract in
+  [app_scaffold.dart](/D:/workspace/memox/lib/shared/widgets/layout/app_scaffold.dart)
+  to centralize the FAB-aligned bottom spacing formula
+- added a focused `AppScaffold` widget test for the `FAB + bottom nav` case so
+  the content baseline stays aligned to the FAB top edge
+- re-ran targeted shared-layout, home, and theme-preview widget tests after the
+  scaffold change
+- re-ran `python tools/guard/run.py --scope all` after the final shared/test
+  updates
+- re-ran `flutter analyze` after the final shared/test updates
+- lifted the pinned cards toolbar onto a stronger neutral surface tier and
+  restored section-title hierarchy in
+  [deck_cards_toolbar.dart](/D:/workspace/memox/lib/features/decks/presentation/widgets/deck_cards_toolbar.dart)
+- added a pinned-state bottom divider in
+  [deck_cards_toolbar_delegate.dart](/D:/workspace/memox/lib/features/decks/presentation/widgets/deck_cards_toolbar_delegate.dart)
+  so the sticky toolbar separates from the card content when overlapping
+- strengthened toolbar search contrast in
+  [app_search_bar.dart](/D:/workspace/memox/lib/shared/widgets/inputs/app_search_bar.dart)
+  by giving the toolbar variant an explicit border contract on top of the
+  stronger fill tier
+- rebuilt `CardListTile` onto a filled neutral card surface with a clearer
+  border and replaced the expanded raw icon buttons with `AppEditDeleteMenu`
+- added section spacing before the cards toolbar and increased card-row
+  separators in
+  [deck_detail_screen.dart](/D:/workspace/memox/lib/features/decks/presentation/screens/deck_detail_screen.dart)
+- re-ran targeted deck toolbar, search bar, card tile, and deck detail tests
+- re-ran `python tools/guard/run.py --scope features`
+- re-ran `flutter analyze`
+- re-ran targeted deck toolbar and deck detail widget tests
+- normalized Settings inter-section rhythm in
+  [settings_content_view.dart](/D:/workspace/memox/lib/features/settings/presentation/widgets/settings_content_view.dart)
+  by promoting peer-section gaps from `xl` to `sectionGap`
+- rebuilt
+  [settings_section_header.dart](/D:/workspace/memox/lib/features/settings/presentation/widgets/settings_section_header.dart)
+  onto the calmer `titleLarge` tier and aligned it to the settings card-content
+  grammar instead of the raw group-card edge
+- lifted
+  [settings_group_card.dart](/D:/workspace/memox/lib/features/settings/presentation/widgets/settings_group_card.dart)
+  onto a visible neutral surface tier with a clearer outline so grouped settings
+  sections stop disappearing into the dark-mode background
+- collapsed the Appearance section into one grouped surface in
+  [settings_appearance_section.dart](/D:/workspace/memox/lib/features/settings/presentation/widgets/settings_appearance_section.dart)
+  and rebalanced the theme-mode chooser into a stable three-column row with
+  stronger card contrast
+- upgraded settings stepper affordance by making the shared
+  [icon_action_button.dart](/D:/workspace/memox/lib/shared/widgets/buttons/icon_action_button.dart)
+  use a clearer neutral surface/border contract and by letting
+  [settings_stepper_row.dart](/D:/workspace/memox/lib/features/settings/presentation/widgets/settings_stepper_row.dart)
+  inherit the restored 48dp target
+- added focused regression coverage for settings grouping, settings hierarchy,
+  and the shared icon-action control in:
+  - [settings_section_grouping_test.dart](/D:/workspace/memox/test/features/settings/presentation/widgets/settings_section_grouping_test.dart)
+  - [icon_action_button_test.dart](/D:/workspace/memox/test/shared/widgets/buttons/icon_action_button_test.dart)
+- ran `dart run build_runner build --delete-conflicting-outputs`
+- ran `flutter gen-l10n`
 - ran `python tools/guard/run.py --scope all`
 - ran `flutter analyze`
 - ran `flutter test`
@@ -70,6 +135,28 @@ verification, and summary-note sync.
 - [home_screen_test.dart](/D:/workspace/memox/test/features/folders/presentation/screens/home_screen_test.dart)
 - [folder_deck_tile_test.dart](/D:/workspace/memox/test/features/folders/presentation/widgets/folder_deck_tile_test.dart)
 - [choice_bottom_sheet_test.dart](/D:/workspace/memox/test/shared/widgets/dialogs/choice_bottom_sheet_test.dart)
+- [deck_cards_toolbar.dart](/D:/workspace/memox/lib/features/decks/presentation/widgets/deck_cards_toolbar.dart)
+- [deck_cards_toolbar_test.dart](/D:/workspace/memox/test/features/decks/presentation/widgets/deck_cards_toolbar_test.dart)
+- [app_scaffold.dart](/D:/workspace/memox/lib/shared/widgets/layout/app_scaffold.dart)
+- [app_scaffold_test.dart](/D:/workspace/memox/test/shared/widgets/layout/app_scaffold_test.dart)
+- [deck_cards_toolbar_delegate.dart](/D:/workspace/memox/lib/features/decks/presentation/widgets/deck_cards_toolbar_delegate.dart)
+- [app_search_bar.dart](/D:/workspace/memox/lib/shared/widgets/inputs/app_search_bar.dart)
+- [card_list_tile.dart](/D:/workspace/memox/lib/features/cards/presentation/widgets/card_list_tile.dart)
+- [deck_detail_screen.dart](/D:/workspace/memox/lib/features/decks/presentation/screens/deck_detail_screen.dart)
+- [app_search_bar_test.dart](/D:/workspace/memox/test/shared/widgets/inputs/app_search_bar_test.dart)
+- [card_list_tile_test.dart](/D:/workspace/memox/test/features/cards/presentation/widgets/card_list_tile_test.dart)
+- [settings_content_view.dart](/D:/workspace/memox/lib/features/settings/presentation/widgets/settings_content_view.dart)
+- [settings_section_header.dart](/D:/workspace/memox/lib/features/settings/presentation/widgets/settings_section_header.dart)
+- [settings_group_card.dart](/D:/workspace/memox/lib/features/settings/presentation/widgets/settings_group_card.dart)
+- [settings_appearance_section.dart](/D:/workspace/memox/lib/features/settings/presentation/widgets/settings_appearance_section.dart)
+- [settings_stepper_row.dart](/D:/workspace/memox/lib/features/settings/presentation/widgets/settings_stepper_row.dart)
+- [icon_action_button.dart](/D:/workspace/memox/lib/shared/widgets/buttons/icon_action_button.dart)
+- [settings_section_grouping_test.dart](/D:/workspace/memox/test/features/settings/presentation/widgets/settings_section_grouping_test.dart)
+- [icon_action_button_test.dart](/D:/workspace/memox/test/shared/widgets/buttons/icon_action_button_test.dart)
+- [.codex/notes/ui_fix_app_wide_summary.md](/D:/workspace/memox/.codex/notes/ui_fix_app_wide_summary.md)
+- [.codex/notes/ui_full_redesign_fix_pass.md](/D:/workspace/memox/.codex/notes/ui_full_redesign_fix_pass.md)
+- [.codex/notes/ui_fix_shared_widgets_summary.md](/D:/workspace/memox/.codex/notes/ui_fix_shared_widgets_summary.md)
+- [.codex/notes/ui_fix_reference_screens_summary.md](/D:/workspace/memox/.codex/notes/ui_fix_reference_screens_summary.md)
 
 ## Deferred items
 
@@ -83,6 +170,14 @@ verification, and summary-note sync.
   dashboard still needs a later pass to further reduce card-stack sameness
 - broader statistics, home, and library layout propagation remains deferred to
   later focused screen passes
+- deck-detail overview-to-toolbar spacing was not reopened in this hotfix; only
+  the toolbar's own inset/extent contract was corrected
+- actual `floatingActionButtonLocation` geometry was not changed in this pass;
+  this fix only normalized the shared content baseline around the existing FAB
+  placement contract
+- no extra deck-detail sliver bottom padding was added in this pass because the
+  shared `AppScaffold` FAB clearance already reserves more than `xxxl` space at
+  the bottom edge
 
 ## Risks / regressions to watch
 
@@ -102,9 +197,22 @@ verification, and summary-note sync.
 - the new feature bottom-sheet guard means any future sheet wrapper added in
   feature code should route through `context.showAppBottomSheet(...)` or a
   shared helper from the start
+- deck toolbar compact localization should still be watched on-device if sort
+  labels grow in future locales, because the extent is now matched more
+  closely to the compact header contract
+- if the design direction later requires the FAB itself to sit lower or overlap
+  bottom navigation more aggressively, that should be handled as a separate
+  `floatingActionButtonLocation` pass instead of piggybacking on body padding
+- `CardListTile` now uses the shared overflow menu for edit/delete, so card
+  actions are calmer but one tap deeper; if users need direct one-tap inline
+  actions later, that should be designed as a shared pattern instead of
+  reintroducing raw per-screen icon rows
+- the Appearance section now assumes a stable three-column chooser on compact
+  screens; this should be spot-checked on-device in longer locales to confirm
+  the centered labels still read comfortably without awkward wrapping
 
 ## Next step
 
-If the redesign continues, the next safe batch is likely top-bar geometry
-normalization plus further propagation of the calmer library/dashboard rhythm to
-the remaining home and statistics surfaces.
+If the next polish batch stays in Settings, the safest continuation is the
+notifications/time-picker path and the backup/data cards, now that the section
+hierarchy, appearance grouping, and stepper affordance are consistent.

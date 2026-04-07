@@ -311,3 +311,168 @@ screen issues from the audit notes.
   - passed with no issues
 - `flutter test`
   - passed
+
+## Follow-up Batch 4
+
+Date: 2026-04-08
+
+This continuation stayed in the shared shell. It fixed one remaining app-wide
+bottom-rhythm inconsistency around floating actions without changing navigation
+or screen-specific business behavior.
+
+### Additional fixes implemented now
+
+#### App-wide shell cleanup
+
+- updated
+  [app_scaffold.dart](/D:/workspace/memox/lib/shared/widgets/layout/app_scaffold.dart)
+  so FAB-driven bottom breathing room is applied whenever a screen has a FAB,
+  even if the same shell also has a bottom navigation bar
+- centralized that formula as `AppScaffold.fabContentClearance` instead of
+  duplicating the size math inline
+
+#### Verification coverage
+
+- extended
+  [app_scaffold_test.dart](/D:/workspace/memox/test/shared/widgets/layout/app_scaffold_test.dart)
+  with a `FAB + bottom nav` geometry assertion that locks the content baseline
+  to the FAB top edge and confirms the remaining gap above the nav equals the
+  shared clearance contract
+- re-ran home and theme-preview screen tests to validate the shared shell change
+  against the existing FAB consumers
+
+### Additional visual impact
+
+- screens using the shared FAB contract now land content at a more consistent
+  bottom baseline across root-tab and detail contexts
+- the app keeps the existing FAB placement style, but the content no longer
+  feels visually lower on screens that combine FAB and bottom nav
+
+### Additional regression watchpoints
+
+- this pass intentionally did not change `floatingActionButtonLocation`, so any
+  future request to make the FAB itself sit lower should be treated as a
+  separate design decision rather than another body-padding tweak
+
+## Follow-up Batch 5
+
+Date: 2026-04-08
+
+This continuation stayed inside the existing deck-detail/cards-section system.
+It cleaned up one of the last dark-mode contrast weak spots and removed one
+remaining feature-local action-pattern bypass.
+
+### Additional fixes implemented now
+
+#### Shared / shared-consumer cleanup
+
+- strengthened the toolbar-search contract in
+  [app_search_bar.dart](/D:/workspace/memox/lib/shared/widgets/inputs/app_search_bar.dart)
+  by giving the toolbar variant an explicit enabled/focused border on top of
+  its stronger fill tier
+- replaced the expanded raw edit/delete icon row in
+  [card_list_tile.dart](/D:/workspace/memox/lib/features/cards/presentation/widgets/card_list_tile.dart)
+  with `AppEditDeleteMenu` and moved the card onto a clearer filled neutral
+  surface with a stronger border
+
+#### Representative screen cleanup
+
+- moved the pinned cards toolbar in
+  [deck_cards_toolbar.dart](/D:/workspace/memox/lib/features/decks/presentation/widgets/deck_cards_toolbar.dart)
+  onto a stronger neutral surface tier and promoted the section title to
+  `titleLarge`
+- added a pinned-state divider in
+  [deck_cards_toolbar_delegate.dart](/D:/workspace/memox/lib/features/decks/presentation/widgets/deck_cards_toolbar_delegate.dart)
+  so the sticky toolbar reads as a distinct control band once content scrolls
+  underneath it
+- inserted a clearer section gap before the toolbar and increased card-row
+  separators in
+  [deck_detail_screen.dart](/D:/workspace/memox/lib/features/decks/presentation/screens/deck_detail_screen.dart)
+
+### Additional visual impact
+
+- the cards section now reads as a real section boundary below the overview
+  instead of a low-contrast continuation of the same block
+- search stays visible against the toolbar in dark mode
+- card rows feel more containerized and their expanded actions match the shared
+  menu grammar already used elsewhere in the library
+
+### Additional regression watchpoints
+
+- card edit/delete is now a calmer shared overflow menu, so action access is
+  one tap deeper than the previous raw icon row
+- no extra deck-detail sliver bottom padding was added because the shared
+  `AppScaffold` FAB clearance already reserves more than `SpacingTokens.xxxl`
+  at the bottom edge
+
+## Follow-up Batch 6
+
+Date: 2026-04-08
+
+This continuation stayed within the existing settings/shared-control system and
+finished one of the remaining weak reference screens without widening the
+design-system scope.
+
+### Additional fixes implemented now
+
+#### Shared widget fixes
+
+- lifted
+  [settings_group_card.dart](/D:/workspace/memox/lib/features/settings/presentation/widgets/settings_group_card.dart)
+  onto a visible neutral surface tier with a clearer outline so grouped
+  settings surfaces stop collapsing into the page background in dark mode
+- upgraded
+  [icon_action_button.dart](/D:/workspace/memox/lib/shared/widgets/buttons/icon_action_button.dart)
+  to a clearer neutral surface/border treatment while preserving the shared
+  MemoX icon-action contract and adding focused regression coverage in
+  [icon_action_button_test.dart](/D:/workspace/memox/test/shared/widgets/buttons/icon_action_button_test.dart)
+
+#### Representative screen fixes
+
+- normalized inter-section rhythm in
+  [settings_content_view.dart](/D:/workspace/memox/lib/features/settings/presentation/widgets/settings_content_view.dart)
+  so peer settings sections now separate with `Gap.section()`
+- rebuilt
+  [settings_section_header.dart](/D:/workspace/memox/lib/features/settings/presentation/widgets/settings_section_header.dart)
+  onto the calmer `titleLarge` tier and aligned it to the inner group-card
+  content edge
+- merged theme, language, and app color into one grouped Appearance surface in
+  [settings_appearance_section.dart](/D:/workspace/memox/lib/features/settings/presentation/widgets/settings_appearance_section.dart)
+  and rebalanced the theme chooser into a stable three-column row
+- let
+  [settings_stepper_row.dart](/D:/workspace/memox/lib/features/settings/presentation/widgets/settings_stepper_row.dart)
+  inherit the restored 48dp shared icon-action target instead of locally
+  shrinking the controls
+
+### Additional visual impact
+
+- Settings now reads as one coherent hierarchy instead of a stack of oversized
+  section labels on top of faint card blocks
+- the Appearance section feels compact and intentional instead of split into
+  loosely related cards
+- stepper controls are easier to spot and feel more consistent with the rest of
+  the shared control grammar
+
+### Additional regression watchpoints
+
+- the Appearance chooser now assumes three equal columns on compact screens, so
+  future locale growth should be spot-checked on-device before widening the
+  labels or card padding
+- this pass intentionally did not add a dedicated settings-only group-card
+  variant; if another feature later needs the same calmer grouped-surface
+  grammar, the team should decide whether to generalize it or keep it local to
+  Settings
+
+### Verification for this continuation
+
+- `dart run build_runner build --delete-conflicting-outputs`
+  - passed
+- `flutter gen-l10n`
+  - passed
+- `python tools/guard/run.py --scope all`
+  - passed
+  - only the pre-existing `feature_completeness` warnings remain
+- `flutter analyze`
+  - passed with no issues
+- `flutter test`
+  - passed

@@ -195,3 +195,63 @@ The next safe app-wide batch should stay shared-layer-first and target:
 2. `AppListTile` / `AppCardListTile` role separation so search, settings, entity rows, and sheet rows stop sharing one overloaded grammar
 3. settings row density cleanup using row-specific variants instead of padding stacked on top of `AppPressable`
 4. geometry-anchor normalization only after adding dedicated layout tests for top bars, study chrome, and dense card stacks
+
+## Follow-up Batch: Shared FAB Baseline Consistency
+
+Date: 2026-04-08
+
+This follow-up stayed inside the app shell instead of restyling individual
+screens. It addressed one remaining inconsistency in bottom rhythm around
+floating actions.
+
+### What problem was fixed
+
+- `AppScaffold` reserved FAB breathing room only on screens without a bottom
+  nav
+- screens with `fab + bottomNavigationBar` therefore let content run lower than
+  the FAB top edge, while screens with only a FAB stopped content exactly at
+  the FAB baseline
+- this made bottom rhythm feel inconsistent between home/theme-preview and the
+  detail screens that also rely on the shared FAB contract
+
+### Shared layers modified
+
+- [app_scaffold.dart](/D:/workspace/memox/lib/shared/widgets/layout/app_scaffold.dart)
+- [app_scaffold_test.dart](/D:/workspace/memox/test/shared/widgets/layout/app_scaffold_test.dart)
+
+### What was implemented
+
+- added `AppScaffold.fabContentClearance` so the shell owns one explicit
+  bottom-spacing formula for FAB-aligned content
+- changed `contentBottomPadding(...)` to prioritize `hasFab` before
+  `hasBottomNav`, which keeps the shared content baseline aligned to the FAB
+  top edge in both shell configurations
+- extended the shared scaffold tests with a `FAB + bottom nav` case that
+  measures the content baseline against both the FAB and nav geometry
+
+### Visual impact
+
+- bottom-aligned content now stops at the same visual level relative to the
+  FAB across screens that use the shared shell
+- root-tab screens with a FAB no longer feel like the content sinks below the
+  floating action compared with detail screens
+- the fix is centralized, so future shell consumers inherit the calmer baseline
+  automatically without local padding hacks
+
+### Regression risk and deferral
+
+- risk is low to moderate because the change is limited to shared body padding
+  and covered by shell-level widget tests
+- this pass did **not** change `floatingActionButtonLocation`; if the product
+  later wants the FAB itself to sit lower or overlap bottom nav differently,
+  that should be a separate visual calibration pass
+
+### Verification for this follow-up
+
+- `python tools/guard/run.py --scope all`
+  - passed
+  - only the pre-existing `feature_completeness` warnings remain
+- `flutter analyze`
+  - passed with no issues
+- `flutter test test/shared/widgets/layout/app_scaffold_test.dart test/features/folders/presentation/screens/home_screen_test.dart test/features/settings/presentation/screens/theme_preview_screen_test.dart`
+  - passed

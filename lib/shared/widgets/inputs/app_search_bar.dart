@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/duration_tokens.dart';
+import 'package:memox/core/theme/tokens/radius_tokens.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 
@@ -72,6 +73,8 @@ class _AppSearchBarState extends State<AppSearchBar> {
         hintText: widget.hint,
         fillColor: _fillColor(context),
         contentPadding: _contentPadding,
+        enabledBorder: _enabledBorder(context),
+        focusedBorder: _focusedBorder(context),
         prefixIcon: const Icon(Icons.search_outlined),
         suffixIcon: _controller.text.isEmpty
             ? null
@@ -90,6 +93,22 @@ class _AppSearchBarState extends State<AppSearchBar> {
     AppSearchBarVariant.toolbar => const EdgeInsets.symmetric(
       horizontal: SpacingTokens.lg,
       vertical: SpacingTokens.md,
+    ),
+  };
+
+  InputBorder? _enabledBorder(BuildContext context) => switch (widget.variant) {
+    AppSearchBarVariant.page => null,
+    AppSearchBarVariant.toolbar => OutlineInputBorder(
+      borderRadius: const BorderRadius.all(Radius.circular(RadiusTokens.input)),
+      borderSide: BorderSide(color: context.colors.outline),
+    ),
+  };
+
+  InputBorder? _focusedBorder(BuildContext context) => switch (widget.variant) {
+    AppSearchBarVariant.page => null,
+    AppSearchBarVariant.toolbar => OutlineInputBorder(
+      borderRadius: const BorderRadius.all(Radius.circular(RadiusTokens.input)),
+      borderSide: BorderSide(color: context.colors.primary),
     ),
   };
 }

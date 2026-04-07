@@ -35,11 +35,6 @@ class SettingsAppearanceSection extends ConsumerWidget {
             ),
           ),
           SettingsLanguageRow(settings: settings),
-        ],
-      ),
-      const Gap.md(),
-      SettingsGroupCard(
-        children: [
           _AppearanceBlock(
             title: context.l10n.settingsAppColorTitle,
             child: ColorPicker(
@@ -85,46 +80,35 @@ class _ThemeModeChooser extends StatelessWidget {
   final ValueChanged<ThemeMode> onThemeModeChanged;
 
   @override
-  Widget build(BuildContext context) => LayoutBuilder(
-    builder: (context, constraints) {
-      final cardWidth = context.isCompact
-          ? (constraints.maxWidth - SpacingTokens.sm) / 2
-          : (constraints.maxWidth - (SpacingTokens.sm * 2)) / 3;
-
-      return Wrap(
-        spacing: SpacingTokens.sm,
-        runSpacing: SpacingTokens.sm,
-        children: [
-          SizedBox(
-            width: cardWidth,
-            child: _ThemeModeCard(
-              icon: Icons.brightness_auto_outlined,
-              isSelected: settings.themeMode == ThemeMode.system,
-              label: context.l10n.themeModeSystem,
-              onTap: () => onThemeModeChanged(ThemeMode.system),
-            ),
-          ),
-          SizedBox(
-            width: cardWidth,
-            child: _ThemeModeCard(
-              icon: Icons.light_mode_outlined,
-              isSelected: settings.themeMode == ThemeMode.light,
-              label: context.l10n.themeModeLight,
-              onTap: () => onThemeModeChanged(ThemeMode.light),
-            ),
-          ),
-          SizedBox(
-            width: cardWidth,
-            child: _ThemeModeCard(
-              icon: Icons.dark_mode_outlined,
-              isSelected: settings.themeMode == ThemeMode.dark,
-              label: context.l10n.themeModeDark,
-              onTap: () => onThemeModeChanged(ThemeMode.dark),
-            ),
-          ),
-        ],
-      );
-    },
+  Widget build(BuildContext context) => Row(
+    children: [
+      Expanded(
+        child: _ThemeModeCard(
+          icon: Icons.brightness_auto_outlined,
+          isSelected: settings.themeMode == ThemeMode.system,
+          label: context.l10n.themeModeSystem,
+          onTap: () => onThemeModeChanged(ThemeMode.system),
+        ),
+      ),
+      const Gap.sm(),
+      Expanded(
+        child: _ThemeModeCard(
+          icon: Icons.light_mode_outlined,
+          isSelected: settings.themeMode == ThemeMode.light,
+          label: context.l10n.themeModeLight,
+          onTap: () => onThemeModeChanged(ThemeMode.light),
+        ),
+      ),
+      const Gap.sm(),
+      Expanded(
+        child: _ThemeModeCard(
+          icon: Icons.dark_mode_outlined,
+          isSelected: settings.themeMode == ThemeMode.dark,
+          label: context.l10n.themeModeDark,
+          onTap: () => onThemeModeChanged(ThemeMode.dark),
+        ),
+      ),
+    ],
   );
 }
 
@@ -145,28 +129,36 @@ class _ThemeModeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final borderColor = isSelected
         ? context.colors.primary
-        : context.colors.outline.withValues(alpha: OpacityTokens.borderSubtle);
+        : context.colors.onSurface.withValues(alpha: OpacityTokens.focus);
+    final backgroundColor = isSelected
+        ? context.colors.primary.withValues(alpha: OpacityTokens.focus)
+        : context.colors.surfaceContainerHigh;
+    final foregroundColor = isSelected
+        ? context.colors.primary
+        : context.colors.onSurface;
 
     return AppCard(
       onTap: onTap,
       borderColor: borderColor,
-      backgroundColor: isSelected
-          ? context.colors.primary.withValues(alpha: OpacityTokens.focus)
-          : null,
+      backgroundColor: backgroundColor,
       padding: const EdgeInsets.symmetric(
-        horizontal: SpacingTokens.md,
-        vertical: SpacingTokens.lg,
+        horizontal: SpacingTokens.sm,
+        vertical: SpacingTokens.md,
       ),
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: SizeTokens.iconMd),
-            const Gap.sm(),
+            Icon(icon, size: SizeTokens.iconMd, color: foregroundColor),
+            const Gap.xs(),
             Text(
               label,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: context.textTheme.titleSmall,
+              style: context.textTheme.bodySmall?.copyWith(
+                color: foregroundColor,
+              ),
             ),
           ],
         ),
