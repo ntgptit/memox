@@ -2,10 +2,11 @@
 
 ## Current phase
 
-Completed and verified the fill/recall compact-layout cleanup. This pass keeps
-the study mode content-direction fix from the previous batch, then tightens
-prompt, feedback, and writing-area proportions so fill and recall remain
-readable on phone-sized dark-mode screens without reopening business logic.
+Completed, verified, committed, and pushed the current UI workflow state on
+`codex/fill-recall-study-layout`. This pass keeps the study mode
+content-direction fix from the previous batch, then tightens prompt, feedback,
+and writing-area proportions so fill and recall remain readable on phone-sized
+dark-mode screens without reopening business logic.
 
 ## Completed work
 
@@ -309,6 +310,6 @@ readable on phone-sized dark-mode screens without reopening business logic.
 
 ## Next step
 
-The tree is verified. The remaining release step is to place the current
-workflow state on a dedicated `codex/` branch, commit it cleanly, and push it
-for review instead of leaving the cumulative redesign work stranded on `main`.
+Open a PR from `codex/fill-recall-study-layout` and do a visual device pass on
+the compact fill/recall flows, with extra attention on very long examples,
+localized action labels, and tagged recall cards.
