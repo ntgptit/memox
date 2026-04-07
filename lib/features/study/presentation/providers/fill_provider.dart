@@ -54,7 +54,7 @@ extension FillStateX on FillState {
   bool get canPracticeMistakes =>
       results.any((item) => item.firstAttemptResult != FillResult.correct);
 
-  bool get canSkip => isRetrying && retryCount >= 2;
+  bool get canSkip => isRetrying && retryCount >= 1;
 
   bool get canSubmit => userInput.trim().isNotEmpty;
 
@@ -382,6 +382,7 @@ class FillSession extends _$FillSession {
         firstAttemptResult: firstAttemptResult,
         isRetrying: true,
         retryCount: current.retryCount + 1,
+        showHint: current.showHint || current.currentPrompt.hint != null,
         streak: 0,
       ),
     );

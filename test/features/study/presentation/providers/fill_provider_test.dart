@@ -76,116 +76,126 @@ void main() {
     expect(review.userAnswer.value, 'banan');
   });
 
-  test('initial prompt expects the answer side and shows the clue side', () async {
-    final cardReviewDao = FakeCardReviewDao();
-    final container = buildContainer(
-      flashcardRepository: FakeFlashcardRepository(cards: _cards(1)),
-      cardReviewDao: cardReviewDao,
-    );
-    addTearDown(cardReviewDao.dispose);
-    addTearDown(container.dispose);
+  test(
+    'initial prompt expects the answer side and shows the clue side',
+    () async {
+      final cardReviewDao = FakeCardReviewDao();
+      final container = buildContainer(
+        flashcardRepository: FakeFlashcardRepository(cards: _cards(1)),
+        cardReviewDao: cardReviewDao,
+      );
+      addTearDown(cardReviewDao.dispose);
+      addTearDown(container.dispose);
 
-    final state = await container.read(fillSessionProvider(1).future);
+      final state = await container.read(fillSessionProvider(1).future);
 
-    expect(state.currentPrompt.correctAnswer, 'banana');
-    expect(state.currentPrompt.sentenceWithBlank, 'I ate a ________ for breakfast.');
-  });
+      expect(state.currentPrompt.correctAnswer, 'banana');
+      expect(
+        state.currentPrompt.sentenceWithBlank,
+        'I ate a ________ for breakfast.',
+      );
+    },
+  );
 
-  test('retry requires a matching answer before the card can advance', () async {
-    final cardReviewDao = FakeCardReviewDao();
-    final container = buildContainer(
-      flashcardRepository: FakeFlashcardRepository(cards: _cards(1)),
-      cardReviewDao: cardReviewDao,
-    );
-    addTearDown(cardReviewDao.dispose);
-    addTearDown(container.dispose);
-    final notifier = container.read(fillSessionProvider(1).notifier);
+  test(
+    'retry requires a matching answer before the card can advance',
+    () async {
+      final cardReviewDao = FakeCardReviewDao();
+      final container = buildContainer(
+        flashcardRepository: FakeFlashcardRepository(cards: _cards(1)),
+        cardReviewDao: cardReviewDao,
+      );
+      addTearDown(cardReviewDao.dispose);
+      addTearDown(container.dispose);
+      final notifier = container.read(fillSessionProvider(1).notifier);
 
-    await container.read(fillSessionProvider(1).future);
-    await notifier.updateInput('apple');
-    await notifier.submitAnswer();
+      await container.read(fillSessionProvider(1).future);
+      await notifier.updateInput('apple');
+      await notifier.submitAnswer();
 
-    var state = container.read(fillSessionProvider(1)).requireValue;
-    expect(state.isRetrying, isTrue);
-    expect(state.currentIndex, 0);
-    expect(state.retryCount, 1);
-    expect(cardReviewDao.insertedReviews, hasLength(1));
+      var state = container.read(fillSessionProvider(1)).requireValue;
+      expect(state.isRetrying, isTrue);
+      expect(state.currentIndex, 0);
+      expect(state.retryCount, 1);
+      expect(cardReviewDao.insertedReviews, hasLength(1));
 
-    await notifier.updateInput('banana');
-    await notifier.submitAnswer();
+      await notifier.updateInput('banana');
+      await notifier.submitAnswer();
 
-    state = container.read(fillSessionProvider(1)).requireValue;
-    expect(state.isComplete, isTrue);
-    expect(state.results.single.firstAttemptResult, FillResult.wrong);
-    expect(state.results.single.retryCount, 1);
-    expect(cardReviewDao.insertedReviews, hasLength(1));
-  });
+      state = container.read(fillSessionProvider(1)).requireValue;
+      expect(state.isComplete, isTrue);
+      expect(state.results.single.firstAttemptResult, FillResult.wrong);
+      expect(state.results.single.retryCount, 1);
+      expect(cardReviewDao.insertedReviews, hasLength(1));
+    },
+  );
 
-  test('skip only becomes available after two failed retries', () async {
-    final cardReviewDao = FakeCardReviewDao();
-    final container = buildContainer(
-      flashcardRepository: FakeFlashcardRepository(cards: _cards(1)),
-      cardReviewDao: cardReviewDao,
-    );
-    addTearDown(cardReviewDao.dispose);
-    addTearDown(container.dispose);
-    final notifier = container.read(fillSessionProvider(1).notifier);
+  test(
+    'skip becomes available after the first retry and hints open automatically',
+    () async {
+      final cardReviewDao = FakeCardReviewDao();
+      final container = buildContainer(
+        flashcardRepository: FakeFlashcardRepository(cards: _cards(1)),
+        cardReviewDao: cardReviewDao,
+      );
+      addTearDown(cardReviewDao.dispose);
+      addTearDown(container.dispose);
+      final notifier = container.read(fillSessionProvider(1).notifier);
 
-    await container.read(fillSessionProvider(1).future);
-    await notifier.updateInput('apple');
-    await notifier.submitAnswer();
+      await container.read(fillSessionProvider(1).future);
+      await notifier.updateInput('apple');
+      await notifier.submitAnswer();
 
-    var state = container.read(fillSessionProvider(1)).requireValue;
-    expect(state.canSkip, isFalse);
+      var state = container.read(fillSessionProvider(1)).requireValue;
+      expect(state.canSkip, isTrue);
+      expect(state.retryCount, 1);
+      expect(state.showHint, isTrue);
 
-    await notifier.updateInput('pear');
-    await notifier.submitAnswer();
+      await notifier.skipCard();
 
-    state = container.read(fillSessionProvider(1)).requireValue;
-    expect(state.canSkip, isTrue);
-    expect(state.retryCount, 2);
+      state = container.read(fillSessionProvider(1)).requireValue;
+      expect(state.isComplete, isTrue);
+      expect(state.results.single.retryCount, 1);
+    },
+  );
 
-    await notifier.skipCard();
+  test(
+    'streak increases on first-try correct answers and resets on wrong',
+    () async {
+      final cardReviewDao = FakeCardReviewDao();
+      final container = buildContainer(
+        flashcardRepository: FakeFlashcardRepository(cards: _cards(3)),
+        cardReviewDao: cardReviewDao,
+      );
+      addTearDown(cardReviewDao.dispose);
+      addTearDown(container.dispose);
+      final notifier = container.read(fillSessionProvider(1).notifier);
 
-    state = container.read(fillSessionProvider(1)).requireValue;
-    expect(state.isComplete, isTrue);
-    expect(state.results.single.retryCount, 2);
-  });
+      await container.read(fillSessionProvider(1).future);
 
-  test('streak increases on first-try correct answers and resets on wrong', () async {
-    final cardReviewDao = FakeCardReviewDao();
-    final container = buildContainer(
-      flashcardRepository: FakeFlashcardRepository(cards: _cards(3)),
-      cardReviewDao: cardReviewDao,
-    );
-    addTearDown(cardReviewDao.dispose);
-    addTearDown(container.dispose);
-    final notifier = container.read(fillSessionProvider(1).notifier);
+      var state = container.read(fillSessionProvider(1)).requireValue;
+      await notifier.updateInput(state.currentPrompt.correctAnswer);
+      await notifier.submitAnswer();
 
-    await container.read(fillSessionProvider(1).future);
+      state = container.read(fillSessionProvider(1)).requireValue;
+      expect(state.streak, 1);
 
-    var state = container.read(fillSessionProvider(1)).requireValue;
-    await notifier.updateInput(state.currentPrompt.correctAnswer);
-    await notifier.submitAnswer();
+      await notifier.updateInput(state.currentPrompt.correctAnswer);
+      await notifier.submitAnswer();
 
-    state = container.read(fillSessionProvider(1)).requireValue;
-    expect(state.streak, 1);
+      state = container.read(fillSessionProvider(1)).requireValue;
+      expect(state.streak, 2);
+      expect(state.bestStreak, 2);
 
-    await notifier.updateInput(state.currentPrompt.correctAnswer);
-    await notifier.submitAnswer();
+      await notifier.updateInput('wrong');
+      await notifier.submitAnswer();
 
-    state = container.read(fillSessionProvider(1)).requireValue;
-    expect(state.streak, 2);
-    expect(state.bestStreak, 2);
-
-    await notifier.updateInput('wrong');
-    await notifier.submitAnswer();
-
-    state = container.read(fillSessionProvider(1)).requireValue;
-    expect(state.isRetrying, isTrue);
-    expect(state.streak, 0);
-    expect(state.bestStreak, 2);
-  });
+      state = container.read(fillSessionProvider(1)).requireValue;
+      expect(state.isRetrying, isTrue);
+      expect(state.streak, 0);
+      expect(state.bestStreak, 2);
+    },
+  );
 }
 
 List<FlashcardEntity> _cards(int count) => List<FlashcardEntity>.generate(

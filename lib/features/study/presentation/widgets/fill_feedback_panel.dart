@@ -80,6 +80,14 @@ class _FillCloseFeedback extends StatelessWidget {
         ),
         const SizedBox(height: SpacingTokens.xs),
         FillDiffText(userAnswer: userAnswer, correctAnswer: answer),
+        const SizedBox(height: SpacingTokens.sm),
+        Text(
+          context.l10n.fillCloseExplanation,
+          style: context.textTheme.bodySmall?.copyWith(
+            color: context.colors.onSurfaceVariant,
+          ),
+          textAlign: TextAlign.center,
+        ),
         const SizedBox(height: SpacingTokens.lg),
         Wrap(
           alignment: WrapAlignment.center,

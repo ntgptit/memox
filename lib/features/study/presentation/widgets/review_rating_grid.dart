@@ -40,6 +40,7 @@ class ReviewRatingGrid extends StatelessWidget {
       ReviewRatingButton(
         rating: rating,
         label: _label(context, rating),
+        hint: _hint(context, rating),
         preview: nextReviewTimes[rating] ?? '',
         onTap: () => onRate(rating),
       );
@@ -49,6 +50,13 @@ class ReviewRatingGrid extends StatelessWidget {
     ReviewRating.hard => context.l10n.reviewRatingHard,
     ReviewRating.good => context.l10n.reviewRatingGood,
     ReviewRating.easy => context.l10n.reviewRatingEasy,
+  };
+
+  String _hint(BuildContext context, ReviewRating rating) => switch (rating) {
+    ReviewRating.again => context.l10n.reviewRatingAgainHint,
+    ReviewRating.hard => context.l10n.reviewRatingHardHint,
+    ReviewRating.good => context.l10n.reviewRatingGoodHint,
+    ReviewRating.easy => context.l10n.reviewRatingEasyHint,
   };
 }
 

@@ -49,6 +49,26 @@ void main() {
     expect(updated.selectedDefinitionId, isNull);
   });
 
+  test('tapping the selected term again clears the selection', () async {
+    final cardReviewDao = FakeCardReviewDao();
+    final container = buildContainer(
+      flashcardRepository: FakeFlashcardRepository(cards: _cards(2)),
+      cardReviewDao: cardReviewDao,
+    );
+    addTearDown(cardReviewDao.dispose);
+    addTearDown(container.dispose);
+    final initial = await container.read(matchSessionProvider(1).future);
+    final notifier = container.read(matchSessionProvider(1).notifier);
+    final selectedTerm = initial.game.terms.first;
+
+    await notifier.selectItem(selectedTerm);
+    await notifier.selectItem(selectedTerm);
+
+    final updated = container.read(matchSessionProvider(1)).requireValue;
+    expect(updated.selectedTermId, isNull);
+    expect(updated.selectedDefinitionId, isNull);
+  });
+
   test('wrong selection increments mistakes and clears the pair', () async {
     final cardReviewDao = FakeCardReviewDao();
     final container = buildContainer(

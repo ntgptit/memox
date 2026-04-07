@@ -9,6 +9,7 @@ class ReviewRatingButton extends StatelessWidget {
   const ReviewRatingButton({
     required this.rating,
     required this.label,
+    required this.hint,
     required this.preview,
     required this.onTap,
     super.key,
@@ -16,6 +17,7 @@ class ReviewRatingButton extends StatelessWidget {
 
   final ReviewRating rating;
   final String label;
+  final String hint;
   final String preview;
   final VoidCallback onTap;
 
@@ -37,6 +39,12 @@ class ReviewRatingButton extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(label, style: context.textTheme.titleSmall),
+          Text(
+            hint,
+            style: context.textTheme.bodySmall?.copyWith(
+              color: context.colors.onSurfaceVariant,
+            ),
+          ),
           Text(
             preview,
             style: context.appTextStyles.nextReviewTime.copyWith(

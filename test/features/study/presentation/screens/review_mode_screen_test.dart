@@ -44,6 +44,8 @@ void main() {
     expect(find.text('How well did you remember it?'), findsOneWidget);
     expect(find.text('Again'), findsOneWidget);
     expect(find.text('Easy'), findsOneWidget);
+    expect(find.text("Didn't know"), findsOneWidget);
+    expect(find.text('Instant'), findsOneWidget);
   });
 
   testWidgets('ReviewModeScreen shows completion after rating the card', (
@@ -67,7 +69,9 @@ void main() {
 
     await tester.tap(find.byKey(const ValueKey<String>('review-front-1')));
     await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const ValueKey<ReviewRating>(ReviewRating.good)));
+    await tester.tap(
+      find.byKey(const ValueKey<ReviewRating>(ReviewRating.good)),
+    );
     await tester.pumpAndSettle();
 
     expect(find.text('1 cards reviewed'), findsOneWidget);
@@ -147,10 +151,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('3 cards reviewed'), findsOneWidget);
-    expect(
-      find.text('Again: 1 · Hard: 0 · Good: 1 · Easy: 1'),
-      findsOneWidget,
-    );
+    expect(find.text('Again: 1 · Hard: 0 · Good: 1 · Easy: 1'), findsOneWidget);
   });
 }
 

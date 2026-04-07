@@ -683,3 +683,96 @@ mapping bug was corrected.
   - passed with no issues
 - `flutter test`
   - passed
+
+## Follow-up Reference Screen Batch 8
+
+Date: 2026-04-08
+
+This continuation stayed inside the existing study-mode shells and fixed the
+highest-confidence UX problems that could be improved safely without reopening
+session persistence, SRS rollback, or broader mode semantics.
+
+### 14. Review, guess, recall, fill, and match study UX guidance
+
+**Main issues fixed**
+
+- review ratings still lacked explicit guidance for newer users even after the
+  earlier study-shell cleanup
+- guess mode did not explain wrong answers and gave no manual way to advance
+  early after a correct answer
+- recall self-rating still relied entirely on user interpretation of
+  `Missed/Partial/Got it`
+- fill close-match actions still felt ambiguous, and the retry path stayed
+  harsher than necessary on the first failure
+- match mode already had provider support for deselection behavior, but the
+  selected-item re-tap path was not actually implemented
+
+**Implemented**
+
+- wired review rating micro-hints into
+  [review_rating_grid.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/review_rating_grid.dart)
+  and
+  [review_rating_button.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/review_rating_button.dart)
+  so `Again/Hard/Good/Easy` now explain the intended recall quality without
+  changing the SRS contract
+- added
+  [guess_feedback_card.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/guess_feedback_card.dart)
+  and mounted it from
+  [guess_round_view.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/guess_round_view.dart)
+  so wrong guesses now show the correct answer, definition, example, and hint
+- exposed an explicit `Continue` action for answered guess questions while
+  keeping the existing delayed auto-advance path intact for correct answers
+- added
+  [recall_rating_guidance.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/recall_rating_guidance.dart)
+  and mounted it from
+  [recall_reveal_phase.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/recall_reveal_phase.dart)
+  so self-rating criteria stay visible next to the comparison view
+- clarified fill close-match decisions in
+  [fill_feedback_panel.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/fill_feedback_panel.dart)
+  with a consequence explainer and clearer action labels
+- relaxed first-retry friction in
+  [fill_provider.dart](/D:/workspace/memox/lib/features/study/presentation/providers/fill_provider.dart)
+  so hints open automatically and `Skip for now` becomes available after the
+  first retry instead of the second
+- implemented selected-item re-tap deselection in
+  [match_provider.dart](/D:/workspace/memox/lib/features/study/presentation/providers/match_provider.dart)
+  for both term and definition selections
+- updated localized copy in:
+  - [app_en.arb](/D:/workspace/memox/l10n/app_en.arb)
+  - [app_vi.arb](/D:/workspace/memox/l10n/app_vi.arb)
+  - [app_ko.arb](/D:/workspace/memox/l10n/app_ko.arb)
+
+**Before / after structural improvement**
+
+- before: study modes had cleaner shells, but several key action decisions were
+  still under-explained or awkward once the user reached the learning moment
+- after: review explains its rating choices, guess explains mistakes and lets
+  users advance deliberately, recall gives clearer self-rating criteria, fill
+  reduces retry confusion, and match allows obvious selection recovery
+
+## Additional reusable patterns proven by follow-up batch 8
+
+22. High-frequency study actions should pair their learning decision with one
+    short explanation instead of relying on jargon-only labels.
+23. Wrong-answer states should prefer a compact explanation surface inside the
+    current round instead of forcing the user to infer the correction from
+    option color alone.
+24. When a study mode uses delayed auto-advance, a manual `Continue` action is
+    a safe companion as long as the provider already guards double-advance.
+25. Retry-heavy input modes should expose the lowest-risk recovery tools
+    earlier, such as hints or a neutral skip path, before forcing repeated
+    wrong submissions.
+
+### Verification for follow-up batch 8
+
+- `dart run build_runner build --delete-conflicting-outputs`
+  - passed
+- `flutter gen-l10n`
+  - passed
+- `python tools/guard/run.py --scope all`
+  - passed
+  - only the pre-existing `feature_completeness` warnings remain
+- `flutter analyze`
+  - passed with no issues
+- `flutter test`
+  - passed

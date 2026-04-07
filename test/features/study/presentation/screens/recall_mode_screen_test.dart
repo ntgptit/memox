@@ -9,6 +9,7 @@ import 'package:memox/core/providers/repository_providers.dart';
 import 'package:memox/features/cards/domain/entities/flashcard_entity.dart';
 import 'package:memox/features/study/domain/entities/study_session.dart';
 import 'package:memox/features/study/domain/repositories/study_repository.dart';
+import 'package:memox/features/study/domain/srs/srs_engine.dart';
 import 'package:memox/features/study/presentation/providers/recall_provider.dart';
 import 'package:memox/features/study/presentation/screens/recall_mode_screen.dart';
 import 'package:memox/features/study/presentation/widgets/recall_prompt_card.dart';
@@ -48,10 +49,7 @@ void main() {
       tester.getSize(find.byType(RecallPromptCard)).height,
       lessThanOrEqualTo(800 * 0.4),
     );
-    expect(
-      find.widgetWithText(SecondaryButton, 'Show answer'),
-      findsOneWidget,
-    );
+    expect(find.widgetWithText(SecondaryButton, 'Show answer'), findsOneWidget);
     expect(tester.getTopLeft(find.byType(TextField)).dy, lessThan(800 * 0.7));
 
     await tester.tap(find.text('Show answer'), warnIfMissed: false);
@@ -67,6 +65,8 @@ void main() {
     expect(find.text('Complete answer'), findsOneWidget);
     expect(find.text('Term 1'), findsOneWidget);
     expect(find.text('How well did you recall?'), findsOneWidget);
+    expect(find.text('Completely wrong or blank'), findsOneWidget);
+    expect(find.text('All key points covered'), findsOneWidget);
   });
 
   testWidgets('RecallModeScreen can restart with missed cards', (tester) async {
@@ -92,7 +92,11 @@ void main() {
     await tester.pumpAndSettle();
     await tester.tap(find.text('Show answer'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Missed'));
+    final missedChoice = find.descendant(
+      of: find.byType(SegmentedButton<SelfRating>),
+      matching: find.text('Missed'),
+    );
+    await tester.tap(missedChoice.first);
     await tester.pumpAndSettle();
 
     expect(find.text('1 cards recalled'), findsOneWidget);
@@ -139,10 +143,7 @@ void main() {
       tester.getSize(find.byType(RecallPromptCard)).height,
       lessThanOrEqualTo(800 * 0.4),
     );
-    expect(
-      find.widgetWithText(SecondaryButton, 'Show answer'),
-      findsOneWidget,
-    );
+    expect(find.widgetWithText(SecondaryButton, 'Show answer'), findsOneWidget);
   });
 }
 
@@ -151,18 +152,16 @@ Future<void> _setCompactSurface(WidgetTester tester) async {
   addTearDown(() => tester.binding.setSurfaceSize(null));
 }
 
-List<FlashcardEntity> _cards(
-  int count, {
-  String? back,
-}) => List<FlashcardEntity>.generate(
-  count,
-  (index) => FlashcardEntity(
-    id: index + 1,
-    deckId: 4,
-    front: 'Term ${index + 1}',
-    back: back ?? 'Definition ${index + 1}',
-  ),
-);
+List<FlashcardEntity> _cards(int count, {String? back}) =>
+    List<FlashcardEntity>.generate(
+      count,
+      (index) => FlashcardEntity(
+        id: index + 1,
+        deckId: 4,
+        front: 'Term ${index + 1}',
+        back: back ?? 'Definition ${index + 1}',
+      ),
+    );
 
 final class _FakeStudyRepository implements StudyRepository {
   @override

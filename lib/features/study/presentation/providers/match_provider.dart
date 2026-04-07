@@ -110,9 +110,23 @@ class MatchSession extends _$MatchSession {
     }
 
     if (item.type == MatchItemType.term) {
+      if (current.selectedTermId == item.id) {
+        state = AsyncValue<MatchState>.data(
+          current.copyWith(selectedTermId: null),
+        );
+        return;
+      }
+
       final updated = current.copyWith(selectedTermId: item.id);
       state = AsyncValue<MatchState>.data(updated);
       await _resolveSelection(updated);
+      return;
+    }
+
+    if (current.selectedDefinitionId == item.id) {
+      state = AsyncValue<MatchState>.data(
+        current.copyWith(selectedDefinitionId: null),
+      );
       return;
     }
 

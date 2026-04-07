@@ -312,6 +312,87 @@ screen issues from the audit notes.
 - `flutter test`
   - passed
 
+## Follow-up Batch 9
+
+Date: 2026-04-08
+
+This continuation stayed inside the study feature and focused on the highest
+value-to-risk UX improvements that were still missing after the earlier shell,
+layout, and content-direction fixes.
+
+### Additional fixes implemented now
+
+#### Representative screen and mode fixes
+
+- added rating guidance copy to review mode through:
+  - [review_rating_grid.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/review_rating_grid.dart)
+  - [review_rating_button.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/review_rating_button.dart)
+- added a compact wrong-answer explanation surface for guess mode through:
+  - [guess_feedback_card.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/guess_feedback_card.dart)
+  - [guess_round_view.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/guess_round_view.dart)
+- kept guess auto-advance behavior intact while exposing an explicit manual
+  `Continue` action for answered questions
+- added recall self-rating criteria through:
+  - [recall_rating_guidance.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/recall_rating_guidance.dart)
+  - [recall_reveal_phase.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/recall_reveal_phase.dart)
+- clarified fill close-match decisions and lowered retry friction through:
+  - [fill_feedback_panel.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/fill_feedback_panel.dart)
+  - [fill_provider.dart](/D:/workspace/memox/lib/features/study/presentation/providers/fill_provider.dart)
+- implemented selection recovery in match mode through
+  [match_provider.dart](/D:/workspace/memox/lib/features/study/presentation/providers/match_provider.dart)
+  so tapping an already-selected item clears that choice
+- updated localized study strings in:
+  - [app_en.arb](/D:/workspace/memox/l10n/app_en.arb)
+  - [app_vi.arb](/D:/workspace/memox/l10n/app_vi.arb)
+  - [app_ko.arb](/D:/workspace/memox/l10n/app_ko.arb)
+
+#### Regression coverage
+
+- updated focused study tests to lock the new UX contract in:
+  - [review_mode_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/review_mode_screen_test.dart)
+  - [guess_mode_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/guess_mode_screen_test.dart)
+  - [recall_mode_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/recall_mode_screen_test.dart)
+  - [fill_mode_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/fill_mode_screen_test.dart)
+  - [fill_provider_test.dart](/D:/workspace/memox/test/features/study/presentation/providers/fill_provider_test.dart)
+  - [match_provider_test.dart](/D:/workspace/memox/test/features/study/presentation/providers/match_provider_test.dart)
+
+### Additional visual and UX impact
+
+- review mode now gives first-time users clearer guidance on when to choose
+  `Again/Hard/Good/Easy`
+- guess mode now teaches on wrong answers instead of only marking them, and it
+  lets users continue early without waiting for the timer when they answer
+  correctly
+- recall mode now anchors self-rating with explicit criteria instead of only
+  three terse labels
+- fill mode now explains what “close enough” means and surfaces hint/skip
+  recovery earlier in the retry loop
+- match mode now supports a more obvious recovery path for accidental taps
+
+### Additional regression watchpoints
+
+- this pass intentionally did not implement review undo, swipe-to-rate,
+  pause/resume sessions, or recall minimum-answer gating because those would
+  widen the change into persistence or SRS semantics
+- guess mode now keeps both delayed auto-advance and manual `Continue`, so the
+  live feel should still be spot-checked at shorter auto-advance durations
+- fill retry still counts the first wrong answer as a wrong first attempt; this
+  pass clarified the UX but did not rewrite the underlying grading semantics
+
+### Verification for this continuation
+
+- `dart run build_runner build --delete-conflicting-outputs`
+  - passed
+- `flutter gen-l10n`
+  - passed
+- `python tools/guard/run.py --scope all`
+  - passed
+  - only the pre-existing `feature_completeness` warnings remain
+- `flutter analyze`
+  - passed with no issues
+- `flutter test`
+  - passed
+
 ## Final continuation: study proportion cleanup
 
 Date: 2026-04-08

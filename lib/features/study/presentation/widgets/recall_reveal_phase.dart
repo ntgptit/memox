@@ -4,6 +4,7 @@ import 'package:memox/features/cards/domain/entities/flashcard_entity.dart';
 import 'package:memox/features/study/domain/srs/srs_engine.dart';
 import 'package:memox/features/study/presentation/providers/recall_provider.dart';
 import 'package:memox/features/study/presentation/widgets/recall_comparison_view.dart';
+import 'package:memox/features/study/presentation/widgets/recall_rating_guidance.dart';
 import 'package:memox/features/study/presentation/widgets/recall_self_assessment.dart';
 
 class RecallRevealPhase extends StatelessWidget {
@@ -32,6 +33,8 @@ class RecallRevealPhase extends StatelessWidget {
           selectedRating: state.selfRating,
           onSelected: onRateSelf,
         ),
+        const SizedBox(height: SpacingTokens.md),
+        const RecallRatingGuidance(),
       ],
     ),
   );

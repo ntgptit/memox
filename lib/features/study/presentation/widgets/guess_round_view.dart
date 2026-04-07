@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/study/presentation/providers/guess_provider.dart';
+import 'package:memox/features/study/presentation/widgets/guess_feedback_card.dart';
 import 'package:memox/features/study/presentation/widgets/guess_option_button.dart';
 import 'package:memox/features/study/presentation/widgets/guess_question_card.dart';
 import 'package:memox/shared/widgets/buttons/text_link_button.dart';
@@ -63,47 +64,65 @@ class _GuessAnswerArea extends StatelessWidget {
   final VoidCallback onContinue;
 
   @override
-  Widget build(BuildContext context) {
-    final footerAction = _footerAction(context);
-
-    return Column(
-      children: [
-        Expanded(
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                ...state.currentQuestion.options.asMap().entries.map(
-                  (entry) => Padding(
-                    padding: const EdgeInsets.only(bottom: SpacingTokens.sm),
-                    child: GuessOptionButton(
-                      option: entry.value,
-                      prefixLabel: _optionPrefix(context, entry.key),
-                      isAnswered: state.isAnswered,
-                      isSelected: state.selectedOptionIndex == entry.key,
-                      isCorrectAnswer:
-                          state.isAnswered && entry.value.isCorrect,
-                      isWrongSelection:
-                          state.isAnswered &&
-                          state.selectedOptionIndex == entry.key &&
-                          state.isCorrect == false,
-                      onTap: () => onSelect(entry.key),
-                    ),
+  Widget build(BuildContext context) => Column(
+    children: [
+      Expanded(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              ...state.currentQuestion.options.asMap().entries.map(
+                (entry) => Padding(
+                  padding: const EdgeInsets.only(bottom: SpacingTokens.sm),
+                  child: GuessOptionButton(
+                    option: entry.value,
+                    prefixLabel: _optionPrefix(context, entry.key),
+                    isAnswered: state.isAnswered,
+                    isSelected: state.selectedOptionIndex == entry.key,
+                    isCorrectAnswer:
+                        state.isAnswered && entry.value.isCorrect,
+                    isWrongSelection:
+                        state.isAnswered &&
+                        state.selectedOptionIndex == entry.key &&
+                        state.isCorrect == false,
+                    onTap: () => onSelect(entry.key),
                   ),
                 ),
+              ),
+              if (state.isAnswered && state.isCorrect == false) ...[
+                const SizedBox(height: SpacingTokens.md),
+                _GuessExplanationCard(state: state),
               ],
-            ),
+            ],
           ),
         ),
-        if (footerAction != null) ...[
-          const SizedBox(height: SpacingTokens.sm),
-          Align(alignment: Alignment.centerLeft, child: footerAction),
-        ],
-      ],
-    );
-  }
+      ),
+      const SizedBox(height: SpacingTokens.sm),
+      Align(
+        alignment: Alignment.centerLeft,
+        child: _GuessFooterAction(
+          state: state,
+          onSkip: onSkip,
+          onContinue: onContinue,
+        ),
+      ),
+    ],
+  );
+}
 
-  Widget? _footerAction(BuildContext context) {
-    if (state.canContinue) {
+class _GuessFooterAction extends StatelessWidget {
+  const _GuessFooterAction({
+    required this.state,
+    required this.onSkip,
+    required this.onContinue,
+  });
+
+  final GuessState state;
+  final VoidCallback onSkip;
+  final VoidCallback onContinue;
+
+  @override
+  Widget build(BuildContext context) {
+    if (state.isAnswered) {
       return TextLinkButton(
         label: context.l10n.guessContinueAction,
         onTap: onContinue,
@@ -111,15 +130,28 @@ class _GuessAnswerArea extends StatelessWidget {
       );
     }
 
-    if (!state.isAnswered) {
-      return TextLinkButton(
-        label: context.l10n.guessSkipAction,
-        onTap: onSkip,
-        showTrailingArrow: true,
-      );
+    return TextLinkButton(
+      label: context.l10n.guessSkipAction,
+      onTap: onSkip,
+      showTrailingArrow: true,
+    );
+  }
+}
+
+class _GuessExplanationCard extends StatelessWidget {
+  const _GuessExplanationCard({required this.state});
+
+  final GuessState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final card = state.currentCard;
+
+    if (card == null) {
+      return const SizedBox.shrink();
     }
 
-    return null;
+    return GuessFeedbackCard(card: card);
   }
 }
 

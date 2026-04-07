@@ -58,10 +58,16 @@ void main() {
 
     expect(find.text('Almost! Correct spelling:'), findsOneWidget);
     expect(
-      find.widgetWithText(SecondaryButton, 'Accept anyway'),
+      find.text(
+        'Your answer was close. Count it as correct, or retry to practice the exact spelling.',
+      ),
       findsOneWidget,
     );
-    expect(find.text('Mark as wrong'), findsOneWidget);
+    expect(
+      find.widgetWithText(SecondaryButton, 'Close enough'),
+      findsOneWidget,
+    );
+    expect(find.text('Practice spelling'), findsOneWidget);
     expect(
       _feedbackTop(tester) - _inputBottom(tester),
       closeTo(SpacingTokens.lg, 1),
@@ -71,7 +77,9 @@ void main() {
     await tester.pump();
   });
 
-  testWidgets('FillModeScreen completes after a correct answer', (tester) async {
+  testWidgets('FillModeScreen completes after a correct answer', (
+    tester,
+  ) async {
     final cardReviewDao = FakeCardReviewDao();
     addTearDown(cardReviewDao.dispose);
     await tester.pumpWidget(
@@ -106,6 +114,39 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
     await tester.pump();
   });
+
+  testWidgets(
+    'FillModeScreen shows hint and skip after the first wrong answer',
+    (tester) async {
+      await _setCompactSurface(tester);
+      final cardReviewDao = FakeCardReviewDao();
+      addTearDown(cardReviewDao.dispose);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            flashcardRepositoryProvider.overrideWithValue(
+              FakeFlashcardRepository(cards: _cards()),
+            ),
+            studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
+            cardReviewDaoProvider.overrideWithValue(cardReviewDao),
+            fillRandomProvider(5).overrideWithValue(Random(1)),
+            fillAutoAdvanceDelayProvider.overrideWith((ref) => Duration.zero),
+            fillWrongClearDelayProvider.overrideWith((ref) => Duration.zero),
+          ],
+          child: buildTestApp(home: const FillModeScreen(deckId: 5)),
+        ),
+      );
+      await _pumpFillScreen(tester);
+
+      await tester.enterText(find.byType(TextField), 'apple');
+      await _pumpFillScreen(tester);
+      await tester.tap(find.byIcon(Icons.arrow_forward));
+      await _pumpFillScreen(tester);
+
+      expect(find.textContaining('Hint:'), findsOneWidget);
+      expect(find.text('Skip for now'), findsOneWidget);
+    },
+  );
 }
 
 Future<void> _setCompactSurface(WidgetTester tester) async {

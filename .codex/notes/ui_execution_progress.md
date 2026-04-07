@@ -2,11 +2,11 @@
 
 ## Current phase
 
-Completed, verified, committed, and pushed the current UI workflow state on
-`codex/fill-recall-study-layout`. This pass keeps the study mode
-content-direction fix from the previous batch, then tightens prompt, feedback,
-and writing-area proportions so fill and recall remain readable on phone-sized
-dark-mode screens without reopening business logic.
+Verified locally on `codex/fill-recall-study-layout` and ready to stage/commit
+the next study-UX batch. This pass keeps the earlier study
+content-direction/layout fixes, then adds safer high-impact action and feedback
+improvements across review, match, guess, recall, and fill without reopening
+session persistence or SRS rollback contracts.
 
 ## Completed work
 
@@ -179,6 +179,49 @@ dark-mode screens without reopening business logic.
 - re-ran `flutter analyze` on the final code state and cleared the one
   redundant-argument / unused-import follow-up in `RecallPromptCard`
 - re-ran `flutter test` across the full repo on the final code state
+- added review-mode rating guidance copy by wiring micro-hints into
+  [review_rating_grid.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/review_rating_grid.dart)
+  and
+  [review_rating_button.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/review_rating_button.dart)
+  so `Again/Hard/Good/Easy` now explain the intended recall quality without
+  changing SRS behavior
+- clarified fill-mode close-match decisions in
+  [fill_feedback_panel.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/fill_feedback_panel.dart)
+  with a consequence explainer and calmer action copy, then relaxed retry
+  friction in
+  [fill_provider.dart](/D:/workspace/memox/lib/features/study/presentation/providers/fill_provider.dart)
+  so the first retry immediately exposes hints and allows `Skip for now`
+- added a dedicated wrong-answer explanation surface for guess mode in
+  [guess_feedback_card.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/guess_feedback_card.dart)
+  and inserted it into
+  [guess_round_view.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/guess_round_view.dart)
+  so wrong answers now show the correct term, definition, example, and hint
+- exposed an explicit `Continue` affordance after answered guess questions
+  while keeping the existing auto-advance logic intact for correct answers
+- added recall self-rating guidance in
+  [recall_rating_guidance.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/recall_rating_guidance.dart)
+  and mounted it from
+  [recall_reveal_phase.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/recall_reveal_phase.dart)
+  so `Missed/Partial/Got it` now carry clearer criteria during self-assessment
+- implemented a safe match-mode usability fix in
+  [match_provider.dart](/D:/workspace/memox/lib/features/study/presentation/providers/match_provider.dart)
+  so tapping an already-selected term or definition clears that selection
+- updated localized study copy in:
+  - [app_en.arb](/D:/workspace/memox/l10n/app_en.arb)
+  - [app_vi.arb](/D:/workspace/memox/l10n/app_vi.arb)
+  - [app_ko.arb](/D:/workspace/memox/l10n/app_ko.arb)
+- extended focused study regression coverage for:
+  - review rating guidance
+  - fill retry/skip and close-match copy
+  - guess explanation + explicit continue
+  - recall rating guidance and compact reveal flow
+  - match deselection behavior
+- re-ran `dart run build_runner build --delete-conflicting-outputs` after the
+  study UX batch
+- re-ran `flutter gen-l10n` after the study UX batch
+- re-ran `python tools/guard/run.py --scope all` after the study UX batch
+- re-ran `flutter analyze` after the study UX batch
+- re-ran `flutter test` after the study UX batch
 
 ## Files modified
 
@@ -234,6 +277,19 @@ dark-mode screens without reopening business logic.
 - [fill_feedback_panel.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/fill_feedback_panel.dart)
 - [recall_prompt_card.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/recall_prompt_card.dart)
 - [recall_mode_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/recall_mode_screen_test.dart)
+- [l10n/app_en.arb](/D:/workspace/memox/l10n/app_en.arb)
+- [l10n/app_vi.arb](/D:/workspace/memox/l10n/app_vi.arb)
+- [l10n/app_ko.arb](/D:/workspace/memox/l10n/app_ko.arb)
+- [match_provider.dart](/D:/workspace/memox/lib/features/study/presentation/providers/match_provider.dart)
+- [guess_round_view.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/guess_round_view.dart)
+- [guess_feedback_card.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/guess_feedback_card.dart)
+- [recall_reveal_phase.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/recall_reveal_phase.dart)
+- [recall_rating_guidance.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/recall_rating_guidance.dart)
+- [review_rating_button.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/review_rating_button.dart)
+- [review_rating_grid.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/review_rating_grid.dart)
+- [match_provider_test.dart](/D:/workspace/memox/test/features/study/presentation/providers/match_provider_test.dart)
+- [guess_mode_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/guess_mode_screen_test.dart)
+- [review_mode_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/review_mode_screen_test.dart)
 
 ## Deferred items
 
@@ -307,9 +363,22 @@ dark-mode screens without reopening business logic.
 - the recall prompt label is now sentence case and larger, so the live layout
   should be spot-checked with a tagged card to confirm the label, prompt, and
   tag still form a calm top cluster
+- guess mode now keeps a manual `Continue` affordance visible alongside the
+  delayed correct-answer advance path, so the live flow should be spot-checked
+  once on-device to confirm the button does not feel redundant at short delays
+- fill mode now exposes `Skip for now` on the first retry and auto-opens hints,
+  so the team should confirm this is the desired pedagogy for harder spelling
+  cards before propagating the pattern further
+- recall guidance now introduces an additional explanatory block under the
+  rating control, so very small screens should be spot-checked to confirm the
+  reveal phase still feels compact enough
+- match-mode deselection is now explicit through re-tapping the selected item,
+  so the interaction should be visually smoke-tested to confirm users infer it
+  without a separate hint
 
 ## Next step
 
-Open a PR from `codex/fill-recall-study-layout` and do a visual device pass on
-the compact fill/recall flows, with extra attention on very long examples,
-localized action labels, and tagged recall cards.
+Stage, commit, and push the study-UX batch on
+`codex/fill-recall-study-layout`, then do a visual device pass on review,
+guess, recall, fill, and match with extra attention on compact locales and the
+new explanation/guidance blocks.
