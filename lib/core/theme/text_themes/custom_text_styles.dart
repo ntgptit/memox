@@ -30,7 +30,8 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
 
   factory AppTextStyles.fromTextTheme(TextTheme textTheme) {
     final bodyColor = textTheme.bodyLarge?.color ?? ColorTokens.onSurfaceLight;
-    final mutedColor = textTheme.bodySmall?.color ?? bodyColor;
+    final mutedColor =
+        textTheme.labelMedium?.color ?? textTheme.bodySmall?.color ?? bodyColor;
 
     TextStyle themed({
       TextStyle? base,
@@ -83,13 +84,13 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
       questionText: themed(
         base: textTheme.titleMedium,
         fontSize: TypographyTokens.titleMedium,
-        fontWeight: TypographyTokens.regular,
+        fontWeight: TypographyTokens.medium,
         height: TypographyTokens.relaxedHeight,
       ),
       studyTerm: themed(
         base: textTheme.headlineMedium,
         fontSize: TypographyTokens.headlineMedium,
-        fontWeight: TypographyTokens.regular,
+        fontWeight: TypographyTokens.semiBold,
         height: TypographyTokens.headingHeight,
       ),
       recallTerm: themed(
@@ -120,8 +121,8 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
         letterSpacing: TypographyTokens.headingSpacing,
       ),
       statNumberSm: themed(
-        base: textTheme.titleLarge,
-        fontSize: TypographyTokens.titleLarge,
+        base: textTheme.headlineMedium,
+        fontSize: TypographyTokens.headlineMedium,
         fontWeight: TypographyTokens.semiBold,
         height: TypographyTokens.headingHeight,
         letterSpacing: TypographyTokens.headingSpacing,
@@ -134,8 +135,8 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
         color: mutedColor,
       ),
       appTitle: themed(
-        base: textTheme.headlineMedium,
-        fontSize: TypographyTokens.headlineMedium,
+        base: textTheme.titleLarge,
+        fontSize: TypographyTokens.titleLarge,
         fontWeight: TypographyTokens.semiBold,
         height: TypographyTokens.headingHeight,
         letterSpacing: TypographyTokens.headingSpacing,
@@ -156,12 +157,13 @@ class AppTextStyles extends ThemeExtension<AppTextStyles> {
         color: mutedColor,
       ),
       progressCount: themed(
-        base: textTheme.labelLarge,
-        fontSize: TypographyTokens.bodySmall,
-        fontWeight: TypographyTokens.regular,
-        height: TypographyTokens.bodyHeight,
+        base: textTheme.labelMedium,
+        fontSize: TypographyTokens.labelMedium,
+        fontWeight: TypographyTokens.medium,
+        height: TypographyTokens.captionHeight,
         letterSpacing: TypographyTokens.labelSpacing,
         fontFeatures: const <FontFeature>[FontFeature.tabularFigures()],
+        color: mutedColor,
       ),
       nextReviewTime: themed(
         base: textTheme.bodySmall,

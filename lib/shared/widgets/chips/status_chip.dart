@@ -21,6 +21,7 @@ class StatusChip extends StatelessWidget {
 
     return DecoratedBox(
       decoration: BoxDecoration(
+        color: context.colors.surfaceContainerLow,
         border: Border.all(color: context.colors.outline),
         borderRadius: BorderRadius.circular(RadiusTokens.chip),
       ),
@@ -40,7 +41,9 @@ class StatusChip extends StatelessWidget {
             const SizedBox(width: SpacingTokens.xs),
             Text(
               status.label(context.l10n),
-              style: context.appTextStyles.tagText.copyWith(color: color),
+              style: context.appTextStyles.tagText.copyWith(
+                color: context.colors.onSurfaceVariant,
+              ),
             ),
           ],
         ),

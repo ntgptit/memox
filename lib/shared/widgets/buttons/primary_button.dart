@@ -11,7 +11,7 @@ class PrimaryButton extends StatelessWidget {
     this.isLoading = false,
     this.icon,
     this.fullWidth = true,
-    this.height = SizeTokens.buttonHeightLg,
+    this.height = SizeTokens.buttonHeight,
     this.backgroundColor,
     this.foregroundColor,
     super.key,

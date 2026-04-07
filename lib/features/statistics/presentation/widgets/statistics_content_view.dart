@@ -44,7 +44,7 @@ class StatisticsContentView extends ConsumerWidget {
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.only(
-              top: SpacingTokens.xl,
+              top: SpacingTokens.lg,
               bottom: SpacingTokens.xxxl,
             ),
             child: Column(
@@ -59,15 +59,11 @@ class StatisticsContentView extends ConsumerWidget {
                         value;
                   },
                 ),
-                const Gap.section(),
+                const Gap.lg(),
                 StreakHeroCard(stats: data.stats),
-                const Gap.section(),
+                const Gap.xl(),
                 WeeklyBarChartSection(activities: data.stats.weeklyActivity),
-                const Gap.section(),
-                MasteryDonutChartSection(mastery: data.stats.mastery),
-                const Gap.section(),
-                ModeUsageChart(modeUsage: data.stats.modeUsage),
-                const Gap.section(),
+                const Gap.xl(),
                 DifficultCardsSection(
                   cards: data.stats.difficultCards,
                   onPractice: () => showStatisticsPracticeFlow(
@@ -75,6 +71,10 @@ class StatisticsContentView extends ConsumerWidget {
                     data.stats.difficultCards,
                   ),
                 ),
+                const Gap.xl(),
+                MasteryDonutChartSection(mastery: data.stats.mastery),
+                const Gap.xl(),
+                ModeUsageChart(modeUsage: data.stats.modeUsage),
               ],
             ),
           ),

@@ -10,13 +10,11 @@ class DeckTileSupporting extends StatelessWidget {
   const DeckTileSupporting({
     required this.deck,
     required this.masteryPercentage,
-    required this.accentColor,
     super.key,
   });
 
   final DeckEntity deck;
   final double masteryPercentage;
-  final Color accentColor;
 
   @override
   Widget build(BuildContext context) => Column(
@@ -27,7 +25,7 @@ class DeckTileSupporting extends StatelessWidget {
           deck.description,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: context.textTheme.bodyMedium,
+          style: context.textTheme.bodySmall,
         ),
       if (deck.description.trim().isNotEmpty && deck.tags.isNotEmpty)
         const Gap.md(),
@@ -45,7 +43,9 @@ class DeckTileSupporting extends StatelessWidget {
           const Gap.md(),
           Text(
             context.l10n.deckMasteryLabel((masteryPercentage * 100).round()),
-            style: context.textTheme.labelMedium?.copyWith(color: accentColor),
+            style: context.textTheme.labelMedium?.copyWith(
+              color: context.colors.onSurfaceVariant,
+            ),
           ),
         ],
       ),

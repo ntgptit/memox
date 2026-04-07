@@ -41,11 +41,7 @@ class FillFeedbackPanel extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    return _FillWrongFeedback(
-      answer: answer,
-      canSkip: canSkip,
-      onSkip: onSkip,
-    );
+    return _FillWrongFeedback(answer: answer, canSkip: canSkip, onSkip: onSkip);
   }
 }
 
@@ -79,13 +75,11 @@ class _FillCloseFeedback extends StatelessWidget {
           children: [
             TextLinkButton(
               label: context.l10n.fillAcceptCloseAction,
-              color: context.customColors.ratingGood,
               onTap: onAcceptClose,
             ),
             const SizedBox(width: SpacingTokens.lg),
             TextLinkButton(
               label: context.l10n.fillRejectCloseAction,
-              color: context.customColors.ratingAgain,
               onTap: onRejectClose,
             ),
           ],

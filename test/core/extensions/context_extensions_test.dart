@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:memox/core/constants/app_strings.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
 import '../../test_helpers/test_app.dart';
@@ -65,8 +64,10 @@ void main() {
     await tester.pump();
 
     final snackBar = tester.widget<SnackBar>(find.byType(SnackBar));
+    final errorIcon = tester.widget<Icon>(find.byIcon(Icons.error_outline));
     expect(find.text('Theme error'), findsOneWidget);
-    expect(snackBar.backgroundColor, capturedContext.customColors.ratingAgain);
+    expect(snackBar.backgroundColor, capturedContext.colors.inverseSurface);
+    expect(errorIcon.color, capturedContext.colors.error);
 
     await tester.tap(find.text('sheet'));
     await tester.pumpAndSettle();
@@ -81,8 +82,8 @@ void main() {
 
     expect(find.text('Delete'), findsOneWidget);
     expect(find.text('Confirm delete?'), findsOneWidget);
-    expect(find.text(AppStrings.confirmAction), findsOneWidget);
-    expect(find.text(AppStrings.cancelAction), findsOneWidget);
+    expect(find.text(capturedContext.l10n.confirmAction), findsOneWidget);
+    expect(find.text(capturedContext.l10n.cancelAction), findsOneWidget);
     expect(
       tester
           .widget<AlertDialog>(find.byType(AlertDialog))

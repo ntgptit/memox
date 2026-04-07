@@ -100,7 +100,9 @@ class _StudyTopBarHeader extends StatelessWidget {
   Widget build(BuildContext context) => SizedBox(
     height: SizeTokens.appBarHeight,
     child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: SpacingTokens.sm),
+      padding: EdgeInsets.symmetric(
+        horizontal: context.screenType.screenPadding,
+      ),
       child: Row(
         children: [
           TopBarIconButton(
@@ -215,7 +217,9 @@ class _StudyTopBarMeta extends StatelessWidget {
     return SizedBox(
       height: SizeTokens.studyTopBarMetaHeight,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: SpacingTokens.lg),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.screenType.screenPadding,
+        ),
         child: subtitle != null
             ? Align(
                 alignment: Alignment.centerLeft,

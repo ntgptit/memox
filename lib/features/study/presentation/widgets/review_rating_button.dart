@@ -25,9 +25,13 @@ class ReviewRatingButton extends StatelessWidget {
     return AppCard(
       key: ValueKey<ReviewRating>(rating),
       onTap: onTap,
-      backgroundColor: accentColor.withValues(alpha: OpacityTokens.overlay),
-      borderColor: accentColor,
-      padding: const EdgeInsets.symmetric(horizontal: SpacingTokens.md, vertical: SpacingTokens.sm),
+      backgroundColor: context.colors.surfaceContainerLow,
+      borderColor: accentColor.withValues(alpha: OpacityTokens.focus),
+      leftBorderColor: accentColor,
+      padding: const EdgeInsets.symmetric(
+        horizontal: SpacingTokens.md,
+        vertical: SpacingTokens.sm,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -36,7 +40,7 @@ class ReviewRatingButton extends StatelessWidget {
           Text(
             preview,
             style: context.appTextStyles.nextReviewTime.copyWith(
-              color: accentColor,
+              color: context.colors.onSurfaceVariant,
             ),
           ),
         ],

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
-import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/decks/domain/entities/deck_entity.dart';
-import 'package:memox/shared/widgets/cards/app_card.dart';
+import 'package:memox/shared/widgets/lists/app_card_list_tile.dart';
+import 'package:memox/shared/widgets/lists/app_tile_glyph.dart';
 import 'package:memox/shared/widgets/progress/mastery_ring.dart';
 
 class FolderDeckTile extends StatelessWidget {
@@ -22,41 +22,23 @@ class FolderDeckTile extends StatelessWidget {
   final VoidCallback? onTap;
 
   @override
-  Widget build(BuildContext context) => AppCard(
-      onTap: onTap,
-      leftBorderColor: isHighlighted ? context.colors.primary : null,
-      child: Row(
-        children: [
-          Icon(Icons.style_outlined, color: Color(deck.colorValue)),
-          const SizedBox(width: SpacingTokens.lg),
-          Expanded(
-            child: _DeckText(name: deck.name, subtitle: subtitle),
-          ),
-          const SizedBox(width: SpacingTokens.md),
-          MasteryRing(
-            percentage: masteryPercentage,
-            showZeroPercentText: true,
-          ),
-        ],
+  Widget build(BuildContext context) => AppCardListTile(
+    onTap: onTap,
+    borderColor: isHighlighted ? context.colors.primary : null,
+    leading: AppTileGlyph(
+      icon: Icons.style_outlined,
+      color: Color(deck.colorValue),
+    ),
+    title: Text(deck.name, style: context.textTheme.titleMedium),
+    subtitle: Text(
+      subtitle,
+      style: context.textTheme.bodySmall?.copyWith(
+        color: context.colors.onSurfaceVariant,
       ),
-    );
-}
-
-class _DeckText extends StatelessWidget {
-  const _DeckText({required this.name, required this.subtitle});
-
-  final String name;
-  final String subtitle;
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(name, style: textTheme.titleMedium),
-        Text(subtitle, style: textTheme.bodySmall),
-      ],
-    );
-  }
+    ),
+    trailing: MasteryRing(
+      percentage: masteryPercentage,
+      showZeroPercentText: true,
+    ),
+  );
 }

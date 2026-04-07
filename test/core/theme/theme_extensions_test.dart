@@ -46,15 +46,35 @@ void main() {
       closeTo(OpacityTokens.subtleHint, 0.001),
     );
     expect(appTextStyles!.statNumber.fontSize, TypographyTokens.statDisplay);
+    expect(appTextStyles!.studyTerm.fontSize, TypographyTokens.headlineMedium);
     expect(
-      appTextStyles!.studyTerm.fontSize,
+      appTextStyles!.statNumberSm.fontSize,
       TypographyTokens.headlineMedium,
     );
+    expect(appTextStyles!.appTitle.fontSize, TypographyTokens.titleLarge);
+    expect(appTextStyles!.progressCount.fontSize, TypographyTokens.labelMedium);
     expect(
       appTextStyles!.sectionLabel.letterSpacing,
       TypographyTokens.sectionSpacing,
     );
     expect(theme, isNotNull);
+    expect(
+      theme!.scaffoldBackgroundColor,
+      theme!.colorScheme.surfaceContainerLowest,
+    );
+    expect(theme!.cardTheme.color, theme!.colorScheme.surface);
+    expect(
+      theme!.dialogTheme.backgroundColor,
+      theme!.colorScheme.surfaceContainerLow,
+    );
+    expect(
+      theme!.bottomSheetTheme.backgroundColor,
+      theme!.colorScheme.surfaceContainerLow,
+    );
+    expect(
+      theme!.inputDecorationTheme.fillColor,
+      theme!.colorScheme.surfaceContainerHigh,
+    );
     expect(
       theme!.textTheme.displayLarge?.fontSize,
       TypographyTokens.displayLarge,
@@ -77,7 +97,15 @@ void main() {
     expect(theme!.textTheme.labelSmall?.fontSize, TypographyTokens.labelSmall);
     expect(
       theme!.filledButtonTheme.style?.textStyle?.resolve({})?.fontSize,
-      TypographyTokens.bodyLarge,
+      TypographyTokens.titleSmall,
+    );
+    expect(
+      theme!.textButtonTheme.style?.textStyle?.resolve({})?.fontSize,
+      TypographyTokens.labelLarge,
+    );
+    expect(
+      theme!.textButtonTheme.style?.foregroundColor?.resolve({}),
+      theme!.colorScheme.onSurfaceVariant,
     );
     expect(appTextStyles!.sectionLabel.fontSize, TypographyTokens.labelSmall);
     expect(appTextStyles!.breadcrumb.fontSize, TypographyTokens.bodySmall);

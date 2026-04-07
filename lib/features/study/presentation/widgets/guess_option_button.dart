@@ -54,6 +54,8 @@ class GuessOptionButton extends StatelessWidget {
             context,
             isCorrectAnswer: isCorrectAnswer,
             isWrongSelection: isWrongSelection,
+            isSelected: isSelected,
+            isAnswered: isAnswered,
           ),
         ),
       ),
@@ -65,7 +67,9 @@ class GuessOptionButton extends StatelessWidget {
           child: _GuessOptionContent(
             option: option,
             prefixLabel: prefixLabel,
-            contentColor: _guessOptionContentColor(
+            textColor: _guessOptionTextColor(context),
+            prefixColor: context.colors.onSurfaceVariant,
+            trailingColor: _guessOptionTrailingColor(
               context,
               isCorrectAnswer: isCorrectAnswer,
               isWrongSelection: isWrongSelection,
@@ -85,13 +89,17 @@ class _GuessOptionContent extends StatelessWidget {
   const _GuessOptionContent({
     required this.option,
     required this.prefixLabel,
-    required this.contentColor,
+    required this.textColor,
+    required this.prefixColor,
+    required this.trailingColor,
     required this.trailingIcon,
   });
 
   final GuessOption option;
   final String prefixLabel;
-  final Color contentColor;
+  final Color textColor;
+  final Color prefixColor;
+  final Color trailingColor;
   final IconData? trailingIcon;
 
   @override
@@ -99,9 +107,7 @@ class _GuessOptionContent extends StatelessWidget {
     children: [
       Text(
         prefixLabel,
-        style: context.appTextStyles.progressCount.copyWith(
-          color: contentColor,
-        ),
+        style: context.appTextStyles.progressCount.copyWith(color: prefixColor),
       ),
       const SizedBox(width: SpacingTokens.md),
       Expanded(
@@ -109,46 +115,18 @@ class _GuessOptionContent extends StatelessWidget {
           option.text,
           maxLines: 2,
           overflow: TextOverflow.ellipsis,
-          style: context.appTextStyles.studyTerm.copyWith(color: contentColor),
+          style: context.appTextStyles.studyTerm.copyWith(color: textColor),
         ),
       ),
       if (trailingIcon != null) ...[
         const SizedBox(width: SpacingTokens.md),
-        Icon(trailingIcon, color: contentColor),
+        Icon(trailingIcon, color: trailingColor),
       ],
     ],
   );
 }
 
 Color _guessOptionBorderColor(
-  BuildContext context, {
-  required bool isCorrectAnswer,
-  required bool isWrongSelection,
-}) {
-  if (isCorrectAnswer) {
-    return context.customColors.success;
-  }
-
-  if (isWrongSelection) {
-    return context.customColors.warning;
-  }
-
-  return context.colors.outline;
-}
-
-Color _guessOptionContentColor(
-  BuildContext context, {
-  required bool isCorrectAnswer,
-  required bool isWrongSelection,
-}) {
-  if (isCorrectAnswer || isWrongSelection) {
-    return context.colors.onPrimary;
-  }
-
-  return context.colors.onSurface;
-}
-
-Color _guessOptionHighlightColor(
   BuildContext context, {
   required bool isCorrectAnswer,
   required bool isWrongSelection,
@@ -164,7 +142,47 @@ Color _guessOptionHighlightColor(
   }
 
   if (isSelected && !isAnswered) {
-    return context.colors.primaryContainer;
+    return context.colors.primary.withValues(alpha: OpacityTokens.focus);
+  }
+
+  return context.colors.outline;
+}
+
+Color _guessOptionTextColor(BuildContext context) => context.colors.onSurface;
+
+Color _guessOptionTrailingColor(
+  BuildContext context, {
+  required bool isCorrectAnswer,
+  required bool isWrongSelection,
+}) {
+  if (isCorrectAnswer) {
+    return context.customColors.success;
+  }
+
+  if (isWrongSelection) {
+    return context.customColors.warning;
+  }
+
+  return context.colors.onSurfaceVariant;
+}
+
+Color _guessOptionHighlightColor(
+  BuildContext context, {
+  required bool isCorrectAnswer,
+  required bool isWrongSelection,
+  required bool isSelected,
+  required bool isAnswered,
+}) {
+  if (isCorrectAnswer) {
+    return context.customColors.success.withValues(alpha: OpacityTokens.focus);
+  }
+
+  if (isWrongSelection) {
+    return context.customColors.warning.withValues(alpha: OpacityTokens.focus);
+  }
+
+  if (isSelected && !isAnswered) {
+    return context.colors.surfaceContainerHighest;
   }
 
   return context.colors.surface;

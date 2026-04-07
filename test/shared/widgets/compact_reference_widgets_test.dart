@@ -58,7 +58,12 @@ void main() {
 
     await tester.pumpWidget(
       buildTestApp(
-        home: Scaffold(body: AppSearchBar(onChanged: values.add)),
+        home: Scaffold(
+          body: AppSearchBar(
+            onChanged: values.add,
+            variant: AppSearchBarVariant.page,
+          ),
+        ),
       ),
     );
 

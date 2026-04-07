@@ -44,4 +44,22 @@ void main() {
     );
     expect(size.width, greaterThan(size.height));
   });
+
+  testWidgets('TextLinkButton defaults to the quiet tertiary color', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      buildTestApp(
+        home: Center(
+          child: TextLinkButton(label: 'Retry', onTap: () {}),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final theme = Theme.of(tester.element(find.byType(TextLinkButton)));
+    final text = tester.widget<Text>(find.text('Retry'));
+
+    expect(text.style?.color, theme.colorScheme.onSurfaceVariant);
+  });
 }

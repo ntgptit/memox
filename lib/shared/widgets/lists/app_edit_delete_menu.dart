@@ -46,7 +46,7 @@ class AppEditDeleteMenu extends StatelessWidget {
               action: _AppEditDeleteAction.delete,
               icon: Icons.delete_outline,
               label: deleteLabel,
-              color: context.customColors.ratingAgain,
+              color: context.colors.error,
             ),
         ],
   );

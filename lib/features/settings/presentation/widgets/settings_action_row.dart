@@ -11,35 +11,25 @@ class SettingsActionRow extends StatelessWidget {
     required this.title,
     required this.icon,
     required this.onTap,
-    this.titleColor,
     super.key,
   });
 
   final String title;
   final IconData icon;
   final VoidCallback onTap;
-  final Color? titleColor;
 
   @override
   Widget build(BuildContext context) => AppPressable(
     onTap: onTap,
     borderRadius: RadiusTokens.none,
-    padding: const EdgeInsets.symmetric(
-      horizontal: SpacingTokens.lg,
-      vertical: SpacingTokens.md,
-    ),
+    padding: const EdgeInsets.symmetric(horizontal: SpacingTokens.lg),
     child: ConstrainedBox(
-      constraints: const BoxConstraints(minHeight: SizeTokens.listItemCompact),
+      constraints: const BoxConstraints(minHeight: SizeTokens.listItemHeight),
       child: Row(
         children: [
-          Icon(icon, color: titleColor ?? context.colors.onSurfaceVariant),
+          Icon(icon, color: context.colors.onSurfaceVariant),
           const Gap.lg(),
-          Expanded(
-            child: Text(
-              title,
-              style: context.textTheme.titleMedium?.copyWith(color: titleColor),
-            ),
-          ),
+          Expanded(child: Text(title, style: context.textTheme.titleMedium)),
           Icon(Icons.chevron_right, color: context.colors.onSurfaceVariant),
         ],
       ),

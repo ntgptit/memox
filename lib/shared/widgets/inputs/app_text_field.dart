@@ -128,7 +128,7 @@ InputDecoration _buildInputDecoration(
   focusedBorder: config.focusedBorder,
   disabledBorder: config.disabledBorder,
   errorStyle: context.textTheme.bodySmall?.copyWith(
-    color: context.customColors.ratingAgain,
+    color: context.colors.error,
   ),
   constraints: config.isSingleLine
       ? const BoxConstraints(minHeight: SizeTokens.inputHeight)

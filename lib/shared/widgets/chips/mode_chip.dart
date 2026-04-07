@@ -22,10 +22,12 @@ class ModeChip extends StatelessWidget {
     ),
     decoration: BoxDecoration(
       color: isSelected
-          ? context.colors.primary.withValues(alpha: OpacityTokens.selected)
+          ? context.colors.surfaceContainerHighest
           : context.colors.surface.withValues(alpha: 0),
       border: Border.all(
-        color: isSelected ? context.colors.primary : context.colors.outline,
+        color: isSelected
+            ? context.colors.primary.withValues(alpha: OpacityTokens.focus)
+            : context.colors.outline,
       ),
       borderRadius: BorderRadius.circular(RadiusTokens.chip),
     ),

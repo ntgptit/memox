@@ -32,7 +32,7 @@ class AppCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final radius = borderRadius ?? RadiusTokens.card;
-    final background = backgroundColor ?? Theme.of(context).colorScheme.surface;
+    final background = backgroundColor ?? Theme.of(context).cardTheme.color;
     final outlineColor =
         borderColor ??
         Theme.of(

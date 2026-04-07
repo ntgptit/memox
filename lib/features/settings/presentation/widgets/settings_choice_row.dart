@@ -22,12 +22,9 @@ class SettingsChoiceRow extends StatelessWidget {
   Widget build(BuildContext context) => AppPressable(
     onTap: onTap,
     borderRadius: RadiusTokens.none,
-    padding: const EdgeInsets.symmetric(
-      horizontal: SpacingTokens.lg,
-      vertical: SpacingTokens.md,
-    ),
+    padding: const EdgeInsets.symmetric(horizontal: SpacingTokens.lg),
     child: ConstrainedBox(
-      constraints: const BoxConstraints(minHeight: SizeTokens.listItemCompact),
+      constraints: const BoxConstraints(minHeight: SizeTokens.listItemHeight),
       child: Row(
         children: [
           Expanded(

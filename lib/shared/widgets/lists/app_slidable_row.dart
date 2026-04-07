@@ -3,7 +3,6 @@ import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/duration_tokens.dart';
 import 'package:memox/core/theme/tokens/opacity_tokens.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
-import 'package:memox/core/utils/color_utils.dart';
 
 class AppSlidableRow extends StatelessWidget {
   const AppSlidableRow({
@@ -46,13 +45,15 @@ class AppSlidableRow extends StatelessWidget {
     ),
     background: _ActionBackground(
       alignment: Alignment.centerLeft,
-      color: context.colors.primary,
+      color: context.colors.surfaceContainerHighest,
       icon: Icons.edit_outlined,
+      iconColor: context.colors.onSurface,
     ),
     secondaryBackground: _ActionBackground(
       alignment: Alignment.centerRight,
-      color: context.customColors.ratingAgain,
+      color: context.colors.errorContainer,
       icon: Icons.delete_outline,
+      iconColor: context.colors.onErrorContainer,
     ),
     movementDuration: DurationTokens.slow,
     dismissThresholds: const {
@@ -141,11 +142,13 @@ class _ActionBackground extends StatelessWidget {
     required this.alignment,
     required this.color,
     required this.icon,
+    required this.iconColor,
   });
 
   final Alignment alignment;
   final Color color;
   final IconData icon;
+  final Color iconColor;
 
   @override
   Widget build(BuildContext context) => ColoredBox(
@@ -154,7 +157,7 @@ class _ActionBackground extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: SizeTokens.touchTarget),
       child: Align(
         alignment: alignment,
-        child: Icon(icon, color: AppColorUtils.foregroundOn(color)),
+        child: Icon(icon, color: iconColor),
       ),
     ),
   );

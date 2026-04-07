@@ -28,10 +28,14 @@ class SettingsDataSection extends ConsumerWidget {
             icon: Icons.file_upload_outlined,
             onTap: () => handleSettingsImport(context, ref),
           ),
+        ],
+      ),
+      const Gap.md(),
+      SettingsGroupCard(
+        children: [
           SettingsActionRow(
             title: context.l10n.settingsClearHistoryAction,
             icon: Icons.delete_outline,
-            titleColor: context.colors.error,
             onTap: () => handleSettingsClearHistory(context, ref),
           ),
         ],

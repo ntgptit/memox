@@ -77,9 +77,9 @@ class DeckDetailHeader extends StatelessWidget {
       background: Padding(
         padding: EdgeInsets.fromLTRB(
           context.screenType.screenPadding,
-          SizeTokens.appBarHeight + SpacingTokens.sm,
+          SizeTokens.appBarHeight + SpacingTokens.xs,
           context.screenType.screenPadding,
-          SpacingTokens.md,
+          SpacingTokens.sm,
         ),
         child: Align(
           alignment: Alignment.bottomLeft,
@@ -145,7 +145,7 @@ class _DeckDetailHeaderBody extends StatelessWidget {
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       BreadcrumbBar(segments: breadcrumb),
-      const SizedBox(height: SpacingTokens.md),
+      const SizedBox(height: SpacingTokens.sm),
       Text(
         deckName,
         maxLines: context.isCompact ? 2 : 1,
@@ -155,12 +155,12 @@ class _DeckDetailHeaderBody extends StatelessWidget {
       const SizedBox(height: SpacingTokens.xs),
       Text(
         summary,
-        maxLines: 1,
+        maxLines: showMasteryBar && context.isCompact ? 1 : 2,
         overflow: TextOverflow.ellipsis,
-        style: context.textTheme.bodyMedium,
+        style: context.textTheme.bodySmall,
       ),
       if (showMasteryBar) ...[
-        const SizedBox(height: SpacingTokens.md),
+        const SizedBox(height: SpacingTokens.sm),
         Text(
           context.l10n.deckMasteryLabel((masteryPercentage * 100).round()),
           style: context.textTheme.labelMedium,

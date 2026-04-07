@@ -10,12 +10,15 @@ class ReorderModeBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) => AppCard(
     backgroundColor: context.colors.surfaceContainerLow,
-    borderColor: context.colors.primary.withValues(
+    borderColor: context.colors.outline.withValues(
       alpha: OpacityTokens.borderSubtle,
     ),
     child: Row(
       children: [
-        Icon(Icons.drag_indicator_outlined, color: context.colors.primary),
+        Icon(
+          Icons.drag_indicator_outlined,
+          color: context.colors.onSurfaceVariant,
+        ),
         const SizedBox(width: SpacingTokens.md),
         Expanded(
           child: Text(

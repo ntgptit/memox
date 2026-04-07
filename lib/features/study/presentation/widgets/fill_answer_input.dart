@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
+import 'package:memox/core/theme/tokens/opacity_tokens.dart';
 import 'package:memox/core/theme/tokens/radius_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/study/domain/fill/fill_engine.dart';
@@ -65,9 +66,15 @@ class FillAnswerInput extends StatelessWidget {
   );
 
   Color _borderColor(BuildContext context) => switch (result) {
-    FillResult.correct => context.customColors.ratingGood,
-    FillResult.close => context.customColors.ratingHard,
-    FillResult.wrong => context.customColors.ratingAgain,
+    FillResult.correct => context.customColors.ratingGood.withValues(
+      alpha: OpacityTokens.focus,
+    ),
+    FillResult.close => context.customColors.ratingHard.withValues(
+      alpha: OpacityTokens.focus,
+    ),
+    FillResult.wrong => context.colors.error.withValues(
+      alpha: OpacityTokens.focus,
+    ),
     null => context.colors.outline,
   };
 }

@@ -56,7 +56,6 @@ class DeckTile extends StatelessWidget {
       supporting: DeckTileSupporting(
         deck: deck,
         masteryPercentage: masteryPercentage,
-        accentColor: accentColor,
       ),
     );
   }

@@ -39,6 +39,7 @@ void main() {
                 child: const SizedBox(width: 16, height: 16),
               ),
               InlineTextLinkButton(label: 'Home', onTap: () {}),
+              TextLinkButton(label: 'Open details', onTap: () {}),
               const SuccessIndicator(),
               const OfflineStateView(),
               const UnauthorizedStateView(),
@@ -62,13 +63,13 @@ void main() {
     expect(find.byType(SectionContainer, skipOffstage: false), findsOneWidget);
     expect(find.byType(AppListTile, skipOffstage: false), findsOneWidget);
     expect(find.byType(AppCardSwitchTile, skipOffstage: false), findsOneWidget);
-    expect(find.byType(AppPressable), findsWidgets);
-    expect(find.byType(AppTapRegion), findsWidgets);
+    expect(find.byType(AppPressable, skipOffstage: false), findsWidgets);
+    expect(find.byType(AppTapRegion, skipOffstage: false), findsWidgets);
     expect(
       find.byType(InlineTextLinkButton, skipOffstage: false),
       findsOneWidget,
     );
-    expect(find.byType(TextLinkButton, skipOffstage: false), findsOneWidget);
+    expect(find.byType(TextLinkButton, skipOffstage: false), findsWidgets);
     expect(find.byType(SuccessIndicator, skipOffstage: false), findsOneWidget);
     expect(find.byType(OfflineStateView, skipOffstage: false), findsOneWidget);
     expect(

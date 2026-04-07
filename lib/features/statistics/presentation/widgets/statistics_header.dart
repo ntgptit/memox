@@ -20,9 +20,9 @@ class StatisticsHeader extends StatelessWidget {
     children: [
       Text(
         context.l10n.progressHeaderTitle,
-        style: context.textTheme.headlineSmall,
+        style: context.appTextStyles.appTitle,
       ),
-      const Gap.md(),
+      const Gap.sm(),
       StatisticsPeriodTabs(
         selectedRange: selectedRange,
         onSelected: onRangeSelected,

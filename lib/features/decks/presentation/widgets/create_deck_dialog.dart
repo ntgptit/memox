@@ -83,6 +83,7 @@ class _CreateDeckDialogState extends State<CreateDeckDialog> {
 
   @override
   Widget build(BuildContext context) => AppDialog(
+    variant: AppDialogVariant.form,
     title: Text(widget.title ?? context.l10n.createDeck),
     content: Column(
       mainAxisSize: MainAxisSize.min,

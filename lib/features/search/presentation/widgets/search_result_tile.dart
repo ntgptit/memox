@@ -19,10 +19,9 @@ class SearchResultTile extends StatelessWidget {
   Widget build(BuildContext context) => AppListTile(
     title: item.name,
     subtitle: _subtitle,
-    leading: Icon(
-      _icon,
-      color: context.colors.onSurfaceVariant,
-    ),
+    variant: AppListTileVariant.search,
+    leading: Icon(_icon, color: context.colors.onSurfaceVariant),
+    trailing: Icon(Icons.chevron_right, color: context.colors.onSurfaceVariant),
     onTap: onTap,
     showDivider: showDivider,
   );

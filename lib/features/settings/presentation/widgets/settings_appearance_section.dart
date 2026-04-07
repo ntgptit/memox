@@ -28,38 +28,18 @@ class SettingsAppearanceSection extends ConsumerWidget {
         children: [
           _AppearanceBlock(
             title: context.l10n.settingsThemePreferenceTitle,
-            child: Row(
-              children: [
-                _ThemeModeCard(
-                  icon: Icons.brightness_auto_outlined,
-                  isSelected: settings.themeMode == ThemeMode.system,
-                  label: context.l10n.themeModeSystem,
-                  onTap: () => ref
-                      .read(settingsProvider.notifier)
-                      .updateThemeMode(ThemeMode.system),
-                ),
-                const Gap.sm(),
-                _ThemeModeCard(
-                  icon: Icons.light_mode_outlined,
-                  isSelected: settings.themeMode == ThemeMode.light,
-                  label: context.l10n.themeModeLight,
-                  onTap: () => ref
-                      .read(settingsProvider.notifier)
-                      .updateThemeMode(ThemeMode.light),
-                ),
-                const Gap.sm(),
-                _ThemeModeCard(
-                  icon: Icons.dark_mode_outlined,
-                  isSelected: settings.themeMode == ThemeMode.dark,
-                  label: context.l10n.themeModeDark,
-                  onTap: () => ref
-                      .read(settingsProvider.notifier)
-                      .updateThemeMode(ThemeMode.dark),
-                ),
-              ],
+            child: _ThemeModeChooser(
+              settings: settings,
+              onThemeModeChanged: (value) =>
+                  ref.read(settingsProvider.notifier).updateThemeMode(value),
             ),
           ),
           SettingsLanguageRow(settings: settings),
+        ],
+      ),
+      const Gap.md(),
+      SettingsGroupCard(
+        children: [
           _AppearanceBlock(
             title: context.l10n.settingsAppColorTitle,
             child: ColorPicker(
@@ -95,6 +75,59 @@ class _AppearanceBlock extends StatelessWidget {
   );
 }
 
+class _ThemeModeChooser extends StatelessWidget {
+  const _ThemeModeChooser({
+    required this.settings,
+    required this.onThemeModeChanged,
+  });
+
+  final AppSettings settings;
+  final ValueChanged<ThemeMode> onThemeModeChanged;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) {
+      final cardWidth = context.isCompact
+          ? (constraints.maxWidth - SpacingTokens.sm) / 2
+          : (constraints.maxWidth - (SpacingTokens.sm * 2)) / 3;
+
+      return Wrap(
+        spacing: SpacingTokens.sm,
+        runSpacing: SpacingTokens.sm,
+        children: [
+          SizedBox(
+            width: cardWidth,
+            child: _ThemeModeCard(
+              icon: Icons.brightness_auto_outlined,
+              isSelected: settings.themeMode == ThemeMode.system,
+              label: context.l10n.themeModeSystem,
+              onTap: () => onThemeModeChanged(ThemeMode.system),
+            ),
+          ),
+          SizedBox(
+            width: cardWidth,
+            child: _ThemeModeCard(
+              icon: Icons.light_mode_outlined,
+              isSelected: settings.themeMode == ThemeMode.light,
+              label: context.l10n.themeModeLight,
+              onTap: () => onThemeModeChanged(ThemeMode.light),
+            ),
+          ),
+          SizedBox(
+            width: cardWidth,
+            child: _ThemeModeCard(
+              icon: Icons.dark_mode_outlined,
+              isSelected: settings.themeMode == ThemeMode.dark,
+              label: context.l10n.themeModeDark,
+              onTap: () => onThemeModeChanged(ThemeMode.dark),
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
+
 class _ThemeModeCard extends StatelessWidget {
   const _ThemeModeCard({
     required this.label,
@@ -114,30 +147,28 @@ class _ThemeModeCard extends StatelessWidget {
         ? context.colors.primary
         : context.colors.outline.withValues(alpha: OpacityTokens.borderSubtle);
 
-    return Expanded(
-      child: AppCard(
-        onTap: onTap,
-        borderColor: borderColor,
-        backgroundColor: isSelected
-            ? context.colors.primary.withValues(alpha: OpacityTokens.focus)
-            : null,
-        padding: const EdgeInsets.symmetric(
-          horizontal: SpacingTokens.md,
-          vertical: SpacingTokens.lg,
-        ),
-        child: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(icon, size: SizeTokens.iconMd),
-              const Gap.sm(),
-              Text(
-                label,
-                textAlign: TextAlign.center,
-                style: context.textTheme.titleSmall,
-              ),
-            ],
-          ),
+    return AppCard(
+      onTap: onTap,
+      borderColor: borderColor,
+      backgroundColor: isSelected
+          ? context.colors.primary.withValues(alpha: OpacityTokens.focus)
+          : null,
+      padding: const EdgeInsets.symmetric(
+        horizontal: SpacingTokens.md,
+        vertical: SpacingTokens.lg,
+      ),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: SizeTokens.iconMd),
+            const Gap.sm(),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: context.textTheme.titleSmall,
+            ),
+          ],
         ),
       ),
     );

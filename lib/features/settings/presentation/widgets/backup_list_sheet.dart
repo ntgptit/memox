@@ -10,12 +10,7 @@ import 'package:memox/shared/widgets/lists/app_list_tile.dart';
 Future<String?> showBackupListSheet(
   BuildContext context, {
   required List<BackupInfo> backups,
-}) => showModalBottomSheet<String>(
-  context: context,
-  isScrollControlled: true,
-  useSafeArea: true,
-  builder: (_) => _BackupListSheet(backups: backups),
-);
+}) => context.showAppBottomSheet<String>(_BackupListSheet(backups: backups));
 
 class _BackupListSheet extends StatelessWidget {
   const _BackupListSheet({required this.backups});
@@ -41,18 +36,30 @@ class _BackupListSheet extends StatelessWidget {
           const SizedBox(height: SpacingTokens.lg),
           Text(
             context.l10n.settingsRestoreAction,
-            style: context.textTheme.titleMedium,
+            style: context.textTheme.titleLarge,
           ),
           const SizedBox(height: SpacingTokens.lg),
-          ...backups.map(
-            (backup) => AppListTile(
-              title: _formatDate(backup.modifiedTime),
-              subtitle: _formatSize(backup.sizeBytes),
-              leading: Icon(
-                Icons.cloud_done_outlined,
-                color: context.colors.onSurfaceVariant,
-              ),
-              onTap: () => Navigator.of(context).pop(backup.fileId),
+          ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: context.screenHeight * 0.6),
+            child: ListView.separated(
+              shrinkWrap: true,
+              padding: EdgeInsets.zero,
+              itemCount: backups.length,
+              separatorBuilder: (_, _) => const SizedBox.shrink(),
+              itemBuilder: (context, index) {
+                final backup = backups[index];
+
+                return AppListTile(
+                  title: _formatDate(backup.modifiedTime),
+                  subtitle: _formatSize(backup.sizeBytes),
+                  variant: AppListTileVariant.sheet,
+                  leading: Icon(
+                    Icons.cloud_done_outlined,
+                    color: context.colors.onSurfaceVariant,
+                  ),
+                  onTap: () => Navigator.of(context).pop(backup.fileId),
+                );
+              },
             ),
           ),
         ],

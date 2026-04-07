@@ -23,9 +23,11 @@ class SelectableCard extends StatelessWidget {
     child: AppCard(
       onTap: onTap,
       backgroundColor: isSelected
-          ? context.colors.primary.withValues(alpha: OpacityTokens.press)
+          ? context.colors.surfaceContainerHighest
           : null,
-      borderColor: isSelected ? context.colors.primary : null,
+      borderColor: isSelected
+          ? context.colors.primary.withValues(alpha: OpacityTokens.focus)
+          : null,
       child: child,
     ),
   );

@@ -12,10 +12,13 @@ class DeckTileDuePill extends StatelessWidget {
   @override
   Widget build(BuildContext context) => DecoratedBox(
     decoration: BoxDecoration(
-      color: context.customColors.ratingHard.withValues(
-        alpha: OpacityTokens.focus,
-      ),
+      color: context.colors.surfaceContainerHighest,
       borderRadius: BorderRadius.circular(RadiusTokens.full),
+      border: Border.all(
+        color: context.colors.outline.withValues(
+          alpha: OpacityTokens.borderSubtle,
+        ),
+      ),
     ),
     child: Padding(
       padding: const EdgeInsets.symmetric(
@@ -25,7 +28,7 @@ class DeckTileDuePill extends StatelessWidget {
       child: Text(
         '$count',
         style: context.textTheme.labelMedium?.copyWith(
-          color: context.customColors.ratingHard,
+          color: context.colors.onSurfaceVariant,
         ),
       ),
     ),

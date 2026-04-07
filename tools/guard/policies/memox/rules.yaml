@@ -112,6 +112,13 @@ shared_widget_mapping:
       - "AppEditDeleteMenu("
     forbidden_widgets:
       - "PopupMenuButton"
+  folder_deck_tile:
+    path_pattern: "features/folders/presentation/widgets/folder_deck_tile.dart"
+    required_widgets:
+      - "AppCardListTile("
+      - "AppTileGlyph("
+    forbidden_widgets:
+      - "AppCard("
   settings_stepper_row:
     path_pattern: "features/settings/presentation/widgets/settings_stepper_row.dart"
     required_widgets:
@@ -130,6 +137,60 @@ shared_widget_mapping:
       - "AppPressable("
     forbidden_widgets:
       - "AppCard("
+  settings_section_group_card:
+    path_pattern: "features/settings/presentation/widgets/settings_*_section.dart"
+    required_widgets:
+      - "SettingsSectionHeader("
+      - "SettingsGroupCard("
+  feature_dialogs:
+    path_pattern: "lib/features/*/presentation/widgets/*dialog*.dart"
+    required_any_widgets:
+      - "AppDialog("
+      - "ConfirmDialog("
+      - "InputDialog("
+    forbidden_widgets:
+      - "AlertDialog("
+  search_screen_entry:
+    path_pattern: "features/search/presentation/screens/search_screen.dart"
+    required_widgets:
+      - "AppSearchBar("
+      - "variant: AppSearchBarVariant.page"
+  deck_toolbar_search:
+    path_pattern: "features/decks/presentation/widgets/deck_cards_toolbar.dart"
+    required_widgets:
+      - "AppSearchBar("
+      - "variant: AppSearchBarVariant.toolbar"
+      - "showChoiceBottomSheet<DeckCardSort>("
+    forbidden_widgets:
+      - "SegmentedButton<DeckCardSort>("
+  search_result_tile_variant:
+    path_pattern: "features/search/presentation/widgets/search_result_tile.dart"
+    required_widgets:
+      - "AppListTile("
+      - "variant: AppListTileVariant.search"
+    forbidden_widgets:
+      - "AppCard("
+      - "AppCardListTile("
+  backup_list_sheet_variant:
+    path_pattern: "features/settings/presentation/widgets/backup_list_sheet.dart"
+    required_widgets:
+      - "AppListTile("
+      - "variant: AppListTileVariant.sheet"
+  home_top_bar_actions:
+    path_pattern: "features/folders/presentation/screens/home_screen.dart"
+    required_widgets:
+      - "TopBarActionRow("
+      - "TopBarIconButton("
+  folder_detail_top_bar_actions:
+    path_pattern: "features/folders/presentation/screens/folder_detail_screen.dart"
+    required_widgets:
+      - "TopBarActionRow("
+      - "TopBarIconButton("
+  deck_detail_top_bar_actions:
+    path_pattern: "features/decks/presentation/widgets/deck_detail_header.dart"
+    required_widgets:
+      - "TopBarActionRow("
+      - "TopBarIconButton("
   card_editor_switch:
     path_pattern: "features/cards/presentation/widgets/card_editor_view.dart"
     required_widgets:
@@ -140,6 +201,37 @@ shared_widget_mapping:
       - "homeFolderTileDataProvider("
     forbidden_widgets:
       - "folderDetailProvider("
+  shared_error_view_color:
+    path_pattern: "lib/shared/widgets/feedback/error_view.dart"
+    required_widgets:
+      - "context.colors.error"
+    forbidden_widgets:
+      - "context.customColors.ratingAgain"
+  shared_toast_error_color:
+    path_pattern: "lib/shared/widgets/feedback/toast.dart"
+    required_widgets:
+      - "context.colors.error"
+      - "context.colors.inverseSurface"
+    forbidden_widgets:
+      - "context.customColors.ratingAgain"
+  shared_text_field_error_color:
+    path_pattern: "lib/shared/widgets/inputs/app_text_field.dart"
+    required_widgets:
+      - "context.colors.error"
+    forbidden_widgets:
+      - "context.customColors.ratingAgain"
+  shared_delete_menu_color:
+    path_pattern: "lib/shared/widgets/lists/app_edit_delete_menu.dart"
+    required_widgets:
+      - "context.colors.error"
+    forbidden_widgets:
+      - "context.customColors.ratingAgain"
+  shared_slidable_delete_color:
+    path_pattern: "lib/shared/widgets/lists/app_slidable_row.dart"
+    required_widgets:
+      - "context.colors.errorContainer"
+    forbidden_widgets:
+      - "context.customColors.ratingAgain"
 
 provider_naming:
   match_paths:

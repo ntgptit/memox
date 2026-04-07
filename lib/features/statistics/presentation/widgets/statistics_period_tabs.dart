@@ -3,7 +3,6 @@ import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/duration_tokens.dart';
 import 'package:memox/core/theme/tokens/opacity_tokens.dart';
 import 'package:memox/core/theme/tokens/radius_tokens.dart';
-import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/statistics/domain/value_objects/date_range.dart';
 import 'package:memox/shared/widgets/buttons/app_pressable.dart';
@@ -19,15 +18,15 @@ class StatisticsPeriodTabs extends StatelessWidget {
   final ValueChanged<DateRange> onSelected;
 
   @override
-  Widget build(BuildContext context) => Row(
+  Widget build(BuildContext context) => Wrap(
+    spacing: SpacingTokens.sm,
+    runSpacing: SpacingTokens.sm,
     children: DateRange.values
         .map(
-          (range) => Expanded(
-            child: _StatisticsPeriodTab(
-              label: _label(context, range),
-              isSelected: selectedRange == range,
-              onTap: () => onSelected(range),
-            ),
+          (range) => _StatisticsPeriodTab(
+            label: _label(context, range),
+            isSelected: selectedRange == range,
+            onTap: () => onSelected(range),
           ),
         )
         .toList(),
@@ -54,34 +53,39 @@ class _StatisticsPeriodTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final transparent = context.colors.surface.withValues(alpha: 0);
+    final borderColor = isSelected
+        ? context.colors.primary.withValues(alpha: OpacityTokens.focus)
+        : context.colors.outline;
 
     return AppPressable(
       color: transparent,
       borderRadius: RadiusTokens.chip,
       onTap: onTap,
-      child: SizedBox(
-        height: SizeTokens.touchTarget,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              label,
-              style: context.textTheme.titleSmall?.copyWith(
-                color: isSelected
-                    ? context.colors.primary
-                    : context.colors.onSurface.withValues(
-                        alpha: OpacityTokens.disabled,
-                      ),
-              ),
+      child: AnimatedContainer(
+        duration: DurationTokens.normal,
+        padding: const EdgeInsets.symmetric(
+          horizontal: SpacingTokens.lg,
+          vertical: SpacingTokens.sm,
+        ),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? context.colors.surfaceContainerHighest
+              : transparent,
+          border: Border.all(color: borderColor),
+          borderRadius: BorderRadius.circular(RadiusTokens.chip),
+        ),
+        child: Center(
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: context.textTheme.labelLarge?.copyWith(
+              color: isSelected
+                  ? context.colors.primary
+                  : context.colors.onSurfaceVariant,
             ),
-            const SizedBox(height: SpacingTokens.xs),
-            AnimatedContainer(
-              duration: DurationTokens.normal,
-              height: SizeTokens.progressBarHeight,
-              width: double.infinity,
-              color: isSelected ? context.colors.primary : transparent,
-            ),
-          ],
+          ),
         ),
       ),
     );

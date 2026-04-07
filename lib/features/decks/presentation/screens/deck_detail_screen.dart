@@ -152,8 +152,6 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
                 },
               ),
               if (viewState != DeckDetailViewState.empty)
-                _buildCardsHeading(context),
-              if (viewState != DeckDetailViewState.empty)
                 _buildToolbar(context),
               if (viewState != DeckDetailViewState.empty)
                 _buildCardsSliver(context, detail, cards),
@@ -231,22 +229,6 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
       ),
     ),
   ];
-
-  Widget _buildCardsHeading(BuildContext context) => SliverPadding(
-    padding: ResponsivePadding.horizontal(context),
-    sliver: SliverToBoxAdapter(
-      child: Padding(
-        padding: const EdgeInsets.only(
-          top: SpacingTokens.lg,
-          bottom: SpacingTokens.sm,
-        ),
-        child: Text(
-          context.l10n.cardsTitle,
-          style: context.textTheme.titleLarge,
-        ),
-      ),
-    ),
-  );
 
   Widget _buildToolbar(BuildContext context) => SliverPersistentHeader(
     pinned: true,

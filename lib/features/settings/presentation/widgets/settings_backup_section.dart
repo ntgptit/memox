@@ -7,6 +7,7 @@ import 'package:memox/features/settings/presentation/widgets/settings_action_row
 import 'package:memox/features/settings/presentation/widgets/settings_backup_actions.dart';
 import 'package:memox/features/settings/presentation/widgets/settings_group_card.dart';
 import 'package:memox/features/settings/presentation/widgets/settings_section_header.dart';
+import 'package:memox/shared/widgets/cards/app_card.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
 import 'package:memox/shared/widgets/layout/spacing.dart';
 
@@ -65,22 +66,33 @@ class _SignedInView extends ConsumerWidget {
   final GoogleSignInAccount user;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) => SettingsGroupCard(
+  Widget build(BuildContext context, WidgetRef ref) => Column(
     children: [
-      SettingsActionRow(
-        title: context.l10n.settingsBackupNowAction,
-        icon: Icons.cloud_upload_outlined,
-        onTap: () => handleBackupToDrive(context, ref),
+      _BackupAccountCard(user: user),
+      const Gap.md(),
+      SettingsGroupCard(
+        children: [
+          SettingsActionRow(
+            title: context.l10n.settingsBackupNowAction,
+            icon: Icons.cloud_upload_outlined,
+            onTap: () => handleBackupToDrive(context, ref),
+          ),
+          SettingsActionRow(
+            title: context.l10n.settingsRestoreAction,
+            icon: Icons.cloud_download_outlined,
+            onTap: () => handleShowBackupList(context, ref),
+          ),
+        ],
       ),
-      SettingsActionRow(
-        title: context.l10n.settingsRestoreAction,
-        icon: Icons.cloud_download_outlined,
-        onTap: () => handleShowBackupList(context, ref),
-      ),
-      SettingsActionRow(
-        title: context.l10n.settingsSignOutAction,
-        icon: Icons.logout_outlined,
-        onTap: () => _signOut(ref),
+      const Gap.md(),
+      SettingsGroupCard(
+        children: [
+          SettingsActionRow(
+            title: context.l10n.settingsSignOutAction,
+            icon: Icons.logout_outlined,
+            onTap: () => _signOut(ref),
+          ),
+        ],
       ),
     ],
   );
@@ -89,4 +101,40 @@ class _SignedInView extends ConsumerWidget {
     await ref.read(googleSignInServiceProvider).signOut();
     ref.invalidate(currentGoogleUserProvider);
   }
+}
+
+class _BackupAccountCard extends StatelessWidget {
+  const _BackupAccountCard({required this.user});
+
+  final GoogleSignInAccount user;
+
+  @override
+  Widget build(BuildContext context) => AppCard(
+    child: Row(
+      children: [
+        Icon(Icons.cloud_done_outlined, color: context.colors.primary),
+        const Gap.md(),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                user.displayName ?? user.email,
+                style: context.textTheme.titleMedium,
+              ),
+              if (user.displayName != null) ...[
+                const Gap.xs(),
+                Text(
+                  user.email,
+                  style: context.textTheme.bodySmall?.copyWith(
+                    color: context.colors.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
 }

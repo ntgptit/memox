@@ -22,13 +22,16 @@ class StudyModeSheet extends StatelessWidget {
             style: context.textTheme.titleLarge,
           ),
           const SizedBox(height: SpacingTokens.md),
-          ...StudyMode.values.map((mode) => AppListTile(
+          ...StudyMode.values.map(
+            (mode) => AppListTile(
+              variant: AppListTileVariant.sheet,
               title: mode.label(context.l10n),
               subtitle: _description(context, mode),
               leading: _EmojiBubble(emoji: mode.emoji),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => Navigator.of(context).pop(mode),
-            )),
+            ),
+          ),
         ],
       ),
     ),
@@ -61,8 +64,5 @@ class _EmojiBubble extends StatelessWidget {
   );
 }
 
-Future<StudyMode?> showStudyModeSheet(BuildContext context) => showModalBottomSheet<StudyMode>(
-    context: context,
-    useSafeArea: true,
-    builder: (_) => const StudyModeSheet(),
-  );
+Future<StudyMode?> showStudyModeSheet(BuildContext context) =>
+    context.showAppBottomSheet<StudyMode>(const StudyModeSheet());

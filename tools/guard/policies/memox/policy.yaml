@@ -156,6 +156,15 @@ category_overrides:
   test_coverage: "testing"
   text_style: "design_system"
   touch_target: "design_system"
+  app_theme_surface_contract: "design_system"
+  shared_action_button_contract: "design_system"
+  app_search_bar_contract: "design_system"
+  app_list_tile_contract: "design_system"
+  shared_overlay_contract: "design_system"
+  selection_surface_contract: "design_system"
+  study_top_bar_contract: "design_system"
+  balanced_top_bar_slot: "design_system"
+  feature_bottom_sheet_entrypoint: "design_system"
   typography_scale: "design_system"
 
 exit_policy:
@@ -539,8 +548,14 @@ rules:
         message: "Dùng AppListTile thay vì raw ListTile()"
       - regex: '\bSwitchListTile\('
         message: "Dùng AppSwitchTile thay vì raw SwitchListTile()"
+      - regex: '\bSwitch\.adaptive\('
+        message: "Dùng AppCardSwitchTile hoặc shared switch wrapper thay vì raw Switch.adaptive()"
       - regex: '\bPopupMenuButton(?:<[^>]+>)?\s*\('
         message: "Dùng AppEditDeleteMenu hoặc shared popup wrapper thay vì raw PopupMenuButton()"
+      - regex: '\bSearchBar\('
+        message: "Dùng AppSearchBar thay vì raw SearchBar()"
+      - regex: '\bRawChip\('
+        message: "Dùng shared chip wrapper thay vì raw RawChip()"
       - regex: '\bInkWell\('
         message: "Dùng AppPressable, AppCard, TextLinkButton, hoặc shared wrapper thay vì raw InkWell()"
       - regex: '\bGestureDetector\('
@@ -549,6 +564,42 @@ rules:
         message: "Dùng Toast thay vì raw ScaffoldMessenger"
       - regex: '\bDismissible\('
         message: "Dùng AppSlidableRow thay vì raw Dismissible()"
+
+  - id: balanced_top_bar_slot
+    type: forbidden_pattern
+    name: Balanced top-bar slot allowlist
+    description: balancedSlotWidth should stay limited to the allowlisted header surfaces that need centered-title geometry.
+    severity: error
+    scope: local
+    enabled: true
+    skip_comments: true
+    targets:
+      exclude:
+        - "lib/shared/widgets/navigation/study_top_bar.dart"
+        - "lib/shared/widgets/navigation/top_bar_back_button.dart"
+        - "lib/shared/widgets/navigation/editor_top_bar.dart"
+        - "lib/features/decks/presentation/widgets/deck_detail_header.dart"
+        - "lib/features/decks/presentation/screens/deck_detail_screen.dart"
+        - "lib/features/folders/presentation/screens/folder_detail_screen.dart"
+        - "test/"
+    patterns:
+      - regex: 'TopBar(?:IconButton|BackButton)\.balancedSlotWidth'
+        message: "balancedSlotWidth is reserved for allowlisted headers. Prefer compact slot usage elsewhere."
+
+  - id: feature_bottom_sheet_entrypoint
+    type: forbidden_pattern
+    name: Feature bottom-sheet entrypoint
+    description: Feature presentation code should use shared bottom-sheet helpers instead of raw showModalBottomSheet.
+    severity: error
+    scope: local
+    enabled: true
+    skip_comments: true
+    targets:
+      include:
+        - "lib/features/*/presentation/**/*.dart"
+    patterns:
+      - regex: '\bshowModalBottomSheet(?:<[^>]+>)?\s*\('
+        message: "Dùng context.showAppBottomSheet(...) hoặc shared sheet helper thay vì raw showModalBottomSheet()."
 
   - id: button_usage
     type: forbidden_pattern
@@ -756,6 +807,216 @@ rules:
           - "SizeTokens.inputHeight"
           - "SizeTokens.listItemHeight"
           - "SizeTokens.listItemTall"
+
+  - id: app_scaffold_contract
+    type: content_contract
+    name: AppScaffold contract
+    description: AppScaffold must retain MemoX shell padding, safe-area, and bottom-spacing behavior.
+    severity: error
+    scope: local
+    enabled: true
+    messages:
+      missing_file: "File bắt buộc `{file}` đang bị thiếu."
+      aggregate_missing_required_tokens: "`{file_name}` lệch AppScaffold contract. Thiếu {tokens}."
+    cases:
+      - file: "lib/shared/widgets/layout/app_scaffold.dart"
+        required_tokens:
+          - "contentBottomPadding("
+          - "context.screenType.maxContentWidth"
+          - "context.screenType.screenPadding"
+          - "bottomNavigationBar != null"
+          - "fab != null"
+          - "useSafeArea ? SafeArea(child: content) : content"
+
+  - id: app_pressable_contract
+    type: content_contract
+    name: AppPressable contract
+    description: AppPressable must preserve MemoX tap-target and ink semantics.
+    severity: error
+    scope: local
+    enabled: true
+    messages:
+      missing_file: "File bắt buộc `{file}` đang bị thiếu."
+      aggregate_missing_required_tokens: "`{file_name}` lệch AppPressable contract. Thiếu {tokens}."
+    cases:
+      - file: "lib/shared/widgets/buttons/app_pressable.dart"
+        required_tokens:
+          - "Material("
+          - "InkWell("
+          - "BorderRadius.circular(borderRadius)"
+          - "SizeTokens.touchTarget"
+
+  - id: app_theme_surface_contract
+    type: content_contract
+    name: App theme surface contract
+    description: App theme must preserve the shared neutral surface ladder and input layering.
+    severity: error
+    scope: local
+    enabled: true
+    messages:
+      missing_file: "File bắt buộc `{file}` đang bị thiếu."
+      aggregate_missing_required_tokens: "`{file_name}` lệch shared surface contract. Thiếu {tokens}."
+    cases:
+      - file: "lib/core/theme/app_theme.dart"
+        required_tokens:
+          - "final pageSurface = colorScheme.surfaceContainerLowest;"
+          - "final cardSurface = colorScheme.surface;"
+          - "final utilitySurface = colorScheme.surfaceContainerLow;"
+          - "final interactiveSurface = colorScheme.surfaceContainerHigh;"
+          - "scaffoldBackgroundColor: pageSurface,"
+          - "color: cardSurface,"
+          - "color: utilitySurface,"
+          - "fillColor: interactiveSurface,"
+          - "backgroundColor: utilitySurface,"
+
+  - id: shared_action_button_contract
+    type: content_contract
+    name: Shared action button contract
+    description: Shared button primitives must preserve MemoX height, tap-feedback, and neutral-secondary defaults.
+    severity: error
+    scope: local
+    enabled: true
+    messages:
+      missing_file: "File bắt buộc `{file}` đang bị thiếu."
+      aggregate_missing_required_tokens: "`{file_name}` lệch shared action-button contract. Thiếu {tokens}."
+    cases:
+      - file: "lib/shared/widgets/buttons/primary_button.dart"
+        required_tokens:
+          - "this.height = SizeTokens.buttonHeight,"
+          - "FilledButton("
+          - "minimumSize: Size(0, height)"
+          - "ScaleTap("
+          - "BorderRadius.circular(RadiusTokens.button)"
+      - file: "lib/shared/widgets/buttons/secondary_button.dart"
+        required_tokens:
+          - "this.height = SizeTokens.buttonHeight,"
+          - "theme.colorScheme.onSurfaceVariant"
+          - "theme.colorScheme.outlineVariant"
+          - "OutlinedButton("
+          - "minimumSize: Size(0, height)"
+          - "ScaleTap("
+          - "BorderRadius.circular(RadiusTokens.button)"
+      - file: "lib/shared/widgets/buttons/icon_action_button.dart"
+        required_tokens:
+          - "this.size = SizeTokens.touchTarget,"
+          - "IconButton.outlined("
+          - "minimumSize: Size.square(size)"
+          - "SizeTokens.iconMd"
+
+  - id: app_search_bar_contract
+    type: content_contract
+    name: AppSearchBar contract
+    description: AppSearchBar must preserve variant-specific height, debounce, and neutral fill behavior.
+    severity: error
+    scope: local
+    enabled: true
+    messages:
+      missing_file: "File bắt buộc `{file}` đang bị thiếu."
+      aggregate_missing_required_tokens: "`{file_name}` lệch AppSearchBar contract. Thiếu {tokens}."
+    cases:
+      - file: "lib/shared/widgets/inputs/app_search_bar.dart"
+        required_tokens:
+          - "enum AppSearchBarVariant { page, toolbar }"
+          - "height: SizeTokens.searchBarHeight,"
+          - "Timer(DurationTokens.debounce, () => widget.onChanged(value))"
+          - "_focusNode.requestFocus();"
+          - "AppSearchBarVariant.page => context.colors.surfaceContainerHigh,"
+          - "AppSearchBarVariant.toolbar => context.colors.surfaceContainerHighest,"
+          - "horizontal: SpacingTokens.lg,"
+          - "vertical: SpacingTokens.md,"
+
+  - id: app_list_tile_contract
+    type: content_contract
+    name: AppListTile contract
+    description: AppListTile must preserve the standard, sheet, and search size tiers from the redesign.
+    severity: error
+    scope: local
+    enabled: true
+    messages:
+      missing_file: "File bắt buộc `{file}` đang bị thiếu."
+      aggregate_missing_required_tokens: "`{file_name}` lệch AppListTile contract. Thiếu {tokens}."
+    cases:
+      - file: "lib/shared/widgets/lists/app_list_tile.dart"
+        required_tokens:
+          - "enum AppListTileVariant { standard, sheet, search }"
+          - "BorderRadius.circular(RadiusTokens.md)"
+          - "SizeTokens.listItemCompact"
+          - "SizeTokens.listItemHeight"
+          - "SizeTokens.listItemTall"
+          - "SizeTokens.avatarMd"
+          - "SizeTokens.avatarLg"
+          - "AppListTileVariant.search => context.textTheme.titleSmall,"
+          - "AppListTileVariant.sheet => context.textTheme.titleMedium,"
+
+  - id: shared_overlay_contract
+    type: content_contract
+    name: Shared overlay contract
+    description: Shared dialogs and bottom sheets must keep the MemoX spacing, width, and list semantics.
+    severity: error
+    scope: local
+    enabled: true
+    messages:
+      missing_file: "File bắt buộc `{file}` đang bị thiếu."
+      aggregate_missing_required_tokens: "`{file_name}` lệch shared overlay contract. Thiếu {tokens}."
+    cases:
+      - file: "lib/shared/widgets/dialogs/app_dialog.dart"
+        required_tokens:
+          - "enum AppDialogVariant { standard, form }"
+          - "context.screenType.screenPadding"
+          - "scrollable: true,"
+          - "SizeTokens.dialogWidthMd"
+          - "SizeTokens.dialogWidthLg"
+          - "SpacingTokens.xl"
+          - "SpacingTokens.lg"
+      - file: "lib/shared/widgets/dialogs/choice_bottom_sheet.dart"
+        required_tokens:
+          - "SafeArea("
+          - "SpacingTokens.lg"
+          - "AppListTileVariant.sheet"
+          - "context.showAppBottomSheet<T>("
+
+  - id: selection_surface_contract
+    type: content_contract
+    name: Selection surface contract
+    description: Shared selectable surfaces and chips must keep the calmer neutral selection treatment.
+    severity: error
+    scope: local
+    enabled: true
+    messages:
+      missing_file: "File bắt buộc `{file}` đang bị thiếu."
+      aggregate_missing_required_tokens: "`{file_name}` lệch selection-surface contract. Thiếu {tokens}."
+    cases:
+      - file: "lib/shared/widgets/cards/selectable_card.dart"
+        required_tokens:
+          - "context.colors.surfaceContainerHighest"
+          - "context.colors.primary.withValues(alpha: OpacityTokens.focus)"
+      - file: "lib/shared/widgets/chips/mode_chip.dart"
+        required_tokens:
+          - "context.colors.surfaceContainerHighest"
+          - "context.colors.primary.withValues(alpha: OpacityTokens.focus)"
+          - "context.colors.outline,"
+      - file: "lib/shared/widgets/chips/status_chip.dart"
+        required_tokens:
+          - "context.colors.surfaceContainerLow"
+          - "context.colors.outline"
+          - "context.colors.onSurfaceVariant"
+
+  - id: study_top_bar_contract
+    type: content_contract
+    name: StudyTopBar contract
+    description: StudyTopBar must align with responsive shell padding instead of fixed local gutters.
+    severity: error
+    scope: local
+    enabled: true
+    messages:
+      missing_file: "File bắt buộc `{file}` đang bị thiếu."
+      aggregate_missing_required_tokens: "`{file_name}` lệch StudyTopBar contract. Thiếu {tokens}."
+    cases:
+      - file: "lib/shared/widgets/navigation/study_top_bar.dart"
+        required_tokens:
+          - "context.screenType.screenPadding"
+          - "TopBarIconButton.balancedSlotWidth"
+          - "SizeTokens.studyTopBarMetaHeight"
 
   - id: typography_scale
     type: content_contract

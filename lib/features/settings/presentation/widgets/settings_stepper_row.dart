@@ -25,12 +25,9 @@ class SettingsStepperRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.symmetric(
-      horizontal: SpacingTokens.lg,
-      vertical: SpacingTokens.md,
-    ),
+    padding: const EdgeInsets.symmetric(horizontal: SpacingTokens.lg),
     child: ConstrainedBox(
-      constraints: const BoxConstraints(minHeight: SizeTokens.listItemCompact),
+      constraints: const BoxConstraints(minHeight: SizeTokens.listItemHeight),
       child: Row(
         children: [
           Expanded(

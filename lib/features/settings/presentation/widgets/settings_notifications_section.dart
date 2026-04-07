@@ -5,7 +5,7 @@ import 'package:memox/core/theme/tokens/radius_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/settings/domain/entities/app_setting.dart';
 import 'package:memox/features/settings/presentation/providers/settings_provider.dart';
-import 'package:memox/features/settings/presentation/widgets/settings_action_row.dart';
+import 'package:memox/features/settings/presentation/widgets/settings_choice_row.dart';
 import 'package:memox/features/settings/presentation/widgets/settings_group_card.dart';
 import 'package:memox/features/settings/presentation/widgets/settings_section_header.dart';
 import 'package:memox/shared/widgets/buttons/app_pressable.dart';
@@ -40,10 +40,9 @@ class SettingsNotificationsSection extends ConsumerWidget {
                   .updateStudyReminder(studyReminder: value),
             ),
             if (settings.studyReminder)
-              SettingsActionRow(
-                title:
-                    '${context.l10n.settingsReminderTimeTitle} · $formattedTime',
-                icon: Icons.schedule_outlined,
+              SettingsChoiceRow(
+                title: context.l10n.settingsReminderTimeTitle,
+                valueLabel: formattedTime,
                 onTap: () => _pickReminderTime(context, ref),
               ),
             _SettingsSwitchRow(
@@ -88,10 +87,7 @@ class _SettingsSwitchRow extends StatelessWidget {
   Widget build(BuildContext context) => AppPressable(
     onTap: () => onChanged(!value),
     borderRadius: RadiusTokens.none,
-    padding: const EdgeInsets.symmetric(
-      horizontal: SpacingTokens.lg,
-      vertical: SpacingTokens.md,
-    ),
+    padding: const EdgeInsets.symmetric(horizontal: SpacingTokens.lg),
     child: AppSwitchTile(label: label, value: value, onChanged: onChanged),
   );
 }

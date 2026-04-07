@@ -25,26 +25,26 @@ void main() {
     await tester.pumpAndSettle();
     final scrollable = find.byType(Scrollable).first;
 
-    expect(find.text('Appearance'.toUpperCase()), findsOneWidget);
-    expect(find.text('Studying'.toUpperCase()), findsOneWidget);
+    expect(find.text('Appearance'), findsOneWidget);
+    expect(find.text('Studying'), findsOneWidget);
 
     await tester.scrollUntilVisible(
-      find.text('Notifications'.toUpperCase()),
+      find.text('Notifications'),
       300,
       scrollable: scrollable,
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Notifications'.toUpperCase()), findsOneWidget);
+    expect(find.text('Notifications'), findsOneWidget);
 
     await tester.scrollUntilVisible(
-      find.text('Data'.toUpperCase()),
+      find.text('Data'),
       300,
       scrollable: scrollable,
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Data'.toUpperCase()), findsOneWidget);
+    expect(find.text('Data'), findsOneWidget);
 
     await tester.scrollUntilVisible(
       find.text('Export cards (JSON)'),

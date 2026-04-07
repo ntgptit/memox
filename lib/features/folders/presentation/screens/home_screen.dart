@@ -75,7 +75,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               focusDeckId: deck.id,
             ),
           ),
-          const SizedBox(height: SpacingTokens.sectionGap),
+          const SizedBox(height: SpacingTokens.xl),
           Expanded(
             child: AppAsyncBuilder<List<FolderEntity>>(
               value: foldersAsync,
@@ -221,20 +221,14 @@ class _HomeFolderHeader extends StatelessWidget {
   Widget build(BuildContext context) => Column(
     crossAxisAlignment: CrossAxisAlignment.stretch,
     children: [
-      Row(
-        children: [
-          Expanded(
-            child: Text(
-              context.l10n.folderSectionTitle.toUpperCase(),
-              style: context.appTextStyles.sectionLabel,
-            ),
-          ),
-        ],
+      Text(
+        context.l10n.folderSectionTitle,
+        style: context.textTheme.headlineMedium,
       ),
-      const SizedBox(height: SpacingTokens.md),
+      const SizedBox(height: SpacingTokens.sm),
       if (isSortMode) ...[
         const ReorderModeBanner(),
-        const SizedBox(height: SpacingTokens.md),
+        const SizedBox(height: SpacingTokens.sm),
       ],
     ],
   );

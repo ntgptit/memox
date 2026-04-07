@@ -1,12 +1,17 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/duration_tokens.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
+import 'package:memox/core/theme/tokens/spacing_tokens.dart';
+
+enum AppSearchBarVariant { page, toolbar }
 
 class AppSearchBar extends StatefulWidget {
   const AppSearchBar({
     required this.onChanged,
+    required this.variant,
     this.hint,
     this.autofocus = false,
     super.key,
@@ -15,6 +20,7 @@ class AppSearchBar extends StatefulWidget {
   final ValueChanged<String> onChanged;
   final String? hint;
   final bool autofocus;
+  final AppSearchBarVariant variant;
 
   @override
   State<AppSearchBar> createState() => _AppSearchBarState();
@@ -64,6 +70,8 @@ class _AppSearchBarState extends State<AppSearchBar> {
       onChanged: _onTextChanged,
       decoration: InputDecoration(
         hintText: widget.hint,
+        fillColor: _fillColor(context),
+        contentPadding: _contentPadding,
         prefixIcon: const Icon(Icons.search_outlined),
         suffixIcon: _controller.text.isEmpty
             ? null
@@ -71,4 +79,17 @@ class _AppSearchBarState extends State<AppSearchBar> {
       ),
     ),
   );
+
+  Color _fillColor(BuildContext context) => switch (widget.variant) {
+    AppSearchBarVariant.page => context.colors.surfaceContainerHigh,
+    AppSearchBarVariant.toolbar => context.colors.surfaceContainerHighest,
+  };
+
+  EdgeInsetsGeometry? get _contentPadding => switch (widget.variant) {
+    AppSearchBarVariant.page => null,
+    AppSearchBarVariant.toolbar => const EdgeInsets.symmetric(
+      horizontal: SpacingTokens.lg,
+      vertical: SpacingTokens.md,
+    ),
+  };
 }

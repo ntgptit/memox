@@ -10,18 +10,16 @@ mixin Toast {
     String message, {
     ToastType type = ToastType.info,
   }) {
-    final (backgroundColor, icon) = switch (type) {
+    final (iconColor, icon) = switch (type) {
       ToastType.success => (
         context.customColors.success,
         Icons.check_circle_outline,
       ),
-      ToastType.error => (
-        context.customColors.ratingAgain,
-        Icons.error_outline,
-      ),
-      ToastType.info => (context.colors.inverseSurface, Icons.info_outline),
+      ToastType.error => (context.colors.error, Icons.error_outline),
+      ToastType.info => (context.colors.inversePrimary, Icons.info_outline),
     };
-    final foregroundColor = _foregroundColor(context, backgroundColor);
+    final backgroundColor = context.colors.inverseSurface;
+    final foregroundColor = context.colors.onInverseSurface;
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
@@ -29,7 +27,7 @@ mixin Toast {
           backgroundColor: backgroundColor,
           content: Row(
             children: [
-              Icon(icon, color: foregroundColor),
+              Icon(icon, color: iconColor),
               const SizedBox(width: SpacingTokens.sm),
               Expanded(
                 child: Text(
@@ -43,14 +41,5 @@ mixin Toast {
           ),
         ),
       );
-  }
-
-  static Color _foregroundColor(BuildContext context, Color backgroundColor) {
-    if (ThemeData.estimateBrightnessForColor(backgroundColor) ==
-        Brightness.dark) {
-      return context.colors.surface;
-    }
-
-    return context.colors.onSurface;
   }
 }

@@ -4,19 +4,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/core/design/card_status.dart';
+import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/providers/repository_providers.dart';
 import 'package:memox/features/cards/domain/entities/flashcard_entity.dart';
 import 'package:memox/features/decks/domain/entities/deck_entity.dart';
 import 'package:memox/features/decks/presentation/screens/deck_detail_screen.dart';
 import 'package:memox/features/folders/domain/entities/folder_entity.dart';
-import 'package:memox/shared/widgets/feedback/loading_indicator.dart';
+import 'package:memox/shared/widgets/feedback/skeleton_parts.dart';
 import '../../../../test_helpers/fakes/fake_deck_repository.dart';
 import '../../../../test_helpers/fakes/fake_flashcard_repository.dart';
 import '../../../../test_helpers/fakes/fake_folder_repository.dart';
 import '../../../../test_helpers/test_app.dart';
 
 void main() {
-  testWidgets('DeckDetailScreen shows loading indicator while data loads', (
+  testWidgets('DeckDetailScreen shows skeleton loading while data loads', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -46,8 +47,9 @@ void main() {
     );
     await tester.pump();
 
-    expect(find.byType(LoadingIndicator), findsOneWidget);
-    expect(find.byTooltip('Back'), findsOneWidget);
+    expect(find.byType(SkeletonHeader), findsOneWidget);
+    expect(find.byType(SkeletonList), findsOneWidget);
+    expect(find.text('Korean Core'), findsNothing);
 
     await tester.pumpAndSettle();
 
@@ -99,12 +101,13 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    final context = tester.element(find.byType(DeckDetailScreen));
     expect(find.text('Korean Core'), findsOneWidget);
-    expect(find.text('Study 1 due card'), findsOneWidget);
-    expect(find.text('Cards'), findsOneWidget);
-    expect(find.text('Search cards'), findsOneWidget);
+    expect(find.text(context.l10n.studyDueCardsAction(1)), findsOneWidget);
     await tester.drag(find.byType(CustomScrollView), const Offset(0, -400));
     await tester.pumpAndSettle();
+    expect(find.text(context.l10n.cardsTitle), findsOneWidget);
+    expect(find.text(context.l10n.searchCardsHint), findsOneWidget);
     expect(find.text('안녕하세요'), findsOneWidget);
     expect(find.text('Hello'), findsOneWidget);
     await tester.tap(find.text('안녕하세요'));
@@ -203,9 +206,10 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    final context = tester.element(find.byType(DeckDetailScreen));
     expect(tester.takeException(), isNull);
     expect(find.text('Korean Core'), findsWidgets);
-    expect(find.text('Study 1 due card'), findsOneWidget);
+    expect(find.text(context.l10n.studyDueCardsAction(1)), findsOneWidget);
   });
 
   testWidgets('DeckDetailScreen loads more cards while scrolling', (

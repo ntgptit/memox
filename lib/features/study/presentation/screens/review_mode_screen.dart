@@ -107,7 +107,9 @@ Widget _buildBody(
           state.goodCount,
           state.easyCount,
         ),
-        style: context.appTextStyles.statNumberSm,
+        style: context.textTheme.bodySmall?.copyWith(
+          color: context.colors.onSurfaceVariant,
+        ),
         textAlign: TextAlign.center,
       ),
       primaryAction: SessionAction(

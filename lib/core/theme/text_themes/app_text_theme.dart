@@ -8,34 +8,47 @@ mixin AppTextTheme {
       ThemeData(brightness: colorScheme.brightness).textTheme,
     );
 
-    TextStyle? heading(TextStyle? style, double fontSize) => style?.copyWith(
-      color: colorScheme.onSurface,
-      fontSize: fontSize,
-      fontWeight: TypographyTokens.semiBold,
-      height: TypographyTokens.headingHeight,
-      letterSpacing: TypographyTokens.headingSpacing,
-    );
-
-    TextStyle? body(TextStyle? style, double fontSize) => style?.copyWith(
-      color: colorScheme.onSurface,
-      fontSize: fontSize,
-      fontWeight: TypographyTokens.regular,
-      height: TypographyTokens.bodyHeight,
-    );
-
-    TextStyle? label(
+    TextStyle? heading(
       TextStyle? style,
       double fontSize, {
-      required FontWeight fontWeight,
-      required Color color,
-      required double height,
-      double? letterSpacing,
+      FontWeight fontWeight = TypographyTokens.semiBold,
+      Color? color,
+      double height = TypographyTokens.headingHeight,
+      double? letterSpacing = TypographyTokens.headingSpacing,
     }) => style?.copyWith(
-      color: color,
+      color: color ?? colorScheme.onSurface,
       fontSize: fontSize,
       fontWeight: fontWeight,
       height: height,
       letterSpacing: letterSpacing,
+    );
+
+    TextStyle? title(
+      TextStyle? style,
+      double fontSize, {
+      required FontWeight fontWeight,
+      Color? color,
+      double height = TypographyTokens.bodyHeight,
+      double? letterSpacing,
+    }) => style?.copyWith(
+      color: color ?? colorScheme.onSurface,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      height: height,
+      letterSpacing: letterSpacing,
+    );
+
+    TextStyle? body(
+      TextStyle? style,
+      double fontSize, {
+      Color? color,
+      FontWeight fontWeight = TypographyTokens.regular,
+      double height = TypographyTokens.bodyHeight,
+    }) => style?.copyWith(
+      color: color ?? colorScheme.onSurface,
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      height: height,
     );
 
     TextStyle? caption(TextStyle? style, double fontSize) => style?.copyWith(
@@ -60,29 +73,62 @@ mixin AppTextTheme {
         base.headlineMedium,
         TypographyTokens.headlineMedium,
       ),
-      headlineSmall: heading(base.headlineSmall, TypographyTokens.titleLarge),
+      headlineSmall: heading(
+        base.headlineSmall,
+        TypographyTokens.headlineMedium,
+        fontWeight: TypographyTokens.medium,
+        letterSpacing: TypographyTokens.bodySpacing,
+      ),
       titleLarge: heading(base.titleLarge, TypographyTokens.titleLarge),
-      titleMedium: heading(base.titleMedium, TypographyTokens.titleMedium),
-      titleSmall: heading(base.titleSmall, TypographyTokens.titleSmall),
+      titleMedium: title(
+        base.titleMedium,
+        TypographyTokens.titleMedium,
+        fontWeight: TypographyTokens.semiBold,
+      ),
+      titleSmall: title(
+        base.titleSmall,
+        TypographyTokens.titleSmall,
+        fontWeight: TypographyTokens.medium,
+      ),
       bodyLarge: body(base.bodyLarge, TypographyTokens.bodyLarge),
       bodyMedium: body(base.bodyMedium, TypographyTokens.bodyMedium),
-      bodySmall: caption(base.bodySmall, TypographyTokens.bodySmall),
+      bodySmall: body(
+        base.bodySmall,
+        TypographyTokens.bodySmall,
+        color: colorScheme.onSurfaceVariant,
+      ),
       labelLarge: label(
         base.labelLarge,
         TypographyTokens.labelLarge,
         fontWeight: TypographyTokens.medium,
-        color: colorScheme.onSurface,
+        color: colorScheme.onSurfaceVariant,
         height: TypographyTokens.bodyHeight,
         letterSpacing: TypographyTokens.labelSpacing,
       ),
       labelMedium: label(
         base.labelMedium,
         TypographyTokens.labelMedium,
-        fontWeight: TypographyTokens.regular,
+        fontWeight: TypographyTokens.medium,
         color: colorScheme.onSurfaceVariant,
-        height: TypographyTokens.bodyHeight,
+        height: TypographyTokens.captionHeight,
+        letterSpacing: TypographyTokens.labelSpacing,
       ),
       labelSmall: caption(base.labelSmall, TypographyTokens.labelSmall),
     );
   }
+
+  static TextStyle? label(
+    TextStyle? style,
+    double fontSize, {
+    required FontWeight fontWeight,
+    required Color color,
+    required double height,
+    double? letterSpacing,
+  }) => style?.copyWith(
+    color: color,
+    fontSize: fontSize,
+    fontWeight: fontWeight,
+    height: height,
+    letterSpacing: letterSpacing,
+  );
 }

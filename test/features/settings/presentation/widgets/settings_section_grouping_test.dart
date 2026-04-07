@@ -39,17 +39,18 @@ void main() {
     expect(find.byType(Divider), findsNWidgets(2));
   });
 
-  testWidgets('appearance section groups theme and color controls', (
-    tester,
-  ) async {
-    await pumpSettingsSection(
-      tester,
-      const SettingsAppearanceSection(settings: AppSettings.defaults),
-    );
+  testWidgets(
+    'appearance section splits theme and color controls into groups',
+    (tester) async {
+      await pumpSettingsSection(
+        tester,
+        const SettingsAppearanceSection(settings: AppSettings.defaults),
+      );
 
-    expect(find.byType(SettingsGroupCard), findsOneWidget);
-    expect(find.byType(Divider), findsNWidgets(2));
-  });
+      expect(find.byType(SettingsGroupCard), findsNWidgets(2));
+      expect(find.byType(Divider), findsOneWidget);
+    },
+  );
 
   testWidgets('theme mode cards center their labels', (tester) async {
     await pumpSettingsSection(
@@ -61,12 +62,14 @@ void main() {
     expect(systemLabel.textAlign, TextAlign.center);
   });
 
-  testWidgets('data section uses one grouped card', (tester) async {
+  testWidgets('data section separates import/export from destructive actions', (
+    tester,
+  ) async {
     await pumpSettingsSection(tester, const SettingsDataSection());
 
-    expect(find.byType(SettingsGroupCard), findsOneWidget);
-    expect(find.byType(AppCard), findsOneWidget);
-    expect(find.byType(Divider), findsNWidgets(2));
+    expect(find.byType(SettingsGroupCard), findsNWidgets(2));
+    expect(find.byType(AppCard), findsNWidgets(2));
+    expect(find.byType(Divider), findsOneWidget);
   });
 }
 

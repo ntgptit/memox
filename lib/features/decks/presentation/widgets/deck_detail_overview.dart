@@ -8,7 +8,6 @@ import 'package:memox/features/decks/presentation/models/deck_detail_view_state.
 import 'package:memox/features/decks/presentation/widgets/deck_stats_grid.dart';
 import 'package:memox/shared/widgets/buttons/primary_button.dart';
 import 'package:memox/shared/widgets/buttons/secondary_button.dart';
-import 'package:memox/shared/widgets/buttons/text_link_button.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
 
 class DeckDetailOverview extends StatelessWidget {
@@ -50,13 +49,8 @@ class DeckDetailOverview extends StatelessWidget {
       ];
     }
 
-    final children = <Widget>[
-      DeckStatsGrid(stats: stats),
-      const SizedBox(height: SpacingTokens.lg),
-    ];
-
     if (viewState == DeckDetailViewState.caughtUp) {
-      children.add(
+      return [
         _DeckActionCard(
           icon: Icons.check_circle_outline,
           title: context.l10n.deckCaughtUpTitle,
@@ -64,28 +58,22 @@ class DeckDetailOverview extends StatelessWidget {
           primaryLabel: context.l10n.chooseStudyModeButton,
           onPrimaryTap: onChooseStudyMode,
         ),
-      );
-      return children;
+        const SizedBox(height: SpacingTokens.lg),
+        DeckStatsGrid(stats: stats),
+      ];
     }
 
-    children
-      ..add(
-        PrimaryButton(
-          label: context.l10n.studyDueCardsAction(stats.due),
-          onPressed: onStudyDueCards,
-        ),
-      )
-      ..add(const SizedBox(height: SpacingTokens.sm))
-      ..add(
-        Align(
-          alignment: Alignment.centerLeft,
-          child: TextLinkButton(
-            label: context.l10n.chooseStudyModeAction,
-            onTap: onChooseStudyMode,
-          ),
-        ),
-      );
-    return children;
+    return [
+      _DeckActionCard(
+        icon: Icons.play_circle_outline,
+        title: context.l10n.studyDueCardsAction(stats.due),
+        subtitle: context.l10n.deckCardsDueSubtitle(stats.total, stats.due),
+        primaryLabel: context.l10n.chooseStudyModeButton,
+        onPrimaryTap: onStudyDueCards,
+      ),
+      const SizedBox(height: SpacingTokens.lg),
+      DeckStatsGrid(stats: stats),
+    ];
   }
 }
 
@@ -128,17 +116,10 @@ class _DeckActionCard extends StatelessWidget {
         const SizedBox(height: SpacingTokens.sm),
         Text(subtitle, style: context.textTheme.bodyMedium),
         const SizedBox(height: SpacingTokens.lg),
-        PrimaryButton(
-          label: primaryLabel,
-          onPressed: onPrimaryTap,
-          height: SizeTokens.buttonHeight,
-        ),
+        PrimaryButton(label: primaryLabel, onPressed: onPrimaryTap),
         if (secondaryLabel != null && onSecondaryTap != null) ...[
           const SizedBox(height: SpacingTokens.sm),
-          SecondaryButton(
-            label: secondaryLabel!,
-            onPressed: onSecondaryTap,
-          ),
+          SecondaryButton(label: secondaryLabel!, onPressed: onSecondaryTap),
         ],
       ],
     ),

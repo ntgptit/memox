@@ -64,6 +64,7 @@ class _CreateFolderDialogState extends State<CreateFolderDialog> {
 
   @override
   Widget build(BuildContext context) => AppDialog(
+    variant: AppDialogVariant.form,
     title: Text(widget.title ?? context.l10n.createFolder),
     content: Column(
       mainAxisSize: MainAxisSize.min,

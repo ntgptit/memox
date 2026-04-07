@@ -22,12 +22,15 @@ class SearchScreen extends ConsumerWidget {
 
     return AppScaffold(
       appBar: AppBar(title: Text(context.l10n.searchTitle)),
-      applyHorizontalPadding: false,
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(SpacingTokens.xl),
+            padding: const EdgeInsets.only(
+              top: SpacingTokens.lg,
+              bottom: SpacingTokens.md,
+            ),
             child: AppSearchBar(
+              variant: AppSearchBarVariant.page,
               onChanged: (value) =>
                   ref.read(searchQueryProvider.notifier).update(value),
               hint: context.l10n.searchHint,

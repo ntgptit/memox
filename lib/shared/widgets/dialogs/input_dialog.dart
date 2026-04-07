@@ -52,6 +52,7 @@ class _InputDialogState extends State<InputDialog> {
 
   @override
   Widget build(BuildContext context) => AppDialog(
+    variant: AppDialogVariant.form,
     title: Text(widget.title),
     content: TextField(
       controller: _controller,

@@ -13,7 +13,7 @@ class StreakHeroCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AppCard(
-    backgroundColor: context.colors.surfaceContainerHighest,
+    backgroundColor: context.colors.surfaceContainerHigh,
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -29,13 +29,13 @@ class StreakHeroCard extends StatelessWidget {
             const SizedBox(width: SpacingTokens.sm),
             Icon(
               Icons.local_fire_department_outlined,
-              color: context.customColors.mastery,
+              color: context.colors.onSurfaceVariant,
             ),
             const SizedBox(width: SpacingTokens.sm),
             Expanded(
               child: Text(
                 context.l10n.statisticsStreakLabel,
-                style: context.textTheme.titleLarge,
+                style: context.textTheme.headlineMedium,
               ),
             ),
           ],
@@ -45,12 +45,18 @@ class StreakHeroCard extends StatelessWidget {
           crossAxisAlignment: WrapCrossAlignment.center,
           spacing: SpacingTokens.xs,
           children: [
-            Text(context.l10n.statisticsTodayPrefix),
+            Text(
+              context.l10n.statisticsTodayPrefix,
+              style: context.textTheme.bodySmall,
+            ),
             CountUpText(
               endValue: stats.cardsToday,
-              style: context.textTheme.bodyMedium!,
+              style: context.textTheme.bodySmall!,
             ),
-            Text(context.l10n.statisticsCardsUnit),
+            Text(
+              context.l10n.statisticsCardsUnit,
+              style: context.textTheme.bodySmall,
+            ),
             Icon(
               Icons.circle_outlined,
               size: SizeTokens.iconXs,
@@ -58,9 +64,12 @@ class StreakHeroCard extends StatelessWidget {
             ),
             CountUpText(
               endValue: stats.minutesToday,
-              style: context.textTheme.bodyMedium!,
+              style: context.textTheme.bodySmall!,
             ),
-            Text(context.l10n.statisticsMinutesUnit),
+            Text(
+              context.l10n.statisticsMinutesUnit,
+              style: context.textTheme.bodySmall,
+            ),
           ],
         ),
       ],

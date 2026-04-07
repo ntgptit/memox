@@ -53,7 +53,7 @@ class AppCardSwitchTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) => AppCard(
     onTap: () => onChanged(!value),
-    backgroundColor: context.customColors.surfaceDim,
+    backgroundColor: context.colors.surfaceContainerHigh,
     borderColor: context.colors.outline.withValues(
       alpha: OpacityTokens.borderSubtle,
     ),

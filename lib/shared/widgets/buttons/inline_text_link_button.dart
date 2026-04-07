@@ -37,7 +37,7 @@ class _InlineTextLinkButtonState extends State<InlineTextLinkButton> {
   Widget build(BuildContext context) {
     final isInteractive = widget.onTap != null;
     final baseColor = widget.color ?? context.colors.onSurfaceVariant;
-    final accentColor = widget.activeColor ?? context.colors.primary;
+    final accentColor = widget.activeColor ?? context.colors.onSurface;
     final displayColor = _hovered || _focused ? accentColor : baseColor;
     final baseStyle =
         widget.textStyle ??

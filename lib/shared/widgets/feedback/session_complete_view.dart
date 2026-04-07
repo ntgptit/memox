@@ -5,8 +5,8 @@ import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/duration_tokens.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
+import 'package:memox/shared/widgets/buttons/inline_text_link_button.dart';
 import 'package:memox/shared/widgets/buttons/primary_button.dart';
-import 'package:memox/shared/widgets/buttons/text_link_button.dart';
 import 'package:memox/shared/widgets/feedback/success_indicator.dart';
 
 part 'session_complete_view.freezed.dart';
@@ -38,7 +38,7 @@ class SessionCompleteView extends StatelessWidget {
                 const SizedBox(height: SpacingTokens.lg),
                 Text(
                   title ?? context.l10n.sessionCompleteTitle,
-                  style: context.appTextStyles.statNumberSm,
+                  style: context.textTheme.titleLarge,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: SpacingTokens.xl),
@@ -55,7 +55,7 @@ class SessionCompleteView extends StatelessWidget {
                 if (secondaryAction != null) ...[
                   const SizedBox(height: SpacingTokens.lg),
                   Center(
-                    child: TextLinkButton(
+                    child: InlineTextLinkButton(
                       label: secondaryAction!.label,
                       onTap: secondaryAction!.onTap,
                     ),
@@ -85,18 +85,11 @@ class _SessionStatRow extends StatelessWidget {
       children: [
         Icon(stat.icon, size: SizeTokens.iconXs, color: stat.valueColor),
         const SizedBox(width: SpacingTokens.sm),
-        Expanded(
-          child: Text(
-            stat.label,
-            style: context.textTheme.bodyMedium?.copyWith(
-              color: stat.valueColor ?? context.colors.onSurface,
-            ),
-          ),
-        ),
+        Expanded(child: Text(stat.label, style: context.textTheme.bodySmall)),
         if (stat.value != null)
           Text(
             stat.value!,
-            style: context.appTextStyles.statNumberSm.copyWith(
+            style: context.textTheme.headlineMedium?.copyWith(
               color: stat.valueColor ?? context.colors.onSurface,
             ),
           ),

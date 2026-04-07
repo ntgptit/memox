@@ -21,6 +21,10 @@ mixin AppTheme {
     final customColors = AppColorScheme.customColorsFor(colorScheme.brightness);
     final textTheme = AppTextTheme.build(colorScheme);
     final appTextStyles = AppTextStyles.fromTextTheme(textTheme);
+    final pageSurface = colorScheme.surfaceContainerLowest;
+    final cardSurface = colorScheme.surface;
+    final utilitySurface = colorScheme.surfaceContainerLow;
+    final interactiveSurface = colorScheme.surfaceContainerHigh;
     final border = BorderSide(color: colorScheme.outline);
     final transparentSurface = colorScheme.surface.withValues(alpha: 0);
     final neutralHoverColor = colorScheme.onSurface.withValues(
@@ -56,7 +60,7 @@ mixin AppTheme {
       useMaterial3: true,
       colorScheme: colorScheme,
       textTheme: textTheme,
-      scaffoldBackgroundColor: colorScheme.surface,
+      scaffoldBackgroundColor: pageSurface,
       hoverColor: neutralHoverColor,
       focusColor: accentFocusColor,
       highlightColor: neutralPressColor,
@@ -73,7 +77,7 @@ mixin AppTheme {
         systemOverlayStyle: _overlayStyle(colorScheme),
       ),
       cardTheme: CardThemeData(
-        color: colorScheme.surface,
+        color: cardSurface,
         elevation: ElevationTokens.level0,
         margin: EdgeInsets.zero,
         shadowColor: transparentSurface,
@@ -84,7 +88,7 @@ mixin AppTheme {
         ),
       ),
       popupMenuTheme: PopupMenuThemeData(
-        color: colorScheme.surface,
+        color: utilitySurface,
         surfaceTintColor: transparentSurface,
         elevation: ElevationTokens.level3,
         shadowColor: colorScheme.shadow.withValues(
@@ -109,7 +113,7 @@ mixin AppTheme {
           padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
             EdgeInsets.symmetric(horizontal: SpacingTokens.xl),
           ),
-          textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.bodyLarge),
+          textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.titleSmall),
           overlayColor: _stateLayer(
             hovered: onPrimaryHoverColor,
             focused: onPrimaryFocusColor,
@@ -130,7 +134,7 @@ mixin AppTheme {
           padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
             EdgeInsets.symmetric(horizontal: SpacingTokens.xl),
           ),
-          textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.bodyLarge),
+          textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.titleSmall),
           overlayColor: _stateLayer(
             hovered: accentHoverColor,
             focused: accentFocusColor,
@@ -143,6 +147,9 @@ mixin AppTheme {
           minimumSize: const WidgetStatePropertyAll<Size>(
             Size(0, SizeTokens.touchTarget),
           ),
+          foregroundColor: WidgetStatePropertyAll<Color>(
+            colorScheme.onSurfaceVariant,
+          ),
           shape: WidgetStatePropertyAll<OutlinedBorder>(
             RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(RadiusTokens.full),
@@ -151,11 +158,11 @@ mixin AppTheme {
           padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
             EdgeInsets.symmetric(horizontal: SpacingTokens.md),
           ),
-          textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.bodyLarge),
+          textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.labelLarge),
           overlayColor: _stateLayer(
-            hovered: accentHoverColor,
+            hovered: neutralHoverColor,
             focused: accentFocusColor,
-            pressed: accentPressColor,
+            pressed: neutralPressColor,
           ),
         ),
       ),
@@ -177,7 +184,7 @@ mixin AppTheme {
           padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
             EdgeInsets.symmetric(horizontal: SpacingTokens.xl),
           ),
-          textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.bodyLarge),
+          textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.titleSmall),
           overlayColor: _stateLayer(
             hovered: onPrimaryHoverColor,
             focused: onPrimaryFocusColor,
@@ -208,7 +215,7 @@ mixin AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: customColors.surfaceDim,
+        fillColor: interactiveSurface,
         hoverColor: neutralHoverColor,
         focusColor: accentFocusColor,
         contentPadding: const EdgeInsets.symmetric(
@@ -227,15 +234,31 @@ mixin AppTheme {
           borderSide: BorderSide(color: colorScheme.error),
         ),
       ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: utilitySurface,
+        surfaceTintColor: transparentSurface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(RadiusTokens.dialog),
+          side: border,
+        ),
+        titleTextStyle: textTheme.titleLarge,
+        contentTextStyle: textTheme.bodyMedium,
+      ),
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: utilitySurface,
+        surfaceTintColor: transparentSurface,
+        shape: RoundedRectangleBorder(
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(RadiusTokens.sheet),
+          ),
+          side: border,
+        ),
+      ),
       chipTheme: ChipThemeData(
-        backgroundColor: customColors.surfaceDim,
-        disabledColor: customColors.surfaceDim,
-        selectedColor: customColors.mastery.withValues(
-          alpha: OpacityTokens.selected,
-        ),
-        secondarySelectedColor: customColors.mastery.withValues(
-          alpha: OpacityTokens.selected,
-        ),
+        backgroundColor: utilitySurface,
+        disabledColor: utilitySurface,
+        selectedColor: colorScheme.surfaceContainerHighest,
+        secondarySelectedColor: colorScheme.surfaceContainerHighest,
         padding: const EdgeInsets.symmetric(horizontal: SpacingTokens.sm),
         labelStyle: textTheme.labelMedium,
         secondaryLabelStyle: textTheme.labelMedium,

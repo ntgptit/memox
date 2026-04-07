@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
+import 'package:memox/core/theme/tokens/opacity_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/statistics/domain/entities/difficult_card.dart';
 import 'package:memox/shared/widgets/buttons/text_link_button.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
 import 'package:memox/shared/widgets/layout/spacing.dart';
-import 'package:memox/shared/widgets/lists/app_list_tile.dart';
 import 'package:memox/shared/widgets/lists/expandable_tile.dart';
 
 class DifficultCardsSection extends StatelessWidget {
@@ -40,20 +40,7 @@ class DifficultCardsSection extends StatelessWidget {
             )
           : Column(
               children: [
-                ...cards.map(
-                  (card) => AppListTile(
-                    title: card.card.front,
-                    subtitle: card.deckName,
-                    trailing: Text(
-                      '${card.accuracy.round()}%',
-                      style: context.textTheme.titleSmall?.copyWith(
-                        color: card.accuracy < 50
-                            ? context.customColors.ratingAgain
-                            : context.colors.onSurface,
-                      ),
-                    ),
-                  ),
-                ),
+                ...cards.map((card) => _DifficultCardRow(card: card)),
                 const Gap.md(),
                 Align(
                   alignment: Alignment.centerLeft,
@@ -64,6 +51,55 @@ class DifficultCardsSection extends StatelessWidget {
                 ),
               ],
             ),
+    ),
+  );
+}
+
+class _DifficultCardRow extends StatelessWidget {
+  const _DifficultCardRow({required this.card});
+
+  final DifficultCard card;
+
+  @override
+  Widget build(BuildContext context) => DecoratedBox(
+    decoration: BoxDecoration(
+      border: Border(
+        bottom: BorderSide(
+          color: context.colors.outline.withValues(
+            alpha: OpacityTokens.divider,
+          ),
+        ),
+      ),
+    ),
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: SpacingTokens.sm),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  card.card.front,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: context.textTheme.titleSmall,
+                ),
+                const Gap.xs(),
+                Text(card.deckName, style: context.textTheme.bodySmall),
+              ],
+            ),
+          ),
+          const Gap.md(),
+          Text(
+            '${card.accuracy.round()}%',
+            style: context.textTheme.labelLarge?.copyWith(
+              color: context.colors.onSurface,
+            ),
+          ),
+        ],
+      ),
     ),
   );
 }

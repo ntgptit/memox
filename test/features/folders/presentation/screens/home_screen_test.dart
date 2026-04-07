@@ -38,7 +38,7 @@ void main() {
     await tester.pump();
 
     expect(find.byType(LoadingIndicator), findsWidgets);
-    expect(find.text('MY FOLDERS'), findsOneWidget);
+    expect(find.text('My folders'), findsOneWidget);
 
     await tester.pumpAndSettle();
 
@@ -67,7 +67,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Japanese N5'), findsOneWidget);
-    expect(find.text('MY FOLDERS'), findsOneWidget);
+    expect(find.text('My folders'), findsOneWidget);
     expect(find.byIcon(Icons.more_vert), findsOneWidget);
     expect(find.byTooltip('Reorder'), findsOneWidget);
     expect(find.byTooltip('Create folder'), findsOneWidget);

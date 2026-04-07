@@ -12,7 +12,7 @@ class SettingsGroupCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AppCard(
-    padding: EdgeInsets.zero,
+    padding: const EdgeInsets.symmetric(vertical: SpacingTokens.xs),
     child: Column(children: _buildChildren(context)),
   );
 

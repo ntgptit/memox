@@ -26,13 +26,15 @@ class SecondaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accentColor = color ?? Theme.of(context).colorScheme.primary;
+    final theme = Theme.of(context);
+    final foregroundColor = color ?? theme.colorScheme.onSurfaceVariant;
+    final borderColor = color ?? theme.colorScheme.outlineVariant;
     final child = OutlinedButton(
       onPressed: isLoading ? null : onPressed,
       style: OutlinedButton.styleFrom(
         minimumSize: Size(0, height),
-        foregroundColor: accentColor,
-        side: BorderSide(color: accentColor),
+        foregroundColor: foregroundColor,
+        side: BorderSide(color: borderColor),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(RadiusTokens.button),
         ),
@@ -41,7 +43,7 @@ class SecondaryButton extends StatelessWidget {
         label: label,
         icon: icon,
         isLoading: isLoading,
-        progressColor: accentColor,
+        progressColor: foregroundColor,
       ),
     );
     final wrapped = ScaleTap(
