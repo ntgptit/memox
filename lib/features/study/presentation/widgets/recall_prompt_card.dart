@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/duration_tokens.dart';
-import 'package:memox/core/theme/tokens/spacing_tokens.dart';
-import 'package:memox/core/theme/tokens/typography_tokens.dart';
 import 'package:memox/features/cards/domain/entities/flashcard_entity.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
 import 'package:memox/shared/widgets/chips/tag_chip.dart';
@@ -17,29 +15,30 @@ class RecallPromptCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
       AppCard(
-            backgroundColor: context.colors.surfaceContainerHighest,
-            padding: const EdgeInsets.all(SpacingTokens.fieldGap),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  context.l10n.recallPromptLabel.toUpperCase(),
-                  style: context.textTheme.labelSmall?.copyWith(
-                    letterSpacing: TypographyTokens.labelSpacing,
+            backgroundColor: context.colors.surfaceContainerHigh,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    context.l10n.recallPromptLabel,
+                    style: context.textTheme.labelLarge?.copyWith(
+                      color: context.colors.onSurface,
+                    ),
+                    textAlign: TextAlign.center,
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                const Gap.md(),
-                Text(
-                  card.front,
-                  style: context.appTextStyles.recallTerm,
-                  textAlign: TextAlign.center,
-                ),
-                if (card.tags.isNotEmpty) ...[
-                  const Gap.md(),
-                  TagChip(label: card.tags.first),
+                  const Gap.sm(),
+                  Text(
+                    card.back,
+                    style: _promptStyle(context),
+                    textAlign: TextAlign.center,
+                  ),
+                  if (card.tags.isNotEmpty) ...[
+                    const Gap.md(),
+                    TagChip(label: card.tags.first),
+                  ],
                 ],
-              ],
+              ),
             ),
           )
           .animate()
@@ -49,4 +48,19 @@ class RecallPromptCard extends StatelessWidget {
             end: const Offset(1, 1),
             duration: DurationTokens.normal,
           );
+
+  TextStyle _promptStyle(BuildContext context) {
+    final contentLength = card.back.length;
+
+    if (contentLength > 60) {
+      return context.appTextStyles.questionText;
+    }
+
+    if (contentLength > 30) {
+      return context.textTheme.headlineMedium ??
+          context.appTextStyles.questionText;
+    }
+
+    return context.appTextStyles.recallTerm;
+  }
 }

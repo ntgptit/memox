@@ -25,7 +25,7 @@ class RecallRevealPhase extends StatelessWidget {
       children: [
         RecallComparisonView(
           userAnswer: state.userAnswer,
-          correctAnswer: card.back,
+          correctAnswer: card.front,
         ),
         const SizedBox(height: SpacingTokens.fieldGap),
         RecallSelfAssessment(

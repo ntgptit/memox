@@ -118,6 +118,7 @@ severity_overrides:
 
 category_overrides:
   no_else: "style"
+  inkwell_highlight_override: "design_system"
   l10n: "i18n"
   async_builder: "design_system"
   legacy_state_notifier: "state_management"
@@ -332,6 +333,29 @@ rules:
       - regex: '\belse\b'
         message_code: "no_else.forbidden_else"
         message: "Use early return, guard clause, or switch expression instead of else."
+
+  - id: inkwell_highlight_override
+    type: forbidden_pattern
+    name: InkWell highlight override
+    description: >
+      Do not override highlightColor on InkWell. Theme keeps it transparent to
+      avoid rectangular highlight artifacts inside rounded containers.
+    severity: warning
+    scope: global
+    enabled: true
+    skip_comments: true
+    targets:
+      include:
+        - "lib/shared/widgets/**"
+        - "lib/core/theme/**"
+      exclude:
+        - "lib/core/theme/app_theme.dart"
+        - "test/"
+    patterns:
+      - regex: 'highlightColor\s*:'
+        message: >
+          Do not set highlightColor directly. Theme keeps it transparent to
+          avoid rectangular highlight artifacts inside rounded containers.
 
   - id: l10n
     type: forbidden_pattern
@@ -864,6 +888,8 @@ rules:
           - "final utilitySurface = colorScheme.surfaceContainerLow;"
           - "final interactiveSurface = colorScheme.surfaceContainerHigh;"
           - "scaffoldBackgroundColor: pageSurface,"
+          - "highlightColor: transparentSurface,"
+          - "splashFactory: InkSparkle.splashFactory,"
           - "color: cardSurface,"
           - "color: utilitySurface,"
           - "fillColor: interactiveSurface,"

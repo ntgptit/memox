@@ -40,9 +40,9 @@ final class FillEngine {
       return examplePrompt;
     }
 
-    final answer = card.back.trim();
+    final answer = card.front.trim();
     return _buildPrompt(
-      sentence: "The answer for '${card.front.trim()}' is $fillBlankToken",
+      sentence: "The answer for '${card.back.trim()}' is $fillBlankToken",
       answer: answer,
     );
   }
@@ -81,19 +81,13 @@ final class FillEngine {
       return null;
     }
 
-    final backPrompt = _blankedSentence(example, card.back.trim());
-
-    if (backPrompt != null) {
-      return _buildPrompt(sentence: backPrompt, answer: card.back.trim());
-    }
-
     final frontPrompt = _blankedSentence(example, card.front.trim());
 
-    if (frontPrompt != null) {
-      return _buildPrompt(sentence: frontPrompt, answer: card.front.trim());
+    if (frontPrompt == null) {
+      return null;
     }
 
-    return null;
+    return _buildPrompt(sentence: frontPrompt, answer: card.front.trim());
   }
 
   String? _blankedSentence(String sentence, String answer) {

@@ -3,6 +3,7 @@ import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/study/domain/fill/fill_engine.dart';
 import 'package:memox/features/study/presentation/widgets/fill_diff_text.dart';
+import 'package:memox/shared/widgets/buttons/secondary_button.dart';
 import 'package:memox/shared/widgets/buttons/text_link_button.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
 
@@ -64,20 +65,33 @@ class _FillCloseFeedback extends StatelessWidget {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(context.l10n.fillAlmostTitle, style: context.textTheme.bodySmall),
-        const SizedBox(height: SpacingTokens.sm),
-        Text(answer, style: context.textTheme.titleSmall),
-        const SizedBox(height: SpacingTokens.sm),
+        Text(
+          context.l10n.fillAlmostTitle,
+          style: context.textTheme.titleSmall?.copyWith(
+            color: context.customColors.ratingHard,
+          ),
+        ),
+        const SizedBox(height: SpacingTokens.xs),
+        Text(
+          answer,
+          style: context.textTheme.titleMedium?.copyWith(
+            color: context.colors.primary,
+          ),
+        ),
+        const SizedBox(height: SpacingTokens.xs),
         FillDiffText(userAnswer: userAnswer, correctAnswer: answer),
-        const SizedBox(height: SpacingTokens.md),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        const SizedBox(height: SpacingTokens.lg),
+        Wrap(
+          alignment: WrapAlignment.center,
+          spacing: SpacingTokens.buttonGap,
+          runSpacing: SpacingTokens.sm,
           children: [
-            TextLinkButton(
+            SecondaryButton(
               label: context.l10n.fillAcceptCloseAction,
-              onTap: onAcceptClose,
+              onPressed: onAcceptClose,
+              fullWidth: false,
+              color: context.colors.primary,
             ),
-            const SizedBox(width: SpacingTokens.lg),
             TextLinkButton(
               label: context.l10n.fillRejectCloseAction,
               onTap: onRejectClose,
@@ -108,12 +122,19 @@ class _FillWrongFeedback extends StatelessWidget {
       children: [
         Text(
           context.l10n.fillCorrectAnswerTitle,
-          style: context.textTheme.bodySmall,
+          style: context.textTheme.titleSmall?.copyWith(
+            color: context.colors.error,
+          ),
         ),
-        const SizedBox(height: SpacingTokens.sm),
-        Text(answer, style: context.textTheme.titleSmall),
+        const SizedBox(height: SpacingTokens.xs),
+        Text(
+          answer,
+          style: context.textTheme.titleMedium?.copyWith(
+            color: context.colors.onSurface,
+          ),
+        ),
         if (canSkip) ...[
-          const SizedBox(height: SpacingTokens.md),
+          const SizedBox(height: SpacingTokens.lg),
           Align(
             alignment: Alignment.centerLeft,
             child: TextLinkButton(

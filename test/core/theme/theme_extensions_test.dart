@@ -158,6 +158,11 @@ void main() {
       theme!.colorScheme.primary.withValues(alpha: OpacityTokens.focus),
     );
     expect(
+      theme!.highlightColor,
+      theme!.colorScheme.surface.withValues(alpha: 0),
+    );
+    expect(theme!.splashFactory, InkSparkle.splashFactory);
+    expect(
       theme!.iconButtonTheme.style?.backgroundColor?.resolve({
         WidgetState.hovered,
       }),

@@ -63,8 +63,9 @@ mixin AppTheme {
       scaffoldBackgroundColor: pageSurface,
       hoverColor: neutralHoverColor,
       focusColor: accentFocusColor,
-      highlightColor: neutralPressColor,
+      highlightColor: transparentSurface,
       splashColor: accentPressColor,
+      splashFactory: InkSparkle.splashFactory,
       extensions: <ThemeExtension<dynamic>>[customColors, appTextStyles],
       appBarTheme: AppBarTheme(
         backgroundColor: transparentSurface,

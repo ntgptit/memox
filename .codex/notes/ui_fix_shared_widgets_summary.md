@@ -333,6 +333,51 @@ Why this improves downstream screens automatically:
 - `flutter analyze` passed
 - `flutter test` passed
 
+## Follow-up Batch: Icon Action Affordance
+
+Date: 2026-04-08
+
+This follow-up stayed inside one shared control instead of adding more
+Settings-specific styling.
+
+### `IconActionButton`
+
+Files:
+
+- [icon_action_button.dart](/D:/workspace/memox/lib/shared/widgets/buttons/icon_action_button.dart)
+- [icon_action_button_test.dart](/D:/workspace/memox/test/shared/widgets/buttons/icon_action_button_test.dart)
+
+Why it needed work:
+
+- stepper `+ / -` controls still felt slightly under-weight in dark mode
+  because the enabled outline used the softer focus-layer opacity
+- the issue was not unique to Settings, so a shared-control adjustment was
+  safer than a local row override
+
+Change type:
+
+- default behavior improvement
+
+What was implemented:
+
+- strengthened the enabled-state outline from the focus opacity tier to the
+  selected opacity tier while keeping the existing neutral filled background and
+  48dp target
+- updated the shared widget test to lock the stronger enabled border contract
+
+Why this improves downstream screens automatically:
+
+- stepper controls and any other compact icon actions built on the shared
+  button now read more clearly as interactive in dark mode without introducing
+  new local variants
+
+### Verification for this follow-up
+
+- `python tools/guard/run.py --scope all` passed with only the existing
+  `feature_completeness` warnings
+- `flutter analyze` passed
+- `flutter test` passed
+
 ## Follow-up Batch: Toolbar Search Contrast
 
 Date: 2026-04-08

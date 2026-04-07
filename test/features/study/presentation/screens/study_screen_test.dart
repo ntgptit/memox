@@ -162,7 +162,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Recall'), findsOneWidget);
-    expect(find.text('안녕하세요'), findsOneWidget);
+    expect(find.text('Hello'), findsOneWidget);
     expect(find.byType(StudyPlaceholderView), findsNothing);
   });
 

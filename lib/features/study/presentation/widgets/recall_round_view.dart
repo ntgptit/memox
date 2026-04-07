@@ -8,6 +8,7 @@ import 'package:memox/features/study/presentation/widgets/recall_reveal_phase.da
 import 'package:memox/features/study/presentation/widgets/recall_writing_area.dart';
 
 const double _recallSwitchLift = 0.04;
+const double _recallPromptMaxHeightFactor = 0.4;
 
 class RecallRoundView extends StatelessWidget {
   const RecallRoundView({
@@ -33,35 +34,51 @@ class RecallRoundView extends StatelessWidget {
     }
 
     return Padding(
-      padding: const EdgeInsets.all(SpacingTokens.screenPadding),
-      child: Column(
-        children: [
-          RecallPromptCard(key: ValueKey<int>(card.id), card: card),
-          const SizedBox(height: SpacingTokens.fieldGap),
-          Expanded(
-            child: AnimatedSwitcher(
-              duration: DurationTokens.contentSwitch,
-              reverseDuration: DurationTokens.fast,
-              transitionBuilder: _transitionBuilder,
-              child: state.isRevealed
-                  ? RecallRevealPhase(
-                      key: ValueKey<String>('reveal-${card.id}'),
-                      card: card,
-                      state: state,
-                      onRateSelf: onRateSelf,
-                    )
-                  : SingleChildScrollView(
-                      key: ValueKey<String>('write-${card.id}'),
-                      child: RecallWritingArea(
-                        controller: controller,
-                        canReveal: state.canReveal,
-                        onChanged: onAnswerChanged,
-                        onReveal: onReveal,
-                      ),
-                    ),
+      padding: EdgeInsets.fromLTRB(
+        SpacingTokens.screenPadding,
+        SpacingTokens.screenPadding,
+        SpacingTokens.screenPadding,
+        SpacingTokens.screenPadding + MediaQuery.viewInsetsOf(context).bottom,
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) => Column(
+          children: [
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxHeight:
+                    constraints.maxHeight * _recallPromptMaxHeightFactor,
+              ),
+              child: RecallPromptCard(
+                key: ValueKey<int>(card.id),
+                card: card,
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: SpacingTokens.lg),
+            Expanded(
+              child: AnimatedSwitcher(
+                duration: DurationTokens.contentSwitch,
+                reverseDuration: DurationTokens.fast,
+                transitionBuilder: _transitionBuilder,
+                child: state.isRevealed
+                    ? RecallRevealPhase(
+                        key: ValueKey<String>('reveal-${card.id}'),
+                        card: card,
+                        state: state,
+                        onRateSelf: onRateSelf,
+                      )
+                    : SingleChildScrollView(
+                        key: ValueKey<String>('write-${card.id}'),
+                        child: RecallWritingArea(
+                          controller: controller,
+                          canReveal: state.canReveal,
+                          onChanged: onAnswerChanged,
+                          onReveal: onReveal,
+                        ),
+                      ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

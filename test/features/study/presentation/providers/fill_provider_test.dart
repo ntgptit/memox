@@ -76,6 +76,21 @@ void main() {
     expect(review.userAnswer.value, 'banan');
   });
 
+  test('initial prompt expects the answer side and shows the clue side', () async {
+    final cardReviewDao = FakeCardReviewDao();
+    final container = buildContainer(
+      flashcardRepository: FakeFlashcardRepository(cards: _cards(1)),
+      cardReviewDao: cardReviewDao,
+    );
+    addTearDown(cardReviewDao.dispose);
+    addTearDown(container.dispose);
+
+    final state = await container.read(fillSessionProvider(1).future);
+
+    expect(state.currentPrompt.correctAnswer, 'banana');
+    expect(state.currentPrompt.sentenceWithBlank, 'I ate a ________ for breakfast.');
+  });
+
   test('retry requires a matching answer before the card can advance', () async {
     final cardReviewDao = FakeCardReviewDao();
     final container = buildContainer(
@@ -178,9 +193,9 @@ List<FlashcardEntity> _cards(int count) => List<FlashcardEntity>.generate(
   (index) => FlashcardEntity(
     id: index + 1,
     deckId: 1,
-    front: 'Term ${index + 1}',
-    back: index == 0 ? 'banana' : 'Answer ${index + 1}',
-    example: index == 0 ? 'The answer is banana.' : '',
+    front: index == 0 ? 'banana' : 'Answer ${index + 1}',
+    back: index == 0 ? 'Fruit ${index + 1}' : 'Clue ${index + 1}',
+    example: index == 0 ? 'I ate a banana for breakfast.' : '',
   ),
 );
 

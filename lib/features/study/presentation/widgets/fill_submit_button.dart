@@ -22,7 +22,7 @@ class FillSubmitButton extends StatelessWidget {
     duration: DurationTokens.stateChange,
     child: AppPressable(
       color: enabled
-          ? context.colors.primaryContainer
+          ? context.colors.primary
           : context.colors.surfaceContainerHighest,
       borderRadius: RadiusTokens.chip,
       onTap: enabled ? onTap : null,
@@ -30,7 +30,13 @@ class FillSubmitButton extends StatelessWidget {
         width: SizeTokens.touchTarget,
         height: SizeTokens.touchTarget,
       ),
-      child: const Icon(Icons.arrow_forward, size: SizeTokens.iconSm),
+      child: Icon(
+        Icons.arrow_forward,
+        size: SizeTokens.iconSm,
+        color: enabled
+            ? context.colors.onPrimary
+            : context.colors.onSurfaceVariant,
+      ),
     ),
   );
 }

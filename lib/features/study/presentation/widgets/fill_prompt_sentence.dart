@@ -116,7 +116,7 @@ class _FillBlankPulseState extends State<_FillBlankPulse> {
             ),
           ),
         ),
-        child: const SizedBox(height: SizeTokens.touchTarget),
+        child: const SizedBox(height: SpacingTokens.xl),
       ),
     ),
   );

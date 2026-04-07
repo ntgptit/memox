@@ -2,9 +2,10 @@
 
 ## Current phase
 
-Completed Settings screen hierarchy, spacing-rhythm, group-surface, and
-stepper-affordance follow-up. Progress note is synced with the final verified
-tree and the relevant summary-note updates.
+Completed and verified the fill/recall compact-layout cleanup. This pass keeps
+the study mode content-direction fix from the previous batch, then tightens
+prompt, feedback, and writing-area proportions so fill and recall remain
+readable on phone-sized dark-mode screens without reopening business logic.
 
 ## Completed work
 
@@ -118,6 +119,65 @@ tree and the relevant summary-note updates.
   - `ui_fix_reference_screens_summary.md`
   - `ui_guards_implemented.md`
   - `ui_full_redesign_fix_pass.md`
+- reversed `FillEngine` prompt generation so fill mode now expects the front
+  side as the typed answer and uses the back side as the visible clue context
+- removed the mixed-direction fallback in `FillEngine` so fill mode no longer
+  alternates between “type the question” and “type the answer” depending on the
+  example content
+- remapped recall prompt/reveal widgets so recall now shows `card.back` during
+  the prompt phase and reveals `card.front` as the complete answer
+- updated fill domain, provider, and screen regression tests to lock the new
+  answer-side contract
+- updated recall screen regression tests to lock the corrected prompt/reveal
+  mapping
+- re-ran the focused fill/recall test suite after the study prompt-direction
+  fix
+- updated `study_screen_test.dart` so the app-level study screen contract now
+  matches the corrected recall prompt side
+- ran `python tools/guard/run.py --scope all` after the study prompt fix
+- ran `flutter analyze` after the study prompt fix
+- ran `flutter test` after the study prompt fix
+- synced the study behavior fix into:
+  - `ui_fix_reference_screens_summary.md`
+  - `ui_full_redesign_fix_pass.md`
+- re-verified the current Settings files and confirmed
+  `SettingsSectionHeader` already uses `titleLarge` while
+  `SettingsContentView` already uses `Gap.section()`, so those two requests did
+  not need extra code churn
+- changed `ThemeData.highlightColor` to transparent and enabled
+  `InkSparkle.splashFactory` in `app_theme.dart` so shared Ink interactions no
+  longer show a solid rectangular highlight inside rounded containers
+- strengthened `IconActionButton` enabled-state outline opacity so stepper and
+  other compact icon actions read as interactive more reliably in dark mode
+- added a low-noise `inkwell_highlight_override` guard to prevent direct
+  `highlightColor:` overrides from reintroducing rectangular press artifacts in
+  shared/theme code
+- updated focused theme and shared-button tests to lock the new press-feedback
+  contract
+- ran focused theme/settings/shared-button tests after the patch
+- synced the shared press-feedback fix into:
+  - `ui_fix_app_wide_summary.md`
+  - `ui_fix_shared_widgets_summary.md`
+  - `ui_guards_implemented.md`
+  - `ui_full_redesign_fix_pass.md`
+- reduced the animated blank-slot height in `FillPromptSentence` from
+  `SpacingTokens.xxl` to `SpacingTokens.xl` so the missing-word pulse no longer
+  wastes a full touch-target worth of vertical space
+- tightened `FillFeedbackPanel` stack rhythm by reducing answer-to-diff dead
+  space while keeping the stronger shared-button hierarchy for the accept
+  action
+- promoted the recall prompt label onto the shared `labelLarge` tier and kept
+  the medium-length prompt fallback on the calmer `headlineMedium` bridge tier
+- extended recall-mode widget coverage so the prompt label stays sentence case,
+  the prompt card remains capped at 40% of a compact surface, and the writing
+  field stays meaningfully above the lower edge
+- re-ran `dart run build_runner build --delete-conflicting-outputs` on the
+  final code state
+- re-ran `flutter gen-l10n` on the final code state
+- re-ran `python tools/guard/run.py --scope all` on the final code state
+- re-ran `flutter analyze` on the final code state and cleared the one
+  redundant-argument / unused-import follow-up in `RecallPromptCard`
+- re-ran `flutter test` across the full repo on the final code state
 
 ## Files modified
 
@@ -157,6 +217,22 @@ tree and the relevant summary-note updates.
 - [.codex/notes/ui_full_redesign_fix_pass.md](/D:/workspace/memox/.codex/notes/ui_full_redesign_fix_pass.md)
 - [.codex/notes/ui_fix_shared_widgets_summary.md](/D:/workspace/memox/.codex/notes/ui_fix_shared_widgets_summary.md)
 - [.codex/notes/ui_fix_reference_screens_summary.md](/D:/workspace/memox/.codex/notes/ui_fix_reference_screens_summary.md)
+- [fill_engine.dart](/D:/workspace/memox/lib/features/study/domain/fill/fill_engine.dart)
+- [recall_prompt_card.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/recall_prompt_card.dart)
+- [recall_reveal_phase.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/recall_reveal_phase.dart)
+- [fill_engine_test.dart](/D:/workspace/memox/test/features/study/domain/fill/fill_engine_test.dart)
+- [fill_provider_test.dart](/D:/workspace/memox/test/features/study/presentation/providers/fill_provider_test.dart)
+- [fill_mode_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/fill_mode_screen_test.dart)
+- [recall_mode_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/recall_mode_screen_test.dart)
+- [study_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/study_screen_test.dart)
+- [app_theme.dart](/D:/workspace/memox/lib/core/theme/app_theme.dart)
+- [icon_action_button.dart](/D:/workspace/memox/lib/shared/widgets/buttons/icon_action_button.dart)
+- [theme_extensions_test.dart](/D:/workspace/memox/test/core/theme/theme_extensions_test.dart)
+- [policy.yaml](/D:/workspace/memox/tools/guard/policies/memox/policy.yaml)
+- [fill_prompt_sentence.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/fill_prompt_sentence.dart)
+- [fill_feedback_panel.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/fill_feedback_panel.dart)
+- [recall_prompt_card.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/recall_prompt_card.dart)
+- [recall_mode_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/recall_mode_screen_test.dart)
 
 ## Deferred items
 
@@ -210,9 +286,29 @@ tree and the relevant summary-note updates.
 - the Appearance section now assumes a stable three-column chooser on compact
   screens; this should be spot-checked on-device in longer locales to confirm
   the centered labels still read comfortably without awkward wrapping
+- fill mode now consistently treats the front side as the typed answer, so any
+  existing decks that implicitly relied on the old mixed-direction bug should
+  be spot-checked on-device for content expectations
+- recall now prompts from the back side and reveals the front side, so study
+  copy and user expectations should be sanity-checked in the live flow after
+  verification even though the provider logic is unchanged
+- `InkSparkle` follows shape correctly, but Android/Desktop tap feel should
+  still be spot-checked on-device in one rounded-card flow and one icon-button
+  flow to confirm the new splash reads well in motion
+- `IconActionButton` now uses a slightly stronger enabled outline, so any
+  future variant that wants a quieter border should become an explicit variant
+  instead of silently weakening the shared default again
+- `FillPromptSentence` is now visibly denser, so long example sentences should
+  be spot-checked on-device to confirm the underline slot still reads clearly
+- `FillFeedbackPanel` now lands tighter to the diff block and relies more on
+  the shared button hierarchy, so long localized action labels should still be
+  checked once in a narrow viewport
+- the recall prompt label is now sentence case and larger, so the live layout
+  should be spot-checked with a tagged card to confirm the label, prompt, and
+  tag still form a calm top cluster
 
 ## Next step
 
-If the next polish batch stays in Settings, the safest continuation is the
-notifications/time-picker path and the backup/data cards, now that the section
-hierarchy, appearance grouping, and stepper affordance are consistent.
+The tree is verified. The remaining release step is to place the current
+workflow state on a dedicated `codex/` branch, commit it cleanly, and push it
+for review instead of leaving the cumulative redesign work stranded on `main`.

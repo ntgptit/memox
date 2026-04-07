@@ -24,7 +24,10 @@ class FillPromptCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) => AppCard(
     backgroundColor: context.colors.surfaceContainerHighest,
-    padding: const EdgeInsets.all(SpacingTokens.xl),
+    padding: const EdgeInsets.symmetric(
+      horizontal: SpacingTokens.xl,
+      vertical: SpacingTokens.lg,
+    ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -38,7 +41,7 @@ class FillPromptCard extends StatelessWidget {
         const Gap.md(),
         FillPromptSentence(prompt: prompt, showAnswer: showAnswer),
         if (showHint && prompt.hint != null) ...[
-          const Gap.md(),
+          const Gap.sm(),
           Text(
             context.l10n.fillHintValue(prompt.hint!),
             style: context.textTheme.bodySmall,
@@ -46,7 +49,7 @@ class FillPromptCard extends StatelessWidget {
           ),
         ],
         if (!showHint && prompt.hint != null) ...[
-          const Gap.md(),
+          const Gap.sm(),
           Center(
             child: TextLinkButton(
               label: context.l10n.fillShowHintAction,

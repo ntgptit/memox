@@ -405,6 +405,52 @@ False-positive risk:
 - `flutter analyze` passed
 - `flutter test` passed
 
+## Follow-up Guards Added 3
+
+Date: 2026-04-08
+
+This continuation added one narrow guard after the shared press-feedback fix
+landed in the theme.
+
+### 12. `inkwell_highlight_override`
+
+Files:
+
+- [policy.yaml](/D:/workspace/memox/tools/guard/policies/memox/policy.yaml)
+
+What it protects against:
+
+- direct `highlightColor:` overrides reappearing in shared widgets or theme
+  files and reintroducing rectangular press artifacts inside rounded containers
+
+Why it matters:
+
+- the rounded press-feedback fix now depends on `ThemeData.highlightColor`
+  staying transparent while splash/overlay layers carry the visible feedback
+- this is a low-noise pattern because the current codebase has one intentional
+  owner for `highlightColor`, and it is the shared theme file
+
+How it is implemented:
+
+- normalized `forbidden_pattern` rule
+- scans `lib/shared/widgets/**` and `lib/core/theme/**`
+- excludes [app_theme.dart](/D:/workspace/memox/lib/core/theme/app_theme.dart)
+  and tests
+- emits a warning when `highlightColor:` appears outside the allowlisted theme
+  owner
+
+False-positive risk:
+
+- low, because raw `InkWell` usage is already tightly constrained and the
+  allowed `highlightColor` owner is explicit
+
+### Verification for this follow-up
+
+- `python tools/guard/run.py --scope all` passed with only the existing
+  `feature_completeness` warnings
+- `flutter analyze` passed
+- `flutter test` passed
+
 ## Follow-up Guards Added 2
 
 Date: 2026-04-08

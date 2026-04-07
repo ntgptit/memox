@@ -106,7 +106,7 @@ class _FillRoundContent extends StatelessWidget {
         onChanged: onInputChanged,
         onSubmit: onSubmit,
       ),
-      const SizedBox(height: SpacingTokens.sm),
+      const SizedBox(height: SpacingTokens.lg),
       FillFeedbackPanel(
         result: state.result,
         answer: state.currentPrompt.correctAnswer,

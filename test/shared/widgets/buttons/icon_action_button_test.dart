@@ -36,7 +36,7 @@ void main() {
       style?.side?.resolve({})?.color,
       Theme.of(
         context,
-      ).colorScheme.onSurface.withValues(alpha: OpacityTokens.focus),
+      ).colorScheme.onSurface.withValues(alpha: OpacityTokens.selected),
     );
   });
 

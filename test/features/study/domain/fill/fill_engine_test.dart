@@ -10,15 +10,15 @@ void main() {
       const FlashcardEntity(
         id: 1,
         deckId: 9,
-        front: 'water',
-        back: 'みず',
-        example: 'The Japanese word for water is みず.',
+        front: 'みず',
+        back: 'water',
+        example: 'The Japanese word for みず is water.',
       ),
     );
 
     expect(
       prompt.sentenceWithBlank,
-      'The Japanese word for water is ________.',
+      'The Japanese word for ________ is water.',
     );
     expect(prompt.correctAnswer, 'みず');
     expect(prompt.hint, 'み _');
@@ -27,7 +27,7 @@ void main() {
 
   test('generatePrompt falls back to the default sentence', () {
     final prompt = engine.generatePrompt(
-      const FlashcardEntity(id: 2, deckId: 9, front: 'water', back: 'mizu'),
+      const FlashcardEntity(id: 2, deckId: 9, front: 'mizu', back: 'water'),
     );
 
     expect(prompt.sentenceWithBlank, "The answer for 'water' is ________");

@@ -255,3 +255,61 @@ floating actions.
   - passed with no issues
 - `flutter test test/shared/widgets/layout/app_scaffold_test.dart test/features/folders/presentation/screens/home_screen_test.dart test/features/settings/presentation/screens/theme_preview_screen_test.dart`
   - passed
+
+## Follow-up Batch: Rounded Press Feedback Cleanup
+
+Date: 2026-04-08
+
+This follow-up stayed in the shared theme layer and addressed a remaining
+interaction artifact that was most visible inside rounded settings cards.
+
+### What problem was fixed
+
+- `ThemeData.highlightColor` still used a visible neutral press overlay, which
+  let Ink highlight read as a solid rectangle inside rounded containers during
+  press states
+- the issue was especially noticeable in grouped settings rows because their
+  parent card is rounded while the row interaction area itself is intentionally
+  square-edged inside the group
+
+### Shared layers modified
+
+- [app_theme.dart](/D:/workspace/memox/lib/core/theme/app_theme.dart)
+- [theme_extensions_test.dart](/D:/workspace/memox/test/core/theme/theme_extensions_test.dart)
+
+### What was implemented
+
+- changed `highlightColor` from the neutral press overlay to the shared
+  transparent surface so the theme no longer paints a solid rectangular
+  highlight layer
+- added `splashFactory: InkSparkle.splashFactory` so the shared splash path
+  stays shape-aware and Material-3-aligned
+- extended the shared theme test to lock both contracts
+
+### Visual impact
+
+- rounded cards and grouped rows now rely on shape-respecting splash feedback
+  instead of the older rectangular highlight layer
+- the settings screen and other rounded surfaces should no longer show the
+  most obvious square press artifact in dark mode
+- the fix is centralized, so existing shared Ink interactions inherit it
+  automatically without local overrides
+
+### Regression risk and deferral
+
+- risk is low because prominent shared buttons already own explicit
+  `overlayColor` contracts and the new theme behavior mainly affects generic
+  Ink interactions
+- this pass intentionally did not retune Settings section headers or section
+  gaps because the current source already matches the requested calmer
+  `titleLarge` + `Gap.section()` contract
+
+### Verification for this follow-up
+
+- `python tools/guard/run.py --scope all`
+  - passed
+  - only the pre-existing `feature_completeness` warnings remain
+- `flutter analyze`
+  - passed with no issues
+- `flutter test`
+  - passed

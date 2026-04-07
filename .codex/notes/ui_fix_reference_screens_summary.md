@@ -554,3 +554,132 @@ vertical rhythm, grouped surfaces, and compact control affordance.
   - passed with no issues
 - `flutter test`
   - passed
+
+## Follow-up Reference Screen Batch 6
+
+Date: 2026-04-08
+
+This continuation stayed inside the existing study-screen system and fixed a
+behavioral mapping defect that made two study modes feel semantically wrong
+even though the surrounding UI shell had already been redesigned.
+
+### 12. Fill and recall answer-side mapping
+
+**Main issues fixed**
+
+- `FillModeScreen` still built prompts around the wrong content side, so users
+  were typing the clue side on some cards instead of the intended answer side
+- `RecallModeScreen` still showed the question side during the prompt phase and
+  revealed the answer side afterwards, which reversed the expected recall flow
+- app-level study-screen regression coverage still locked the old recall
+  contract
+
+**Implemented**
+
+- reversed
+  [fill_engine.dart](/D:/workspace/memox/lib/features/study/domain/fill/fill_engine.dart)
+  so fill mode now always treats `card.front` as the typed answer and uses
+  `card.back` only as the visible clue context
+- removed the old mixed-direction example fallback in `FillEngine` so fill mode
+  no longer flips direction based on whichever side happens to appear in the
+  example sentence
+- remapped
+  [recall_prompt_card.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/recall_prompt_card.dart)
+  to show `card.back` during the prompt phase
+- remapped
+  [recall_reveal_phase.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/recall_reveal_phase.dart)
+  to reveal `card.front` as the complete answer
+- added and updated regression coverage in:
+  - [fill_engine_test.dart](/D:/workspace/memox/test/features/study/domain/fill/fill_engine_test.dart)
+  - [fill_provider_test.dart](/D:/workspace/memox/test/features/study/presentation/providers/fill_provider_test.dart)
+  - [fill_mode_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/fill_mode_screen_test.dart)
+  - [recall_mode_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/recall_mode_screen_test.dart)
+  - [study_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/study_screen_test.dart)
+
+**Before / after structural improvement**
+
+- before: fill and recall looked structurally correct, but the content-side
+  semantics were inverted, so the user-facing study task did not match the
+  visual promise of the mode
+- after: both modes now consistently show the answer side as the visible study
+  content and keep the typed/revealed answer contract aligned with that
+  direction
+
+## Additional reusable patterns proven by follow-up batch 6
+
+20. Study-mode prompt direction should be owned at the domain-contract or
+    dedicated prompt-widget layer, not inferred ad hoc from whatever card side
+    happens to be convenient in one screen.
+21. When a study mode reverses content direction, app-level screen tests should
+    be updated alongside mode-specific tests so the shell router contract
+    cannot silently drift back.
+
+### Verification for follow-up batch 6
+
+- `python tools/guard/run.py --scope all`
+  - passed
+  - only the pre-existing `feature_completeness` warnings remain
+- `flutter analyze`
+  - passed with no issues
+- `flutter test`
+  - passed
+
+## Follow-up Reference Screen Batch 7
+
+Date: 2026-04-08
+
+This continuation stayed inside the existing study-screen redesign and fixed
+the remaining proportional issues in fill and recall mode after the answer-side
+mapping bug was corrected.
+
+### 13. Fill and recall layout rhythm on compact surfaces
+
+**Main issues fixed**
+
+- fill mode still burned too much space inside the blank-word slot, which made
+  the prompt card feel taller than the actual content required
+- fill close-feedback still carried slightly loose internal rhythm after the
+  earlier hierarchy pass
+- recall mode already capped prompt height, but the top label and long-prompt
+  tier still needed a calmer, more readable contract on compact dark surfaces
+
+**Implemented**
+
+- reduced the animated blank-slot height in
+  [fill_prompt_sentence.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/fill_prompt_sentence.dart)
+  from `SpacingTokens.xxl` to `SpacingTokens.xl`
+- tightened the close and wrong feedback stack rhythm in
+  [fill_feedback_panel.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/fill_feedback_panel.dart)
+  by reducing excess answer-to-diff spacing while preserving the stronger
+  shared-button action hierarchy
+- promoted the recall prompt label in
+  [recall_prompt_card.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/recall_prompt_card.dart)
+  onto `labelLarge` and kept the medium-length prompt fallback on the calmer
+  `headlineMedium` bridge tier
+- extended
+  [recall_mode_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/recall_mode_screen_test.dart)
+  so the prompt label stays sentence case and the writing field remains
+  meaningfully visible below the capped prompt card on a compact surface
+
+**Before / after structural improvement**
+
+- before: fill and recall had the right content direction, but the prompt and
+  feedback proportions still made the vertical scan feel top-heavy and slightly
+  disjointed on a phone-sized viewport
+- after: fill prompt content lands sooner, feedback reads as a tighter response
+  block, and recall keeps a calmer prompt-to-writing-area handoff without
+  growing the top cluster again
+
+### Verification for follow-up batch 7
+
+- `dart run build_runner build --delete-conflicting-outputs`
+  - passed
+- `flutter gen-l10n`
+  - passed
+- `python tools/guard/run.py --scope all`
+  - passed
+  - only the pre-existing `feature_completeness` warnings remain
+- `flutter analyze`
+  - passed with no issues
+- `flutter test`
+  - passed

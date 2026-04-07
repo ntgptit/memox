@@ -40,7 +40,7 @@ class RecallWritingArea extends StatelessWidget {
       ),
       const SizedBox(height: SpacingTokens.fieldGap),
       AnimatedOpacity(
-        opacity: canReveal ? 1 : OpacityTokens.disabled,
+        opacity: canReveal ? 1 : OpacityTokens.hintText,
         duration: DurationTokens.stateChange,
         child: SecondaryButton(
           label: context.l10n.recallRevealAction,

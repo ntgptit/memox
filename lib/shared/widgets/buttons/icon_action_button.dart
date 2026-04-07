@@ -49,7 +49,7 @@ class IconActionButton extends StatelessWidget {
 
         return BorderSide(
           color: context.colors.onSurface.withValues(
-            alpha: OpacityTokens.focus,
+            alpha: OpacityTokens.selected,
           ),
         );
       }),

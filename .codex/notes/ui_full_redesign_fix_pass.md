@@ -312,6 +312,112 @@ screen issues from the audit notes.
 - `flutter test`
   - passed
 
+## Final continuation: study proportion cleanup
+
+Date: 2026-04-08
+
+This final continuation stayed inside the already-redesigned study feature and
+polished the last high-signal compact-layout issues in fill and recall mode.
+
+### Additional representative screen fixes
+
+- reduced the blank-slot height in
+  [fill_prompt_sentence.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/fill_prompt_sentence.dart)
+  so fill prompts stop wasting vertical space around the underline animation
+- tightened
+  [fill_feedback_panel.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/fill_feedback_panel.dart)
+  so the response block sits closer to the input while keeping a clearly
+  dominant accept action
+- promoted the recall prompt label and retained the medium-length prompt bridge
+  tier in
+  [recall_prompt_card.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/recall_prompt_card.dart)
+- extended
+  [recall_mode_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/recall_mode_screen_test.dart)
+  to lock the compact-surface prompt cap, sentence-case label, and writing-area
+  visibility expectations
+
+### Additional visual impact
+
+- fill mode now gives more of the viewport back to the answer field and
+  feedback state instead of spending it on a decorative blank pulse
+- recall mode keeps the prompt cluster readable without letting the micro-label
+  or medium-length term tier feel overbuilt
+- the study shell now has a more even prompt -> answer -> feedback progression
+  across both fill and recall
+
+### Verification for this continuation
+
+- `dart run build_runner build --delete-conflicting-outputs`
+  - passed
+- `flutter gen-l10n`
+  - passed
+- `python tools/guard/run.py --scope all`
+  - passed
+  - only the pre-existing `feature_completeness` warnings remain
+- `flutter analyze`
+  - passed with no issues
+- `flutter test`
+  - passed
+
+## Follow-up Batch 8
+
+Date: 2026-04-08
+
+This continuation stayed in shared interaction contracts and cleaned up one
+remaining press-feedback defect that still made otherwise improved screens feel
+cheap during tap states.
+
+### Additional fixes implemented now
+
+#### App-wide interaction cleanup
+
+- changed
+  [app_theme.dart](/D:/workspace/memox/lib/core/theme/app_theme.dart)
+  so the shared theme no longer paints a visible `highlightColor` layer and now
+  uses `InkSparkle.splashFactory` for shape-respecting Material 3 splash
+  feedback
+
+#### Shared widget cleanup
+
+- strengthened
+  [icon_action_button.dart](/D:/workspace/memox/lib/shared/widgets/buttons/icon_action_button.dart)
+  so compact icon actions keep their neutral filled surface but gain a clearer
+  enabled-state outline in dark mode
+
+#### Guard follow-up
+
+- added `inkwell_highlight_override` in
+  [policy.yaml](/D:/workspace/memox/tools/guard/policies/memox/policy.yaml)
+  to keep future shared/theme code from overriding `highlightColor:` outside
+  the one allowed theme owner
+
+### Additional visual impact
+
+- rounded cards and grouped settings rows now press with a cleaner,
+  shape-respecting splash path instead of the old rectangular highlight layer
+- compact icon actions such as settings steppers read more clearly as
+  interactive without introducing a new visual language
+- the fix is centralized, so existing rounded Ink surfaces benefit
+  automatically
+
+### Additional regression watchpoints
+
+- this pass intentionally did not touch the Settings section header or section
+  gap files because the current source already matches the calmer `titleLarge`
+  and `Gap.section()` contract
+- `InkSparkle` should still be spot-checked on-device for feel, especially on
+  Android hardware where splash motion is most visible
+
+### Verification for this continuation
+
+- `python tools/guard/run.py --scope all`
+  - passed
+  - only the pre-existing `feature_completeness` warnings remain
+- `flutter analyze`
+  - passed with no issues
+- `flutter test`
+  - passed
+
 ## Follow-up Batch 4
 
 Date: 2026-04-08
@@ -469,6 +575,69 @@ design-system scope.
   - passed
 - `flutter gen-l10n`
   - passed
+- `python tools/guard/run.py --scope all`
+  - passed
+  - only the pre-existing `feature_completeness` warnings remain
+- `flutter analyze`
+  - passed with no issues
+- `flutter test`
+  - passed
+
+## Follow-up Batch 7
+
+Date: 2026-04-08
+
+This continuation stayed inside the study feature and corrected one remaining
+high-impact semantic mismatch between the redesigned UI and the actual content
+shown to the user.
+
+### Additional fixes implemented now
+
+#### Representative screen / mode fixes
+
+- reversed the fill prompt contract in
+  [fill_engine.dart](/D:/workspace/memox/lib/features/study/domain/fill/fill_engine.dart)
+  so fill mode now consistently expects `card.front` as the typed answer and
+  uses the opposite side only as clue context
+- removed the old mixed-direction example fallback from `FillEngine` so the
+  mode can no longer alternate between two content directions across cards
+- remapped
+  [recall_prompt_card.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/recall_prompt_card.dart)
+  to show `card.back` in the prompt phase and
+  [recall_reveal_phase.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/recall_reveal_phase.dart)
+  to reveal `card.front`
+
+#### Regression coverage updates
+
+- updated study regression coverage so the new prompt-direction contract is
+  locked in:
+  - [fill_engine_test.dart](/D:/workspace/memox/test/features/study/domain/fill/fill_engine_test.dart)
+  - [fill_provider_test.dart](/D:/workspace/memox/test/features/study/presentation/providers/fill_provider_test.dart)
+  - [fill_mode_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/fill_mode_screen_test.dart)
+  - [recall_mode_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/recall_mode_screen_test.dart)
+  - [study_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/study_screen_test.dart)
+
+### Additional visual and UX impact
+
+- fill mode now matches the intended “look at the answer-side clue, type the
+  answer-side term” study direction instead of silently drifting between
+  opposite mappings
+- recall mode now presents and reveals content in the same direction users
+  expect from the redesigned study shell
+- the app-level study router tests now reinforce the corrected mode semantics
+  instead of preserving the old inversion
+
+### Additional regression watchpoints
+
+- this pass intentionally did not rename copy or redesign the fill/recall
+  surfaces; it corrected the content mapping first, so any later wording or
+  layout polish should build on the now-stable study contract
+- existing decks that were mentally worked around the old fill bug may feel
+  different on first use, so on-device sanity-checking of a few real decks is
+  still recommended
+
+### Verification for this continuation
+
 - `python tools/guard/run.py --scope all`
   - passed
   - only the pre-existing `feature_completeness` warnings remain
