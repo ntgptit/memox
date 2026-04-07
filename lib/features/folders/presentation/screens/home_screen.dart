@@ -5,11 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/providers/usecase_providers.dart';
+import 'package:memox/core/router/navigation_helpers.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/folders/domain/entities/folder_entity.dart';
 import 'package:memox/features/folders/presentation/providers/folder_detail_provider.dart';
 import 'package:memox/features/folders/presentation/providers/folders_provider.dart';
-import 'package:memox/features/folders/presentation/screens/folder_detail_screen.dart';
 import 'package:memox/features/folders/presentation/widgets/create_folder_dialog.dart';
 import 'package:memox/features/folders/presentation/widgets/delete_folder_confirm_dialog.dart';
 import 'package:memox/features/folders/presentation/widgets/folder_list_view.dart';
@@ -69,11 +69,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             onRetry: () {
               unawaited(_refreshHomeData(ref));
             },
-            onReviewNow: (deck) => context.push(
-              FolderDetailScreen.routeLocation(
-                deck.folderId,
-                focusDeckId: deck.id,
-              ),
+            onReviewNow: (deck) => context.pushFolderDetail(
+              ref,
+              deck.folderId,
+              focusDeckId: deck.id,
             ),
           ),
           const SizedBox(height: SpacingTokens.sectionGap),
@@ -88,8 +87,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 folders: folders,
                 isSortMode: _isSortMode,
                 onRefresh: () => _refreshHomeData(ref),
-                onTap: (folder) =>
-                    context.push(FolderDetailScreen.routeLocation(folder.id)),
+                onTap: (folder) => context.pushFolderDetail(ref, folder.id),
                 onEdit: (folder) {
                   unawaited(_editFolder(context, ref, folder));
                 },

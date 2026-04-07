@@ -32,7 +32,7 @@ import 'package:memox/shared/widgets/buttons/app_fab.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
 import 'package:memox/shared/widgets/feedback/app_refresh_indicator.dart';
 import 'package:memox/shared/widgets/feedback/loading_indicator.dart';
-import 'package:memox/shared/widgets/feedback/screen_loading_view.dart';
+import 'package:memox/shared/widgets/feedback/skeleton_parts.dart';
 import 'package:memox/shared/widgets/layout/app_scaffold.dart';
 import 'package:memox/shared/widgets/navigation/breadcrumb_bar.dart';
 import 'package:memox/shared/widgets/navigation/top_bar_back_button.dart';
@@ -63,17 +63,23 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
     final detailAsync = ref.watch(deckDetailProvider(widget.deckId));
     return AppAsyncBuilder<DeckDetailData>(
       value: detailAsync,
+      loadingStyle: LoadingStyle.skeleton,
       onRetry: () {
         unawaited(_refreshDeckDetail());
       },
-      onLoading: () => ScreenLoadingView(
-        appBar: _buildLoadingAppBar(context),
-        applyHorizontalPadding: false,
+      onLoading: () => const SafeArea(
+        child: Column(
+          children: [
+            SkeletonHeader(showProgressBar: true),
+            Expanded(child: SkeletonList()),
+          ],
+        ),
       ),
       onData: (detail) => _buildScaffold(context, detail),
     );
   }
 
+  // ignore: unused_element
   PreferredSizeWidget _buildLoadingAppBar(BuildContext context) => AppBar(
     automaticallyImplyLeading: false,
     leadingWidth: TopBarBackButton.balancedSlotWidth,

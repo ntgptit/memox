@@ -5,10 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/providers/usecase_providers.dart';
+import 'package:memox/core/router/navigation_helpers.dart';
+import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/decks/domain/entities/deck_entity.dart';
 import 'package:memox/features/decks/presentation/providers/deck_stats_provider.dart';
-import 'package:memox/features/decks/presentation/screens/deck_detail_screen.dart';
 import 'package:memox/features/decks/presentation/widgets/create_deck_dialog.dart';
 import 'package:memox/features/decks/presentation/widgets/deck_list_view.dart';
 import 'package:memox/features/folders/domain/entities/folder_entity.dart';
@@ -24,7 +25,7 @@ import 'package:memox/shared/widgets/buttons/app_fab.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
 import 'package:memox/shared/widgets/feedback/app_refresh_indicator.dart';
 import 'package:memox/shared/widgets/feedback/empty_state_view.dart';
-import 'package:memox/shared/widgets/feedback/screen_loading_view.dart';
+import 'package:memox/shared/widgets/feedback/skeleton_parts.dart';
 import 'package:memox/shared/widgets/layout/app_scaffold.dart';
 import 'package:memox/shared/widgets/lists/reorder_mode_banner.dart';
 import 'package:memox/shared/widgets/navigation/top_bar_action_row.dart';
@@ -67,10 +68,18 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
 
     return AppAsyncBuilder<FolderDetailData>(
       value: detailAsync,
+      loadingStyle: LoadingStyle.skeleton,
       onRetry: () {
         unawaited(_refreshFolderDetailData(ref, widget.folderId));
       },
-      onLoading: () => ScreenLoadingView(appBar: _buildLoadingAppBar(context)),
+      onLoading: () => const SafeArea(
+        child: Column(
+          children: [
+            SkeletonHeader(),
+            Expanded(child: SkeletonList(itemHeight: SizeTokens.listItemTall)),
+          ],
+        ),
+      ),
       onData: (detail) => AppScaffold(
         appBar: _buildAppBar(context, detail),
         fab: AppFab(
@@ -108,6 +117,7 @@ class _FolderDetailScreenState extends ConsumerState<FolderDetailScreen> {
     );
   }
 
+  // ignore: unused_element
   PreferredSizeWidget _buildLoadingAppBar(BuildContext context) => AppBar(
     automaticallyImplyLeading: false,
     leadingWidth: TopBarBackButton.balancedSlotWidth,
@@ -228,7 +238,7 @@ class _FolderContent extends ConsumerWidget {
       isSortMode: isSortMode,
       onRefresh: onRefresh,
       highlightedDeckId: focusDeckId,
-      onTap: (deck) => context.push(DeckDetailScreen.routeLocation(deck.id)),
+      onTap: (deck) => context.pushDeckDetail(ref, deck.id),
       onEdit: (deck) {
         unawaited(_editDeck(context, ref, deck));
       },
