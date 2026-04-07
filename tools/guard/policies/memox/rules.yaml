@@ -1,3 +1,11 @@
+# MemoX domain rules
+#
+# This file contains MemoX-specific guard rule data: required structures,
+# forbidden patterns, design-system contracts, and project conventions.
+#
+# Loaded automatically when --policy tools/guard/policies/memox is active.
+# Guards reference this data via self.project_rules in their check logic.
+
 color_palette:
   seed_colors:
     - name: "indigo"
@@ -248,12 +256,6 @@ performance_contract:
     - file: "lib/shared/widgets/animations/fade_in_widget.dart"
       required_tokens:
         - "this.duration = DurationTokens.fast,"
-
-legacy_state_notifier:
-  forbidden_patterns:
-    - "StateNotifierProvider"
-    - "extends StateNotifier"
-    - "StateNotifier<"
 
 records_patterns:
   pair_like_patterns:

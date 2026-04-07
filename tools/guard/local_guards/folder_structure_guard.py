@@ -22,38 +22,35 @@ class FolderStructureGuard(BaseGuard):
         scope = self.config.get('_runtime', {}).get('scope', 'all')
         violations: list[Violation] = []
 
-        if scope in {'all', 'core', 'shared', 'features'}:
-            for path in rules.get('required_root_dirs', []):
-                if scope == 'core' and not path.startswith('lib/core'):
-                    continue
+        for path in rules.get('required_root_dirs', []):
+            if not self.paths.path_is_within_scope(path, scope):
+                continue
 
-                if scope == 'shared' and not path.startswith('lib/shared'):
-                    continue
+            target = self.paths.root_dir / path
 
-                if scope == 'features' and not path.startswith('lib/features'):
-                    continue
+            if target.exists():
+                continue
 
-                target = self.paths.root_dir / path
+            violations.append(
+                self._violation(path, f'Thư mục bắt buộc bị thiếu: {path}'),
+            )
 
-                if target.exists():
-                    continue
+        for path in rules.get('core_required_dirs', []):
+            if not self.paths.path_is_within_scope(path, scope):
+                continue
 
-                violations.append(
-                    self._violation(path, f'Thư mục bắt buộc bị thiếu: {path}'),
-                )
+            target = self.paths.root_dir / path
 
-        if scope in {'all', 'core'}:
-            for path in rules.get('core_required_dirs', []):
-                target = self.paths.root_dir / path
+            if target.exists():
+                continue
 
-                if target.exists():
-                    continue
+            violations.append(
+                self._violation(path, f'Core structure thiếu thư mục: {path}'),
+            )
 
-                violations.append(
-                    self._violation(path, f'Core structure thiếu thư mục: {path}'),
-                )
+        features_rel = self.paths.relative_path(self.paths.features_dir)
 
-        if scope not in {'all', 'features'}:
+        if not self.paths.path_is_within_scope(features_rel, scope):
             return violations
 
         features_root = self.paths.features_dir

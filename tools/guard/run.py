@@ -20,11 +20,43 @@ from tools.guard.core.guard_registry import GuardRegistry
 from tools.guard.core.path_constants import PathConstants
 from tools.guard.core.reporter import Reporter
 
+_DEFAULT_POLICY = 'tools/guard/policies/memox'
+
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description='MemoX AI output guard tool')
-    parser.add_argument('--config', default='tools/guard/config.yaml')
-    parser.add_argument('--rules', default='tools/guard/project_rules.yaml')
+    parser = argparse.ArgumentParser(
+        description=(
+            'Code guard tool. '
+            'Select a policy with --policy to load project-specific configuration and rules.'
+        ),
+    )
+    parser.add_argument(
+        '--policy',
+        default=_DEFAULT_POLICY,
+        metavar='DIR',
+        help=(
+            'Policy directory containing policy.yaml and rules.yaml. '
+            f'Default: {_DEFAULT_POLICY}'
+        ),
+    )
+    parser.add_argument(
+        '--config',
+        default=None,
+        metavar='FILE',
+        help=(
+            'Override: explicit path to a policy config YAML. '
+            'Takes precedence over <--policy>/policy.yaml when provided.'
+        ),
+    )
+    parser.add_argument(
+        '--rules',
+        default=None,
+        metavar='FILE',
+        help=(
+            'Override: explicit path to a rules YAML. '
+            'Takes precedence over <--policy>/rules.yaml when provided.'
+        ),
+    )
     parser.add_argument('--family', choices=('all', 'global', 'local'), default='all')
     parser.add_argument('--guard', help='Comma-separated guard ids')
     parser.add_argument('--scope', default='all')
@@ -33,6 +65,18 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--quiet', action='store_true')
     parser.add_argument('--fail-on-warnings', action='store_true')
     return parser.parse_args()
+
+
+def resolve_policy_paths(args: argparse.Namespace) -> tuple[Path, Path]:
+    """Return (config_path, rules_path) resolved against the repo root.
+
+    Explicit ``--config`` / ``--rules`` take precedence over the policy
+    directory; the policy directory is the fallback for each path individually.
+    """
+    policy_dir = REPO_ROOT / args.policy
+    config_path = REPO_ROOT / args.config if args.config else policy_dir / 'policy.yaml'
+    rules_path  = REPO_ROOT / args.rules  if args.rules  else policy_dir / 'rules.yaml'
+    return config_path, rules_path
 
 
 def load_yaml(file_path: Path) -> dict:
@@ -46,9 +90,10 @@ def load_yaml(file_path: Path) -> dict:
 
 def main() -> int:
     args = parse_args()
-    config = load_yaml(REPO_ROOT / args.config)
+    config_path, rules_path = resolve_policy_paths(args)
+    config = load_yaml(config_path)
     config['_runtime'] = {'scope': args.scope}
-    project_rules = load_yaml(REPO_ROOT / args.rules)
+    project_rules = load_yaml(rules_path)
     path_constants = PathConstants.from_config(REPO_ROOT, config)
     registry = GuardRegistry(config=config, path_constants=path_constants, project_rules=project_rules)
     guard_ids = None

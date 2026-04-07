@@ -36,11 +36,10 @@ class BaseGuard(ABC):
 
     @property
     def is_enabled(self) -> bool:
-        family_key = 'global_guards'
-
-        if self.SCOPE == GuardScope.LOCAL:
-            family_key = 'local_guards'
-
+        # Derive the config key from the scope value so this method stays
+        # policy-agnostic: GuardScope.GLOBAL → 'global_guards',
+        # GuardScope.LOCAL → 'local_guards', etc.
+        family_key = f'{self.SCOPE.value}_guards'
         return self.config.get(family_key, {}).get(self.GUARD_ID, True)
 
     def check_file(self, file_path: Path, lines: list[str]) -> list[Violation]:

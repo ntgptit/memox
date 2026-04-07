@@ -19,8 +19,9 @@ class FeatureCompletenessGuard(BaseGuard):
 
     def check_project(self, all_files: list[Path]) -> list[Violation]:
         scope = self.config.get('_runtime', {}).get('scope', 'all')
+        features_rel = self.paths.relative_path(self.paths.features_dir)
 
-        if scope not in {'all', 'features'}:
+        if not self.paths.path_is_within_scope(features_rel, scope):
             return []
 
         rules = self.project_rules.get('folder_structure', {})

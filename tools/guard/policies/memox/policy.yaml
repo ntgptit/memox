@@ -1,0 +1,198 @@
+# MemoX policy configuration
+#
+# This file is loaded by the guard engine when --policy tools/guard/policies/memox
+# is active (the default).
+#
+# To add a policy for a different project:
+#   1. Copy this directory to tools/guard/policies/<your-project>/
+#   2. Adjust the values below to match your project layout.
+#   3. Run: python tools/guard/run.py --policy tools/guard/policies/<your-project>
+#
+# No Python code changes are required for a new policy.
+
+project_name: "MemoX"
+language: "dart"
+source_root: "lib"
+test_root: "test"
+
+# File extensions accepted project-wide. Individual scopes may override this
+# via their own ``extensions`` key inside ``scan_targets``.
+language_extensions:
+  - ".dart"
+
+paths:
+  core_dir: "lib/core"
+  shared_dir: "lib/shared"
+  features_dir: "lib/features"
+  exclude_patterns:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/*.config.dart"
+    - "**/l10n/generated/**"
+    - "**/gen/**"
+    - "**/build/**"
+    - "**/.dart_tool/**"
+
+# ---------------------------------------------------------------------------
+# Scan targets — see docs/config_scopes_paths.md for schema reference
+# ---------------------------------------------------------------------------
+scan_targets:
+  all:
+    roots:
+      - "lib"
+      - "test"
+  core:
+    roots:
+      - "lib/core"
+  shared:
+    roots:
+      - "lib/shared"
+  features:
+    roots:
+      - "lib/features"
+  test:
+    roots:
+      - "test"
+
+thresholds:
+  max_widget_lines: 80
+  max_file_lines: 300
+  max_file_lines_hard: 500
+  min_const_ratio: 0.7
+
+# ---------------------------------------------------------------------------
+# Guard enablement maps
+# Keys must match GUARD_ID values on each guard class.
+# Absent keys default to enabled (true).
+# ---------------------------------------------------------------------------
+global_guards:
+  no_hardcoded_color: true
+  no_hardcoded_duration: true
+  no_hardcoded_radius: true
+  no_hardcoded_size: true
+  no_hardcoded_font_size: true
+  no_hardcoded_string: true
+  shared_widget: true
+  widget_length: true
+  widget_class_length: true
+  const_constructor: true
+  import_direction: true
+  icon_style: true
+
+local_guards:
+  button_usage: true
+  freezed_json_model: true
+  folder_structure: true
+  l10n_source: true
+  color_palette: true
+  design_token_usage: true
+  feature_completeness: true
+  drift_table: true
+  provider_naming: true
+  performance_contract: true
+  records_patterns: true
+  riverpod_syntax: true
+  responsive_layout_test: true
+  responsive_text_scale: true
+  refresh_retry: true
+  safe_area_keyboard: true
+  screen_scaffold: true
+  shared_widget_mapping: true
+  srs_field: true
+  test_coverage: true
+  text_style: true
+  touch_target: true
+  typography_scale: true
+
+severity_overrides:
+  widget_length: "warning"
+  widget_class_length: "warning"
+  const_constructor: "warning"
+  folder_structure: "info"
+  icon_style: "warning"
+  feature_completeness: "warning"
+  records_patterns: "warning"
+
+# ---------------------------------------------------------------------------
+# Normalized rules (schema: docs/rule_schema_v2.md)
+# These rules are executed by core/rule_executor.py, not by guard class files.
+# Migration status: fully migrated — guard .py files for these IDs are removed.
+# ---------------------------------------------------------------------------
+rules:
+  - id: no_else
+    type: forbidden_pattern
+    name: No else
+    description: Use early return, guard clause, or switch expression instead of else.
+    severity: error
+    scope: global
+    enabled: true
+    skip_comments: true
+    literal_skip:
+      - '"else"'
+      - "'else'"
+    patterns:
+      - regex: '\belse\b'
+        message: "Use early return, guard clause, or switch expression instead of else."
+
+  - id: l10n
+    type: forbidden_pattern
+    name: L10n usage
+    description: User-facing strings should come from localization.
+    severity: warning
+    scope: global
+    enabled: true
+    skip_comments: true
+    targets:
+      exclude:
+        - "test/"
+        - "lib/core/constants/"
+    patterns:
+      - regex: 'Text\(\s*[''"]'
+        message: "Hardcoded string in Text(). Use context.l10n.*"
+
+  - id: async_builder
+    type: forbidden_pattern
+    name: Async builder enforcement
+    description: Prefer AppAsyncBuilder over raw AsyncValue.when calls.
+    severity: error
+    scope: global
+    enabled: true
+    skip_comments: false
+    targets:
+      exclude:
+        - "lib/shared/widgets/feedback/app_async_builder.dart"
+        - "test/"
+    patterns:
+      - regex: '\.when\s*\('
+        message: "Raw .when() detected. Use AppAsyncBuilder widget."
+
+  - id: legacy_state_notifier
+    type: forbidden_pattern
+    name: Legacy StateNotifier
+    description: Do not use StateNotifier or StateNotifierProvider in Riverpod 3 code.
+    severity: error
+    scope: local
+    enabled: true
+    skip_comments: true
+    targets:
+      exclude:
+        - "test/"
+        - "*.g.dart"
+        - "*.freezed.dart"
+    patterns:
+      - regex: 'StateNotifierProvider'
+        message: "Legacy StateNotifier syntax detected. Use @riverpod/@Riverpod."
+      - regex: 'extends StateNotifier'
+        message: "Legacy StateNotifier syntax detected. Use @riverpod/@Riverpod."
+      - regex: 'StateNotifier<'
+        message: "Legacy StateNotifier syntax detected. Use @riverpod/@Riverpod."
+
+  - id: naming_convention
+    type: file_naming
+    name: File naming convention
+    description: Dart files should use snake_case names.
+    severity: warning
+    scope: global
+    enabled: true
+    naming_pattern: '^[a-z0-9_]+\.dart$'
+    naming_message: "File name must follow snake_case."

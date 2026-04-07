@@ -5,6 +5,7 @@ import time
 
 from tools.guard.core.file_scanner import FileScanner
 from tools.guard.core.guard_result import GuardScope, Severity, Violation
+from tools.guard.core.rule_executor import RuleExecutor
 from tools.guard.global_guards.family import GlobalGuardFamily
 from tools.guard.local_guards.family import LocalGuardFamily
 
@@ -20,6 +21,7 @@ class GuardRegistry:
         self.paths = path_constants
         self.project_rules = project_rules
         self.scanner = FileScanner(path_constants)
+        self.executor = RuleExecutor(config=config, paths=path_constants)
 
     def create_guards(
         self,
@@ -59,9 +61,16 @@ class GuardRegistry:
         scope: str = 'all',
     ) -> list['GuardResult']:
         files = self.scanner.scan(scope=scope)
-        results = []
+
+        # Run config-driven normalized rules first.
+        results = self.executor.run(files=files, family=family, guard_ids=guard_ids)
+
+        # Skip legacy guard classes whose IDs have been migrated to the executor.
+        normalized_ids = self.executor.rule_ids
 
         for guard in self.create_guards(family=family, guard_ids=guard_ids):
+            if guard.GUARD_ID in normalized_ids:
+                continue
             started_at = time.perf_counter()
             violations = []
             files_scanned = len(files)
