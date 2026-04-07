@@ -11,7 +11,7 @@ class TypographyScaleGuard(BaseGuard):
     GUARD_NAME = 'Typography scale contract'
     DESCRIPTION = (
         'Typography token mapping and primary documentation must stay aligned '
-        'with the approved MemoX type scale.'
+        'with the approved project type scale.'
     )
     DEFAULT_SEVERITY = Severity.ERROR
     SCOPE = GuardScope.LOCAL

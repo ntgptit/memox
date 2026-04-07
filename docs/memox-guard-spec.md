@@ -3,6 +3,15 @@
 > Python CLI tool that validates AI-generated Flutter code against project conventions.
 > Runs as CI gate or manual check after each task.
 
+> CLI, policy layout, scope config, and normalized rule behavior changed during
+> the rule/schema/policy refactor. The authoritative current docs are:
+> `tools/guard/docs/cli_usage_v2.md`,
+> `tools/guard/docs/config_scopes_paths.md`,
+> `tools/guard/docs/rule_schema_v2.md`, and
+> `tools/guard/docs/final_commonization_audit.md`.
+> The architecture and file-layout sections below are retained as historical
+> background and are not the source of truth for the refactored system.
+
 ---
 
 ## Architecture

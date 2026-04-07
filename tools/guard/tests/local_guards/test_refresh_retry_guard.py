@@ -93,9 +93,17 @@ Widget build(BuildContext context) => AppRefreshIndicator(
                     'features/*/presentation/widgets/*_view.dart',
                     'features/*/presentation/widgets/*_card.dart',
                 ],
+                'retry_tokens': ['AppAsyncBuilder<'],
+                'retry_callback_tokens': ['onRetry:'],
+                'missing_retry_message': (
+                    'Configured retry-capable async builder must provide onRetry:.'
+                ),
                 'refresh_path_patterns': [
                     'features/folders/presentation/screens/home_screen.dart',
                 ],
+                'missing_refresh_message': (
+                    'List/content view must use a configured pull-to-refresh wrapper.'
+                ),
                 'refresh_tokens': [
                     'AppRefreshIndicator(',
                     'AppRefreshScrollView(',

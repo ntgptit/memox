@@ -1,0 +1,35 @@
+version = 1
+preset_namespace = "memox"
+preset_dir = "$CODEX_HOME/agent-presets/memox"
+workflow_doc = "docs/codex-agent-workflow.md"
+orchestration_skill = "codex-agent-control"
+domain_skill = "flutter-full-app"
+
+[repo]
+name = "MemoX"
+root = "."
+
+[read_first]
+files = [
+  "AGENTS.md",
+  "docs/codex-agent-workflow.toml",
+  "docs/codex-agent-workflow.md",
+  "docs/memox-reference.md",
+  "docs/memox-guard-spec.md",
+]
+
+[profiles]
+default = "memox-default"
+ui_heavy = "ui-heavy"
+sync_heavy = "sync-heavy"
+migration_risk = "migration-risk"
+
+[profile_selection]
+enabled = true
+strategy = "score_terms_and_paths"
+prefer_auto = true
+
+[verification]
+default_guard_scope = "all"
+analyze = "flutter analyze"
+test_default = "flutter test"

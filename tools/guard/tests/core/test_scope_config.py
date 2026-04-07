@@ -289,6 +289,39 @@ class PathIsWithinScopeTest(unittest.TestCase):
             self.assertFalse(paths.path_is_within_scope('lib/features_extra', 'features'))
 
 
+class LayerDetectionTest(unittest.TestCase):
+    def test_defaults_root_segment_from_features_dir_name(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = {
+                'source_root': 'src',
+                'test_root': 'test',
+                'paths': {
+                    'core_dir': 'src/core',
+                    'shared_dir': 'src/shared',
+                    'features_dir': 'src/modules',
+                    'exclude_patterns': [],
+                },
+            }
+            paths = _make_paths(root, config)
+            file_path = root / 'src/modules/cards/presentation/card_screen.dart'
+
+            self.assertEqual(paths.get_layer(file_path), 'presentation')
+
+    def test_layer_detection_override_applied(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = _minimal_config()
+            config['paths']['layer_detection'] = {
+                'root_segment': 'packages',
+                'layer_offset': 1,
+            }
+            paths = _make_paths(root, config)
+            file_path = root / 'lib/packages/domain/entity.dart'
+
+            self.assertEqual(paths.get_layer(file_path), 'domain')
+
+
 class ValidationTest(unittest.TestCase):
     """_validate_scope raises ValueError for malformed scope entries."""
 

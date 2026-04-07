@@ -84,7 +84,7 @@ The tool raises `ValueError` with a descriptive message on startup when:
 
 ## MemoX default scopes
 
-The current `config.yaml` declares these five scopes that match the original CLI
+The current MemoX `policy.yaml` declares these five scopes that match the original CLI
 contract (`--scope all|core|shared|features|test`):
 
 ```yaml
@@ -116,7 +116,7 @@ All scopes inherit `language_extensions: [".dart"]` and are subject to the globa
 
 ### Old configs without `scan_targets`
 
-If `scan_targets` is **not** present in `config.yaml`, the engine automatically
+If `scan_targets` is **not** present in a policy config, the engine automatically
 reconstructs the five legacy scopes from the existing `paths.*` keys:
 
 ```yaml
@@ -242,7 +242,7 @@ No Python code changes are required.
    reconstructs the same five scopes automatically.
 
 2. **Add `scan_targets` when you need new scopes or per-scope extension control.**
-   Copy the MemoX default block from `config.yaml` and extend it.
+   Copy the MemoX default block from `policies/memox/policy.yaml` and extend it.
 
 3. **Add `language_extensions` once** if you want the project default to be explicit
    rather than relying on the `".dart"` fallback.

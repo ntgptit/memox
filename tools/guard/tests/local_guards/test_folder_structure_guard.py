@@ -24,6 +24,7 @@ class FolderStructureGuardTest(unittest.TestCase):
                 },
                 '_runtime': {'scope': 'features'},
                 'severity_overrides': {'folder_structure': 'info'},
+                'category_overrides': {'folder_structure': 'structure'},
             }
             rules = {
                 'folder_structure': {
@@ -39,11 +40,13 @@ class FolderStructureGuardTest(unittest.TestCase):
             guard = FolderStructureGuard(config=config, path_constants=paths, project_rules=rules)
 
             violations = guard.check_project([])
+            result = guard.create_result(violations, files_scanned=0, duration_ms=0.0)
 
             messages = [violation.message for violation in violations]
             self.assertIn('folders/ thiếu layer data/', messages)
             self.assertIn('folders/ thiếu layer domain/', messages)
             self.assertIn('folders/ thiếu layer presentation/', messages)
+            self.assertTrue(all(violation.category == 'structure' for violation in result.violations))
 
 
 if __name__ == '__main__':

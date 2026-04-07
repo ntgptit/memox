@@ -10,8 +10,8 @@ class ResponsiveTextScaleGuard(BaseGuard):
     GUARD_ID = 'responsive_text_scale'
     GUARD_NAME = 'Responsive text scaling enforcement'
     DESCRIPTION = (
-        'App root and widget test harness must apply '
-        'ScreenType.of(context).textScaleFactor via MediaQuery textScaler.'
+        'App root and widget test harness must apply the configured responsive '
+        'text-scaling contract.'
     )
     DEFAULT_SEVERITY = Severity.ERROR
     SCOPE = GuardScope.LOCAL

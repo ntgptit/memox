@@ -9,7 +9,7 @@ from tools.guard.core.guard_result import GuardScope, Severity, Violation
 class RefreshRetryGuard(BaseGuard):
     GUARD_ID = 'refresh_retry'
     GUARD_NAME = 'Refresh and retry wiring'
-    DESCRIPTION = 'List/content views must wire pull-to-refresh and AppAsyncBuilder retry callbacks.'
+    DESCRIPTION = 'List/content views must wire pull-to-refresh and configured retry callbacks.'
     DEFAULT_SEVERITY = Severity.ERROR
     SCOPE = GuardScope.LOCAL
 
@@ -20,16 +20,26 @@ class RefreshRetryGuard(BaseGuard):
             return []
 
         content = '\n'.join(lines)
+        rules = self.project_rules.get(self.GUARD_ID, {})
         violations: list[Violation] = []
 
         if self._matches_pattern(file_path, 'retry_path_patterns'):
-            if 'AppAsyncBuilder<' in content and 'onRetry:' not in content:
+            retry_tokens = rules.get('retry_tokens', [])
+            retry_callback_tokens = rules.get('retry_callback_tokens', [])
+
+            if (
+                any(token in content for token in retry_tokens)
+                and not any(token in content for token in retry_callback_tokens)
+            ):
                 violations.append(
                     Violation(
                         file_path=relative,
                         line_number=1,
                         line_content='',
-                        message='AppAsyncBuilder call site phải truyền onRetry để Retry hoạt động.',
+                        message=rules.get(
+                            'missing_retry_message',
+                            'Configured retry-capable async builder must provide a retry callback.',
+                        ),
                         guard_id=self.GUARD_ID,
                         severity=self.severity,
                         scope=self.SCOPE,
@@ -37,10 +47,7 @@ class RefreshRetryGuard(BaseGuard):
                 )
 
         if self._matches_pattern(file_path, 'refresh_path_patterns'):
-            refresh_tokens = self.project_rules.get(self.GUARD_ID, {}).get(
-                'refresh_tokens',
-                [],
-            )
+            refresh_tokens = rules.get('refresh_tokens', [])
 
             if not any(token in content for token in refresh_tokens):
                 violations.append(
@@ -48,7 +55,10 @@ class RefreshRetryGuard(BaseGuard):
                         file_path=relative,
                         line_number=1,
                         line_content='',
-                        message='List/content view phải dùng AppRefreshIndicator hoặc AppRefreshScrollView để hỗ trợ pull-to-refresh.',
+                        message=rules.get(
+                            'missing_refresh_message',
+                            'List/content view must use a configured pull-to-refresh wrapper.',
+                        ),
                         guard_id=self.GUARD_ID,
                         severity=self.severity,
                         scope=self.SCOPE,

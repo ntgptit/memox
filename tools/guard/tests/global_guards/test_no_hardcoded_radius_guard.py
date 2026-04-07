@@ -4,8 +4,13 @@ from pathlib import Path
 import tempfile
 import unittest
 
+import yaml
+
 from tools.guard.core.path_constants import PathConstants
-from tools.guard.global_guards.no_hardcoded_radius_guard import NoHardcodedRadiusGuard
+from tools.guard.core.rule_executor import RuleExecutor
+
+_REPO_ROOT = Path(__file__).resolve().parents[4]
+_POLICY_PATH = _REPO_ROOT / 'tools/guard/policies/memox/policy.yaml'
 
 
 class NoHardcodedRadiusGuardTest(unittest.TestCase):
@@ -63,7 +68,8 @@ class NoHardcodedRadiusGuardTest(unittest.TestCase):
 
             self.assertEqual([], violations)
 
-    def _create_guard(self, root: Path) -> NoHardcodedRadiusGuard:
+    def _create_guard(self, root: Path) -> 'ConfiguredRuleHarness':
+        rule = _load_rule('no_hardcoded_radius')
         config = {
             'source_root': 'lib',
             'test_root': 'test',
@@ -74,9 +80,28 @@ class NoHardcodedRadiusGuardTest(unittest.TestCase):
                 'exclude_patterns': [],
             },
             'global_guards': {'no_hardcoded_radius': True},
+            'rules': [rule],
         }
         paths = PathConstants.from_config(root, config)
-        return NoHardcodedRadiusGuard(config=config, path_constants=paths)
+        executor = RuleExecutor(config=config, paths=paths)
+        return ConfiguredRuleHarness(executor)
+
+
+class ConfiguredRuleHarness:
+    def __init__(self, executor: RuleExecutor) -> None:
+        self.executor = executor
+
+    def check_file(self, file_path: Path, _: list[str]) -> list:
+        results = self.executor.run(files=[file_path], family='global')
+        return results[0].violations
+
+
+def _load_rule(rule_id: str) -> dict:
+    config = yaml.safe_load(_POLICY_PATH.read_text(encoding='utf-8'))
+    for rule in config.get('rules', []):
+        if rule.get('id') == rule_id:
+            return rule
+    raise AssertionError(f'Rule {rule_id} not found in policy.yaml')
 
 
 if __name__ == '__main__':

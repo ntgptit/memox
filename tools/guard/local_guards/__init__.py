@@ -1,1 +1,1 @@
-"""MemoX-specific guards."""
+"""Guard implementations that still require Python logic."""

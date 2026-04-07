@@ -12,7 +12,7 @@ class PerformanceContractGuard(BaseGuard):
     GUARD_NAME = 'Performance contract'
     DESCRIPTION = (
         'Critical routing, provider-scope, and async-transition files must '
-        'stay aligned with MemoX performance contracts.'
+        'stay aligned with configured performance contracts.'
     )
     DEFAULT_SEVERITY = Severity.ERROR
     SCOPE = GuardScope.LOCAL

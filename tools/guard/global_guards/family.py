@@ -14,11 +14,11 @@ class GlobalGuardFamily(GuardFamily):
     def create_guards(self) -> list[BaseGuard]:
         guards: list[BaseGuard] = []
 
-        for guard_class in self._discover_classes():
+        for guard_class in self.discover_guard_classes():
             guard = guard_class(
                 config=self.config,
                 path_constants=self.path_constants,
-                project_rules=None,
+                project_rules=self.project_rules,
             )
 
             if not guard.is_enabled:

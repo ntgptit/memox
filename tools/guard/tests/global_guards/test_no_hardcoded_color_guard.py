@@ -4,8 +4,13 @@ from pathlib import Path
 import tempfile
 import unittest
 
+import yaml
+
 from tools.guard.core.path_constants import PathConstants
-from tools.guard.global_guards.no_hardcoded_color_guard import NoHardcodedColorGuard
+from tools.guard.core.rule_executor import RuleExecutor
+
+_REPO_ROOT = Path(__file__).resolve().parents[4]
+_POLICY_PATH = _REPO_ROOT / 'tools/guard/policies/memox/policy.yaml'
 
 
 class NoHardcodedColorGuardTest(unittest.TestCase):
@@ -21,8 +26,7 @@ class NoHardcodedColorGuardTest(unittest.TestCase):
             guard = self._create_guard(root)
 
             violations = guard.check_file(
-                file_path,
-                file_path.read_text(encoding='utf-8').splitlines(),
+                [file_path],
             )
 
             self.assertEqual(1, len(violations))
@@ -41,13 +45,13 @@ class NoHardcodedColorGuardTest(unittest.TestCase):
             guard = self._create_guard(root)
 
             violations = guard.check_file(
-                file_path,
-                file_path.read_text(encoding='utf-8').splitlines(),
+                [file_path],
             )
 
             self.assertEqual([], violations)
 
-    def _create_guard(self, root: Path) -> NoHardcodedColorGuard:
+    def _create_guard(self, root: Path) -> 'ConfiguredRuleHarness':
+        rule = _load_rule('no_hardcoded_color')
         config = {
             'source_root': 'lib',
             'test_root': 'test',
@@ -58,9 +62,28 @@ class NoHardcodedColorGuardTest(unittest.TestCase):
                 'exclude_patterns': [],
             },
             'global_guards': {'no_hardcoded_color': True},
+            'rules': [rule],
         }
         paths = PathConstants.from_config(root, config)
-        return NoHardcodedColorGuard(config=config, path_constants=paths)
+        executor = RuleExecutor(config=config, paths=paths)
+        return ConfiguredRuleHarness(executor)
+
+
+class ConfiguredRuleHarness:
+    def __init__(self, executor: RuleExecutor) -> None:
+        self.executor = executor
+
+    def check_file(self, files: list[Path]) -> list:
+        results = self.executor.run(files=files, family='global')
+        return results[0].violations
+
+
+def _load_rule(rule_id: str) -> dict:
+    config = yaml.safe_load(_POLICY_PATH.read_text(encoding='utf-8'))
+    for rule in config.get('rules', []):
+        if rule.get('id') == rule_id:
+            return rule
+    raise AssertionError(f'Rule {rule_id} not found in policy.yaml')
 
 
 if __name__ == '__main__':

@@ -1,6 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:memox/core/design/study_mode.dart';
-import 'package:memox/core/router/app_page_transition.dart';
+import 'package:memox/core/router/route_transitions.dart';
 import 'package:memox/features/cards/presentation/screens/card_create_screen.dart';
 import 'package:memox/features/cards/presentation/screens/card_edit_screen.dart';
 import 'package:memox/features/cards/presentation/screens/cards_screen.dart';
@@ -30,7 +31,8 @@ GoRouter appRouter(Ref ref) => GoRouter(
             GoRoute(
               path: HomeScreen.routePath,
               name: HomeScreen.routeName,
-              builder: (context, state) => const HomeScreen(),
+              pageBuilder: (_, s) =>
+                  fadeThroughPage(state: s, child: const HomeScreen()),
             ),
           ],
         ),
@@ -39,7 +41,8 @@ GoRouter appRouter(Ref ref) => GoRouter(
             GoRoute(
               path: DecksScreen.routePath,
               name: DecksScreen.routeName,
-              builder: (context, state) => const DecksScreen(),
+              pageBuilder: (_, s) =>
+                  fadeThroughPage(state: s, child: const DecksScreen()),
             ),
           ],
         ),
@@ -48,7 +51,8 @@ GoRouter appRouter(Ref ref) => GoRouter(
             GoRoute(
               path: StatisticsScreen.routePath,
               name: StatisticsScreen.routeName,
-              builder: (context, state) => const StatisticsScreen(),
+              pageBuilder: (_, s) =>
+                  fadeThroughPage(state: s, child: const StatisticsScreen()),
             ),
           ],
         ),
@@ -57,7 +61,8 @@ GoRouter appRouter(Ref ref) => GoRouter(
             GoRoute(
               path: SettingsScreen.routePath,
               name: SettingsScreen.routeName,
-              builder: (context, state) => const SettingsScreen(),
+              pageBuilder: (_, s) =>
+                  fadeThroughPage(state: s, child: const SettingsScreen()),
             ),
           ],
         ),
@@ -66,92 +71,80 @@ GoRouter appRouter(Ref ref) => GoRouter(
     GoRoute(
       path: DeckDetailScreen.routePath,
       name: DeckDetailScreen.routeName,
-      pageBuilder: (context, state) => appFadeTransitionPage(
-        state: state,
-        child: DeckDetailScreen(
-          deckId: int.parse(state.pathParameters['deckId']!),
-        ),
+      pageBuilder: (_, s) => sharedAxisZPage(
+        state: s,
+        child: DeckDetailScreen(deckId: int.parse(s.pathParameters['deckId']!)),
       ),
     ),
     GoRoute(
       path: CardCreateScreen.routePath,
       name: CardCreateScreen.routeName,
-      pageBuilder: (context, state) => appFadeTransitionPage(
-        state: state,
+      pageBuilder: (_, s) => MaterialPage<void>(
+        key: s.pageKey,
         fullscreenDialog: true,
         child: CardCreateScreen(
-          deckId: int.parse(state.pathParameters['deckId']!),
-          initialMode:
-              _editorModeFromName(state.uri.queryParameters['mode']),
+          deckId: int.parse(s.pathParameters['deckId']!),
+          initialMode: _editorModeFromName(s.uri.queryParameters['mode']),
         ),
       ),
     ),
     GoRoute(
       path: CardEditScreen.routePath,
       name: CardEditScreen.routeName,
-      pageBuilder: (context, state) => appFadeTransitionPage(
-        state: state,
+      pageBuilder: (_, s) => MaterialPage<void>(
+        key: s.pageKey,
         fullscreenDialog: true,
         child: CardEditScreen(
-          deckId: int.parse(state.pathParameters['deckId']!),
-          cardId: int.parse(state.pathParameters['cardId']!),
+          deckId: int.parse(s.pathParameters['deckId']!),
+          cardId: int.parse(s.pathParameters['cardId']!),
         ),
       ),
     ),
     GoRoute(
       path: FolderDetailScreen.routePath,
       name: FolderDetailScreen.routeName,
-      pageBuilder: (context, state) => appFadeTransitionPage(
-        state: state,
+      pageBuilder: (_, s) => sharedAxisZPage(
+        state: s,
         child: FolderDetailScreen(
-          folderId: int.parse(state.pathParameters['folderId']!),
-          focusDeckId:
-              int.tryParse(state.uri.queryParameters['deck'] ?? ''),
+          folderId: int.parse(s.pathParameters['folderId']!),
+          focusDeckId: int.tryParse(s.uri.queryParameters['deck'] ?? ''),
         ),
       ),
     ),
     GoRoute(
       path: SearchScreen.routePath,
       name: SearchScreen.routeName,
-      pageBuilder: (context, state) => appFadeTransitionPage(
-        state: state,
-        child: const SearchScreen(),
-      ),
+      pageBuilder: (_, s) =>
+          fadeThroughPage(state: s, child: const SearchScreen()),
     ),
     GoRoute(
       path: CardsScreen.routePath,
       name: CardsScreen.routeName,
-      pageBuilder: (context, state) => appFadeTransitionPage(
-        state: state,
-        child: const CardsScreen(),
-      ),
+      pageBuilder: (_, s) =>
+          fadeThroughPage(state: s, child: const CardsScreen()),
     ),
     GoRoute(
       path: StudyScreen.routePath,
       name: StudyScreen.routeName,
-      pageBuilder: (context, state) => appFadeTransitionPage(
-        state: state,
-        child: const StudyScreen(),
-      ),
+      pageBuilder: (_, s) =>
+          fadeThroughPage(state: s, child: const StudyScreen()),
     ),
     GoRoute(
       path: StudyScreen.deckRoutePath,
       name: 'deck-study',
-      pageBuilder: (context, state) => appFadeTransitionPage(
-        state: state,
+      pageBuilder: (_, s) => sharedAxisZPage(
+        state: s,
         child: StudyScreen(
-          deckId: int.parse(state.pathParameters['deckId']!),
-          mode: _studyModeFromName(state.pathParameters['mode']),
+          deckId: int.parse(s.pathParameters['deckId']!),
+          mode: _studyModeFromName(s.pathParameters['mode']),
         ),
       ),
     ),
     GoRoute(
       path: ThemePreviewScreen.routePath,
       name: ThemePreviewScreen.routeName,
-      pageBuilder: (context, state) => appFadeTransitionPage(
-        state: state,
-        child: const ThemePreviewScreen(),
-      ),
+      pageBuilder: (_, s) =>
+          sharedAxisZPage(state: s, child: const ThemePreviewScreen()),
     ),
   ],
 );

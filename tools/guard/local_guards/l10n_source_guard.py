@@ -9,7 +9,7 @@ from tools.guard.core.guard_result import GuardScope, Severity, Violation
 class L10nSourceGuard(BaseGuard):
     GUARD_ID = 'l10n_source'
     GUARD_NAME = 'L10n source enforcement'
-    DESCRIPTION = 'UI-facing files must source strings from localization, not AppStrings.'
+    DESCRIPTION = 'UI-facing files must source strings from the configured localization API.'
     DEFAULT_SEVERITY = Severity.ERROR
     SCOPE = GuardScope.LOCAL
 
@@ -22,7 +22,12 @@ class L10nSourceGuard(BaseGuard):
         if not self._matches_rule_path(file_path):
             return []
 
-        forbidden_tokens = self.project_rules.get(self.GUARD_ID, {}).get('forbidden_tokens', [])
+        rules = self.project_rules.get(self.GUARD_ID, {})
+        forbidden_tokens = rules.get('forbidden_tokens', [])
+        message = rules.get(
+            'message',
+            'UI-facing files must use the configured localization source.',
+        )
         violations: list[Violation] = []
 
         for index, line in enumerate(lines, start=1):
@@ -40,7 +45,7 @@ class L10nSourceGuard(BaseGuard):
                         file_path=relative,
                         line_number=index,
                         line_content=line,
-                        message='UI string source phải dùng context.l10n.* thay vì AppStrings.',
+                        message=message,
                         guard_id=self.GUARD_ID,
                         severity=self.severity,
                         scope=self.SCOPE,

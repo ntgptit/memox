@@ -133,6 +133,8 @@ class PathConstants:
     core_dir: Path
     shared_dir: Path
     features_dir: Path
+    layer_root_segment: str
+    layer_offset: int
     exclude_patterns: tuple[str, ...]
     scope_definitions: dict[str, ScopeDefinition]
     default_extensions: tuple[str, ...]
@@ -142,6 +144,13 @@ class PathConstants:
         paths = config.get('paths', {})
         source_root = root_dir / config.get('source_root', 'lib')
         test_root   = root_dir / config.get('test_root', 'test')
+        layer_detection = paths.get('layer_detection', {})
+        features_dir = paths.get('features_dir', 'lib/features')
+        layer_root_segment = layer_detection.get(
+            'root_segment',
+            PurePosixPath(features_dir).name,
+        )
+        layer_offset = layer_detection.get('layer_offset', 2)
 
         # ``language_extensions`` is the project-wide default; individual scopes
         # may override it via their own ``extensions`` key.
@@ -156,6 +165,8 @@ class PathConstants:
             core_dir=root_dir / paths.get('core_dir', 'lib/core'),
             shared_dir=root_dir / paths.get('shared_dir', 'lib/shared'),
             features_dir=root_dir / paths.get('features_dir', 'lib/features'),
+            layer_root_segment=layer_root_segment,
+            layer_offset=layer_offset,
             exclude_patterns=tuple(paths.get('exclude_patterns', [])),
             scope_definitions=scope_defs,
             default_extensions=default_extensions,
@@ -194,6 +205,10 @@ class PathConstants:
         """Return the ``ScopeDefinition`` for *scope*, or ``None`` if unknown."""
         return self.scope_definitions.get(scope)
 
+    @property
+    def scope_ids(self) -> tuple[str, ...]:
+        return tuple(self.scope_definitions.keys())
+
     def scope_roots(self, scope: str) -> list[Path]:
         """Return the list of root directories to walk for *scope*.
 
@@ -230,12 +245,15 @@ class PathConstants:
     def get_layer(self, file_path: Path) -> str | None:
         parts = PurePosixPath(self.relative_path(file_path)).parts
 
-        if 'features' not in parts:
+        if not self.layer_root_segment:
             return None
 
-        feature_index = parts.index('features')
-
-        if len(parts) <= feature_index + 2:
+        if self.layer_root_segment not in parts:
             return None
 
-        return parts[feature_index + 2]
+        layer_index = parts.index(self.layer_root_segment) + self.layer_offset
+
+        if len(parts) <= layer_index:
+            return None
+
+        return parts[layer_index]

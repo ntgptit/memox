@@ -137,6 +137,23 @@ Do NOT recreate these. Import from `shared/widgets/`:
 - Test with `NativeDatabase.memory()`, not mocks.
 - Foreign keys enforced. Cascade deletes in repository.
 
+## Codex agent workflow
+
+- When a MemoX task is non-trivial and the user explicitly allows subagents or
+  parallel work, use the `codex-agent-control` skill together with
+  `docs/codex-agent-workflow.md` and `docs/codex-agent-workflow.toml`.
+- Prefer automatic profile selection from task text and changed-path hints
+  before falling back to manual profile choice.
+- Choose the closest preset profile when available:
+  - `memox-default` for ordinary feature work
+  - `ui-heavy` for UI-first tasks
+  - `sync-heavy` for import, export, backup, restore, and sync work
+  - `migration-risk` for Drift schema or persistence migration work
+- Keep architecture decisions, shared widget or theme changes, sync boundaries,
+  final integration, and final verification in the coordinator agent.
+- Only delegate bounded write scopes with no overlap across provider graphs,
+  routes, shared surfaces, or generated files.
+
 ## Validation checklist
 
 Before considering any task complete:
@@ -159,3 +176,5 @@ Read relevant sections BEFORE implementing:
 - `docs/memox-reference.md` → architecture, tokens, widgets, database, backup, DI, patterns, typography
 - `docs/memox-guard-spec.md` → guard tool architecture, all guards, config, CLI usage
 - `docs/claude-code-memox-development-prompts.md` → bugs, missing features, architecture improvements, test gaps
+- `docs/codex-agent-workflow.md` → MemoX multi-agent workflow, ownership, model selection, and verification order
+- `docs/codex-agent-workflow.toml` → MemoX machine-readable preset pointer for Codex multi-agent orchestration

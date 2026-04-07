@@ -14,7 +14,7 @@ class LocalGuardFamily(GuardFamily):
     def create_guards(self) -> list[BaseGuard]:
         guards: list[BaseGuard] = []
 
-        for guard_class in self._discover_classes():
+        for guard_class in self.discover_guard_classes():
             guard = guard_class(
                 config=self.config,
                 path_constants=self.path_constants,

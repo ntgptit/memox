@@ -1,1 +1,1 @@
-"""MemoX guard tool package."""
+"""Config-driven guard tool package."""

@@ -10,7 +10,7 @@ from tools.guard.core.guard_result import GuardScope, Severity, Violation
 class ColorPaletteGuard(BaseGuard):
     GUARD_ID = 'color_palette'
     GUARD_NAME = 'Color palette'
-    DESCRIPTION = 'Color token files should only use MemoX-approved palette values.'
+    DESCRIPTION = 'Configured color token files should only use approved palette values.'
     DEFAULT_SEVERITY = Severity.ERROR
     SCOPE = GuardScope.LOCAL
 
@@ -21,15 +21,17 @@ class ColorPaletteGuard(BaseGuard):
         return False
 
     def check_project(self, all_files: list[Path]) -> list[Violation]:
-        token_file = self.paths.root_dir / 'lib/core/theme/tokens/color_tokens.dart'
+        rules = self.project_rules.get(self.GUARD_ID, {})
+        target_file = rules.get('target_file', '')
+        token_file = self.paths.root_dir / target_file
 
         if not token_file.exists():
             return [
                 Violation(
-                    file_path='lib/core/theme/tokens/color_tokens.dart',
+                    file_path=target_file,
                     line_number=1,
                     line_content='',
-                    message='Không tìm thấy color_tokens.dart để validate palette.',
+                    message='Không tìm thấy configured color token file để validate palette.',
                     guard_id=self.GUARD_ID,
                     severity=self.severity,
                     scope=self.SCOPE,
@@ -50,7 +52,7 @@ class ColorPaletteGuard(BaseGuard):
                         file_path=self.paths.relative_path(token_file),
                         line_number=index,
                         line_content=line,
-                        message=f'Hex {match} không nằm trong MemoX palette.',
+                        message=f'Hex {match} không nằm trong configured palette.',
                         guard_id=self.GUARD_ID,
                         severity=self.severity,
                         scope=self.SCOPE,

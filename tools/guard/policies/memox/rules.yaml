@@ -7,6 +7,7 @@
 # Guards reference this data via self.project_rules in their check logic.
 
 color_palette:
+  target_file: "lib/core/theme/tokens/color_tokens.dart"
   seed_colors:
     - name: "indigo"
       hex: "0xFF5C6BC0"
@@ -53,81 +54,12 @@ color_palette:
     partial: "0xFFFFB74D"
     got_it: "0xFF4DB6AC"
 
-button_usage:
-  forbidden_buttons:
-    - "ElevatedButton"
-    - "FilledButton"
-    - "OutlinedButton"
-    - "TextButton"
-  whitelist_dirs:
-    - "lib/shared/widgets/buttons/"
-    - "test/"
-
-l10n_source:
-  path_patterns:
-    - "app.dart"
-    - "core/extensions/*.dart"
-    - "shared/widgets/**/*.dart"
-    - "features/*/presentation/**/*.dart"
-  forbidden_tokens:
-    - "AppStrings."
-    - "core/constants/app_strings.dart"
-
 freezed_json_model:
   model_file_patterns:
     - "features/*/domain/entities/*.dart"
 
-folder_structure:
-  required_root_dirs:
-    - "lib/core"
-    - "lib/shared"
-    - "lib/features"
-  required_features:
-    - "folders"
-    - "decks"
-    - "cards"
-    - "study"
-    - "statistics"
-    - "settings"
-    - "search"
-  feature_layers:
-    - "data"
-    - "domain"
-    - "presentation"
-  data_subdirs:
-    - "tables"
-    - "daos"
-    - "mappers"
-    - "repositories"
-  domain_subdirs:
-    - "entities"
-    - "repositories"
-    - "usecases"
-  presentation_subdirs:
-    - "screens"
-    - "widgets"
-    - "providers"
-  core_required_dirs:
-    - "lib/core/theme/tokens"
-    - "lib/core/theme/color_schemes"
-    - "lib/core/theme/component_themes"
-    - "lib/core/theme/text_themes"
-    - "lib/core/responsive"
-    - "lib/core/router"
-    - "lib/core/constants"
-    - "lib/core/utils"
-    - "lib/core/extensions"
-    - "lib/core/mixins"
-    - "lib/core/errors"
-    - "lib/core/database"
-    - "lib/core/database/tables"
-    - "lib/core/database/daos"
-    - "lib/core/backup"
-    - "lib/core/services"
-    - "lib/core/providers"
-    - "lib/core/types"
-
 drift_tables:
+  tables_dir: "lib/core/database/tables"
   folders_table:
     required_columns: ["id", "name", "parentId", "colorValue", "createdAt", "updatedAt", "sortOrder"]
   decks_table:
@@ -210,52 +142,60 @@ shared_widget_mapping:
       - "folderDetailProvider("
 
 provider_naming:
-  repository_pattern: "^\\w+RepositoryProvider$"
-  usecase_pattern: "^\\w+UseCaseProvider$"
-  controller_pattern: "^\\w+ControllerProvider$"
+  match_paths:
+    - "/providers/"
+    - "/controllers/"
+  annotation_tokens:
+    - "@riverpod"
+    - "@Riverpod(keepAlive: true)"
+    - "@Riverpod"
+  naming_cases:
+    - path_suffix: "repository_providers.dart"
+      generated_name_pattern: "^\\w+RepositoryProvider$"
+      label: "repository"
+    - path_suffix: "usecase_providers.dart"
+      generated_name_pattern: "^\\w+UseCaseProvider$"
+      label: "use case"
+    - path_contains: "/controllers/"
+      generated_name_pattern: "^\\w+ControllerProvider$"
+      label: "controller"
 
-performance_contract:
-  cases:
-    - file: "lib/core/router/app_router.dart"
-      required_tokens:
-        - "StatefulShellRoute.indexedStack("
-        - "StatefulShellBranch("
-    - file: "lib/shared/widgets/navigation/app_root_bottom_nav.dart"
-      required_tokens:
-        - "StatefulNavigationShell.maybeOf(context)"
-        - "shellState.goBranch("
-    - file: "lib/features/folders/presentation/providers/folders_provider.dart"
-      required_patterns:
-        - "@Riverpod\\(keepAlive: true\\)\\s+Stream<List<FolderEntity>> folders\\(Ref ref\\)"
-        - "@Riverpod\\(keepAlive: true\\)\\s+Stream<List<FolderEntity>> allFolders\\(Ref ref\\)"
-        - "@Riverpod\\(keepAlive: true\\)\\s+Stream<List<DeckEntity>> allDecks\\(Ref ref\\)"
-        - "@Riverpod\\(keepAlive: true\\)\\s+Stream<List<FlashcardEntity>> allFlashcards\\(Ref ref\\)"
-        - "@Riverpod\\(keepAlive: true\\)\\s+AsyncValue<HomeDueSummary> homeDueSummary\\(Ref ref\\)"
-    - file: "lib/features/folders/presentation/providers/folder_detail_provider.dart"
-      required_tokens:
-        - "folderByIdProvider("
-        - "subfolderProvider("
-        - "decksByFolderProvider("
-        - "folderRecursiveStatsProvider("
-      forbidden_tokens:
-        - "allFoldersProvider"
-        - "allDecksProvider"
-        - "allFlashcardsProvider"
-    - file: "lib/features/decks/presentation/providers/deck_detail_provider.dart"
-      required_tokens:
-        - "deckByIdProvider("
-        - "cardsByDeckProvider("
-        - "folderBreadcrumbProvider("
-        - "_deckStats(cards)"
-      forbidden_tokens:
-        - "allDecksProvider"
-        - "deckStatsProvider("
-    - file: "lib/shared/widgets/feedback/app_async_builder.dart"
-      required_tokens:
-        - "this.animate = false,"
-    - file: "lib/shared/widgets/animations/fade_in_widget.dart"
-      required_tokens:
-        - "this.duration = DurationTokens.fast,"
+icon_style:
+  excluded_paths:
+    - "test/"
+  skip_lines_containing:
+    - "selectedIcon:"
+  allowed_non_outlined:
+    - "close"
+    - "add"
+    - "check"
+    - "remove"
+    - "arrow_back"
+    - "arrow_forward"
+    - "chevron_right"
+    - "drag_handle"
+    - "expand_more"
+    - "more_vert"
+    - "more_horiz"
+  message_code: "icon_style.prefer_outlined"
+  message_template: "Icons.{icon_name} → dùng Icons.{icon_name}_outlined nếu có."
+
+import_direction:
+  excluded_paths:
+    - "test/"
+  layers:
+    - "data"
+    - "domain"
+    - "presentation"
+  import_path_regex_template: "import\\s+'package:[^']+/features/\\w+/({layers})/"
+  forbidden_imports:
+    domain:
+      - "data"
+      - "presentation"
+    presentation:
+      - "data"
+  message_code: "import_direction.forbidden_layer_import"
+  message_template: "{current_layer}/ không được import {imported_layer}/. Vi phạm Dependency Inversion."
 
 records_patterns:
   pair_like_patterns:
@@ -302,32 +242,23 @@ responsive_layout_test:
         - "setSurfaceSize("
         - "takeException()"
 
-responsive_text_scale:
-  cases:
-    - file: "lib/app.dart"
-      required_tokens:
-        - "MediaQuery("
-        - "textScaler:"
-        - "TextScaler.linear("
-        - "ScreenType.of(context).textScaleFactor"
-    - file: "test/test_helpers/test_app.dart"
-      required_tokens:
-        - "MediaQuery("
-        - "textScaler:"
-        - "TextScaler.linear("
-        - "ScreenType.of(context).textScaleFactor"
-
 refresh_retry:
   retry_path_patterns:
     - "features/*/presentation/screens/*_screen.dart"
     - "features/*/presentation/widgets/*_view.dart"
     - "features/*/presentation/widgets/*_card.dart"
+  retry_tokens:
+    - "AppAsyncBuilder<"
+  retry_callback_tokens:
+    - "onRetry:"
+  missing_retry_message: "Configured retry-capable async builder must provide onRetry:."
   refresh_path_patterns:
     - "features/folders/presentation/screens/home_screen.dart"
     - "features/folders/presentation/screens/folder_detail_screen.dart"
     - "features/decks/presentation/screens/deck_detail_screen.dart"
     - "features/statistics/presentation/widgets/statistics_content_view.dart"
     - "features/settings/presentation/widgets/settings_content_view.dart"
+  missing_refresh_message: "List/content view must use a configured pull-to-refresh wrapper."
   refresh_tokens:
     - "AppRefreshIndicator("
     - "AppRefreshScrollView("
@@ -349,63 +280,7 @@ safe_area_keyboard:
     - "SingleChildScrollView("
     - "ListView("
     - "CustomScrollView("
-
-screen_scaffold:
-  path_patterns:
-    - "features/*/presentation/screens/*_screen.dart"
-  allowed_scaffolds:
-    - "AppScaffold("
-    - "SliverScaffold("
-
-touch_target:
-  path_patterns:
-    - "shared/widgets/buttons/text_link_button.dart"
-    - "shared/widgets/buttons/inline_text_link_button.dart"
-    - "shared/widgets/inputs/color_picker.dart"
-    - "shared/widgets/navigation/breadcrumb_bar.dart"
-    - "features/statistics/presentation/widgets/difficult_cards_section.dart"
-    - "features/study/presentation/widgets/fill_submit_button.dart"
-  required_tokens:
-    - "AppPressable("
-    - "InlineTextLinkButton("
-    - "ExpandableTile("
-    - "SizeTokens.touchTarget"
-    - "minimumSize:"
-    - "minHeight:"
-    - "SizeTokens.buttonHeight"
-    - "SizeTokens.inputHeight"
-    - "SizeTokens.listItemHeight"
-    - "SizeTokens.listItemTall"
-
-typography_scale:
-  cases:
-    - file: "lib/core/theme/tokens/typography_tokens.dart"
-      required_tokens:
-        - "48 / 32 / 24 / 20 / 16 / 14 / 12"
-        - "static const double displayLarge = 32;"
-        - "static const double displayMedium = 32;"
-        - "static const double statDisplay = 48;"
-        - "static const double headlineLarge = 24;"
-        - "static const double headlineMedium = 20;"
-        - "static const double titleLarge = 24;"
-        - "static const double titleMedium = 16;"
-        - "static const double titleSmall = 16;"
-        - "static const double bodyLarge = 16;"
-        - "static const double bodyMedium = 16;"
-        - "static const double bodySmall = 14;"
-        - "static const double labelLarge = 14;"
-        - "static const double labelMedium = 12;"
-        - "static const double labelSmall = 12;"
-        - "static const double caption = 12;"
-    - file: "AGENTS.md"
-      required_tokens:
-        - "48 / 32 / 24 / 20 / 16 / 14 / 12"
-        - "`20` (`headlineMedium`) is the bridge headline size"
-    - file: "docs/memox-typography-usage-rules.md"
-      required_tokens:
-        - "constrained app type scale only"
-        - "`20` — bridge headline"
-        - "`48 / 32 / 24 / 20 / 16 / 14 / 12`"
+  missing_keyboard_safe_message: "File contains input but does not use a configured keyboard-safe wrapper."
 
 test_coverage:
   screen_file_glob: "presentation/screens/*_screen.dart"
@@ -413,19 +288,12 @@ test_coverage:
   usecase_file_glob: "domain/usecases/*.dart"
   usecase_test_glob: "domain/usecases/*_test.dart"
 
-text_style:
-  forbidden_patterns:
-    - "TextStyle\\("
-    - "fontWeight\\s*:\\s*FontWeight\\."
-    - "fontFamily\\s*:"
-    - "fontStyle\\s*:"
-    - "letterSpacing\\s*:\\s*\\d"
-    - "height\\s*:\\s*\\d"
-  whitelist_dirs:
-    - "lib/core/theme/"
-    - "test/"
-
 srs_fields:
+  target_file: "lib/core/database/tables/cards_table.dart"
+  missing_target_message_code: "srs_field.missing_cards_table"
+  missing_target_message: "Không tìm thấy configured cards table file để validate SRS fields."
+  missing_column_message_code: "srs_field.missing_required_column"
+  missing_column_message: "Cards table thiếu SRS field `{column}`."
   cards_table:
     required_columns:
       - "status"

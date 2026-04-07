@@ -30,6 +30,9 @@ class GuardFamily(ABC):
     def create_guards(self) -> list[BaseGuard]:
         raise NotImplementedError
 
+    def discover_guard_classes(self) -> tuple[Type[BaseGuard], ...]:
+        return tuple(self._discover_classes())
+
     def _discover_classes(self) -> list[Type[BaseGuard]]:
         guard_root = Path(__file__).resolve().parents[1] / self.GUARDS_DIR
         classes: list[Type[BaseGuard]] = []

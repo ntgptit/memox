@@ -52,6 +52,47 @@ rules:
     # file_naming fields
     naming_pattern: '^[a-z0-9_]+\.dart$'
     naming_message: "File name must follow snake_case."
+
+    # content_contract fields
+    messages:
+      missing_file: "File bắt buộc `{file}` đang bị thiếu."
+      missing_required_token: "`{file_name}` thiếu token `{token}`."
+      aggregate_missing_required_tokens: "`{file_name}` thiếu {tokens}."
+      missing_required_any_tokens: "`{file_name}` must contain one of {tokens}."
+      missing_required_pattern: "`{file_name}` thiếu pattern `{pattern}`."
+      forbidden_token: "`{file_name}` chứa token `{token}`."
+      forbidden_pattern: "`{file_name}` contains a forbidden pattern."
+    cases:
+      - file: "lib/app.dart"           # exact repo-relative file
+        required_tokens:
+          - "MediaQuery("
+      - path_patterns:                 # source-path-like globs matched against repo-relative paths
+          - "features/*/presentation/screens/*_screen.dart"
+        required_any_tokens:
+          - "AppScaffold("
+          - "SliverScaffold("
+        forbidden_patterns:
+          - regex: '\bScaffold\('
+
+    # path_requirements fields
+    entries:
+      - path: "lib/core"              # exact repo-relative path
+        path_kind: dir                # any|file|dir
+        messages:
+          missing_path: "Thư mục bắt buộc bị thiếu: {path}"
+      - path_template: "lib/features/{feature}/{layer}"
+        path_kind: dir
+        variables:
+          feature: ["search"]
+          layer: ["data", "domain", "presentation"]
+        messages:
+          missing_path: "{feature}/ thiếu layer {layer}/"
+      - path: "lib/features/search/domain/usecases"
+        path_kind: dir
+        must_exist: false
+        contains_glob: "*.dart"
+        messages:
+          empty_path: "search/domain/usecases đang rỗng."
 ```
 
 ---
@@ -62,12 +103,22 @@ rules:
 |---|---|
 | `forbidden_pattern` | For each scanned file, checks every non-excluded line against one or more regex patterns. Emits one `Violation` per matching line (first matching pattern wins). |
 | `file_naming` | For each scanned file, tests the filename against `naming_pattern`. Emits one `Violation` per non-matching filename. |
+| `content_contract` | Checks exact files or path-pattern-matched files for required tokens, any-of token presence, required regex matches, and forbidden tokens or patterns. |
+| `path_requirements` | Checks exact paths or template-expanded paths for existence, kind (`file`/`dir`), and optional non-empty content via `contains_glob`. |
 
 ---
 
 ## Target matching
 
-The `targets.include` and `targets.exclude` lists support two matching modes:
+The `targets.include` and `targets.exclude` lists are validated as
+`list[str]` and apply consistently to normalized rules:
+
+- `forbidden_pattern`
+- `file_naming`
+- `content_contract`
+- `path_requirements`
+
+The matching behavior supports two modes:
 
 | Pattern shape | How it matches |
 |---|---|
@@ -102,32 +153,9 @@ severity_overrides:
 
 ## Migration status
 
-### Fully migrated (Python class removed)
-
-| Guard ID | Type | Scope | Notes |
-|---|---|---|---|
-| `no_else` | `forbidden_pattern` | global | `literal_skip` prevents false positives on string literals `"else"` / `'else'` |
-| `l10n` | `forbidden_pattern` | global | Excludes `test/` and `lib/core/constants/` |
-| `async_builder` | `forbidden_pattern` | global | Excludes `app_async_builder.dart` and `test/` |
-| `legacy_state_notifier` | `forbidden_pattern` | local | 3 patterns; excludes `test/`, `*.g.dart`, `*.freezed.dart`. Data removed from `rules.yaml`. |
-| `naming_convention` | `file_naming` | global | |
-
-### Still legacy (Python class)
-
-All remaining guards in `global_guards/` and `local_guards/` continue to run as
-Python classes.  These guards involve logic that cannot be expressed by the
-current two rule types — multi-file analysis, threshold comparisons, structural
-inspection, or config-key lookups into `rules.yaml`.
-
-Representative examples:
-
-| Guard | Reason for keeping as Python |
-|---|---|
-| `folder_structure_guard` | Checks directory existence, not file content |
-| `design_token_usage_guard` | Whitelist of class names read from `rules.yaml` |
-| `performance_contract_guard` | Per-file required/forbidden token lists from `rules.yaml` |
-| `drift_table_guard` | Column presence check across multiple files |
-| `color_palette_guard` | Validates hex literals against an approved palette |
+See [generic_guard_migration.md](/D:/workspace/memox/tools/guard/docs/generic_guard_migration.md)
+for the current migrated guard inventory, behavior clustering, and remaining
+legacy guards.
 
 ---
 
@@ -154,6 +182,41 @@ Example — forbid `print(` statements outside tests:
     patterns:
       - regex: '\bprint\('
         message: "Use a logger instead of print()."
+```
+
+Example — enforce a file contract:
+
+```yaml
+  - id: app_shell_contract
+    type: content_contract
+    name: App shell contract
+    description: App root must apply text scaling.
+    scope: local
+    messages:
+      aggregate_missing_required_tokens: "`{file_name}` thiếu {tokens}."
+    cases:
+      - file: "lib/app.dart"
+        required_tokens:
+          - "MediaQuery("
+          - "TextScaler.linear("
+```
+
+Example — enforce path structure:
+
+```yaml
+  - id: feature_structure
+    type: path_requirements
+    name: Feature structure
+    description: Required feature directories must exist.
+    scope: local
+    entries:
+      - path_template: "lib/features/{feature}/{layer}"
+        path_kind: dir
+        variables:
+          feature: ["search", "study"]
+          layer: ["data", "domain", "presentation"]
+        messages:
+          missing_path: "{feature}/ thiếu layer {layer}/"
 ```
 
 ---

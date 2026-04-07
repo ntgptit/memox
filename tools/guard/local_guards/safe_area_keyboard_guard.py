@@ -39,7 +39,10 @@ class SafeAreaKeyboardGuard(BaseGuard):
                 file_path=relative,
                 line_number=1,
                 line_content='',
-                message='File chứa input nhưng không có keyboard-safe wrapper. Dùng AppScaffold, AppDialog, hoặc scroll container.',
+                message=rules.get(
+                    'missing_keyboard_safe_message',
+                    'File contains input but does not use a configured keyboard-safe wrapper.',
+                ),
                 guard_id=self.GUARD_ID,
                 severity=self.severity,
                 scope=self.SCOPE,

@@ -10,7 +10,7 @@ from tools.guard.core.guard_result import GuardScope, Severity, Violation
 class DriftTableGuard(BaseGuard):
     GUARD_ID = 'drift_table'
     GUARD_NAME = 'Drift table columns'
-    DESCRIPTION = 'Drift tables must declare required MemoX columns.'
+    DESCRIPTION = 'Drift tables must declare required configured columns.'
     DEFAULT_SEVERITY = Severity.ERROR
     SCOPE = GuardScope.LOCAL
 
@@ -24,15 +24,20 @@ class DriftTableGuard(BaseGuard):
 
     def check_project(self, all_files: list[Path]) -> list[Violation]:
         table_rules = self.project_rules.get('drift_tables', {})
+        tables_dir = Path(table_rules.get('tables_dir', ''))
         violations: list[Violation] = []
 
         for table_name, rule in table_rules.items():
-            file_path = self.paths.root_dir / 'lib/core/database/tables' / f'{table_name}.dart'
+            if table_name == 'tables_dir':
+                continue
+
+            relative_path = (tables_dir / f'{table_name}.dart').as_posix()
+            file_path = self.paths.root_dir / relative_path
 
             if not file_path.exists():
                 violations.append(
                     self._violation(
-                        f'lib/core/database/tables/{table_name}.dart',
+                        relative_path,
                         f'Missing drift table file for {table_name}.',
                     ),
                 )

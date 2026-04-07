@@ -9,7 +9,7 @@ from tools.guard.core.guard_result import GuardScope, Severity, Violation
 class FolderStructureGuard(BaseGuard):
     GUARD_ID = 'folder_structure'
     GUARD_NAME = 'Folder structure'
-    DESCRIPTION = 'Project folders should match the MemoX structure contract.'
+    DESCRIPTION = 'Project folders should match the configured structure contract.'
     DEFAULT_SEVERITY = Severity.INFO
     SCOPE = GuardScope.LOCAL
 
