@@ -960,6 +960,11 @@ and the code that is already on disk.
 - made the review undo snackbar trigger reliable from the built `ReviewState`
   instead of the earlier listener-only path in
   [review_mode_screen.dart](/D:/workspace/memox/lib/features/study/presentation/screens/review_mode_screen.dart)
+- closed the last written checklist gap in guess mode by allowing the answered
+  screen to advance from a broad tap target in
+  [guess_round_view.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/guess_round_view.dart),
+  with regression coverage in
+  [guess_mode_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/guess_mode_screen_test.dart)
 - tightened study regression coverage around:
   - [review_mode_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/review_mode_screen_test.dart)
   - [guess_mode_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/guess_mode_screen_test.dart)

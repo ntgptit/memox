@@ -176,6 +176,60 @@ void main() {
     expect(find.text('Guess complete'), findsOneWidget);
   });
 
+  testWidgets('GuessModeScreen advances when the answered screen is tapped', (
+    tester,
+  ) async {
+    final cardReviewDao = FakeCardReviewDao();
+    addTearDown(cardReviewDao.dispose);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          cardReviewDaoProvider.overrideWithValue(cardReviewDao),
+          flashcardRepositoryProvider.overrideWithValue(
+            FakeFlashcardRepository(
+              cards: const [
+                FlashcardEntity(
+                  id: 1,
+                  deckId: 5,
+                  front: '안녕하세요',
+                  back: 'Hello',
+                ),
+              ],
+            ),
+          ),
+          deckRepositoryProvider.overrideWithValue(FakeDeckRepository()),
+          studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
+          guessEngineProvider(
+            5,
+          ).overrideWithValue(GuessEngine(random: Random(1))),
+          guessAutoAdvanceDelayProvider.overrideWith(
+            (ref) => const Duration(milliseconds: 500),
+          ),
+        ],
+        child: buildTestApp(home: const GuessModeScreen(deckId: 5)),
+      ),
+    );
+    await _pumpGuessScreen(tester);
+
+    final optionButton = find
+        .ancestor(
+          of: find.text('안녕하세요'),
+          matching: find.byType(GuessOptionButton),
+        )
+        .first;
+    await tester.ensureVisible(optionButton);
+    await tester.tap(optionButton);
+    await tester.pump();
+
+    expect(find.text('Continue'), findsOneWidget);
+    await tester.tap(find.text('Hello'));
+    await _pumpGuessScreen(tester);
+    await tester.pump(const Duration(milliseconds: 500));
+    await _pumpGuessScreen(tester);
+
+    expect(find.text('Guess complete'), findsOneWidget);
+  });
+
   testWidgets(
     'GuessModeScreen explains the correct answer after a wrong guess',
     (tester) async {

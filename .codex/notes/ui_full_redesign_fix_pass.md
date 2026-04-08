@@ -370,6 +370,8 @@ Implemented now:
 - full requested study-mode UX checklist coverage on the branch
 - final regression stabilization for review undo and the study screen resume
   path
+- answered-state tap-to-continue parity in guess mode so the shipped behavior
+  now matches the written interaction checklist more closely
 - notes/progress reconciliation so the markdown sources match the real code
 
 Recommended next:

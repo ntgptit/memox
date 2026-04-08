@@ -18,6 +18,9 @@ final repo-wide verification pass stays green.
 - reconciled the progress and redesign summary markdown files with the actual
   implementation so they no longer report already-shipped study features as
   deferred
+- closed the last remaining parity gap against the written study checklist by
+  letting answered guess rounds advance on a broad tap target instead of only
+  the explicit `Continue` link
 - loaded the MemoX multi-agent workflow preset and repo execution rules
 - inspected current worktree state to avoid overlapping or unrelated edits
 - started the required progress log for this implementation workflow
@@ -375,6 +378,8 @@ final repo-wide verification pass stays green.
 - [review_provider.dart](/D:/workspace/memox/lib/features/study/presentation/providers/review_provider.dart)
 - [recall_provider_test.dart](/D:/workspace/memox/test/features/study/presentation/providers/recall_provider_test.dart)
 - [study_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/study_screen_test.dart)
+- [guess_round_view.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/guess_round_view.dart)
+- [guess_mode_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/guess_mode_screen_test.dart)
 
 ## Deferred items
 

@@ -5,6 +5,7 @@ import 'package:memox/features/study/presentation/providers/guess_provider.dart'
 import 'package:memox/features/study/presentation/widgets/guess_feedback_card.dart';
 import 'package:memox/features/study/presentation/widgets/guess_option_button.dart';
 import 'package:memox/features/study/presentation/widgets/guess_question_card.dart';
+import 'package:memox/shared/widgets/buttons/app_tap_region.dart';
 import 'package:memox/shared/widgets/buttons/text_link_button.dart';
 
 class GuessRoundView extends StatelessWidget {
@@ -22,35 +23,39 @@ class GuessRoundView extends StatelessWidget {
   final VoidCallback onContinue;
 
   @override
-  Widget build(BuildContext context) => Padding(
-    padding: const EdgeInsets.fromLTRB(
-      SpacingTokens.screenPadding,
-      SpacingTokens.xl,
-      SpacingTokens.screenPadding,
-      SpacingTokens.screenPadding,
-    ),
-    child: Column(
-      children: [
-        Expanded(
-          flex: 4,
-          child: GuessQuestionCard(
-            question: state.currentQuestion,
-            warning: state.totalCards < 8
-                ? context.l10n.guessSmallDeckWarning(state.totalCards)
-                : null,
+  Widget build(BuildContext context) => AppTapRegion(
+    onTap: state.isAnswered ? onContinue : null,
+    behavior: HitTestBehavior.translucent,
+    child: Padding(
+      padding: const EdgeInsets.fromLTRB(
+        SpacingTokens.screenPadding,
+        SpacingTokens.xl,
+        SpacingTokens.screenPadding,
+        SpacingTokens.screenPadding,
+      ),
+      child: Column(
+        children: [
+          Expanded(
+            flex: 4,
+            child: GuessQuestionCard(
+              question: state.currentQuestion,
+              warning: state.totalCards < 8
+                  ? context.l10n.guessSmallDeckWarning(state.totalCards)
+                  : null,
+            ),
           ),
-        ),
-        const SizedBox(height: SpacingTokens.xl),
-        Expanded(
-          flex: 6,
-          child: _GuessAnswerArea(
-            state: state,
-            onSelect: onSelect,
-            onSkip: onSkip,
-            onContinue: onContinue,
+          const SizedBox(height: SpacingTokens.xl),
+          Expanded(
+            flex: 6,
+            child: _GuessAnswerArea(
+              state: state,
+              onSelect: onSelect,
+              onSkip: onSkip,
+              onContinue: onContinue,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     ),
   );
 }
