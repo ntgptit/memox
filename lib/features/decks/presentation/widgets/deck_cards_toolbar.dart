@@ -33,7 +33,9 @@ class DeckCardsToolbar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => DecoratedBox(
-    decoration: BoxDecoration(color: context.colors.surfaceContainerLow),
+    decoration: BoxDecoration(
+      color: Theme.of(context).scaffoldBackgroundColor,
+    ),
     child: Padding(
       padding: const EdgeInsets.symmetric(vertical: SpacingTokens.sm),
       child: Column(

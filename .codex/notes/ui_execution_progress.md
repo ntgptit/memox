@@ -21,6 +21,9 @@ final repo-wide verification pass stays green.
 - closed the last remaining parity gap against the written study checklist by
   letting answered guess rounds advance on a broad tap target instead of only
   the explicit `Continue` link
+- removed the extra utility-surface block around the deck-detail `Cards`
+  section by letting `DeckCardsToolbar` inherit the page background instead of
+  painting its own darker container shell
 - loaded the MemoX multi-agent workflow preset and repo execution rules
 - inspected current worktree state to avoid overlapping or unrelated edits
 - started the required progress log for this implementation workflow
@@ -380,6 +383,8 @@ final repo-wide verification pass stays green.
 - [study_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/study_screen_test.dart)
 - [guess_round_view.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/guess_round_view.dart)
 - [guess_mode_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/guess_mode_screen_test.dart)
+- [deck_cards_toolbar.dart](/D:/workspace/memox/lib/features/decks/presentation/widgets/deck_cards_toolbar.dart)
+- [deck_cards_toolbar_test.dart](/D:/workspace/memox/test/features/decks/presentation/widgets/deck_cards_toolbar_test.dart)
 
 ## Deferred items
 

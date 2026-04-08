@@ -57,7 +57,7 @@ void main() {
     );
     expect(
       (surface.decoration as BoxDecoration).color,
-      Theme.of(context).colorScheme.surfaceContainerLow,
+      Theme.of(context).scaffoldBackgroundColor,
     );
   });
 }
