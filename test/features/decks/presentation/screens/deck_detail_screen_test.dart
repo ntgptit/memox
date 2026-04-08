@@ -325,7 +325,7 @@ void main() {
 
     expect(
       firstCardRect.top - searchBarRect.bottom,
-      closeTo(SpacingTokens.lg, 0.01),
+      closeTo(SpacingTokens.md, 0.01),
     );
     expect(find.byTooltip('Flagged'), findsNothing);
   });

@@ -276,7 +276,7 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
   ) => SliverPadding(
     padding: ResponsivePadding.horizontal(
       context,
-    ).add(const EdgeInsets.only(top: SpacingTokens.lg)),
+    ).add(const EdgeInsets.only(top: SpacingTokens.md)),
     sliver: SliverList.separated(
       itemBuilder: (context, index) => CardListTile(
         card: cards[index],
