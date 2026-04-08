@@ -84,15 +84,36 @@
   "matchMistakesLabel": "Mistakes",
   "matchStarsLabel": "Stars",
   "matchPlayAgainAction": "Play again",
+  "matchDeselectHint": "Tap the selected card again to clear it.",
   "matchEmptySubtitle": "Add cards to this deck before starting Match mode.",
   "guessPromptLabel": "What is this?",
   "guessSkipAction": "Skip",
   "guessContinueAction": "Continue",
+  "guessSkipLimitHint": "Skip used {count}/{limit} times for this card.",
+  "@guessSkipLimitHint": {
+    "placeholders": {
+      "count": {},
+      "limit": {}
+    }
+  },
+  "guessSmallDeckWarning": "Guess mode works best with 8+ cards. This deck only has {count}.",
+  "@guessSmallDeckWarning": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "guessCorrectAnswerLabel": "Correct answer",
   "guessExampleLabel": "Example",
   "guessCorrectLabel": "Correct",
   "guessAccuracyLabel": "Accuracy",
   "guessBestStreakLabel": "Best streak",
+  "guessSkippedSummary": "Skipped cards: {count}",
+  "@guessSkippedSummary": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "studyMistakesListAction": "Review difficult cards",
   "guessCompleteTitle": "Guess complete",
   "guessPlayAgainAction": "Play again",
   "guessEmptySubtitle": "Add cards to this deck before starting Guess mode.",
@@ -612,8 +633,23 @@
     }
   },
   "recallReviewMissedAction": "Review missed cards",
+  "recallIDontKnowAction": "I don't know",
+  "recallPracticeMissedAction": "Practice {count} missed cards",
+  "@recallPracticeMissedAction": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "recallPracticeMissedSummary": "This is a new practice session for the cards you missed earlier.",
   "fillPromptLabel": "Complete the blank",
   "fillShowHintAction": "Show hint",
+  "fillExamplesRecommendedWarning": "Fill mode works best with example sentences. {missing} of {total} cards are missing one.",
+  "@fillExamplesRecommendedWarning": {
+    "placeholders": {
+      "missing": {},
+      "total": {}
+    }
+  },
   "fillHintValue": "Hint: {hint}",
   "@fillHintValue": {
     "placeholders": {

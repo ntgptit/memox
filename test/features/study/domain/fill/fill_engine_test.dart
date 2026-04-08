@@ -25,12 +25,30 @@ void main() {
     expect(prompt.answerLength, 2);
   });
 
-  test('generatePrompt falls back to the default sentence', () {
+  test('generatePrompt falls back to a definition-based sentence', () {
     final prompt = engine.generatePrompt(
       const FlashcardEntity(id: 2, deckId: 9, front: 'mizu', back: 'water'),
     );
 
-    expect(prompt.sentenceWithBlank, "The answer for 'water' is ________");
+    expect(prompt.sentenceWithBlank, "The word meaning 'water' is ________");
+    expect(prompt.correctAnswer, 'mizu');
+  });
+
+  test('generatePrompt prefers hint fallback when example is missing', () {
+    final prompt = engine.generatePrompt(
+      const FlashcardEntity(
+        id: 3,
+        deckId: 9,
+        front: 'mizu',
+        back: 'water',
+        hint: 'basic vocabulary',
+      ),
+    );
+
+    expect(
+      prompt.sentenceWithBlank,
+      'Hint: basic vocabulary. The word is ________',
+    );
     expect(prompt.correctAnswer, 'mizu');
   });
 

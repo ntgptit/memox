@@ -19,6 +19,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'guess_provider.freezed.dart';
 part 'guess_provider.g.dart';
 
+typedef GuessResult = ({int cardId, bool isCorrect, bool skipped});
+
 @freezed
 abstract class GuessState with _$GuessState {
   const factory GuessState({
@@ -30,22 +32,27 @@ abstract class GuessState with _$GuessState {
     bool? isCorrect,
     @Default(0) int streak,
     @Default(0) int bestStreak,
-    @Default(<bool>[]) List<bool> results,
+    @Default(<GuessResult>[]) List<GuessResult> results,
+    @Default(<int, int>{}) Map<int, int> skipCounts,
     @Default(false) bool isComplete,
   }) = _GuessState;
 }
 
 extension GuessStateX on GuessState {
+  static const int skipLimit = 2;
+
   int get totalCards => cards.length;
 
-  int get correctCount => results.where((value) => value).length;
+  int get correctCount => results.where((value) => value.isCorrect).length;
 
   int get accuracy =>
       totalCards == 0 ? 0 : ((correctCount / totalCards) * 100).round();
 
   int get displayIndex => totalCards == 0 ? 0 : currentIndex + 1;
 
-  bool get canContinue => isAnswered && isCorrect == false;
+  int get skippedCount => results.where((value) => value.skipped).length;
+
+  bool get canContinue => isAnswered;
 
   FlashcardEntity? get currentCard {
     if (cards.isEmpty || isComplete) {
@@ -54,6 +61,9 @@ extension GuessStateX on GuessState {
 
     return cards[currentIndex];
   }
+
+  int get currentSkipCount =>
+      currentCard == null ? 0 : (skipCounts[currentCard!.id] ?? 0);
 }
 
 GuessState? _stateValueOrNull(AsyncValue<GuessState> value) => switch (value) {
@@ -139,7 +149,10 @@ class GuessSession extends _$GuessSession {
       isCorrect: isCorrect,
       streak: nextStreak,
       bestStreak: math.max(current.bestStreak, nextStreak),
-      results: [...current.results, isCorrect],
+      results: [
+        ...current.results,
+        (cardId: currentCard.id, isCorrect: isCorrect, skipped: false),
+      ],
     );
     final sequence = ++_interactionSequence;
     state = AsyncValue<GuessState>.data(updated);
@@ -161,12 +174,20 @@ class GuessSession extends _$GuessSession {
 
   Future<void> skipQuestion() async {
     final current = _stateValueOrNull(state);
+    final currentCard = current?.currentCard;
 
     if (current == null || current.isComplete || current.isAnswered) {
       return;
     }
 
-    if (current.cards.isEmpty) {
+    if (current.cards.isEmpty || currentCard == null) {
+      return;
+    }
+
+    final currentSkipCount = current.skipCounts[currentCard.id] ?? 0;
+
+    if (currentSkipCount >= GuessStateX.skipLimit) {
+      await _markSkippedWrong(current, currentCard);
       return;
     }
 
@@ -178,7 +199,14 @@ class GuessSession extends _$GuessSession {
         .read(guessEngineProvider(deckId))
         .generateQuestion(cards[current.currentIndex], cards);
     state = AsyncValue<GuessState>.data(
-      current.copyWith(cards: cards, currentQuestion: nextQuestion),
+      current.copyWith(
+        cards: cards,
+        currentQuestion: nextQuestion,
+        skipCounts: {
+          ...current.skipCounts,
+          currentCard.id: currentSkipCount + 1,
+        },
+      ),
     );
   }
 
@@ -206,6 +234,24 @@ class GuessSession extends _$GuessSession {
     _session = await ref
         .read(completeStudySessionUseCaseProvider)
         .call(completedSession);
+  }
+
+  Future<void> _markSkippedWrong(
+    GuessState current,
+    FlashcardEntity card,
+  ) async {
+    final updated = current.copyWith(
+      selectedOptionIndex: null,
+      isAnswered: true,
+      isCorrect: false,
+      streak: 0,
+      results: [
+        ...current.results,
+        (cardId: card.id, isCorrect: false, skipped: true),
+      ],
+    );
+    state = AsyncValue<GuessState>.data(updated);
+    await _persistGuessReview(card, false);
   }
 
   Future<void> _persistGuessReview(FlashcardEntity card, bool isCorrect) async {

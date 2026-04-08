@@ -41,6 +41,7 @@ abstract class MatchState with _$MatchState {
     String? selectedTermId,
     String? selectedDefinitionId,
     @Default(<String>{}) Set<String> matchedPairIds,
+    @Default(<String, int>{}) Map<String, int> attemptCounts,
     @Default(0) int mistakes,
     @Default(false) bool isComplete,
     MatchAttemptResult? lastResult,
@@ -189,8 +190,8 @@ class MatchSession extends _$MatchSession {
         lastResult: result,
       ),
     );
-    await _persistMatchReview(termId);
-    await Future<void>.delayed(DurationTokens.slow);
+    await _persistMatchReview(termId, (current.attemptCounts[termId] ?? 0) + 1);
+    await Future<void>.delayed(DurationTokens.chartDraw);
     final latest = _stateValueOrNull(state);
 
     if (!_isCurrentAttempt(latest, result.sequence)) {
@@ -225,12 +226,16 @@ class MatchSession extends _$MatchSession {
     );
     state = AsyncValue<MatchState>.data(
       current.copyWith(
+        attemptCounts: {
+          ...current.attemptCounts,
+          termId: (current.attemptCounts[termId] ?? 0) + 1,
+        },
         mistakes: current.mistakes + 1,
         comboCount: 0,
         lastResult: result,
       ),
     );
-    await Future<void>.delayed(DurationTokens.slow);
+    await Future<void>.delayed(DurationTokens.chartDraw);
     final latest = _stateValueOrNull(state);
 
     if (!_isCurrentAttempt(latest, result.sequence)) {
@@ -249,14 +254,16 @@ class MatchSession extends _$MatchSession {
   bool _isCurrentAttempt(MatchState? stateValue, int sequence) =>
       stateValue?.lastResult?.sequence == sequence;
 
-  Future<void> _persistMatchReview(String termId) async {
+  Future<void> _persistMatchReview(String termId, int attempts) async {
     final card = _cardsByTermId[termId];
 
     if (card == null) {
       return;
     }
 
-    final review = ref.read(srsEngineProvider).processMatchResult(card, 1);
+    final review = ref
+        .read(srsEngineProvider)
+        .processMatchResult(card, attempts);
     final now = DateTime.now();
     await ref
         .read(flashcardRepositoryProvider)
@@ -284,12 +291,18 @@ class MatchSession extends _$MatchSession {
             cardId: card.id,
             sessionId: session.id,
             mode: StudyMode.match,
-            rating: Value(ReviewRating.easy.index),
+            rating: Value(_ratingIndexForAttempts(attempts)),
             isCorrect: true,
             reviewedAt: now,
           ),
         );
   }
+
+  int _ratingIndexForAttempts(int attempts) => switch (attempts) {
+    <= 1 => ReviewRating.easy.index,
+    2 => ReviewRating.good.index,
+    _ => ReviewRating.hard.index,
+  };
 
   Future<void> _resolveSelection(MatchState current) async {
     final termId = current.selectedTermId;

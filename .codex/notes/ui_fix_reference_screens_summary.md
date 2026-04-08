@@ -776,3 +776,116 @@ session persistence, SRS rollback, or broader mode semantics.
   - passed with no issues
 - `flutter test`
   - passed
+
+## Follow-up Batch 9
+
+Date: 2026-04-08
+
+This continuation stayed inside the study feature again and focused on the
+remaining medium-risk UX gaps that could be solved without changing the
+underlying session-persistence architecture.
+
+### Reference screens / modes updated now
+
+- [review_mode_screen.dart](/D:/workspace/memox/lib/features/study/presentation/screens/review_mode_screen.dart)
+- [match_mode_screen.dart](/D:/workspace/memox/lib/features/study/presentation/screens/match_mode_screen.dart)
+- [guess_mode_screen.dart](/D:/workspace/memox/lib/features/study/presentation/screens/guess_mode_screen.dart)
+- [recall_mode_screen.dart](/D:/workspace/memox/lib/features/study/presentation/screens/recall_mode_screen.dart)
+- [fill_mode_screen.dart](/D:/workspace/memox/lib/features/study/presentation/screens/fill_mode_screen.dart)
+
+### Major issues fixed in this continuation
+
+- review mode still had no alternative input path beyond tap-only interaction
+- guess mode still lacked visible consequences for repeated skipping and gave
+  no completion-time summary of difficult cards
+- match mode still treated every eventual success as equally easy even when the
+  learner made one or more mistakes first
+- recall mode still allowed extremely short reveal bypasses and had no direct
+  recovery path when the learner simply did not know the answer
+- fill mode still had no explicit warning when the current deck was a poor fit
+  for example-driven cloze prompts
+- only fill mode exposed a completion-time mistake list; the other study modes
+  still hid which cards had gone poorly
+
+### What was implemented
+
+- added review keyboard shortcuts in
+  [review_rating_shortcuts.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/review_rating_shortcuts.dart)
+  and mounted them from
+  [review_round_view.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/review_round_view.dart)
+  so review mode now supports space/enter to reveal and `1-4` to rate
+- extended guess mode with per-card skip tracking and a skip-limit consequence
+  path in
+  [guess_provider.dart](/D:/workspace/memox/lib/features/study/presentation/providers/guess_provider.dart),
+  then surfaced that state in
+  [guess_round_view.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/guess_round_view.dart)
+  and
+  [guess_mode_screen.dart](/D:/workspace/memox/lib/features/study/presentation/screens/guess_mode_screen.dart)
+  through small-deck warnings, skip-limit hints, skipped-card summary, and a
+  difficult-cards completion panel
+- extended match mode with attempt-aware SRS persistence in
+  [match_provider.dart](/D:/workspace/memox/lib/features/study/presentation/providers/match_provider.dart),
+  held the confirmation state longer in
+  [match_item_card.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/match_item_card.dart),
+  and added a deselect hint plus difficult-cards completion panel in
+  [match_round_view.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/match_round_view.dart)
+  and
+  [match_mode_screen.dart](/D:/workspace/memox/lib/features/study/presentation/screens/match_mode_screen.dart)
+- extended recall mode with stricter reveal gating, an `I don't know` fast
+  path, practice-missed labeling, edit-from-comparison affordance, and a
+  difficult-cards completion panel across:
+  - [recall_provider.dart](/D:/workspace/memox/lib/features/study/presentation/providers/recall_provider.dart)
+  - [recall_round_view.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/recall_round_view.dart)
+  - [recall_writing_area.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/recall_writing_area.dart)
+  - [recall_reveal_phase.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/recall_reveal_phase.dart)
+  - [recall_mode_screen.dart](/D:/workspace/memox/lib/features/study/presentation/screens/recall_mode_screen.dart)
+- extended fill mode with better fallback prompt quality in
+  [fill_engine.dart](/D:/workspace/memox/lib/features/study/domain/fill/fill_engine.dart),
+  example-coverage warnings in
+  [fill_mode_screen.dart](/D:/workspace/memox/lib/features/study/presentation/screens/fill_mode_screen.dart)
+  and
+  [fill_round_view.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/fill_round_view.dart),
+  and explicit keyboard submit intent in
+  [fill_answer_input.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/fill_answer_input.dart)
+- added a reusable study-mode completion helper in
+  [study_mistakes_panel.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/study_mistakes_panel.dart)
+  and reused it across review, guess, recall, and match completion flows
+
+### Patterns to propagate later
+
+26. When a study mode supports non-touch environments, high-frequency actions
+    should expose low-friction keyboard equivalents without changing the mobile
+    control layout.
+27. Completion screens should not stop at aggregate stats when the mode already
+    knows which cards went badly; a compact expandable summary is enough to
+    reinforce learning without forcing a new navigation flow.
+28. Modes that allow “skip” or “reveal” shortcuts should still surface a
+    consequence or minimum-effort rule so the learner cannot bypass the core
+    exercise with zero friction.
+
+### Deferred from this continuation
+
+- true review-mode undo after rating is still deferred because the current
+  session flow eagerly persists SRS updates and card reviews; a safe undo needs
+  dedicated rollback or delayed-commit semantics
+- card flagging/bookmarking is still deferred because the card data model has
+  no flag field and deck detail has no existing flag filter contract
+- pause/resume across app restart is still deferred because study-mode state is
+  provider-local and there is still no session snapshot or lifecycle
+  restoration path
+- session history browsing and “study next deck” remain deferred because the
+  UI still lacks a query and navigation contract for those flows
+
+### Verification for follow-up batch 9
+
+- `dart run build_runner build --delete-conflicting-outputs`
+  - passed
+- `flutter gen-l10n`
+  - passed
+- `python tools/guard/run.py --scope all`
+  - passed
+  - only the pre-existing `feature_completeness` warnings remain
+- `flutter analyze`
+  - passed with no issues
+- `flutter test`
+  - passed

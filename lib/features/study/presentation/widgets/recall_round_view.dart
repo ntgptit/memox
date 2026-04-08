@@ -16,6 +16,8 @@ class RecallRoundView extends StatelessWidget {
     required this.controller,
     required this.onAnswerChanged,
     required this.onReveal,
+    required this.onEditCard,
+    required this.onMarkMissed,
     required this.onRateSelf,
     super.key,
   });
@@ -24,6 +26,8 @@ class RecallRoundView extends StatelessWidget {
   final TextEditingController controller;
   final ValueChanged<String> onAnswerChanged;
   final VoidCallback onReveal;
+  final VoidCallback onEditCard;
+  final VoidCallback onMarkMissed;
   final ValueChanged<SelfRating> onRateSelf;
 
   @override
@@ -45,13 +49,9 @@ class RecallRoundView extends StatelessWidget {
           children: [
             ConstrainedBox(
               constraints: BoxConstraints(
-                maxHeight:
-                    constraints.maxHeight * _recallPromptMaxHeightFactor,
+                maxHeight: constraints.maxHeight * _recallPromptMaxHeightFactor,
               ),
-              child: RecallPromptCard(
-                key: ValueKey<int>(card.id),
-                card: card,
-              ),
+              child: RecallPromptCard(key: ValueKey<int>(card.id), card: card),
             ),
             const SizedBox(height: SpacingTokens.lg),
             Expanded(
@@ -64,6 +64,7 @@ class RecallRoundView extends StatelessWidget {
                         key: ValueKey<String>('reveal-${card.id}'),
                         card: card,
                         state: state,
+                        onEditCard: onEditCard,
                         onRateSelf: onRateSelf,
                       )
                     : SingleChildScrollView(
@@ -72,6 +73,7 @@ class RecallRoundView extends StatelessWidget {
                           controller: controller,
                           canReveal: state.canReveal,
                           onChanged: onAnswerChanged,
+                          onMarkMissed: onMarkMissed,
                           onReveal: onReveal,
                         ),
                       ),

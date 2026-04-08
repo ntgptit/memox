@@ -84,15 +84,36 @@
   "matchMistakesLabel": "Lỗi",
   "matchStarsLabel": "Sao",
   "matchPlayAgainAction": "Chơi lại",
+  "matchDeselectHint": "Chạm lại thẻ đang chọn để bỏ chọn.",
   "matchEmptySubtitle": "Hãy thêm thẻ vào bộ này trước khi bắt đầu chế độ Ghép cặp.",
   "guessPromptLabel": "Đây là gì?",
   "guessSkipAction": "Bỏ qua",
   "guessContinueAction": "Tiếp tục",
+  "guessSkipLimitHint": "Bạn đã bỏ qua thẻ này {count}/{limit} lần.",
+  "@guessSkipLimitHint": {
+    "placeholders": {
+      "count": {},
+      "limit": {}
+    }
+  },
+  "guessSmallDeckWarning": "Chế độ Đoán phù hợp hơn với 8+ thẻ. Bộ này hiện chỉ có {count} thẻ.",
+  "@guessSmallDeckWarning": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "guessCorrectAnswerLabel": "Đáp án đúng",
   "guessExampleLabel": "Ví dụ",
   "guessCorrectLabel": "Đúng",
   "guessAccuracyLabel": "Độ chính xác",
   "guessBestStreakLabel": "Chuỗi tốt nhất",
+  "guessSkippedSummary": "Số thẻ đã bỏ qua: {count}",
+  "@guessSkippedSummary": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "studyMistakesListAction": "Xem lại các thẻ khó",
   "guessCompleteTitle": "Hoàn thành chế độ đoán",
   "guessPlayAgainAction": "Chơi lại",
   "guessEmptySubtitle": "Hãy thêm thẻ vào bộ này trước khi bắt đầu chế độ Đoán.",
@@ -612,8 +633,23 @@
     }
   },
   "recallReviewMissedAction": "Ôn lại các thẻ bị lỡ",
+  "recallIDontKnowAction": "Mình không biết",
+  "recallPracticeMissedAction": "Luyện {count} thẻ đã lỡ",
+  "@recallPracticeMissedAction": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "recallPracticeMissedSummary": "Đây là một phiên luyện mới dành cho các thẻ bạn đã lỡ trước đó.",
   "fillPromptLabel": "Điền vào chỗ trống",
   "fillShowHintAction": "Hiện gợi ý",
+  "fillExamplesRecommendedWarning": "Chế độ Điền từ phù hợp nhất khi thẻ có câu ví dụ. {missing} trên {total} thẻ hiện chưa có ví dụ.",
+  "@fillExamplesRecommendedWarning": {
+    "placeholders": {
+      "missing": {},
+      "total": {}
+    }
+  },
   "fillHintValue": "Gợi ý: {hint}",
   "@fillHintValue": {
     "placeholders": {

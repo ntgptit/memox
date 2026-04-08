@@ -84,15 +84,36 @@
   "matchMistakesLabel": "실수",
   "matchStarsLabel": "별점",
   "matchPlayAgainAction": "다시 하기",
+  "matchDeselectHint": "선택한 카드를 다시 탭하면 선택이 해제됩니다.",
   "matchEmptySubtitle": "매치 모드를 시작하기 전에 이 덱에 카드를 추가하세요.",
   "guessPromptLabel": "이것은 무엇일까요?",
   "guessSkipAction": "건너뛰기",
   "guessContinueAction": "계속하기",
+  "guessSkipLimitHint": "이 카드는 {count}/{limit}번 건너뛰었습니다.",
+  "@guessSkipLimitHint": {
+    "placeholders": {
+      "count": {},
+      "limit": {}
+    }
+  },
+  "guessSmallDeckWarning": "추측 모드는 카드가 8장 이상일 때 가장 잘 작동합니다. 이 덱에는 {count}장만 있습니다.",
+  "@guessSmallDeckWarning": {
+    "placeholders": {
+      "count": {}
+    }
+  },
   "guessCorrectAnswerLabel": "정답",
   "guessExampleLabel": "예문",
   "guessCorrectLabel": "정답",
   "guessAccuracyLabel": "정확도",
   "guessBestStreakLabel": "최고 연속 기록",
+  "guessSkippedSummary": "건너뛴 카드: {count}",
+  "@guessSkippedSummary": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "studyMistakesListAction": "어려웠던 카드 다시 보기",
   "guessCompleteTitle": "추측 모드 완료",
   "guessPlayAgainAction": "다시 하기",
   "guessEmptySubtitle": "추측 모드를 시작하기 전에 이 덱에 카드를 추가하세요.",
@@ -612,8 +633,23 @@
     }
   },
   "recallReviewMissedAction": "놓친 카드 다시 보기",
+  "recallIDontKnowAction": "모르겠어요",
+  "recallPracticeMissedAction": "놓친 카드 {count}장 다시 연습하기",
+  "@recallPracticeMissedAction": {
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "recallPracticeMissedSummary": "앞서 놓친 카드를 위한 새 연습 세션입니다.",
   "fillPromptLabel": "빈칸을 채워 보세요",
   "fillShowHintAction": "힌트 보기",
+  "fillExamplesRecommendedWarning": "빈칸 채우기 모드는 예문이 있을 때 가장 좋습니다. {total}장 중 {missing}장에는 예문이 없습니다.",
+  "@fillExamplesRecommendedWarning": {
+    "placeholders": {
+      "missing": {},
+      "total": {}
+    }
+  },
   "fillHintValue": "힌트: {hint}",
   "@fillHintValue": {
     "placeholders": {

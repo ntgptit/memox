@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:characters/characters.dart';
 import 'package:drift/drift.dart' show Value;
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:memox/core/database/app_database.dart';
@@ -26,6 +27,7 @@ abstract class RecallState with _$RecallState {
     required List<FlashcardEntity> cards,
     required int currentIndex,
     required String userAnswer,
+    @Default(false) bool isMissedPracticeSession,
     @Default(false) bool isRevealed,
     SelfRating? selfRating,
     @Default(<RecallResult>[]) List<RecallResult> results,
@@ -38,7 +40,11 @@ extension RecallStateX on RecallState {
 
   int get displayIndex => totalCards == 0 ? 0 : currentIndex + 1;
 
-  bool get canReveal => userAnswer.trim().isNotEmpty;
+  bool get canReveal {
+    final answerLength = currentCard?.front.trim().characters.length ?? 0;
+    final minimumLength = math.max(1, math.min(3, answerLength));
+    return userAnswer.trim().characters.length >= minimumLength;
+  }
 
   FlashcardEntity? get currentCard {
     if (cards.isEmpty || isComplete) {
@@ -106,8 +112,47 @@ class RecallSession extends _$RecallSession {
     _interactionSequence++;
     state = const AsyncValue<RecallState>.loading();
     state = AsyncValue<RecallState>.data(
-      await _startWithCards(_missedCards(current)),
+      await _startWithCards(
+        _missedCards(current),
+        isMissedPracticeSession: true,
+      ),
     );
+  }
+
+  Future<void> markMissed() async {
+    final current = _stateValueOrNull(state);
+    final card = current?.currentCard;
+
+    if (current == null || card == null || current.isComplete) {
+      return;
+    }
+
+    if (current.isRevealed || current.selfRating != null) {
+      return;
+    }
+
+    final updated = current.copyWith(
+      selfRating: SelfRating.missed,
+      results: [
+        ...current.results,
+        (
+          cardId: card.id,
+          userAnswer: current.userAnswer,
+          rating: SelfRating.missed,
+        ),
+      ],
+    );
+    final sequence = ++_interactionSequence;
+    state = AsyncValue<RecallState>.data(updated);
+    await _persistRecallReview(card, current.userAnswer, SelfRating.missed);
+    await Future<void>.delayed(ref.read(recallAdvanceDelayProvider));
+    final latest = _stateValueOrNull(state);
+
+    if (!_shouldAdvance(latest, sequence, card.id)) {
+      return;
+    }
+
+    await _advance(latest!);
   }
 
   Future<void> rateSelf(SelfRating rating) async {
@@ -287,7 +332,10 @@ class RecallSession extends _$RecallSession {
     return _startWithCards(_shuffleCards(loadedCards));
   }
 
-  Future<RecallState> _startWithCards(List<FlashcardEntity> cards) async {
+  Future<RecallState> _startWithCards(
+    List<FlashcardEntity> cards, {
+    bool isMissedPracticeSession = false,
+  }) async {
     _interactionSequence = 0;
 
     if (cards.isEmpty) {
@@ -302,6 +350,11 @@ class RecallSession extends _$RecallSession {
     _session = await ref
         .read(startStudySessionUseCaseProvider)
         .call(deckId: cards.first.deckId, mode: StudyMode.recall);
-    return RecallState(cards: cards, currentIndex: 0, userAnswer: '');
+    return RecallState(
+      cards: cards,
+      currentIndex: 0,
+      userAnswer: '',
+      isMissedPracticeSession: isMissedPracticeSession,
+    );
   }
 }

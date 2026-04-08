@@ -13,6 +13,7 @@ import 'package:memox/features/study/domain/srs/srs_engine.dart';
 import 'package:memox/features/study/presentation/providers/recall_provider.dart';
 import 'package:memox/features/study/presentation/screens/recall_mode_screen.dart';
 import 'package:memox/features/study/presentation/widgets/recall_prompt_card.dart';
+import 'package:memox/shared/widgets/buttons/icon_action_button.dart';
 import 'package:memox/shared/widgets/buttons/secondary_button.dart';
 import '../../../../test_helpers/fakes/fake_card_review_dao.dart';
 import '../../../../test_helpers/fakes/fake_flashcard_repository.dart';
@@ -64,6 +65,7 @@ void main() {
 
     expect(find.text('Complete answer'), findsOneWidget);
     expect(find.text('Term 1'), findsOneWidget);
+    expect(find.byType(IconActionButton), findsOneWidget);
     expect(find.text('How well did you recall?'), findsOneWidget);
     expect(find.text('Completely wrong or blank'), findsOneWidget);
     expect(find.text('All key points covered'), findsOneWidget);
@@ -100,14 +102,45 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('1 cards recalled'), findsOneWidget);
-    expect(find.text('Review missed cards'), findsOneWidget);
+    expect(find.text('Practice 1 missed cards'), findsOneWidget);
+    expect(find.text('Review difficult cards'), findsOneWidget);
 
-    await tester.tap(find.text('Review missed cards'));
+    await tester.ensureVisible(find.text('Practice 1 missed cards'));
+    await tester.tap(find.text('Practice 1 missed cards'));
     await tester.pumpAndSettle();
 
     expect(find.text('Definition 1'), findsOneWidget);
-    expect(find.text('Review missed cards'), findsNothing);
+    expect(find.text('Practice 1 missed cards'), findsNothing);
   });
+
+  testWidgets(
+    'RecallModeScreen lets the learner mark a card as missed immediately',
+    (tester) async {
+      final cardReviewDao = FakeCardReviewDao();
+      addTearDown(cardReviewDao.dispose);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            flashcardRepositoryProvider.overrideWithValue(
+              FakeFlashcardRepository(cards: _cards(1)),
+            ),
+            studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
+            cardReviewDaoProvider.overrideWithValue(cardReviewDao),
+            recallRandomProvider(4).overrideWithValue(Random(1)),
+            recallAdvanceDelayProvider.overrideWith((ref) => Duration.zero),
+          ],
+          child: buildTestApp(home: const RecallModeScreen(deckId: 4)),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text("I don't know"));
+      await tester.pumpAndSettle();
+
+      expect(find.text('1 cards recalled'), findsOneWidget);
+      expect(find.text('Review difficult cards'), findsOneWidget);
+    },
+  );
 
   testWidgets('RecallModeScreen keeps long prompts under the writing-area cap', (
     tester,

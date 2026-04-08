@@ -10,6 +10,7 @@ import 'package:memox/features/cards/domain/entities/flashcard_entity.dart';
 import 'package:memox/features/study/domain/entities/study_session.dart';
 import 'package:memox/features/study/domain/match/match_engine.dart';
 import 'package:memox/features/study/domain/repositories/study_repository.dart';
+import 'package:memox/features/study/domain/srs/srs_engine.dart';
 import 'package:memox/features/study/presentation/providers/match_provider.dart';
 import '../../../../test_helpers/fakes/fake_card_review_dao.dart';
 import '../../../../test_helpers/fakes/fake_flashcard_repository.dart';
@@ -94,6 +95,40 @@ void main() {
     expect(updated.selectedTermId, isNull);
     expect(updated.selectedDefinitionId, isNull);
   });
+
+  test(
+    'card matched after one mistake is persisted with a softer rating',
+    () async {
+      final flashcardRepository = FakeFlashcardRepository(cards: _cards(2));
+      final cardReviewDao = FakeCardReviewDao();
+      final container = buildContainer(
+        flashcardRepository: flashcardRepository,
+        cardReviewDao: cardReviewDao,
+      );
+      addTearDown(cardReviewDao.dispose);
+      addTearDown(container.dispose);
+      final initial = await container.read(matchSessionProvider(1).future);
+      final notifier = container.read(matchSessionProvider(1).notifier);
+      final term = initial.game.terms.first;
+      final correctDefinitionId = initial.game.correctPairs[term.id]!;
+      final wrongDefinition = initial.game.definitions.firstWhere(
+        (item) => item.id != correctDefinitionId,
+      );
+      final correctDefinition = initial.game.definitions.firstWhere(
+        (item) => item.id == correctDefinitionId,
+      );
+
+      await notifier.selectItem(term);
+      await notifier.selectItem(wrongDefinition);
+      await notifier.selectItem(term);
+      await notifier.selectItem(correctDefinition);
+
+      expect(
+        cardReviewDao.insertedReviews.single.rating.value,
+        ReviewRating.good.index,
+      );
+    },
+  );
 
   test(
     'correct selections complete the game when all pairs are matched',

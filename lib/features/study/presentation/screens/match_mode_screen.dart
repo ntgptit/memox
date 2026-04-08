@@ -8,6 +8,7 @@ import 'package:memox/features/study/presentation/providers/match_provider.dart'
 import 'package:memox/features/study/presentation/widgets/match_elapsed_timer_text.dart';
 import 'package:memox/features/study/presentation/widgets/match_round_view.dart';
 import 'package:memox/features/study/presentation/widgets/match_star_rating.dart';
+import 'package:memox/features/study/presentation/widgets/study_mistakes_panel.dart';
 import 'package:memox/shared/widgets/buttons/secondary_button.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
 import 'package:memox/shared/widgets/feedback/session_complete_view.dart';
@@ -85,6 +86,7 @@ Widget _buildCompletionView(
   required VoidCallback onPlayAgain,
 }) {
   final starCount = _starCount(state.mistakes);
+  final difficultCards = _matchMistakes(state);
   return SessionCompleteView(
     title: context.l10n.matchCompleteTitle,
     stats: [
@@ -108,6 +110,10 @@ Widget _buildCompletionView(
     extraContent: Column(
       children: [
         MatchStarRating(starCount: starCount),
+        if (difficultCards.isNotEmpty) ...[
+          const SizedBox(height: SpacingTokens.lg),
+          StudyMistakesPanel(items: difficultCards),
+        ],
         const SizedBox(height: SpacingTokens.lg),
         SecondaryButton(
           label: context.l10n.matchPlayAgainAction,
@@ -136,4 +142,23 @@ int _starCount(int mistakes) {
   }
 
   return 1;
+}
+
+List<StudyMistakeItem> _matchMistakes(MatchState state) {
+  if (state.attemptCounts.isEmpty) {
+    return const <StudyMistakeItem>[];
+  }
+
+  final termsById = {for (final item in state.game.terms) item.id: item.text};
+  final definitionsById = {
+    for (final item in state.game.definitions) item.id: item.text,
+  };
+  return state.attemptCounts.entries
+      .map(
+        (entry) => (
+          front: termsById[entry.key] ?? entry.key,
+          back: definitionsById[state.game.correctPairs[entry.key]] ?? '',
+        ),
+      )
+      .toList(growable: false);
 }

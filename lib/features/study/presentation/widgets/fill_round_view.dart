@@ -6,6 +6,7 @@ import 'package:memox/features/study/presentation/providers/fill_provider.dart';
 import 'package:memox/features/study/presentation/widgets/fill_answer_input.dart';
 import 'package:memox/features/study/presentation/widgets/fill_feedback_panel.dart';
 import 'package:memox/features/study/presentation/widgets/fill_prompt_card.dart';
+import 'package:memox/shared/widgets/cards/info_bar.dart';
 
 class FillRoundView extends StatelessWidget {
   const FillRoundView({
@@ -19,6 +20,7 @@ class FillRoundView extends StatelessWidget {
     required this.onAcceptClose,
     required this.onRejectClose,
     required this.onSkip,
+    this.warningText,
     super.key,
   });
 
@@ -32,6 +34,7 @@ class FillRoundView extends StatelessWidget {
   final VoidCallback onAcceptClose;
   final VoidCallback onRejectClose;
   final VoidCallback onSkip;
+  final String? warningText;
 
   @override
   Widget build(BuildContext context) => SingleChildScrollView(
@@ -55,6 +58,7 @@ class FillRoundView extends StatelessWidget {
         onAcceptClose: onAcceptClose,
         onRejectClose: onRejectClose,
         onSkip: onSkip,
+        warningText: warningText,
       ),
     ),
   );
@@ -72,6 +76,7 @@ class _FillRoundContent extends StatelessWidget {
     required this.onAcceptClose,
     required this.onRejectClose,
     required this.onSkip,
+    this.warningText,
     super.key,
   });
 
@@ -85,10 +90,15 @@ class _FillRoundContent extends StatelessWidget {
   final VoidCallback onAcceptClose;
   final VoidCallback onRejectClose;
   final VoidCallback onSkip;
+  final String? warningText;
 
   @override
   Widget build(BuildContext context) => Column(
     children: [
+      if (warningText != null) ...[
+        InfoBar(icon: Icons.lightbulb_outline, text: warningText!),
+        const SizedBox(height: SpacingTokens.lg),
+      ],
       FillPromptCard(
         prompt: state.currentPrompt,
         showHint: state.showHint,

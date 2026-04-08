@@ -6,6 +6,7 @@ import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/study/presentation/providers/guess_provider.dart';
 import 'package:memox/features/study/presentation/widgets/guess_round_view.dart';
+import 'package:memox/features/study/presentation/widgets/study_mistakes_panel.dart';
 import 'package:memox/shared/widgets/buttons/secondary_button.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
 import 'package:memox/shared/widgets/feedback/empty_state_view.dart';
@@ -98,43 +99,71 @@ Widget _buildCompletionView(
   GuessState state, {
   required VoidCallback onDone,
   required VoidCallback onPlayAgain,
-}) => SessionCompleteView(
-  title: context.l10n.guessCompleteTitle,
-  stats: [
-    SessionStat(
-      label: context.l10n.guessCorrectLabel,
-      icon: Icons.check_circle_outline,
-      value: '${state.correctCount}/${state.totalCards}',
-    ),
-    SessionStat(
-      label: context.l10n.guessAccuracyLabel,
-      icon: Icons.track_changes_outlined,
-      value: '${state.accuracy}%',
-    ),
-    SessionStat(
-      label: context.l10n.guessBestStreakLabel,
-      icon: Icons.local_fire_department_outlined,
-      value: '${state.bestStreak}',
-      valueColor: context.customColors.mastery,
-    ),
-  ],
-  extraContent: Column(
-    children: [
-      Text(
-        context.l10n.guessCompletionSummary(
-          state.correctCount,
-          state.totalCards,
-          state.accuracy,
-        ),
-        style: context.appTextStyles.statNumberSm,
-        textAlign: TextAlign.center,
+}) {
+  final difficultCards = _guessMistakes(state);
+  return SessionCompleteView(
+    title: context.l10n.guessCompleteTitle,
+    stats: [
+      SessionStat(
+        label: context.l10n.guessCorrectLabel,
+        icon: Icons.check_circle_outline,
+        value: '${state.correctCount}/${state.totalCards}',
       ),
-      const SizedBox(height: SpacingTokens.lg),
-      SecondaryButton(
-        label: context.l10n.guessPlayAgainAction,
-        onPressed: onPlayAgain,
+      SessionStat(
+        label: context.l10n.guessAccuracyLabel,
+        icon: Icons.track_changes_outlined,
+        value: '${state.accuracy}%',
+      ),
+      SessionStat(
+        label: context.l10n.guessBestStreakLabel,
+        icon: Icons.local_fire_department_outlined,
+        value: '${state.bestStreak}',
+        valueColor: context.customColors.mastery,
       ),
     ],
-  ),
-  primaryAction: SessionAction(label: context.l10n.doneAction, onTap: onDone),
-);
+    extraContent: Column(
+      children: [
+        Text(
+          context.l10n.guessCompletionSummary(
+            state.correctCount,
+            state.totalCards,
+            state.accuracy,
+          ),
+          style: context.appTextStyles.statNumberSm,
+          textAlign: TextAlign.center,
+        ),
+        if (state.skippedCount > 0) ...[
+          const SizedBox(height: SpacingTokens.sm),
+          Text(
+            context.l10n.guessSkippedSummary(state.skippedCount),
+            style: context.textTheme.bodySmall?.copyWith(
+              color: context.colors.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+        if (difficultCards.isNotEmpty) ...[
+          const SizedBox(height: SpacingTokens.lg),
+          StudyMistakesPanel(items: difficultCards),
+        ],
+        const SizedBox(height: SpacingTokens.lg),
+        SecondaryButton(
+          label: context.l10n.guessPlayAgainAction,
+          onPressed: onPlayAgain,
+        ),
+      ],
+    ),
+    primaryAction: SessionAction(label: context.l10n.doneAction, onTap: onDone),
+  );
+}
+
+List<StudyMistakeItem> _guessMistakes(GuessState state) {
+  final cardIds = state.results
+      .where((result) => !result.isCorrect)
+      .map((result) => result.cardId)
+      .toSet();
+  return state.cards
+      .where((card) => cardIds.contains(card.id))
+      .map((card) => (front: card.front, back: card.back))
+      .toList(growable: false);
+}

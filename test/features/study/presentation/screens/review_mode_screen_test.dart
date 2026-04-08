@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/core/design/study_mode.dart';
@@ -78,6 +79,36 @@ void main() {
     expect(find.text('Again: 0 · Hard: 0 · Good: 1 · Easy: 0'), findsOneWidget);
     expect(find.text('Done'), findsOneWidget);
   });
+
+  testWidgets(
+    'ReviewModeScreen supports keyboard reveal and rating shortcuts',
+    (tester) async {
+      final cardReviewDao = FakeCardReviewDao();
+      addTearDown(cardReviewDao.dispose);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            flashcardRepositoryProvider.overrideWithValue(
+              FakeFlashcardRepository(cards: _cards(1)),
+            ),
+            studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
+            cardReviewDaoProvider.overrideWithValue(cardReviewDao),
+          ],
+          child: buildTestApp(home: const ReviewModeScreen(deckId: 6)),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await tester.pumpAndSettle();
+      expect(find.text('Definition 1'), findsOneWidget);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.digit1);
+      await tester.pumpAndSettle();
+      expect(find.text('1 cards reviewed'), findsOneWidget);
+      expect(find.text('Review difficult cards'), findsOneWidget);
+    },
+  );
 
   testWidgets('ReviewModeScreen shows empty state when no cards are due', (
     tester,

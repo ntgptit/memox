@@ -33,7 +33,12 @@ class GuessRoundView extends StatelessWidget {
       children: [
         Expanded(
           flex: 4,
-          child: GuessQuestionCard(question: state.currentQuestion),
+          child: GuessQuestionCard(
+            question: state.currentQuestion,
+            warning: state.totalCards < 8
+                ? context.l10n.guessSmallDeckWarning(state.totalCards)
+                : null,
+          ),
         ),
         const SizedBox(height: SpacingTokens.xl),
         Expanded(
@@ -78,8 +83,7 @@ class _GuessAnswerArea extends StatelessWidget {
                     prefixLabel: _optionPrefix(context, entry.key),
                     isAnswered: state.isAnswered,
                     isSelected: state.selectedOptionIndex == entry.key,
-                    isCorrectAnswer:
-                        state.isAnswered && entry.value.isCorrect,
+                    isCorrectAnswer: state.isAnswered && entry.value.isCorrect,
                     isWrongSelection:
                         state.isAnswered &&
                         state.selectedOptionIndex == entry.key &&
@@ -101,6 +105,7 @@ class _GuessAnswerArea extends StatelessWidget {
         alignment: Alignment.centerLeft,
         child: _GuessFooterAction(
           state: state,
+          currentSkipCount: state.currentSkipCount,
           onSkip: onSkip,
           onContinue: onContinue,
         ),
@@ -112,11 +117,13 @@ class _GuessAnswerArea extends StatelessWidget {
 class _GuessFooterAction extends StatelessWidget {
   const _GuessFooterAction({
     required this.state,
+    required this.currentSkipCount,
     required this.onSkip,
     required this.onContinue,
   });
 
   final GuessState state;
+  final int currentSkipCount;
   final VoidCallback onSkip;
   final VoidCallback onContinue;
 
@@ -130,10 +137,25 @@ class _GuessFooterAction extends StatelessWidget {
       );
     }
 
-    return TextLinkButton(
-      label: context.l10n.guessSkipAction,
-      onTap: onSkip,
-      showTrailingArrow: true,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextLinkButton(
+          label: context.l10n.guessSkipAction,
+          onTap: onSkip,
+          showTrailingArrow: true,
+        ),
+        if (currentSkipCount > 0)
+          Text(
+            context.l10n.guessSkipLimitHint(
+              currentSkipCount,
+              GuessStateX.skipLimit,
+            ),
+            style: context.textTheme.bodySmall?.copyWith(
+              color: context.colors.onSurfaceVariant,
+            ),
+          ),
+      ],
     );
   }
 }

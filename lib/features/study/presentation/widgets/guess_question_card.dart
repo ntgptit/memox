@@ -6,9 +6,10 @@ import 'package:memox/shared/widgets/cards/app_card.dart';
 import 'package:memox/shared/widgets/layout/spacing.dart';
 
 class GuessQuestionCard extends StatelessWidget {
-  const GuessQuestionCard({required this.question, super.key});
+  const GuessQuestionCard({required this.question, this.warning, super.key});
 
   final GuessQuestion question;
+  final String? warning;
 
   @override
   Widget build(BuildContext context) => AppCard(
@@ -21,6 +22,15 @@ class GuessQuestionCard extends StatelessWidget {
           context.l10n.guessPromptLabel,
           style: context.appTextStyles.statLabel,
         ),
+        if (warning != null) ...[
+          const Gap.sm(),
+          Text(
+            warning!,
+            style: context.textTheme.bodySmall?.copyWith(
+              color: context.colors.onSurfaceVariant,
+            ),
+          ),
+        ],
         const Gap.lg(),
         Expanded(
           child: Center(

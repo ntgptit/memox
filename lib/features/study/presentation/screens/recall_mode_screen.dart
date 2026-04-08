@@ -2,9 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
+import 'package:memox/core/theme/tokens/spacing_tokens.dart';
+import 'package:memox/features/cards/presentation/screens/card_edit_screen.dart';
+import 'package:memox/features/study/domain/srs/srs_engine.dart';
 import 'package:memox/features/study/presentation/providers/recall_provider.dart';
 import 'package:memox/features/study/presentation/widgets/recall_round_view.dart';
+import 'package:memox/features/study/presentation/widgets/study_mistakes_panel.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
 import 'package:memox/shared/widgets/feedback/empty_state_view.dart';
 import 'package:memox/shared/widgets/feedback/session_complete_view.dart';
@@ -73,7 +78,7 @@ class _RecallModeScreenState extends ConsumerState<RecallModeScreen> {
     );
 
     if (confirmed == true && context.mounted) {
-      context.pop<void>();
+      Navigator.of(context).pop();
     }
   }
 
@@ -96,6 +101,8 @@ Widget _buildBody(
   RecallState state,
   TextEditingController controller,
 ) {
+  final difficultCards = _recallMistakes(state);
+
   if (state.cards.isEmpty) {
     return EmptyStateView(
       icon: Icons.psychology_outlined,
@@ -129,24 +136,42 @@ Widget _buildBody(
       ],
       primaryAction: SessionAction(
         label: context.l10n.doneAction,
-        onTap: () => context.pop<void>(),
+        onTap: () => Navigator.of(context).pop(),
       ),
-      secondaryAction: state.missedCount == 0
+      secondaryAction: state.missedCount == 0 || state.isMissedPracticeSession
           ? null
           : SessionAction(
-              label: context.l10n.recallReviewMissedAction,
+              label: context.l10n.recallPracticeMissedAction(state.missedCount),
               onTap: () => ref
                   .read(recallSessionProvider(deckId).notifier)
                   .reviewMissedCards(),
             ),
-      extraContent: Text(
-        context.l10n.recallCompletionSummary(
-          state.gotItCount,
-          state.partialCount,
-          state.missedCount,
-        ),
-        style: context.appTextStyles.statNumberSm,
-        textAlign: TextAlign.center,
+      extraContent: Column(
+        children: [
+          Text(
+            context.l10n.recallCompletionSummary(
+              state.gotItCount,
+              state.partialCount,
+              state.missedCount,
+            ),
+            style: context.appTextStyles.statNumberSm,
+            textAlign: TextAlign.center,
+          ),
+          if (state.isMissedPracticeSession) ...[
+            const SizedBox(height: SpacingTokens.sm),
+            Text(
+              context.l10n.recallPracticeMissedSummary,
+              style: context.textTheme.bodySmall?.copyWith(
+                color: context.colors.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+          if (difficultCards.isNotEmpty) ...[
+            const SizedBox(height: SpacingTokens.lg),
+            StudyMistakesPanel(items: difficultCards),
+          ],
+        ],
       ),
     );
   }
@@ -158,7 +183,29 @@ Widget _buildBody(
         ref.read(recallSessionProvider(deckId).notifier).updateAnswer(text),
     onReveal: () =>
         ref.read(recallSessionProvider(deckId).notifier).revealAnswer(),
+    onEditCard: () {
+      final card = state.currentCard;
+
+      if (card == null) {
+        return;
+      }
+
+      unawaited(context.push(CardEditScreen.routeLocation(deckId, card.id)));
+    },
+    onMarkMissed: () =>
+        ref.read(recallSessionProvider(deckId).notifier).markMissed(),
     onRateSelf: (rating) =>
         ref.read(recallSessionProvider(deckId).notifier).rateSelf(rating),
   );
+}
+
+List<StudyMistakeItem> _recallMistakes(RecallState state) {
+  final cardIds = state.results
+      .where((result) => result.rating != SelfRating.gotIt)
+      .map((result) => result.cardId)
+      .toSet();
+  return state.cards
+      .where((card) => cardIds.contains(card.id))
+      .map((card) => (front: card.front, back: card.back))
+      .toList(growable: false);
 }

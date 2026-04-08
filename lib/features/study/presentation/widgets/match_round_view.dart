@@ -31,7 +31,25 @@ class MatchRoundView extends StatelessWidget {
       padding: ResponsivePadding.horizontal(
         context,
       ).add(const EdgeInsets.symmetric(vertical: SpacingTokens.lg)),
-      child: MatchItemBoard(state: state, onSelect: onSelect),
+      child: Column(
+        children: [
+          if (state.selectedTermId != null ||
+              state.selectedDefinitionId != null)
+            Padding(
+              padding: const EdgeInsets.only(bottom: SpacingTokens.sm),
+              child: Text(
+                context.l10n.matchDeselectHint,
+                style: context.textTheme.bodySmall?.copyWith(
+                  color: context.colors.onSurfaceVariant,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          Expanded(
+            child: MatchItemBoard(state: state, onSelect: onSelect),
+          ),
+        ],
+      ),
     );
   }
 }

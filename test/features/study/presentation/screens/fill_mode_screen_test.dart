@@ -147,6 +147,36 @@ void main() {
       expect(find.text('Skip for now'), findsOneWidget);
     },
   );
+
+  testWidgets('FillModeScreen warns when cards are missing example sentences', (
+    tester,
+  ) async {
+    final cardReviewDao = FakeCardReviewDao();
+    addTearDown(cardReviewDao.dispose);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          flashcardRepositoryProvider.overrideWithValue(
+            FakeFlashcardRepository(cards: _cardsWithoutExamples()),
+          ),
+          studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
+          cardReviewDaoProvider.overrideWithValue(cardReviewDao),
+          fillRandomProvider(5).overrideWithValue(Random(1)),
+          fillAutoAdvanceDelayProvider.overrideWith((ref) => Duration.zero),
+          fillWrongClearDelayProvider.overrideWith((ref) => Duration.zero),
+        ],
+        child: buildTestApp(home: const FillModeScreen(deckId: 5)),
+      ),
+    );
+    await _pumpFillScreen(tester);
+
+    expect(
+      find.text(
+        'Fill mode works best with example sentences. 1 of 1 cards are missing one.',
+      ),
+      findsOneWidget,
+    );
+  });
 }
 
 Future<void> _setCompactSurface(WidgetTester tester) async {
@@ -173,6 +203,10 @@ List<FlashcardEntity> _cards() => const [
     back: 'Fruit 1',
     example: 'I ate a banana for breakfast.',
   ),
+];
+
+List<FlashcardEntity> _cardsWithoutExamples() => const [
+  FlashcardEntity(id: 1, deckId: 5, front: 'banana', back: 'Fruit 1'),
 ];
 
 final class _FakeStudyRepository implements StudyRepository {

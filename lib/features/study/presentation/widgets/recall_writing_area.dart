@@ -5,6 +5,7 @@ import 'package:memox/core/theme/tokens/opacity_tokens.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/shared/widgets/buttons/secondary_button.dart';
+import 'package:memox/shared/widgets/buttons/text_link_button.dart';
 import 'package:memox/shared/widgets/inputs/app_text_field.dart';
 
 class RecallWritingArea extends StatelessWidget {
@@ -12,6 +13,7 @@ class RecallWritingArea extends StatelessWidget {
     required this.controller,
     required this.canReveal,
     required this.onChanged,
+    required this.onMarkMissed,
     required this.onReveal,
     super.key,
   });
@@ -19,6 +21,7 @@ class RecallWritingArea extends StatelessWidget {
   final TextEditingController controller;
   final bool canReveal;
   final ValueChanged<String> onChanged;
+  final VoidCallback onMarkMissed;
   final VoidCallback onReveal;
 
   @override
@@ -46,6 +49,14 @@ class RecallWritingArea extends StatelessWidget {
           label: context.l10n.recallRevealAction,
           onPressed: canReveal ? onReveal : null,
           icon: Icons.visibility_outlined,
+        ),
+      ),
+      const SizedBox(height: SpacingTokens.sm),
+      Align(
+        alignment: Alignment.centerLeft,
+        child: TextLinkButton(
+          label: context.l10n.recallIDontKnowAction,
+          onTap: onMarkMissed,
         ),
       ),
     ],

@@ -41,8 +41,14 @@ final class FillEngine {
     }
 
     final answer = card.front.trim();
+    final hintPrompt = _promptFromHint(card);
+
+    if (hintPrompt != null) {
+      return _buildPrompt(sentence: hintPrompt, answer: answer);
+    }
+
     return _buildPrompt(
-      sentence: "The answer for '${card.back.trim()}' is $fillBlankToken",
+      sentence: _promptFromDefinition(card.back),
       answer: answer,
     );
   }
@@ -50,15 +56,13 @@ final class FillEngine {
   bool isNumericAnswer(String answer) =>
       RegExp(r'^[+-]?\d+([.,]\d+)?$').hasMatch(answer.trim());
 
-  FillPrompt _buildPrompt({
-    required String sentence,
-    required String answer,
-  }) => (
-    sentenceWithBlank: sentence,
-    correctAnswer: answer,
-    hint: _hintFor(answer),
-    answerLength: answer.characters.length,
-  );
+  FillPrompt _buildPrompt({required String sentence, required String answer}) =>
+      (
+        sentenceWithBlank: sentence,
+        correctAnswer: answer,
+        hint: _hintFor(answer),
+        answerLength: answer.characters.length,
+      );
 
   String? _hintFor(String answer) {
     final characters = answer.trim().characters.toList(growable: false);
@@ -88,6 +92,23 @@ final class FillEngine {
     }
 
     return _buildPrompt(sentence: frontPrompt, answer: card.front.trim());
+  }
+
+  String _promptFromDefinition(String clue) {
+    final trimmed = clue.trim();
+    final shortened = trimmed.characters.take(20).toString();
+    final suffix = trimmed.characters.length > 20 ? '...' : '';
+    return "The word meaning '$shortened$suffix' is $fillBlankToken";
+  }
+
+  String? _promptFromHint(CardEntity card) {
+    final hint = card.hint.trim();
+
+    if (hint.isEmpty) {
+      return null;
+    }
+
+    return 'Hint: $hint. The word is $fillBlankToken';
   }
 
   String? _blankedSentence(String sentence, String answer) {

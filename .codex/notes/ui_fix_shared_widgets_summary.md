@@ -333,6 +333,51 @@ Why this improves downstream screens automatically:
 - `flutter analyze` passed
 - `flutter test` passed
 
+## Follow-up: Shared Input Contract for Study UX
+
+Date: 2026-04-08
+
+This narrow follow-up stayed in the shared input layer and only added one
+missing capability needed by the later study-mode fixes.
+
+### `AppTextField`
+
+Files:
+
+- [app_text_field.dart](/D:/workspace/memox/lib/shared/widgets/inputs/app_text_field.dart)
+
+Why it needed work:
+
+- the shared field wrapper did not forward `textInputAction`, which forced
+  study flows to rely on default keyboard affordances even when they wanted an
+  explicit submit/done action
+
+Change type:
+
+- default behavior improvement
+- API tightening
+
+What was implemented:
+
+- threaded `textInputAction` through the shared base widget and the public
+  `AppTextField` constructor so feature code can request an explicit IME action
+  without bypassing the shared text-field shell
+
+Why this improves downstream screens automatically:
+
+- study input surfaces such as fill and recall can now express clearer keyboard
+  intent while still staying on the shared field contract instead of using
+  raw Material fields
+
+### Verification for this follow-up
+
+- `dart run build_runner build --delete-conflicting-outputs` passed
+- `flutter gen-l10n` passed
+- `python tools/guard/run.py --scope all` passed with only the existing
+  `feature_completeness` warnings
+- `flutter analyze` passed
+- `flutter test` passed
+
 ## Follow-up Batch: Icon Action Affordance
 
 Date: 2026-04-08

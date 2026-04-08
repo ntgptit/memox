@@ -3,10 +3,10 @@
 ## Current phase
 
 Verified locally on `codex/fill-recall-study-layout` and ready to stage/commit
-the next study-UX batch. This pass keeps the earlier study
-content-direction/layout fixes, then adds safer high-impact action and feedback
-improvements across review, match, guess, recall, and fill without reopening
-session persistence or SRS rollback contracts.
+the supplemental study-UX coverage pass. This batch extends the earlier study
+content-direction/layout fixes with safer cross-mode affordances, warning
+states, keyboard shortcuts, and completion summaries, while still deferring
+session-persistence or SRS-rollback work that needs deeper data contracts.
 
 ## Completed work
 
@@ -222,6 +222,72 @@ session persistence or SRS rollback contracts.
 - re-ran `python tools/guard/run.py --scope all` after the study UX batch
 - re-ran `flutter analyze` after the study UX batch
 - re-ran `flutter test` after the study UX batch
+- added review keyboard shortcuts in
+  [review_rating_shortcuts.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/review_rating_shortcuts.dart)
+  and mounted them from
+  [review_round_view.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/review_round_view.dart)
+  so review mode now supports keyboard-based reveal and 1-4 rating input
+- extended guess mode with per-card skip tracking and a real skip consequence
+  path in
+  [guess_provider.dart](/D:/workspace/memox/lib/features/study/presentation/providers/guess_provider.dart),
+  then surfaced the state in
+  [guess_round_view.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/guess_round_view.dart)
+  and
+  [guess_mode_screen.dart](/D:/workspace/memox/lib/features/study/presentation/screens/guess_mode_screen.dart)
+  through small-deck warnings, skip-limit hints, skipped-card summary, and a
+  difficult-cards completion panel
+- extended match mode with attempt-aware SRS persistence and clearer
+  confirmation timing in
+  [match_provider.dart](/D:/workspace/memox/lib/features/study/presentation/providers/match_provider.dart),
+  [match_item_card.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/match_item_card.dart),
+  and
+  [match_round_view.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/match_round_view.dart),
+  including an explicit deselect hint and a difficult-cards completion panel
+- extended recall mode with an `I don't know` fast path, stricter reveal
+  gating, practice-missed session labeling, edit-from-comparison affordance,
+  and a difficult-cards completion panel across:
+  - [recall_provider.dart](/D:/workspace/memox/lib/features/study/presentation/providers/recall_provider.dart)
+  - [recall_mode_screen.dart](/D:/workspace/memox/lib/features/study/presentation/screens/recall_mode_screen.dart)
+  - [recall_round_view.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/recall_round_view.dart)
+  - [recall_reveal_phase.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/recall_reveal_phase.dart)
+  - [recall_writing_area.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/recall_writing_area.dart)
+- extended fill mode fallback quality and keyboard ergonomics through
+  definition/hint prompt generation in
+  [fill_engine.dart](/D:/workspace/memox/lib/features/study/domain/fill/fill_engine.dart),
+  `TextInputAction.done` wiring in
+  [fill_answer_input.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/fill_answer_input.dart),
+  and example-coverage warnings in
+  [fill_mode_screen.dart](/D:/workspace/memox/lib/features/study/presentation/screens/fill_mode_screen.dart)
+  and
+  [fill_round_view.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/fill_round_view.dart)
+- added a reusable completion-summary helper in
+  [study_mistakes_panel.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/study_mistakes_panel.dart)
+  and reused it across review, guess, recall, and match completion views
+- extended localized copy for the new study-mode warnings, practice labels,
+  and difficult-card affordances in:
+  - [app_en.arb](/D:/workspace/memox/l10n/app_en.arb)
+  - [app_ko.arb](/D:/workspace/memox/l10n/app_ko.arb)
+  - [app_vi.arb](/D:/workspace/memox/l10n/app_vi.arb)
+- extended study-mode regression coverage for:
+  - review keyboard shortcuts and difficult-card completion summary
+  - guess small-deck warning, skipped-card path, and difficult-card summary
+  - match deselect guidance and attempt-aware review persistence
+  - recall missed-action flow, stricter reveal gate, edit affordance, and
+    practice-missed restart
+  - fill example-coverage warning and improved fallback prompt generation
+- re-ran `dart run build_runner build --delete-conflicting-outputs` for the
+  supplemental study-UX coverage pass
+- re-ran `flutter gen-l10n` for the supplemental study-UX coverage pass
+- re-ran `python tools/guard/run.py --scope all` for the supplemental
+  study-UX coverage pass
+- re-ran `flutter analyze` for the supplemental study-UX coverage pass
+- re-ran targeted study-mode provider/screen tests for the supplemental
+  coverage pass
+- re-ran full `flutter test` after the targeted study-mode regression suite
+- synced the supplemental study-UX coverage pass into:
+  - `ui_fix_reference_screens_summary.md`
+  - `ui_fix_shared_widgets_summary.md`
+  - `ui_full_redesign_fix_pass.md`
 
 ## Files modified
 
@@ -375,10 +441,24 @@ session persistence or SRS rollback contracts.
 - match-mode deselection is now explicit through re-tapping the selected item,
   so the interaction should be visually smoke-tested to confirm users infer it
   without a separate hint
+- review still has no true undo-after-rating flow, and the current batch keeps
+  SRS persistence eager to avoid opening a rollback window without dedicated
+  DAO/session support
+- card flagging/bookmarking is still absent; the data model has no card-level
+  flag field or existing deck-detail filter contract for it
+- session pause/resume and cross-restart continuation are still absent because
+  study-mode state remains in-memory per provider and
+  [study_session_active_provider.dart](/D:/workspace/memox/lib/features/study/presentation/providers/study_session_active_provider.dart)
+  is still only a stub
+- session history browsing is still missing from the UI; persisted
+  `StudySession` rows are available, but there is still no session-list screen
+  or per-session review query path
+- “study next deck” is still not wired because the repo has no dedicated
+  “next due deck” selection policy or shared navigation contract for it yet
 
 ## Next step
 
-Stage, commit, and push the study-UX batch on
-`codex/fill-recall-study-layout`, then do a visual device pass on review,
-guess, recall, fill, and match with extra attention on compact locales and the
-new explanation/guidance blocks.
+Stage, commit, and push the supplemental study-UX coverage pass on
+`codex/fill-recall-study-layout`, then spot-check the live study flows on
+device with special attention to the new completion summaries, recall edit
+affordance, guess skip-limit copy, and review keyboard shortcuts.

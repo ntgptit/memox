@@ -19,6 +19,7 @@ class AppTextField extends _AppTextFieldBase {
     super.focusNode,
     super.enabled = true,
     super.onSubmitted,
+    super.textInputAction,
     super.readOnly = false,
     super.prefixIcon,
     super.suffixIcon,
@@ -42,6 +43,7 @@ class AppTextField extends _AppTextFieldBase {
     minLines: minLines,
     maxLength: maxLength,
     keyboardType: keyboardType,
+    textInputAction: textInputAction,
     enabled: enabled,
     readOnly: readOnly,
     textAlign: textAlign,
@@ -67,6 +69,7 @@ abstract class _AppTextFieldBase extends StatelessWidget {
     this.focusNode,
     this.enabled = true,
     this.onSubmitted,
+    this.textInputAction,
     this.readOnly = false,
     this.prefixIcon,
     this.suffixIcon,
@@ -94,6 +97,7 @@ abstract class _AppTextFieldBase extends StatelessWidget {
   final FocusNode? focusNode;
   final bool enabled;
   final ValueChanged<String>? onSubmitted;
+  final TextInputAction? textInputAction;
   final bool readOnly;
   final Widget? prefixIcon;
   final Widget? suffixIcon;

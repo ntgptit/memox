@@ -312,6 +312,95 @@ screen issues from the audit notes.
 - `flutter test`
   - passed
 
+## Final Continuation: Study UX Coverage
+
+Date: 2026-04-08
+
+This continuation stayed inside the study feature and closed the remaining
+medium-risk UX gaps that could be improved without redesigning the session data
+model itself.
+
+### App-wide / shared-layer fixes touched
+
+- extended [app_text_field.dart](/D:/workspace/memox/lib/shared/widgets/inputs/app_text_field.dart)
+  so study inputs can request an explicit `textInputAction`
+
+### Shared widget / shared-in-feature fixes
+
+- added
+  [study_mistakes_panel.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/study_mistakes_panel.dart)
+  as a reusable completion-time summary surface for difficult cards across
+  multiple study modes
+- added
+  [review_rating_shortcuts.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/review_rating_shortcuts.dart)
+  to give review mode a non-touch action path without changing the visual shell
+
+### Representative screen / mode fixes
+
+- Review:
+  - keyboard reveal and `1-4` rating shortcuts
+  - difficult-card completion summary for `Again` cards
+- Match:
+  - deselect hint once one side is chosen
+  - longer correct-state confirmation before fade-out
+  - attempt-aware SRS rating instead of always `easy`
+  - difficult-card completion summary based on mistaken pairs
+- Guess:
+  - small-deck quality warning
+  - per-card skip-limit feedback and skipped-card completion summary
+  - difficult-card completion summary for wrong or skipped cards
+- Recall:
+  - stricter reveal threshold for very short answers
+  - `I don't know` fast path
+  - practice-missed session labeling
+  - edit-card affordance from the comparison view
+  - difficult-card completion summary for missed or partial cards
+- Fill:
+  - better fallback prompt generation from hints/definitions
+  - example-coverage warning for decks that are weak fits for fill mode
+  - explicit keyboard submit intent through `TextInputAction.done`
+
+### Realistic guard / regression coverage added now
+
+- no new repo guard rules were needed for this continuation; the existing
+  design/l10n/shared-widget guards already covered the touched paths cleanly
+- regression protection was added through focused provider and screen tests for
+  review, match, guess, recall, and fill
+
+### Implemented now vs deferred
+
+Implemented now:
+
+- medium-risk action, explanation, and completion-summary improvements inside
+  the existing provider/screen contracts
+- stricter but still local anti-bypass rules for recall reveal and guess skip
+- reusable difficult-card completion surfaces for the study modes that already
+  had enough in-memory result data
+
+Recommended next:
+
+- review-mode undo with delayed commit or explicit rollback support
+- pause/resume session persistence across app restart
+- session history browsing UI
+- “study next deck” selection policy and navigation flow
+- card flagging/bookmarking plus deck-detail filtering
+
+Intentionally deferred:
+
+- any feature that requires new persistent session snapshots or a new card data
+  field
+- any review-undo implementation that would silently mutate completed SRS data
+  without a dedicated rollback contract
+
+### Verification for this continuation
+
+- `dart run build_runner build --delete-conflicting-outputs` passed
+- `flutter gen-l10n` passed
+- `python tools/guard/run.py --scope all` passed with only the pre-existing
+  `feature_completeness` warnings
+- `flutter analyze` passed
+- `flutter test` passed
+
 ## Follow-up Batch 9
 
 Date: 2026-04-08

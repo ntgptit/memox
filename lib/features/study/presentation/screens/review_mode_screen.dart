@@ -3,8 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
+import 'package:memox/core/theme/tokens/spacing_tokens.dart';
+import 'package:memox/features/study/domain/srs/srs_engine.dart';
 import 'package:memox/features/study/presentation/providers/review_provider.dart';
 import 'package:memox/features/study/presentation/widgets/review_round_view.dart';
+import 'package:memox/features/study/presentation/widgets/study_mistakes_panel.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
 import 'package:memox/shared/widgets/feedback/empty_state_view.dart';
 import 'package:memox/shared/widgets/feedback/session_complete_view.dart';
@@ -63,6 +66,8 @@ Widget _buildBody(
   int deckId,
   ReviewState state,
 ) {
+  final difficultCards = _reviewMistakes(state);
+
   if (state.cards.isEmpty) {
     return EmptyStateView(
       icon: Icons.autorenew_outlined,
@@ -100,21 +105,29 @@ Widget _buildBody(
           valueColor: context.customColors.ratingEasy,
         ),
       ],
-      extraContent: Text(
-        context.l10n.reviewCompletionSummary(
-          state.againCount,
-          state.hardCount,
-          state.goodCount,
-          state.easyCount,
-        ),
-        style: context.textTheme.bodySmall?.copyWith(
-          color: context.colors.onSurfaceVariant,
-        ),
-        textAlign: TextAlign.center,
-      ),
       primaryAction: SessionAction(
         label: context.l10n.doneAction,
         onTap: () => context.pop<void>(),
+      ),
+      extraContent: Column(
+        children: [
+          Text(
+            context.l10n.reviewCompletionSummary(
+              state.againCount,
+              state.hardCount,
+              state.goodCount,
+              state.easyCount,
+            ),
+            style: context.textTheme.bodySmall?.copyWith(
+              color: context.colors.onSurfaceVariant,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          if (difficultCards.isNotEmpty) ...[
+            const SizedBox(height: SpacingTokens.lg),
+            StudyMistakesPanel(items: difficultCards),
+          ],
+        ],
       ),
     );
   }
@@ -126,4 +139,15 @@ Widget _buildBody(
     onRate: (rating) =>
         ref.read(reviewSessionProvider(deckId).notifier).rate(rating),
   );
+}
+
+List<StudyMistakeItem> _reviewMistakes(ReviewState state) {
+  final cardIds = state.results
+      .where((result) => result.rating == ReviewRating.again)
+      .map((result) => result.cardId)
+      .toSet();
+  return state.cards
+      .where((card) => cardIds.contains(card.id))
+      .map((card) => (front: card.front, back: card.back))
+      .toList(growable: false);
 }

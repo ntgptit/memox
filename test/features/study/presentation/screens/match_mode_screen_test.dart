@@ -111,6 +111,52 @@ void main() {
     expect(find.text('Done'), findsOneWidget);
   });
 
+  testWidgets('MatchModeScreen shows a deselect hint after choosing one side', (
+    tester,
+  ) async {
+    final cardReviewDao = FakeCardReviewDao();
+    addTearDown(cardReviewDao.dispose);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          cardReviewDaoProvider.overrideWithValue(cardReviewDao),
+          flashcardRepositoryProvider.overrideWithValue(
+            FakeFlashcardRepository(
+              cards: const [
+                FlashcardEntity(
+                  id: 1,
+                  deckId: 4,
+                  front: '안녕하세요',
+                  back: 'Hello',
+                ),
+                FlashcardEntity(
+                  id: 2,
+                  deckId: 4,
+                  front: '감사합니다',
+                  back: 'Thank you',
+                ),
+              ],
+            ),
+          ),
+          studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
+          matchEngineProvider(
+            4,
+          ).overrideWithValue(MatchEngine(random: Random(1))),
+        ],
+        child: buildTestApp(home: const MatchModeScreen(deckId: 4)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('안녕하세요'));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('Tap the selected card again to clear it.'),
+      findsOneWidget,
+    );
+  });
+
   testWidgets('MatchModeScreen truncates long definitions with ellipsis', (
     tester,
   ) async {

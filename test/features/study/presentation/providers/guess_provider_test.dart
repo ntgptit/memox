@@ -57,7 +57,12 @@ void main() {
     state = container.read(guessSessionProvider(1)).requireValue;
     expect(state.streak, 0);
     expect(state.bestStreak, 2);
-    expect(state.results, <bool>[true, true, false]);
+    expect(state.results.map((result) => result.isCorrect).toList(), <bool>[
+      true,
+      true,
+      false,
+    ]);
+    expect(state.results.every((result) => !result.skipped), isTrue);
   });
 
   test('skipQuestion re-queues the current card to the end', () async {
@@ -78,6 +83,34 @@ void main() {
     expect(updated.cards.last.id, skippedCardId);
     expect(updated.currentCard?.id, isNot(skippedCardId));
   });
+
+  test(
+    'third skip marks the current card wrong instead of re-queuing again',
+    () async {
+      final cardReviewDao = FakeCardReviewDao();
+      final container = buildContainer(
+        flashcardRepository: FakeFlashcardRepository(cards: _cards(1)),
+        cardReviewDao: cardReviewDao,
+      );
+      addTearDown(cardReviewDao.dispose);
+      addTearDown(container.dispose);
+      final notifier = container.read(guessSessionProvider(1).notifier);
+      final initial = await container.read(guessSessionProvider(1).future);
+      final skippedCardId = initial.currentCard!.id;
+
+      await notifier.skipQuestion();
+      await notifier.skipQuestion();
+      await notifier.skipQuestion();
+
+      final updated = container.read(guessSessionProvider(1)).requireValue;
+      expect(updated.isAnswered, isTrue);
+      expect(updated.isCorrect, isFalse);
+      expect(updated.skippedCount, 1);
+      expect(updated.results.single.skipped, isTrue);
+      expect(updated.results.single.cardId, skippedCardId);
+      expect(cardReviewDao.insertedReviews.single.isCorrect.value, isFalse);
+    },
+  );
 }
 
 List<FlashcardEntity> _cards(int count) => List<FlashcardEntity>.generate(

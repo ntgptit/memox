@@ -52,6 +52,10 @@ void main() {
     expect(find.text('Hello'), findsOneWidget);
     expect(find.text('안녕하세요'), findsOneWidget);
     expect(find.text('Skip'), findsOneWidget);
+    expect(
+      find.text('Guess mode works best with 8+ cards. This deck only has 1.'),
+      findsOneWidget,
+    );
 
     final termText = tester.widget<Text>(find.text('안녕하세요'));
     expect(termText.style?.fontSize, TypographyTokens.headlineMedium);
@@ -211,6 +215,52 @@ void main() {
       expect(find.text('Continue'), findsOneWidget);
     },
   );
+
+  testWidgets('GuessModeScreen lists difficult cards after a wrong answer', (
+    tester,
+  ) async {
+    final cardReviewDao = FakeCardReviewDao();
+    addTearDown(cardReviewDao.dispose);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          cardReviewDaoProvider.overrideWithValue(cardReviewDao),
+          flashcardRepositoryProvider.overrideWithValue(
+            FakeFlashcardRepository(
+              cards: const [
+                FlashcardEntity(
+                  id: 1,
+                  deckId: 5,
+                  front: '안녕하세요',
+                  back: 'Hello',
+                ),
+              ],
+            ),
+          ),
+          studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
+          guessEngineProvider(
+            5,
+          ).overrideWithValue(GuessEngine(random: Random(1))),
+        ],
+        child: buildTestApp(home: const GuessModeScreen(deckId: 5)),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final wrongOption = find
+        .ancestor(
+          of: find.text('???').first,
+          matching: find.byType(GuessOptionButton),
+        )
+        .first;
+    await tester.ensureVisible(wrongOption);
+    await tester.tap(wrongOption);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Continue'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Review difficult cards'), findsOneWidget);
+  });
 }
 
 final class _FakeStudyRepository implements StudyRepository {

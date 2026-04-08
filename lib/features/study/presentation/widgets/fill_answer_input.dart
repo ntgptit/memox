@@ -40,6 +40,7 @@ class FillAnswerInput extends StatelessWidget {
         : context.l10n.fillAnswerHint,
     onChanged: onChanged,
     onSubmitted: (_) => onSubmit(),
+    textInputAction: TextInputAction.done,
     keyboardType: isNumericAnswer ? TextInputType.number : TextInputType.text,
     readOnly: result == FillResult.close || result == FillResult.correct,
     textAlign: TextAlign.center,

@@ -49,11 +49,39 @@ void main() {
     var state = container.read(recallSessionProvider(1)).requireValue;
     expect(state.isRevealed, isFalse);
 
+    await notifier.updateAnswer('안');
+    await notifier.revealAnswer();
+
+    state = container.read(recallSessionProvider(1)).requireValue;
+    expect(state.isRevealed, isFalse);
+
     await notifier.updateAnswer('안녕하세요');
     await notifier.revealAnswer();
 
     state = container.read(recallSessionProvider(1)).requireValue;
     expect(state.isRevealed, isTrue);
+  });
+
+  test('markMissed advances without requiring typed input', () async {
+    final cardReviewDao = FakeCardReviewDao();
+    addTearDown(cardReviewDao.dispose);
+    final container = buildContainer(
+      flashcardRepository: FakeFlashcardRepository(cards: _cards(2)),
+      cardReviewDao: cardReviewDao,
+    );
+    addTearDown(container.dispose);
+    final notifier = container.read(recallSessionProvider(1).notifier);
+
+    await container.read(recallSessionProvider(1).future);
+    await notifier.markMissed();
+
+    final state = container.read(recallSessionProvider(1)).requireValue;
+    expect(state.currentIndex, 1);
+    expect(state.results.single.rating, SelfRating.missed);
+    expect(
+      cardReviewDao.insertedReviews.single.selfRating.value,
+      SelfRating.missed.index,
+    );
   });
 
   test('self-rating advances to the next card', () async {
@@ -139,6 +167,27 @@ void main() {
     expect(studyRepository.completedSession?.mode, StudyMode.recall);
     expect(studyRepository.completedSession?.correctCount, 1);
     expect(studyRepository.completedSession?.wrongCount, 2);
+  });
+
+  test('reviewMissedCards restarts as a practice-only session', () async {
+    final cardReviewDao = FakeCardReviewDao();
+    final container = buildContainer(
+      flashcardRepository: FakeFlashcardRepository(cards: _cards(2)),
+      cardReviewDao: cardReviewDao,
+    );
+    addTearDown(cardReviewDao.dispose);
+    addTearDown(container.dispose);
+    final notifier = container.read(recallSessionProvider(1).notifier);
+
+    await container.read(recallSessionProvider(1).future);
+    await _answerAndRate(notifier, 'wrong', SelfRating.missed);
+    await _answerAndRate(notifier, 'right', SelfRating.gotIt);
+    await notifier.reviewMissedCards();
+
+    final state = container.read(recallSessionProvider(1)).requireValue;
+    expect(state.isMissedPracticeSession, isTrue);
+    expect(state.totalCards, 1);
+    expect(state.currentCard, isNotNull);
   });
 }
 

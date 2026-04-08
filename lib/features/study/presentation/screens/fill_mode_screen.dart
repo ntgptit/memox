@@ -199,11 +199,20 @@ Widget _buildBody(
   final isNumericAnswer = ref
       .read(fillEngineProvider)
       .isNumericAnswer(state.currentPrompt.correctAnswer);
+  final missingExamples = state.cards
+      .where((card) => card.example.trim().isEmpty)
+      .length;
   return FillRoundView(
     state: state,
     controller: controller,
     focusNode: focusNode,
     isNumericAnswer: isNumericAnswer,
+    warningText: missingExamples == 0
+        ? null
+        : context.l10n.fillExamplesRecommendedWarning(
+            missingExamples,
+            state.totalCards,
+          ),
     onInputChanged: (text) =>
         ref.read(fillSessionProvider(deckId).notifier).updateInput(text),
     onSubmit: () =>
