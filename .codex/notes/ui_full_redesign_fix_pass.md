@@ -904,6 +904,13 @@ shown to the user.
 - kept the change inside the deck-detail surface contract rather than widening
   shared widget or router scope
 
+### Recall layout continuation
+
+- removed the oversized vertical dead zone in recall mode by changing the round
+  shell from a split-height layout to a top-anchored scrolling flow
+- kept the prompt max-height guard, but stopped letting the writing area float
+  inside leftover viewport space on taller screens
+
 ### Verification for this continuation
 
 - `python tools/guard/run.py --scope all`

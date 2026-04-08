@@ -37,50 +37,47 @@ class RecallRoundView extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    return Padding(
+    return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(
         SpacingTokens.screenPadding,
         SpacingTokens.screenPadding,
         SpacingTokens.screenPadding,
         SpacingTokens.screenPadding + MediaQuery.viewInsetsOf(context).bottom,
       ),
-      child: LayoutBuilder(
-        builder: (context, constraints) => Column(
-          children: [
-            ConstrainedBox(
-              constraints: BoxConstraints(
-                maxHeight: constraints.maxHeight * _recallPromptMaxHeightFactor,
-              ),
-              child: RecallPromptCard(key: ValueKey<int>(card.id), card: card),
+      child: Column(
+        children: [
+          ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight:
+                  MediaQuery.sizeOf(context).height *
+                  _recallPromptMaxHeightFactor,
             ),
-            const SizedBox(height: SpacingTokens.lg),
-            Expanded(
-              child: AnimatedSwitcher(
-                duration: DurationTokens.contentSwitch,
-                reverseDuration: DurationTokens.fast,
-                transitionBuilder: _transitionBuilder,
-                child: state.isRevealed
-                    ? RecallRevealPhase(
-                        key: ValueKey<String>('reveal-${card.id}'),
-                        card: card,
-                        state: state,
-                        onEditCard: onEditCard,
-                        onRateSelf: onRateSelf,
-                      )
-                    : SingleChildScrollView(
-                        key: ValueKey<String>('write-${card.id}'),
-                        child: RecallWritingArea(
-                          controller: controller,
-                          canReveal: state.canReveal,
-                          onChanged: onAnswerChanged,
-                          onMarkMissed: onMarkMissed,
-                          onReveal: onReveal,
-                        ),
-                      ),
-              ),
-            ),
-          ],
-        ),
+            child: RecallPromptCard(key: ValueKey<int>(card.id), card: card),
+          ),
+          const SizedBox(height: SpacingTokens.lg),
+          AnimatedSwitcher(
+            duration: DurationTokens.contentSwitch,
+            reverseDuration: DurationTokens.fast,
+            transitionBuilder: _transitionBuilder,
+            layoutBuilder: _layoutBuilder,
+            child: state.isRevealed
+                ? RecallRevealPhase(
+                    key: ValueKey<String>('reveal-${card.id}'),
+                    card: card,
+                    state: state,
+                    onEditCard: onEditCard,
+                    onRateSelf: onRateSelf,
+                  )
+                : RecallWritingArea(
+                    key: ValueKey<String>('write-${card.id}'),
+                    controller: controller,
+                    canReveal: state.canReveal,
+                    onChanged: onAnswerChanged,
+                    onMarkMissed: onMarkMissed,
+                    onReveal: onReveal,
+                  ),
+          ),
+        ],
       ),
     );
   }
@@ -96,4 +93,16 @@ Widget _transitionBuilder(Widget child, Animation<double> animation) =>
         ).animate(animation),
         child: child,
       ),
+    );
+
+Widget _layoutBuilder(Widget? currentChild, List<Widget> previousChildren) =>
+    Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        ...previousChildren,
+        ...switch (currentChild) {
+          final Widget child => <Widget>[child],
+          null => const <Widget>[],
+        },
+      ],
     );

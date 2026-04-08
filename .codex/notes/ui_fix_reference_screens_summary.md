@@ -971,6 +971,11 @@ and the code that is already on disk.
   - [recall_mode_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/recall_mode_screen_test.dart)
   - [study_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/study_screen_test.dart)
   - [recall_provider_test.dart](/D:/workspace/memox/test/features/study/presentation/providers/recall_provider_test.dart)
+- removed the tall dead zone in recall mode by changing
+  [recall_round_view.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/recall_round_view.dart)
+  from a split `Expanded` layout to a single top-anchored scroll column, with
+  tighter spacing coverage in
+  [recall_mode_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/recall_mode_screen_test.dart)
 
 ### Remaining reference-screen defers
 

@@ -51,6 +51,13 @@ final repo-wide verification pass stays green.
   `CardListTile` down to `SpacingTokens.sm`; the pinned header still needs the
   taller intrinsic extent, so the real fix was reducing the results handoff
   scale rather than shrinking the toolbar itself
+- rebuilt the recall round layout into a top-anchored scrolling column instead
+  of a `prompt + Expanded answer area` split, because the old `AnimatedSwitcher`
+  path let short writing content float in a tall center-biased region on long
+  screens
+- added a tighter recall regression check that measures prompt-to-input spacing
+  directly instead of only asserting the input appears somewhere above a broad
+  screen-height threshold
 - replaced the old flagged-filter widget test with a spacing contract test
   that measures the first card container against the toolbar search bar, which
   locks the intended section rhythm instead of a removed control

@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/core/design/study_mode.dart';
 import 'package:memox/core/providers/database_providers.dart';
 import 'package:memox/core/providers/repository_providers.dart';
+import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/cards/domain/entities/flashcard_entity.dart';
 import 'package:memox/features/study/domain/entities/study_session.dart';
 import 'package:memox/features/study/domain/repositories/study_repository.dart';
@@ -57,7 +58,12 @@ void main() {
       lessThanOrEqualTo(800 * 0.4),
     );
     expect(find.widgetWithText(SecondaryButton, 'Show answer'), findsOneWidget);
-    expect(tester.getTopLeft(find.byType(TextField)).dy, lessThan(800 * 0.7));
+    final promptRect = tester.getRect(find.byType(RecallPromptCard));
+    final textFieldRect = tester.getRect(find.byType(TextField));
+    expect(
+      textFieldRect.top - promptRect.bottom,
+      closeTo(SpacingTokens.lg, 0.01),
+    );
 
     await tester.tap(find.text('Show answer'), warnIfMissed: false);
     await _pumpRecallScreen(tester);
