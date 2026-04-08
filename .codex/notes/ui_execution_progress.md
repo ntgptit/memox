@@ -31,6 +31,10 @@ final repo-wide verification pass stays green.
   `CardListTile` by removing the toolbar's duplicate bottom padding and letting
   the list-start sliver own the full `SpacingTokens.lg` gap below the search
   bar
+- corrected the top-side balance of the deck-detail `Cards` section by reducing
+  the standalone spacer above the pinned toolbar; the sticky toolbar still owns
+  its own inset, so the section no longer double-counts breathing room above
+  the title row
 - replaced the old flagged-filter widget test with a spacing contract test
   that measures the first card container against the toolbar search bar, which
   locks the intended section rhythm instead of a removed control

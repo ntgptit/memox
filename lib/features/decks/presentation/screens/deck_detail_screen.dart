@@ -154,7 +154,7 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
               ),
               if (viewState != DeckDetailViewState.empty)
                 const SliverToBoxAdapter(
-                  child: SizedBox(height: SpacingTokens.lg),
+                  child: SizedBox(height: SpacingTokens.sm),
                 ),
               if (viewState != DeckDetailViewState.empty)
                 _buildToolbar(context),
