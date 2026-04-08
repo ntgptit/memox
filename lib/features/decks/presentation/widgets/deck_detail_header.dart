@@ -163,7 +163,9 @@ class _DeckDetailHeaderBody extends StatelessWidget {
         const SizedBox(height: SpacingTokens.sm),
         Text(
           context.l10n.deckMasteryLabel((masteryPercentage * 100).round()),
-          style: context.textTheme.labelMedium,
+          style: context.textTheme.labelLarge?.copyWith(
+            color: context.colors.onSurface,
+          ),
         ),
         const SizedBox(height: SpacingTokens.xs),
         MasteryBar(percentage: masteryPercentage, animate: false),

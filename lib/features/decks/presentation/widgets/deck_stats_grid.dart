@@ -27,8 +27,16 @@ class DeckStatsGrid extends StatelessWidget {
         label: context.l10n.dueLabel,
         valueColor: context.colors.primary,
       ),
-      StatCard(value: '${stats.known}', label: context.l10n.knownLabel),
-      StatCard(value: '${stats.newCards}', label: context.l10n.newLabel),
+      StatCard(
+        value: '${stats.known}',
+        label: context.l10n.knownLabel,
+        valueColor: context.customColors.statusMastered,
+      ),
+      StatCard(
+        value: '${stats.newCards}',
+        label: context.l10n.newLabel,
+        valueColor: context.customColors.statusReviewing,
+      ),
     ],
   );
 }

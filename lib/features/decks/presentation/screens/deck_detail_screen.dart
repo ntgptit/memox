@@ -162,6 +162,10 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
                 _buildCardsSliver(context, detail, cards),
               if (cards.length < allCards.length)
                 _buildLoadingMoreSliver(context),
+              if (viewState != DeckDetailViewState.empty)
+                const SliverToBoxAdapter(
+                  child: SizedBox(height: SpacingTokens.lg),
+                ),
             ],
           ),
         ),
@@ -259,10 +263,7 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
   Widget _buildLoadingMoreSliver(BuildContext context) => SliverToBoxAdapter(
     child: Padding(
       padding: ResponsivePadding.horizontal(context).add(
-        const EdgeInsets.only(
-          top: SpacingTokens.md,
-          bottom: SpacingTokens.xxxl,
-        ),
+        const EdgeInsets.only(top: SpacingTokens.md),
       ),
       child: const LoadingIndicator(size: SizeTokens.iconSm),
     ),

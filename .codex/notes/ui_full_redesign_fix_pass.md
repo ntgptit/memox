@@ -895,6 +895,15 @@ shown to the user.
   different on first use, so on-device sanity-checking of a few real decks is
   still recommended
 
+### Deck detail polish continuation
+
+- rebalanced the deck detail screen so the header owns the summary, the CTA
+  card stays action-led, and the stats grid carries clearer semantic emphasis
+- added dedicated trailing clearance for the cards list so the final card can
+  scroll above the FAB without changing global scaffold geometry
+- kept the change inside the deck-detail surface contract rather than widening
+  shared widget or router scope
+
 ### Verification for this continuation
 
 - `python tools/guard/run.py --scope all`

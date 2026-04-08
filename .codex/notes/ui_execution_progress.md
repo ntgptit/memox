@@ -35,6 +35,18 @@ final repo-wide verification pass stays green.
   the standalone spacer above the pinned toolbar; the sticky toolbar still owns
   its own inset, so the section no longer double-counts breathing room above
   the title row
+- tightened the ready-state deck CTA by removing the duplicate
+  `"{total} cards · {due} due today"` subtitle inside the action card and
+  leaving that summary in the deck header only
+- gave the deck stats grid clearer semantic emphasis by mapping `Known` to the
+  mastered accent and `New` to the reviewing accent while keeping `Due` on the
+  primary accent
+- strengthened the deck header mastery label so the progress cluster reads more
+  clearly above the mastery bar
+- added explicit trailing list clearance after the deck cards section so the
+  final flashcard can scroll above the FAB instead of resting flush against it
+- added focused deck-detail tests for the non-duplicated due summary, semantic
+  stats coloring, and last-card-to-FAB clearance
 - replaced the old flagged-filter widget test with a spacing contract test
   that measures the first card container against the toolbar search bar, which
   locks the intended section rhythm instead of a removed control

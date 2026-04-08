@@ -981,6 +981,24 @@ and the code that is already on disk.
   - smarter guess distractor sourcing from related decks
   - deeper visual smoke testing on-device for the new resume and undo flows
 
+### Deck detail refinement follow-up
+
+- removed the lingering duplication between the deck header summary and the
+  ready-state study CTA by dropping the CTA subtitle in
+  [deck_detail_overview.dart](/D:/workspace/memox/lib/features/decks/presentation/widgets/deck_detail_overview.dart)
+- gave the deck stats grid stronger semantic emphasis in
+  [deck_stats_grid.dart](/D:/workspace/memox/lib/features/decks/presentation/widgets/deck_stats_grid.dart)
+  by mapping `Known` to the mastered accent and `New` to the reviewing accent
+- strengthened the deck header mastery cluster in
+  [deck_detail_header.dart](/D:/workspace/memox/lib/features/decks/presentation/widgets/deck_detail_header.dart)
+  so the mastery label reads more clearly above the bar
+- added trailing clearance after the cards list in
+  [deck_detail_screen.dart](/D:/workspace/memox/lib/features/decks/presentation/screens/deck_detail_screen.dart)
+  so the last flashcard can settle above the FAB instead of resting flush
+- locked the new deck-detail contracts with:
+  - [deck_detail_screen_test.dart](/D:/workspace/memox/test/features/decks/presentation/screens/deck_detail_screen_test.dart)
+  - [deck_stats_grid_test.dart](/D:/workspace/memox/test/features/decks/presentation/widgets/deck_stats_grid_test.dart)
+
 ### Verification for follow-up batch 10
 
 - `dart run build_runner build --delete-conflicting-outputs`

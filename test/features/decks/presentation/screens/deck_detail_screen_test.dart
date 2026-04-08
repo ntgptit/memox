@@ -108,6 +108,7 @@ void main() {
     final context = tester.element(find.byType(DeckDetailScreen));
     expect(find.text('Korean Core'), findsOneWidget);
     expect(find.text(context.l10n.studyDueCardsAction(1)), findsOneWidget);
+    expect(find.text(context.l10n.deckCardsDueSubtitle(2, 1)), findsOneWidget);
     await tester.drag(find.byType(CustomScrollView), const Offset(0, -400));
     await tester.pumpAndSettle();
     expect(find.text(context.l10n.cardsTitle), findsOneWidget);
@@ -327,6 +328,63 @@ void main() {
       closeTo(SpacingTokens.lg, 0.01),
     );
     expect(find.byTooltip('Flagged'), findsNothing);
+  });
+
+  testWidgets('DeckDetailScreen keeps the last card above the fab', (
+    tester,
+  ) async {
+    final cards = List.generate(
+      12,
+      (index) => FlashcardEntity(
+        id: index + 1,
+        deckId: 3,
+        front: 'Card ${index + 1}',
+        back: 'Back ${index + 1}',
+      ),
+    );
+
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          folderRepositoryProvider.overrideWithValue(
+            FakeFolderRepository(
+              folders: const [
+                FolderEntity(id: 1, name: 'Root'),
+                FolderEntity(id: 2, name: 'Languages', parentId: 1),
+              ],
+            ),
+          ),
+          deckRepositoryProvider.overrideWithValue(
+            FakeDeckRepository(
+              decks: const [
+                DeckEntity(id: 3, name: 'Korean Core', folderId: 2),
+              ],
+            ),
+          ),
+          flashcardRepositoryProvider.overrideWithValue(
+            FakeFlashcardRepository(cards: cards),
+          ),
+        ],
+        child: buildTestApp(home: const DeckDetailScreen(deckId: 3)),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.scrollUntilVisible(
+      find.text('Card 12'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
+    final lastCardRect = tester.getRect(
+      find.descendant(
+        of: find.byType(CardListTile).last,
+        matching: find.byType(AppCard),
+      ),
+    );
+    final fabRect = tester.getRect(find.byType(FloatingActionButton));
+
+    expect(fabRect.top - lastCardRect.bottom, closeTo(SpacingTokens.lg, 0.01));
   });
 }
 

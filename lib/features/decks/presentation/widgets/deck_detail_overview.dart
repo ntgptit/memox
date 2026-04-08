@@ -67,7 +67,6 @@ class DeckDetailOverview extends StatelessWidget {
       _DeckActionCard(
         icon: Icons.play_circle_outline,
         title: context.l10n.studyDueCardsAction(stats.due),
-        subtitle: context.l10n.deckCardsDueSubtitle(stats.total, stats.due),
         primaryLabel: context.l10n.chooseStudyModeButton,
         onPrimaryTap: onStudyDueCards,
       ),
@@ -81,16 +80,16 @@ class _DeckActionCard extends StatelessWidget {
   const _DeckActionCard({
     required this.icon,
     required this.title,
-    required this.subtitle,
     required this.primaryLabel,
     required this.onPrimaryTap,
+    this.subtitle,
     this.secondaryLabel,
     this.onSecondaryTap,
   });
 
   final IconData icon;
   final String title;
-  final String subtitle;
+  final String? subtitle;
   final String primaryLabel;
   final VoidCallback onPrimaryTap;
   final String? secondaryLabel;
@@ -113,8 +112,10 @@ class _DeckActionCard extends StatelessWidget {
         ),
         const SizedBox(height: SpacingTokens.md),
         Text(title, style: context.textTheme.titleMedium),
-        const SizedBox(height: SpacingTokens.sm),
-        Text(subtitle, style: context.textTheme.bodyMedium),
+        if (subtitle != null) ...[
+          const SizedBox(height: SpacingTokens.sm),
+          Text(subtitle!, style: context.textTheme.bodyMedium),
+        ],
         const SizedBox(height: SpacingTokens.lg),
         PrimaryButton(label: primaryLabel, onPressed: onPrimaryTap),
         if (secondaryLabel != null && onSecondaryTap != null) ...[
