@@ -56,7 +56,6 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
   static const int _cardsPageSize = 20;
   var _query = '';
   var _sort = DeckCardSort.date;
-  var _showFlaggedOnly = false;
   var _showCollapsedTitle = false;
   var _visibleCardCount = _cardsPageSize;
 
@@ -244,17 +243,12 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
         padding: ResponsivePadding.horizontal(context),
         child: DeckCardsToolbar(
           sort: _sort,
-          showFlaggedOnly: _showFlaggedOnly,
           onQueryChanged: (value) => setState(() {
             _query = value;
             _visibleCardCount = _cardsPageSize;
           }),
           onSortChanged: (value) => setState(() {
             _sort = value;
-            _visibleCardCount = _cardsPageSize;
-          }),
-          onFlagFilterChanged: (value) => setState(() {
-            _showFlaggedOnly = value;
             _visibleCardCount = _cardsPageSize;
           }),
         ),
@@ -279,7 +273,9 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
     DeckDetailData detail,
     List<FlashcardEntity> cards,
   ) => SliverPadding(
-    padding: ResponsivePadding.horizontal(context),
+    padding: ResponsivePadding.horizontal(
+      context,
+    ).add(const EdgeInsets.only(top: SpacingTokens.lg)),
     sliver: SliverList.separated(
       itemBuilder: (context, index) => CardListTile(
         card: cards[index],
@@ -331,10 +327,6 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
     final normalized = _query.trim().toLowerCase();
 
     return cards.where((card) {
-      if (_showFlaggedOnly && !card.isFlagged) {
-        return false;
-      }
-
       if (normalized.isEmpty) {
         return true;
       }

@@ -17,9 +17,7 @@ void main() {
             height: DeckCardsToolbar.height,
             child: const DeckCardsToolbar(
               sort: DeckCardSort.date,
-              showFlaggedOnly: false,
               onQueryChanged: _noopQuery,
-              onFlagFilterChanged: _noopFlagFilter,
               onSortChanged: _noopSort,
             ),
           ),
@@ -63,7 +61,5 @@ void main() {
 }
 
 void _noopQuery(String _) {}
-
-void _noopFlagFilter(bool _) {}
 
 void _noopSort(DeckCardSort _) {}

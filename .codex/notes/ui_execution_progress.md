@@ -24,6 +24,16 @@ final repo-wide verification pass stays green.
 - removed the extra utility-surface block around the deck-detail `Cards`
   section by letting `DeckCardsToolbar` inherit the page background instead of
   painting its own darker container shell
+- removed the deck-detail `Cards` flag filter from the toolbar contract instead
+  of hiding it locally, so the pinned cards toolbar now owns only section
+  title, sort, and search
+- fixed the vertical handoff between the pinned cards toolbar and the first
+  `CardListTile` by removing the toolbar's duplicate bottom padding and letting
+  the list-start sliver own the full `SpacingTokens.lg` gap below the search
+  bar
+- replaced the old flagged-filter widget test with a spacing contract test
+  that measures the first card container against the toolbar search bar, which
+  locks the intended section rhythm instead of a removed control
 - loaded the MemoX multi-agent workflow preset and repo execution rules
 - inspected current worktree state to avoid overlapping or unrelated edits
 - started the required progress log for this implementation workflow
@@ -490,6 +500,6 @@ final repo-wide verification pass stays green.
 
 ## Next step
 
-Do one on-device smoke test pass across review undo, guess skip-limit feedback,
-recall practice-missed copy, fill close-match decisions, and study-session
-resume, then prepare the branch for review.
+Spot-check the updated deck-detail `Cards` section on-device to confirm the
+lighter toolbar and single-owner spacing handoff read correctly, then prepare
+the branch for review.

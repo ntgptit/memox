@@ -6,12 +6,15 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/core/design/card_status.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/providers/repository_providers.dart';
+import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/cards/domain/entities/flashcard_entity.dart';
-import 'package:memox/features/cards/domain/support/flashcard_flags.dart';
+import 'package:memox/features/cards/presentation/widgets/card_list_tile.dart';
 import 'package:memox/features/decks/domain/entities/deck_entity.dart';
 import 'package:memox/features/decks/presentation/screens/deck_detail_screen.dart';
 import 'package:memox/features/folders/domain/entities/folder_entity.dart';
+import 'package:memox/shared/widgets/cards/app_card.dart';
 import 'package:memox/shared/widgets/feedback/skeleton_parts.dart';
+import 'package:memox/shared/widgets/inputs/app_search_bar.dart';
 import '../../../../test_helpers/fakes/fake_deck_repository.dart';
 import '../../../../test_helpers/fakes/fake_flashcard_repository.dart';
 import '../../../../test_helpers/fakes/fake_folder_repository.dart';
@@ -264,7 +267,7 @@ void main() {
     expect(find.text('Card 25'), findsOneWidget);
   });
 
-  testWidgets('DeckDetailScreen filters down to flagged cards only', (
+  testWidgets('DeckDetailScreen keeps breathing room below the cards toolbar', (
     tester,
   ) async {
     await tester.pumpWidget(
@@ -291,15 +294,14 @@ void main() {
                 FlashcardEntity(
                   id: 1,
                   deckId: 3,
-                  front: 'Flagged term',
-                  back: 'Flagged back',
-                  tags: <String>[flaggedCardTag],
+                  front: 'First card',
+                  back: 'First back',
                 ),
                 FlashcardEntity(
                   id: 2,
                   deckId: 3,
-                  front: 'Regular term',
-                  back: 'Regular back',
+                  front: 'Second card',
+                  back: 'Second back',
                 ),
               ],
             ),
@@ -311,11 +313,20 @@ void main() {
     await tester.pumpAndSettle();
     await tester.drag(find.byType(CustomScrollView), const Offset(0, -400));
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Flagged'));
-    await tester.pumpAndSettle();
 
-    expect(find.text('Flagged term'), findsOneWidget);
-    expect(find.text('Regular term'), findsNothing);
+    final searchBarRect = tester.getRect(find.byType(AppSearchBar));
+    final firstCardRect = tester.getRect(
+      find.descendant(
+        of: find.byType(CardListTile).first,
+        matching: find.byType(AppCard),
+      ),
+    );
+
+    expect(
+      firstCardRect.top - searchBarRect.bottom,
+      closeTo(SpacingTokens.lg, 0.01),
+    );
+    expect(find.byTooltip('Flagged'), findsNothing);
   });
 }
 
