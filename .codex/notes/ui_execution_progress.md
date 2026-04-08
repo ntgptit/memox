@@ -48,8 +48,9 @@ final repo-wide verification pass stays green.
 - added focused deck-detail tests for the non-duplicated due summary, semantic
   stats coloring, and last-card-to-FAB clearance
 - tightened the handoff between the deck cards search bar and the first
-  `CardListTile` from `SpacingTokens.lg` to `SpacingTokens.md` so the search
-  control and results list share the same rhythm as the in-list separators
+  `CardListTile` down to `SpacingTokens.sm`; the pinned header still needs the
+  taller intrinsic extent, so the real fix was reducing the results handoff
+  scale rather than shrinking the toolbar itself
 - replaced the old flagged-filter widget test with a spacing contract test
   that measures the first card container against the toolbar search bar, which
   locks the intended section rhythm instead of a removed control

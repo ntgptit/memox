@@ -57,6 +57,7 @@ void main() {
       (surface.decoration as BoxDecoration).color,
       Theme.of(context).scaffoldBackgroundColor,
     );
+    expect(tester.takeException(), isNull);
   });
 }
 
