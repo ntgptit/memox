@@ -14,6 +14,7 @@ import 'package:memox/features/settings/presentation/providers/settings_provider
 import 'package:memox/features/study/domain/entities/study_session.dart';
 import 'package:memox/features/study/domain/fill/fill_engine.dart';
 import 'package:memox/features/study/domain/srs/srs_engine.dart';
+import 'package:memox/features/study/presentation/providers/active_study_session_store.dart';
 import 'package:memox/features/study/presentation/providers/study_engine_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -109,7 +110,15 @@ class FillSession extends _$FillSession {
   var _interactionSequence = 0;
 
   @override
-  Future<FillState> build(int deckId) => _startSession(deckId);
+  Future<FillState> build(int deckId) async {
+    final restored = await _restoreSnapshot();
+
+    if (restored != null) {
+      return restored;
+    }
+
+    return _startSession(deckId);
+  }
 
   Future<void> acceptClose() async {
     final current = _stateValueOrNull(state);
@@ -143,9 +152,8 @@ class FillSession extends _$FillSession {
 
     _interactionSequence++;
     state = const AsyncValue<FillState>.loading();
-    state = AsyncValue<FillState>.data(
-      await _startWithCards(_practiceCards(current)),
-    );
+    final nextState = await _startWithCards(_practiceCards(current));
+    state = AsyncValue<FillState>.data(nextState);
   }
 
   Future<void> rejectClose() async {
@@ -225,7 +233,8 @@ class FillSession extends _$FillSession {
   Future<void> startSession() async {
     _interactionSequence++;
     state = const AsyncValue<FillState>.loading();
-    state = AsyncValue<FillState>.data(await _startSession(deckId));
+    final nextState = await _startSession(deckId);
+    state = AsyncValue<FillState>.data(nextState);
   }
 
   Future<void> submitAnswer() async {
@@ -291,7 +300,9 @@ class FillSession extends _$FillSession {
       return;
     }
 
-    state = AsyncValue<FillState>.data(current.copyWith(showHint: true));
+    final updated = current.copyWith(showHint: true);
+    state = AsyncValue<FillState>.data(updated);
+    await _persistSnapshot(updated);
   }
 
   Future<void> updateInput(String text) async {
@@ -310,7 +321,9 @@ class FillSession extends _$FillSession {
       return;
     }
 
-    state = AsyncValue<FillState>.data(current.copyWith(userInput: text));
+    final updated = current.copyWith(userInput: text);
+    state = AsyncValue<FillState>.data(updated);
+    await _persistSnapshot(updated);
   }
 
   Future<void> _advance(FillState current) async {
@@ -322,19 +335,19 @@ class FillSession extends _$FillSession {
     }
 
     final nextIndex = current.currentIndex + 1;
-    state = AsyncValue<FillState>.data(
-      current.copyWith(
-        currentIndex: nextIndex,
-        currentPrompt: _promptFor(current.cards[nextIndex]),
-        userInput: '',
-        result: null,
-        firstAttemptResult: null,
-        submittedAnswer: null,
-        isRetrying: false,
-        retryCount: 0,
-        showHint: false,
-      ),
+    final updated = current.copyWith(
+      currentIndex: nextIndex,
+      currentPrompt: _promptFor(current.cards[nextIndex]),
+      userInput: '',
+      result: null,
+      firstAttemptResult: null,
+      submittedAnswer: null,
+      isRetrying: false,
+      retryCount: 0,
+      showHint: false,
     );
+    state = AsyncValue<FillState>.data(updated);
+    await _persistSnapshot(updated);
   }
 
   Future<void> _clearForRetry(FillState current) async {
@@ -347,9 +360,9 @@ class FillSession extends _$FillSession {
       return;
     }
 
-    state = AsyncValue<FillState>.data(
-      latest!.copyWith(userInput: '', result: FillResult.wrong),
-    );
+    final updated = latest!.copyWith(userInput: '', result: FillResult.wrong);
+    state = AsyncValue<FillState>.data(updated);
+    await _persistSnapshot(updated);
   }
 
   Future<void> _completeSession(FillState current) async {
@@ -371,6 +384,7 @@ class FillSession extends _$FillSession {
     _session = await ref
         .read(completeStudySessionUseCaseProvider)
         .call(completedSession);
+    await _clearSnapshot();
   }
 
   Future<void> _enterRetry({
@@ -411,6 +425,7 @@ class FillSession extends _$FillSession {
       userInput: current.currentPrompt.correctAnswer,
     );
     state = AsyncValue<FillState>.data(updated);
+    await _persistSnapshot(updated);
     await Future<void>.delayed(ref.read(fillAutoAdvanceDelayProvider));
     final latest = _stateValueOrNull(state);
 
@@ -505,6 +520,7 @@ class FillSession extends _$FillSession {
 
     if (cards.isEmpty) {
       _session = null;
+      await _clearSnapshot();
       return FillState(
         cards: const <FlashcardEntity>[],
         currentIndex: 0,
@@ -516,11 +532,139 @@ class FillSession extends _$FillSession {
     _session = await ref
         .read(startStudySessionUseCaseProvider)
         .call(deckId: cards.first.deckId, mode: StudyMode.fill);
-    return FillState(
+    final nextState = FillState(
       cards: cards,
       currentIndex: 0,
       currentPrompt: _promptFor(cards.first),
       userInput: '',
     );
+    await _persistSnapshot(nextState);
+    return nextState;
   }
+
+  Future<void> _clearSnapshot() async {
+    final store = await ref.read(activeStudySessionStoreProvider.future);
+    await store.clearIfMatches(deckId: deckId, mode: StudyMode.fill);
+  }
+
+  Map<String, dynamic> _encodeState(FillState current) => <String, dynamic>{
+    'cards': current.cards.map((card) => card.toJson()).toList(growable: false),
+    'currentIndex': current.currentIndex,
+    'currentPrompt': <String, dynamic>{
+      'sentenceWithBlank': current.currentPrompt.sentenceWithBlank,
+      'correctAnswer': current.currentPrompt.correctAnswer,
+      'hint': current.currentPrompt.hint,
+      'answerLength': current.currentPrompt.answerLength,
+    },
+    'userInput': current.userInput,
+    'result': current.result?.name,
+    'firstAttemptResult': current.firstAttemptResult?.name,
+    'submittedAnswer': current.submittedAnswer,
+    'isRetrying': current.isRetrying,
+    'retryCount': current.retryCount,
+    'showHint': current.showHint,
+    'streak': current.streak,
+    'bestStreak': current.bestStreak,
+    'results': current.results
+        .map(
+          (result) => <String, dynamic>{
+            'cardId': result.cardId,
+            'firstAttemptResult': result.firstAttemptResult.name,
+            'acceptedAsClose': result.acceptedAsClose,
+            'retryCount': result.retryCount,
+          },
+        )
+        .toList(growable: false),
+  };
+
+  Future<void> _persistSnapshot(FillState current) async {
+    if (current.cards.isEmpty || current.isComplete) {
+      await _clearSnapshot();
+      return;
+    }
+
+    final store = await ref.read(activeStudySessionStoreProvider.future);
+    await store.save(
+      ActiveStudySessionSnapshot(
+        deckId: deckId,
+        mode: StudyMode.fill,
+        session: _session,
+        payload: _encodeState(current),
+      ),
+    );
+  }
+
+  Future<FillState?> _restoreSnapshot() async {
+    final store = await ref.read(activeStudySessionStoreProvider.future);
+    final snapshot = store.load();
+
+    if (snapshot == null) {
+      return null;
+    }
+
+    if (snapshot.deckId != deckId || snapshot.mode != StudyMode.fill) {
+      return null;
+    }
+
+    _interactionSequence = 0;
+    _session = snapshot.session;
+    return FillState(
+      cards: (snapshot.payload['cards'] as List<dynamic>? ?? const <dynamic>[])
+          .map(
+            (card) => FlashcardEntity.fromJson(
+              Map<String, dynamic>.from(card as Map),
+            ),
+          )
+          .toList(growable: false),
+      currentIndex: snapshot.payload['currentIndex'] as int? ?? 0,
+      currentPrompt: _decodePrompt(snapshot.payload['currentPrompt']),
+      userInput: snapshot.payload['userInput'] as String? ?? '',
+      result: _fillResultOrNull(snapshot.payload['result']),
+      firstAttemptResult: _fillResultOrNull(
+        snapshot.payload['firstAttemptResult'],
+      ),
+      submittedAnswer: snapshot.payload['submittedAnswer'] as String?,
+      isRetrying: snapshot.payload['isRetrying'] as bool? ?? false,
+      retryCount: snapshot.payload['retryCount'] as int? ?? 0,
+      showHint: snapshot.payload['showHint'] as bool? ?? false,
+      streak: snapshot.payload['streak'] as int? ?? 0,
+      bestStreak: snapshot.payload['bestStreak'] as int? ?? 0,
+      results:
+          (snapshot.payload['results'] as List<dynamic>? ?? const <dynamic>[])
+              .map(
+                (result) => (
+                  cardId: (result as Map)['cardId'] as String? ?? '',
+                  firstAttemptResult: FillResult.values.byName(
+                    result['firstAttemptResult'] as String? ??
+                        FillResult.wrong.name,
+                  ),
+                  acceptedAsClose: result['acceptedAsClose'] as bool? ?? false,
+                  retryCount: result['retryCount'] as int? ?? 0,
+                ),
+              )
+              .toList(growable: false),
+    );
+  }
+}
+
+FillPrompt _decodePrompt(Object? raw) {
+  if (raw is! Map) {
+    return _emptyPrompt();
+  }
+
+  final json = Map<String, dynamic>.from(raw);
+  return (
+    sentenceWithBlank: json['sentenceWithBlank'] as String? ?? '',
+    correctAnswer: json['correctAnswer'] as String? ?? '',
+    hint: json['hint'] as String?,
+    answerLength: json['answerLength'] as int? ?? 0,
+  );
+}
+
+FillResult? _fillResultOrNull(Object? raw) {
+  if (raw == null) {
+    return null;
+  }
+
+  return FillResult.values.byName(raw as String);
 }

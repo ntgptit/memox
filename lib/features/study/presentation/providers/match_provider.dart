@@ -10,6 +10,7 @@ import 'package:memox/features/cards/domain/entities/flashcard_entity.dart';
 import 'package:memox/features/study/domain/entities/study_session.dart';
 import 'package:memox/features/study/domain/match/match_engine.dart';
 import 'package:memox/features/study/domain/srs/srs_engine.dart';
+import 'package:memox/features/study/presentation/providers/active_study_session_store.dart';
 import 'package:memox/features/study/presentation/providers/study_engine_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -83,7 +84,15 @@ class MatchSession extends _$MatchSession {
   var _attemptSequence = 0;
 
   @override
-  Future<MatchState> build(int deckId) => _startGame(deckId);
+  Future<MatchState> build(int deckId) async {
+    final restored = await _restoreSnapshot();
+
+    if (restored != null) {
+      return restored;
+    }
+
+    return _startGame(deckId);
+  }
 
   Future<void> deselectItem() async {
     final current = _stateValueOrNull(state);
@@ -92,9 +101,12 @@ class MatchSession extends _$MatchSession {
       return;
     }
 
-    state = AsyncValue<MatchState>.data(
-      current.copyWith(selectedTermId: null, selectedDefinitionId: null),
+    final updated = current.copyWith(
+      selectedTermId: null,
+      selectedDefinitionId: null,
     );
+    state = AsyncValue<MatchState>.data(updated);
+    await _persistSnapshot(updated);
   }
 
   Future<void> selectItem(
@@ -112,33 +124,36 @@ class MatchSession extends _$MatchSession {
 
     if (item.type == MatchItemType.term) {
       if (current.selectedTermId == item.id) {
-        state = AsyncValue<MatchState>.data(
-          current.copyWith(selectedTermId: null),
-        );
+        final updated = current.copyWith(selectedTermId: null);
+        state = AsyncValue<MatchState>.data(updated);
+        await _persistSnapshot(updated);
         return;
       }
 
       final updated = current.copyWith(selectedTermId: item.id);
       state = AsyncValue<MatchState>.data(updated);
+      await _persistSnapshot(updated);
       await _resolveSelection(updated);
       return;
     }
 
     if (current.selectedDefinitionId == item.id) {
-      state = AsyncValue<MatchState>.data(
-        current.copyWith(selectedDefinitionId: null),
-      );
+      final updated = current.copyWith(selectedDefinitionId: null);
+      state = AsyncValue<MatchState>.data(updated);
+      await _persistSnapshot(updated);
       return;
     }
 
     final updated = current.copyWith(selectedDefinitionId: item.id);
     state = AsyncValue<MatchState>.data(updated);
+    await _persistSnapshot(updated);
     await _resolveSelection(updated);
   }
 
   Future<void> startGame() async {
     state = const AsyncValue<MatchState>.loading();
-    state = AsyncValue<MatchState>.data(await _startGame(deckId));
+    final nextState = await _startGame(deckId);
+    state = AsyncValue<MatchState>.data(nextState);
   }
 
   bool _isMatched(
@@ -169,6 +184,7 @@ class MatchSession extends _$MatchSession {
     _session = await ref
         .read(completeStudySessionUseCaseProvider)
         .call(completedSession);
+    await _clearSnapshot();
   }
 
   Future<void> _handleCorrect(
@@ -190,6 +206,7 @@ class MatchSession extends _$MatchSession {
         lastResult: result,
       ),
     );
+    await _persistSnapshot(state.requireValue);
     await _persistMatchReview(termId, (current.attemptCounts[termId] ?? 0) + 1);
     await Future<void>.delayed(DurationTokens.chartDraw);
     final latest = _stateValueOrNull(state);
@@ -205,6 +222,7 @@ class MatchSession extends _$MatchSession {
       isComplete: matchedPairIds.length == latest.totalPairs,
     );
     state = AsyncValue<MatchState>.data(cleared);
+    await _persistSnapshot(cleared);
 
     if (!cleared.isComplete) {
       return;
@@ -235,6 +253,7 @@ class MatchSession extends _$MatchSession {
         lastResult: result,
       ),
     );
+    await _persistSnapshot(state.requireValue);
     await Future<void>.delayed(DurationTokens.chartDraw);
     final latest = _stateValueOrNull(state);
 
@@ -242,13 +261,13 @@ class MatchSession extends _$MatchSession {
       return;
     }
 
-    state = AsyncValue<MatchState>.data(
-      latest!.copyWith(
-        selectedTermId: null,
-        selectedDefinitionId: null,
-        lastResult: null,
-      ),
+    final updated = latest!.copyWith(
+      selectedTermId: null,
+      selectedDefinitionId: null,
+      lastResult: null,
     );
+    state = AsyncValue<MatchState>.data(updated);
+    await _persistSnapshot(updated);
   }
 
   bool _isCurrentAttempt(MatchState? stateValue, int sequence) =>
@@ -339,15 +358,160 @@ class MatchSession extends _$MatchSession {
 
     if (game.correctPairs.isEmpty) {
       _session = null;
+      await _clearSnapshot();
       return MatchState(game: game, startTime: DateTime.now());
     }
 
     _session = await ref
         .read(startStudySessionUseCaseProvider)
         .call(deckId: deckId, mode: StudyMode.match);
-    return MatchState(
+    final nextState = MatchState(
       game: game,
       startTime: _session?.startedAt ?? DateTime.now(),
     );
+    await _persistSnapshot(nextState);
+    return nextState;
   }
+
+  Future<void> _clearSnapshot() async {
+    final store = await ref.read(activeStudySessionStoreProvider.future);
+    await store.clearIfMatches(deckId: deckId, mode: StudyMode.match);
+  }
+
+  Map<String, dynamic> _encodeState(MatchState current) => <String, dynamic>{
+    'game': <String, dynamic>{
+      'terms': _encodeItems(current.game.terms),
+      'definitions': _encodeItems(current.game.definitions),
+      'correctPairs': current.game.correctPairs,
+    },
+    'startTime': current.startTime.toIso8601String(),
+    'selectedTermId': current.selectedTermId,
+    'selectedDefinitionId': current.selectedDefinitionId,
+    'matchedPairIds': current.matchedPairIds.toList(growable: false),
+    'attemptCounts': Map<String, int>.fromEntries(
+      current.attemptCounts.entries.map(
+        (entry) => MapEntry<String, int>(entry.key, entry.value),
+      ),
+    ),
+    'mistakes': current.mistakes,
+    'comboCount': current.comboCount,
+  };
+
+  Future<void> _persistSnapshot(MatchState current) async {
+    if (current.isComplete) {
+      await _clearSnapshot();
+      return;
+    }
+
+    final store = await ref.read(activeStudySessionStoreProvider.future);
+    await store.save(
+      ActiveStudySessionSnapshot(
+        deckId: deckId,
+        mode: StudyMode.match,
+        session: _session,
+        payload: _encodeState(current),
+      ),
+    );
+  }
+
+  Future<MatchState?> _restoreSnapshot() async {
+    final store = await ref.read(activeStudySessionStoreProvider.future);
+    final snapshot = store.load();
+
+    if (snapshot == null) {
+      return null;
+    }
+
+    if (snapshot.deckId != deckId || snapshot.mode != StudyMode.match) {
+      return null;
+    }
+
+    final cards = await ref
+        .read(getCardsByDeckUseCaseProvider)
+        .call(deckId)
+        .first;
+    _cardsByTermId
+      ..clear()
+      ..addEntries(
+        cards.map(
+          (card) => MapEntry<String, FlashcardEntity>('term-${card.id}', card),
+        ),
+      );
+    _attemptSequence = 0;
+    _session = snapshot.session;
+    return MatchState(
+      game: _decodeGame(snapshot.payload['game']),
+      startTime:
+          DateTime.tryParse(snapshot.payload['startTime'] as String? ?? '') ??
+          DateTime.now(),
+      selectedTermId: snapshot.payload['selectedTermId'] as String?,
+      selectedDefinitionId: snapshot.payload['selectedDefinitionId'] as String?,
+      matchedPairIds:
+          (snapshot.payload['matchedPairIds'] as List<dynamic>? ??
+                  const <dynamic>[])
+              .map((id) => id as String)
+              .toSet(),
+      attemptCounts: (snapshot.payload['attemptCounts'] as Map?) == null
+          ? const <String, int>{}
+          : (snapshot.payload['attemptCounts'] as Map).map(
+              (key, value) =>
+                  MapEntry<String, int>(key as String, value as int),
+            ),
+      mistakes: snapshot.payload['mistakes'] as int? ?? 0,
+      comboCount: snapshot.payload['comboCount'] as int? ?? 0,
+    );
+  }
+}
+
+List<Map<String, dynamic>> _encodeItems(
+  List<({String id, String text, MatchItemType type})> items,
+) => items
+    .map(
+      (item) => <String, dynamic>{
+        'id': item.id,
+        'text': item.text,
+        'type': item.type.name,
+      },
+    )
+    .toList(growable: false);
+
+({
+  List<({String id, String text, MatchItemType type})> terms,
+  List<({String id, String text, MatchItemType type})> definitions,
+  Map<String, String> correctPairs,
+})
+_decodeGame(Object? raw) {
+  if (raw is! Map) {
+    return (terms: const [], definitions: const [], correctPairs: const {});
+  }
+
+  final json = Map<String, dynamic>.from(raw);
+  return (
+    terms: _decodeItems(json['terms']),
+    definitions: _decodeItems(json['definitions']),
+    correctPairs: (json['correctPairs'] as Map?) == null
+        ? const <String, String>{}
+        : (json['correctPairs'] as Map).map(
+            (key, value) =>
+                MapEntry<String, String>(key as String, value as String),
+          ),
+  );
+}
+
+List<({String id, String text, MatchItemType type})> _decodeItems(Object? raw) {
+  if (raw is! List) {
+    return const [];
+  }
+
+  return raw
+      .map(
+        (item) => (
+          id: (item as Map)['id'] as String? ?? '',
+          text: item['text'] as String? ?? '',
+          type: MatchItemType.values.byName(
+            item['type'] as String? ?? MatchItemType.term.name,
+          ),
+        ),
+      )
+      .toList(growable: false);
 }

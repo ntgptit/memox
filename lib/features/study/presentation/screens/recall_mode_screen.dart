@@ -3,13 +3,16 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:memox/core/design/study_mode.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/cards/presentation/screens/card_edit_screen.dart';
 import 'package:memox/features/study/domain/srs/srs_engine.dart';
+import 'package:memox/features/study/presentation/providers/active_study_session_store.dart';
 import 'package:memox/features/study/presentation/providers/recall_provider.dart';
 import 'package:memox/features/study/presentation/widgets/recall_round_view.dart';
 import 'package:memox/features/study/presentation/widgets/study_mistakes_panel.dart';
+import 'package:memox/features/study/presentation/widgets/study_next_deck_button.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
 import 'package:memox/shared/widgets/feedback/empty_state_view.dart';
 import 'package:memox/shared/widgets/feedback/session_complete_view.dart';
@@ -77,9 +80,18 @@ class _RecallModeScreenState extends ConsumerState<RecallModeScreen> {
       isDestructive: true,
     );
 
-    if (confirmed == true && context.mounted) {
-      Navigator.of(context).pop();
+    if (confirmed != true || !context.mounted) {
+      return;
     }
+
+    final store = await ref.read(activeStudySessionStoreProvider.future);
+    await store.clearIfMatches(deckId: widget.deckId, mode: StudyMode.recall);
+
+    if (!context.mounted) {
+      return;
+    }
+
+    Navigator.of(context).pop();
   }
 
   void _syncAnswerController(String value) {
@@ -157,6 +169,16 @@ Widget _buildBody(
             style: context.appTextStyles.statNumberSm,
             textAlign: TextAlign.center,
           ),
+          if (state.missedCount > 0 && !state.isMissedPracticeSession) ...[
+            const SizedBox(height: SpacingTokens.sm),
+            Text(
+              context.l10n.recallPracticeMissedHint,
+              style: context.textTheme.bodySmall?.copyWith(
+                color: context.colors.onSurfaceVariant,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
           if (state.isMissedPracticeSession) ...[
             const SizedBox(height: SpacingTokens.sm),
             Text(
@@ -169,8 +191,15 @@ Widget _buildBody(
           ],
           if (difficultCards.isNotEmpty) ...[
             const SizedBox(height: SpacingTokens.lg),
-            StudyMistakesPanel(items: difficultCards),
+            StudyMistakesPanel(
+              items: difficultCards,
+              onTapItem: (item) => unawaited(
+                context.push(CardEditScreen.routeLocation(deckId, item.cardId)),
+              ),
+            ),
           ],
+          const SizedBox(height: SpacingTokens.lg),
+          StudyNextDeckButton(currentDeckId: deckId, mode: StudyMode.recall),
         ],
       ),
     );
@@ -206,6 +235,6 @@ List<StudyMistakeItem> _recallMistakes(RecallState state) {
       .toSet();
   return state.cards
       .where((card) => cardIds.contains(card.id))
-      .map((card) => (front: card.front, back: card.back))
+      .map((card) => (cardId: card.id, front: card.front, back: card.back))
       .toList(growable: false);
 }

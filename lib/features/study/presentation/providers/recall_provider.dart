@@ -13,6 +13,7 @@ import 'package:memox/features/settings/domain/entities/app_setting.dart';
 import 'package:memox/features/settings/presentation/providers/settings_provider.dart';
 import 'package:memox/features/study/domain/entities/study_session.dart';
 import 'package:memox/features/study/domain/srs/srs_engine.dart';
+import 'package:memox/features/study/presentation/providers/active_study_session_store.dart';
 import 'package:memox/features/study/presentation/providers/study_engine_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -86,7 +87,15 @@ class RecallSession extends _$RecallSession {
   var _interactionSequence = 0;
 
   @override
-  Future<RecallState> build(int deckId) => _startSession(deckId);
+  Future<RecallState> build(int deckId) async {
+    final restored = await _restoreSnapshot();
+
+    if (restored != null) {
+      return restored;
+    }
+
+    return _startSession(deckId);
+  }
 
   Future<void> revealAnswer() async {
     final current = _stateValueOrNull(state);
@@ -99,7 +108,9 @@ class RecallSession extends _$RecallSession {
       return;
     }
 
-    state = AsyncValue<RecallState>.data(current.copyWith(isRevealed: true));
+    final updated = current.copyWith(isRevealed: true);
+    state = AsyncValue<RecallState>.data(updated);
+    await _persistSnapshot(updated);
   }
 
   Future<void> reviewMissedCards() async {
@@ -111,12 +122,11 @@ class RecallSession extends _$RecallSession {
 
     _interactionSequence++;
     state = const AsyncValue<RecallState>.loading();
-    state = AsyncValue<RecallState>.data(
-      await _startWithCards(
-        _missedCards(current),
-        isMissedPracticeSession: true,
-      ),
+    final nextState = await _startWithCards(
+      _missedCards(current),
+      isMissedPracticeSession: true,
     );
+    state = AsyncValue<RecallState>.data(nextState);
   }
 
   Future<void> markMissed() async {
@@ -144,6 +154,7 @@ class RecallSession extends _$RecallSession {
     );
     final sequence = ++_interactionSequence;
     state = AsyncValue<RecallState>.data(updated);
+    await _persistSnapshot(updated);
     await _persistRecallReview(card, current.userAnswer, SelfRating.missed);
     await Future<void>.delayed(ref.read(recallAdvanceDelayProvider));
     final latest = _stateValueOrNull(state);
@@ -176,6 +187,7 @@ class RecallSession extends _$RecallSession {
     );
     final sequence = ++_interactionSequence;
     state = AsyncValue<RecallState>.data(updated);
+    await _persistSnapshot(updated);
     await _persistRecallReview(card, current.userAnswer, rating);
     await Future<void>.delayed(ref.read(recallAdvanceDelayProvider));
     final latest = _stateValueOrNull(state);
@@ -190,7 +202,8 @@ class RecallSession extends _$RecallSession {
   Future<void> startSession() async {
     _interactionSequence++;
     state = const AsyncValue<RecallState>.loading();
-    state = AsyncValue<RecallState>.data(await _startSession(deckId));
+    final nextState = await _startSession(deckId);
+    state = AsyncValue<RecallState>.data(nextState);
   }
 
   Future<void> updateAnswer(String text) async {
@@ -204,7 +217,9 @@ class RecallSession extends _$RecallSession {
       return;
     }
 
-    state = AsyncValue<RecallState>.data(current.copyWith(userAnswer: text));
+    final updated = current.copyWith(userAnswer: text);
+    state = AsyncValue<RecallState>.data(updated);
+    await _persistSnapshot(updated);
   }
 
   Future<void> _advance(RecallState current) async {
@@ -215,20 +230,21 @@ class RecallSession extends _$RecallSession {
       return;
     }
 
-    state = AsyncValue<RecallState>.data(
-      current.copyWith(
-        currentIndex: current.currentIndex + 1,
-        userAnswer: '',
-        isRevealed: false,
-        selfRating: null,
-      ),
+    final updated = current.copyWith(
+      currentIndex: current.currentIndex + 1,
+      userAnswer: '',
+      isRevealed: false,
+      selfRating: null,
     );
+    state = AsyncValue<RecallState>.data(updated);
+    await _persistSnapshot(updated);
   }
 
   Future<void> _completeSession(RecallState current) async {
     final session = _session;
 
     if (session == null) {
+      await _clearSnapshot();
       return;
     }
 
@@ -244,6 +260,7 @@ class RecallSession extends _$RecallSession {
     _session = await ref
         .read(completeStudySessionUseCaseProvider)
         .call(completedSession);
+    await _clearSnapshot();
   }
 
   List<FlashcardEntity> _missedCards(RecallState current) {
@@ -340,6 +357,7 @@ class RecallSession extends _$RecallSession {
 
     if (cards.isEmpty) {
       _session = null;
+      await _clearSnapshot();
       return const RecallState(
         cards: <FlashcardEntity>[],
         currentIndex: 0,
@@ -347,14 +365,115 @@ class RecallSession extends _$RecallSession {
       );
     }
 
-    _session = await ref
-        .read(startStudySessionUseCaseProvider)
-        .call(deckId: cards.first.deckId, mode: StudyMode.recall);
-    return RecallState(
+    _session = await _startRecallSession(
+      deckId: cards.first.deckId,
+      isMissedPracticeSession: isMissedPracticeSession,
+    );
+    final nextState = RecallState(
       cards: cards,
       currentIndex: 0,
       userAnswer: '',
       isMissedPracticeSession: isMissedPracticeSession,
     );
+    await _persistSnapshot(nextState);
+    return nextState;
+  }
+
+  Future<void> _clearSnapshot() async {
+    final store = await ref.read(activeStudySessionStoreProvider.future);
+    await store.clearIfMatches(deckId: deckId, mode: StudyMode.recall);
+  }
+
+  Map<String, dynamic> _encodeState(RecallState current) => <String, dynamic>{
+    'cards': current.cards.map((card) => card.toJson()).toList(growable: false),
+    'currentIndex': current.currentIndex,
+    'userAnswer': current.userAnswer,
+    'isMissedPracticeSession': current.isMissedPracticeSession,
+    'isRevealed': current.isRevealed,
+    'selfRating': current.selfRating?.name,
+    'results': current.results
+        .map(
+          (result) => <String, dynamic>{
+            'cardId': result.cardId,
+            'userAnswer': result.userAnswer,
+            'rating': result.rating.name,
+          },
+        )
+        .toList(growable: false),
+  };
+
+  Future<void> _persistSnapshot(RecallState current) async {
+    if (current.cards.isEmpty || current.isComplete) {
+      await _clearSnapshot();
+      return;
+    }
+
+    final store = await ref.read(activeStudySessionStoreProvider.future);
+    await store.save(
+      ActiveStudySessionSnapshot(
+        deckId: deckId,
+        mode: StudyMode.recall,
+        session: _session,
+        payload: _encodeState(current),
+      ),
+    );
+  }
+
+  Future<RecallState?> _restoreSnapshot() async {
+    final store = await ref.read(activeStudySessionStoreProvider.future);
+    final snapshot = store.load();
+
+    if (snapshot == null) {
+      return null;
+    }
+
+    if (snapshot.deckId != deckId || snapshot.mode != StudyMode.recall) {
+      return null;
+    }
+
+    _interactionSequence = 0;
+    _session = snapshot.session;
+    return RecallState(
+      cards: (snapshot.payload['cards'] as List<dynamic>? ?? const <dynamic>[])
+          .map(
+            (card) => FlashcardEntity.fromJson(
+              Map<String, dynamic>.from(card as Map),
+            ),
+          )
+          .toList(growable: false),
+      currentIndex: snapshot.payload['currentIndex'] as int? ?? 0,
+      userAnswer: snapshot.payload['userAnswer'] as String? ?? '',
+      isMissedPracticeSession:
+          snapshot.payload['isMissedPracticeSession'] as bool? ?? false,
+      isRevealed: snapshot.payload['isRevealed'] as bool? ?? false,
+      selfRating: snapshot.payload['selfRating'] == null
+          ? null
+          : SelfRating.values.byName(snapshot.payload['selfRating'] as String),
+      results:
+          (snapshot.payload['results'] as List<dynamic>? ?? const <dynamic>[])
+              .map(
+                (result) => (
+                  cardId: (result as Map)['cardId'] as int,
+                  userAnswer: result['userAnswer'] as String? ?? '',
+                  rating: SelfRating.values.byName(
+                    result['rating'] as String? ?? SelfRating.missed.name,
+                  ),
+                ),
+              )
+              .toList(growable: false),
+    );
+  }
+
+  Future<StudySession?> _startRecallSession({
+    required int deckId,
+    required bool isMissedPracticeSession,
+  }) async {
+    if (isMissedPracticeSession) {
+      return null;
+    }
+
+    return ref
+        .read(startStudySessionUseCaseProvider)
+        .call(deckId: deckId, mode: StudyMode.recall);
   }
 }

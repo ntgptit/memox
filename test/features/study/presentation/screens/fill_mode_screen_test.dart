@@ -15,11 +15,17 @@ import 'package:memox/features/study/presentation/screens/fill_mode_screen.dart'
 import 'package:memox/features/study/presentation/widgets/fill_feedback_panel.dart';
 import 'package:memox/features/study/presentation/widgets/fill_prompt_card.dart';
 import 'package:memox/shared/widgets/buttons/secondary_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../test_helpers/fakes/fake_card_review_dao.dart';
+import '../../../../test_helpers/fakes/fake_deck_repository.dart';
 import '../../../../test_helpers/fakes/fake_flashcard_repository.dart';
 import '../../../../test_helpers/test_app.dart';
 
 void main() {
+  setUp(() {
+    SharedPreferences.setMockInitialValues(const <String, Object>{});
+  });
+
   testWidgets('FillModeScreen shows close feedback actions', (tester) async {
     await _setCompactSurface(tester);
     final cardReviewDao = FakeCardReviewDao();
@@ -30,6 +36,7 @@ void main() {
           flashcardRepositoryProvider.overrideWithValue(
             FakeFlashcardRepository(cards: _cards()),
           ),
+          deckRepositoryProvider.overrideWithValue(FakeDeckRepository()),
           studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
           cardReviewDaoProvider.overrideWithValue(cardReviewDao),
           fillRandomProvider(5).overrideWithValue(Random(1)),
@@ -88,6 +95,7 @@ void main() {
           flashcardRepositoryProvider.overrideWithValue(
             FakeFlashcardRepository(cards: _cards()),
           ),
+          deckRepositoryProvider.overrideWithValue(FakeDeckRepository()),
           studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
           cardReviewDaoProvider.overrideWithValue(cardReviewDao),
           fillRandomProvider(5).overrideWithValue(Random(1)),
@@ -127,6 +135,7 @@ void main() {
             flashcardRepositoryProvider.overrideWithValue(
               FakeFlashcardRepository(cards: _cards()),
             ),
+            deckRepositoryProvider.overrideWithValue(FakeDeckRepository()),
             studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
             cardReviewDaoProvider.overrideWithValue(cardReviewDao),
             fillRandomProvider(5).overrideWithValue(Random(1)),
@@ -159,6 +168,7 @@ void main() {
           flashcardRepositoryProvider.overrideWithValue(
             FakeFlashcardRepository(cards: _cardsWithoutExamples()),
           ),
+          deckRepositoryProvider.overrideWithValue(FakeDeckRepository()),
           studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
           cardReviewDaoProvider.overrideWithValue(cardReviewDao),
           fillRandomProvider(5).overrideWithValue(Random(1)),

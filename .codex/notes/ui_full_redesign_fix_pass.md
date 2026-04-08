@@ -312,6 +312,93 @@ screen issues from the audit notes.
 - `flutter test`
   - passed
 
+## Follow-up Batch 8
+
+Date: 2026-04-08
+
+This continuation re-checked the study redesign work against the full
+five-mode UX checklist and reconciled the implementation notes with the actual
+branch state. The main code was already in place; the final work here was to
+confirm coverage, stabilize the last interaction edge cases, and document the
+real end state accurately.
+
+### Highest-impact fixes confirmed in the final study pass
+
+- review mode now has the full “recover from a wrong rating” loop through:
+  - persisted rollback in
+    [review_provider.dart](/D:/workspace/memox/lib/features/study/presentation/providers/review_provider.dart)
+  - reliable undo snackbar display in
+    [review_mode_screen.dart](/D:/workspace/memox/lib/features/study/presentation/screens/review_mode_screen.dart)
+  - swipe and keyboard alternatives in
+    [review_round_view.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/review_round_view.dart)
+    and
+    [review_rating_shortcuts.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/review_rating_shortcuts.dart)
+- match, guess, recall, and fill now all expose a completion-time mistake
+  summary or replay/retry path instead of ending at aggregate stats only
+- active session resume, recent-session history, and “study next deck” are now
+  part of the implemented branch state rather than deferred roadmap items
+
+### App-wide / shared / representative-screen separation at the end of the pass
+
+#### App-wide fixes already in place and used here
+
+- calmer shared surfaces, clearer button/input hierarchy, and lighter accent
+  mapping from earlier shared passes
+- transparent highlight + `InkSparkle` press behavior from
+  [app_theme.dart](/D:/workspace/memox/lib/core/theme/app_theme.dart)
+  so the new study interactions stay visually clean inside rounded surfaces
+
+#### Shared-widget fixes relied on here
+
+- shared toast and icon-action contracts
+- shared `AppSwipeRegion`
+- shared `SessionCompleteView`
+- shared `StudyTopBar`
+
+#### Representative-screen fixes finalized here
+
+- review, guess, recall, fill, and match study screens now collectively cover
+  the requested UX checklist instead of leaving the medium/high-priority items
+  split across TODOs
+- statistics now exposes recent study sessions, which closes the earlier gap
+  around session continuity and post-session visibility
+
+### Implemented now vs. intentionally deferred
+
+Implemented now:
+
+- full requested study-mode UX checklist coverage on the branch
+- final regression stabilization for review undo and the study screen resume
+  path
+- notes/progress reconciliation so the markdown sources match the real code
+
+Recommended next:
+
+- on-device smoke-testing for the new resume, undo, and next-deck flows
+- optional richer recent-session drill-down if the team wants a dedicated
+  history screen later
+
+Intentionally deferred:
+
+- broad non-study app polish outside the already-touched shared and reference
+  screens
+- optional guess distractor expansion from related decks, which is a product
+  enhancement rather than a missing UX regression fix
+
+### Verification for follow-up batch 8
+
+- `dart run build_runner build --delete-conflicting-outputs`
+  - passed
+- `flutter gen-l10n`
+  - passed
+- `python tools/guard/run.py --scope all`
+  - passed
+  - only the pre-existing `feature_completeness` warnings remain
+- `flutter analyze`
+  - passed with no issues
+- `flutter test`
+  - passed
+
 ## Final Continuation: Study UX Coverage
 
 Date: 2026-04-08

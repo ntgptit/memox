@@ -6,6 +6,7 @@ import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/cards/domain/entities/card_batch_parse_result.dart';
 import 'package:memox/features/cards/domain/entities/flashcard_entity.dart';
+import 'package:memox/features/cards/domain/support/flashcard_flags.dart';
 import 'package:memox/shared/widgets/buttons/text_link_button.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
 import 'package:memox/shared/widgets/inputs/app_switch_tile.dart';
@@ -55,12 +56,12 @@ class CardEditorViewState extends ConsumerState<CardEditorView> {
     _hintController = TextEditingController(text: card?.hint);
     _exampleController = TextEditingController(text: card?.example);
     _batchController = TextEditingController();
-    _tags = [...?card?.tags];
+    _tags = [...?card?.visibleTags];
     _mode = widget.isEditing ? CardEditorMode.single : widget.initialMode;
     _showDetails =
         (card?.hint.isNotEmpty ?? false) ||
         (card?.example.isNotEmpty ?? false) ||
-        (card?.tags.isNotEmpty ?? false);
+        (card?.visibleTags.isNotEmpty ?? false);
   }
 
   @override
@@ -222,6 +223,10 @@ class CardEditorViewState extends ConsumerState<CardEditorView> {
     }
 
     if (widget.isEditing) {
+      final nextTags = mergeInternalCardTags(
+        originalTags: widget.initialCard!.tags,
+        visibleTags: _tags,
+      );
       final result = await ref
           .read(updateCardUseCaseProvider)
           .call(
@@ -230,7 +235,7 @@ class CardEditorViewState extends ConsumerState<CardEditorView> {
             back: back,
             hint: _hintController.text,
             example: _exampleController.text,
-            tags: _tags,
+            tags: nextTags,
           );
       if (!mounted || result.isSuccess) {
         return result.isSuccess;

@@ -4,6 +4,7 @@ import 'package:memox/core/design/study_mode.dart';
 import 'package:memox/core/providers/database_providers.dart';
 import 'package:memox/core/providers/repository_providers.dart';
 import 'package:memox/features/cards/domain/entities/flashcard_entity.dart';
+import 'package:memox/features/cards/domain/support/flashcard_flags.dart';
 import 'package:memox/features/study/domain/entities/study_session.dart';
 import 'package:memox/features/study/domain/repositories/study_repository.dart';
 import 'package:memox/features/study/domain/srs/srs_engine.dart';
@@ -152,12 +153,62 @@ void main() {
     expect(studyRepository.completedSession?.correctCount, 2);
     expect(studyRepository.completedSession?.wrongCount, 1);
   });
+
+  test('undoLastRating restores the previous card state', () async {
+    final cardReviewDao = FakeCardReviewDao();
+    final studyRepository = _FakeStudyRepository();
+    final flashcardRepository = FakeFlashcardRepository(cards: _cards(1));
+    final container = buildContainer(
+      flashcardRepository: flashcardRepository,
+      cardReviewDao: cardReviewDao,
+      studyRepository: studyRepository,
+    );
+    addTearDown(cardReviewDao.dispose);
+    addTearDown(container.dispose);
+    final notifier = container.read(reviewSessionProvider(1).notifier);
+
+    await container.read(reviewSessionProvider(1).future);
+    await _revealAndRate(notifier, ReviewRating.good);
+    expect(
+      container.read(reviewSessionProvider(1)).requireValue.isComplete,
+      isTrue,
+    );
+
+    final undone = await notifier.undoLastRating();
+    final state = container.read(reviewSessionProvider(1)).requireValue;
+    final savedCard = await flashcardRepository.getById(1);
+
+    expect(undone, isTrue);
+    expect(state.isComplete, isFalse);
+    expect(state.currentIndex, 0);
+    expect(state.results, isEmpty);
+    expect(savedCard?.interval, 0);
+    expect(cardReviewDao.deletedReviewIds, <int>[1]);
+    expect(studyRepository.completedSession?.completedAt, isNull);
+  });
+
+  test('toggleFlag stores the reserved flag tag on the current card', () async {
+    final cardReviewDao = FakeCardReviewDao();
+    final flashcardRepository = FakeFlashcardRepository(cards: _cards(1));
+    final container = buildContainer(
+      flashcardRepository: flashcardRepository,
+      cardReviewDao: cardReviewDao,
+    );
+    addTearDown(cardReviewDao.dispose);
+    addTearDown(container.dispose);
+    final notifier = container.read(reviewSessionProvider(1).notifier);
+
+    await container.read(reviewSessionProvider(1).future);
+    final isFlagged = await notifier.toggleFlag();
+    final savedCard = await flashcardRepository.getById(1);
+
+    expect(isFlagged, isTrue);
+    expect(savedCard?.tags, contains(flaggedCardTag));
+    expect(savedCard?.visibleTags, isEmpty);
+  });
 }
 
-Future<void> _revealAndRate(
-  ReviewSession notifier,
-  ReviewRating rating,
-) async {
+Future<void> _revealAndRate(ReviewSession notifier, ReviewRating rating) async {
   await notifier.toggleFlip();
   await notifier.rate(rating);
 }

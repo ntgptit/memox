@@ -68,6 +68,8 @@
   "decksTitle": "Bộ thẻ",
   "decksSubtitle": "Khung tính năng bộ thẻ đã sẵn sàng để triển khai.",
   "cardsTitle": "Thẻ",
+  "cardsAllCardsAction": "Tất cả thẻ",
+  "cardsFlaggedOnlyAction": "Đã đánh dấu",
   "cardsSubtitle": "Khung tính năng thẻ đã sẵn sàng để triển khai.",
   "studyTitle": "Học",
   "studySubtitle": "Khung tính năng học đã sẵn sàng để triển khai.",
@@ -114,6 +116,27 @@
     }
   },
   "studyMistakesListAction": "Xem lại các thẻ khó",
+  "studyResumeTitle": "Tiếp tục phiên học?",
+  "studyResumeMessage": "Phiên {mode} trước của bạn vẫn đang còn ({completed}/{total} đã xong). Tiếp tục hay bắt đầu lại?",
+  "@studyResumeMessage": {
+    "placeholders": {
+      "mode": {},
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "studyResumeAction": "Tiếp tục",
+  "studyStartOverAction": "Bắt đầu lại",
+  "studyNextDeckAction": "Học tiếp: {deckName}",
+  "@studyNextDeckAction": {
+    "placeholders": {
+      "deckName": {}
+    }
+  },
   "guessCompleteTitle": "Hoàn thành chế độ đoán",
   "guessPlayAgainAction": "Chơi lại",
   "guessEmptySubtitle": "Hãy thêm thẻ vào bộ này trước khi bắt đầu chế độ Đoán.",
@@ -159,6 +182,7 @@
   "statisticsCardsToFocusTitle": "Những thẻ nên tập trung",
   "statisticsNoHistoryTitle": "Chưa có lịch sử học",
   "statisticsNoHistorySubtitle": "Hoàn thành một phiên học để bắt đầu tạo tiến độ của bạn.",
+  "statisticsRecentSessionsTitle": "Các phiên gần đây",
   "statisticsPracticeTheseAction": "Luyện các thẻ này",
   "statisticsNoDifficultCards": "Hiện chưa có thẻ khó nào.",
   "statisticsPracticeDeckTitle": "Chọn bộ thẻ để luyện",
@@ -482,7 +506,17 @@
   "reviewRatingGoodHint": "Nhớ được",
   "reviewRatingEasy": "Dễ",
   "reviewRatingEasyHint": "Nhớ ngay",
+  "reviewUndoMessage": "Đã chọn {rating}. Hoàn tác?",
+  "@reviewUndoMessage": {
+    "placeholders": {
+      "rating": {}
+    }
+  },
+  "reviewFlagAction": "Đánh dấu thẻ",
+  "reviewUnflagAction": "Bỏ đánh dấu",
   "reviewEmptySubtitle": "Hiện không có thẻ đến hạn trong bộ này.",
+  "cardFlaggedMessage": "Đã đánh dấu thẻ để xem lại sau",
+  "cardUnflaggedMessage": "Đã bỏ đánh dấu thẻ",
   "reviewCompleteTitle": "Đã ôn {count} thẻ",
   "@reviewCompleteTitle": {
     "placeholders": {
@@ -609,6 +643,7 @@
   "recallRatingPartialHint": "Nắm ý chính nhưng thiếu chi tiết quan trọng",
   "recallRatingGotIt": "Nhớ được",
   "recallRatingGotItHint": "Bao phủ đủ các ý chính",
+  "recallComparisonHint": "Phần tô xanh là khớp. Phần tô đỏ là ý còn thiếu hoặc thừa.",
   "recallEmptySubtitle": "Hãy thêm thẻ vào bộ này trước khi bắt đầu chế độ Nhớ lại.",
   "recallCompleteTitle": "Đã nhớ lại {count} thẻ",
   "@recallCompleteTitle": {
@@ -640,7 +675,8 @@
       "count": {}
     }
   },
-  "recallPracticeMissedSummary": "Đây là một phiên luyện mới dành cho các thẻ bạn đã lỡ trước đó.",
+  "recallPracticeMissedHint": "Phiên luyện bổ sung này sẽ không được tính vào thống kê chính của bạn.",
+  "recallPracticeMissedSummary": "Phiên luyện này được tách riêng khỏi thống kê chính của bạn.",
   "fillPromptLabel": "Điền vào chỗ trống",
   "fillShowHintAction": "Hiện gợi ý",
   "fillExamplesRecommendedWarning": "Chế độ Điền từ phù hợp nhất khi thẻ có câu ví dụ. {missing} trên {total} thẻ hiện chưa có ví dụ.",

@@ -72,10 +72,14 @@ class MatchItemCard extends StatelessWidget {
           curve: Curves.easeOut,
         )
         .animate(target: isMatched ? 1 : 0)
-        .fadeOut(duration: DurationTokens.chartDraw)
+        .fadeOut(
+          delay: DurationTokens.chartDraw,
+          duration: DurationTokens.slow,
+        )
         .scale(
           end: const Offset(0.92, 0.92),
-          duration: DurationTokens.chartDraw,
+          delay: DurationTokens.chartDraw,
+          duration: DurationTokens.slow,
         );
   }
 }

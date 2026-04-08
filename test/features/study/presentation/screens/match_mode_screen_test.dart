@@ -14,11 +14,17 @@ import 'package:memox/features/study/domain/repositories/study_repository.dart';
 import 'package:memox/features/study/presentation/providers/match_provider.dart';
 import 'package:memox/features/study/presentation/screens/match_mode_screen.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../test_helpers/fakes/fake_card_review_dao.dart';
+import '../../../../test_helpers/fakes/fake_deck_repository.dart';
 import '../../../../test_helpers/fakes/fake_flashcard_repository.dart';
 import '../../../../test_helpers/test_app.dart';
 
 void main() {
+  setUp(() {
+    SharedPreferences.setMockInitialValues(const <String, Object>{});
+  });
+
   testWidgets('MatchModeScreen renders the current round', (tester) async {
     final cardReviewDao = FakeCardReviewDao();
     addTearDown(cardReviewDao.dispose);
@@ -38,6 +44,7 @@ void main() {
               ],
             ),
           ),
+          deckRepositoryProvider.overrideWithValue(FakeDeckRepository()),
           studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
           matchEngineProvider(
             4,
@@ -46,7 +53,7 @@ void main() {
         child: buildTestApp(home: const MatchModeScreen(deckId: 4)),
       ),
     );
-    await tester.pumpAndSettle();
+    await _pumpMatchScreen(tester);
 
     expect(find.text('Match'), findsOneWidget);
     expect(find.text('1 pair left'), findsOneWidget);
@@ -92,6 +99,7 @@ void main() {
               ],
             ),
           ),
+          deckRepositoryProvider.overrideWithValue(FakeDeckRepository()),
           studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
           matchEngineProvider(
             4,
@@ -100,15 +108,19 @@ void main() {
         child: buildTestApp(home: const MatchModeScreen(deckId: 4)),
       ),
     );
-    await tester.pumpAndSettle();
+    await _pumpMatchScreen(tester);
 
     await tester.tap(find.text('안녕하세요'));
     await tester.tap(find.text('Hello'));
-    await tester.pumpAndSettle();
+    await _pumpMatchScreen(tester);
 
     expect(find.text('All matched!'), findsOneWidget);
     expect(find.text('Play again'), findsOneWidget);
     expect(find.text('Done'), findsOneWidget);
+
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
   });
 
   testWidgets('MatchModeScreen shows a deselect hint after choosing one side', (
@@ -138,6 +150,7 @@ void main() {
               ],
             ),
           ),
+          deckRepositoryProvider.overrideWithValue(FakeDeckRepository()),
           studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
           matchEngineProvider(
             4,
@@ -146,10 +159,10 @@ void main() {
         child: buildTestApp(home: const MatchModeScreen(deckId: 4)),
       ),
     );
-    await tester.pumpAndSettle();
+    await _pumpMatchScreen(tester);
 
     await tester.tap(find.text('안녕하세요'));
-    await tester.pumpAndSettle();
+    await _pumpMatchScreen(tester);
 
     expect(
       find.text('Tap the selected card again to clear it.'),
@@ -181,6 +194,7 @@ void main() {
               ],
             ),
           ),
+          deckRepositoryProvider.overrideWithValue(FakeDeckRepository()),
           studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
           matchEngineProvider(
             4,
@@ -189,7 +203,7 @@ void main() {
         child: buildTestApp(home: const MatchModeScreen(deckId: 4)),
       ),
     );
-    await tester.pumpAndSettle();
+    await _pumpMatchScreen(tester);
 
     final definitionText = tester.widget<Text>(find.text(longDefinition));
 
@@ -217,4 +231,9 @@ final class _FakeStudyRepository implements StudyRepository {
   Stream<List<StudySession>> watchAll() async* {
     yield const <StudySession>[];
   }
+}
+
+Future<void> _pumpMatchScreen(WidgetTester tester) async {
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 700));
 }

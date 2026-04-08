@@ -7,6 +7,7 @@ import 'package:memox/core/design/card_status.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/providers/repository_providers.dart';
 import 'package:memox/features/cards/domain/entities/flashcard_entity.dart';
+import 'package:memox/features/cards/domain/support/flashcard_flags.dart';
 import 'package:memox/features/decks/domain/entities/deck_entity.dart';
 import 'package:memox/features/decks/presentation/screens/deck_detail_screen.dart';
 import 'package:memox/features/folders/domain/entities/folder_entity.dart';
@@ -261,6 +262,60 @@ void main() {
     await tester.pump(const Duration(milliseconds: 200));
 
     expect(find.text('Card 25'), findsOneWidget);
+  });
+
+  testWidgets('DeckDetailScreen filters down to flagged cards only', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          folderRepositoryProvider.overrideWithValue(
+            FakeFolderRepository(
+              folders: const [
+                FolderEntity(id: 1, name: 'Root'),
+                FolderEntity(id: 2, name: 'Languages', parentId: 1),
+              ],
+            ),
+          ),
+          deckRepositoryProvider.overrideWithValue(
+            FakeDeckRepository(
+              decks: const [
+                DeckEntity(id: 3, name: 'Korean Core', folderId: 2),
+              ],
+            ),
+          ),
+          flashcardRepositoryProvider.overrideWithValue(
+            FakeFlashcardRepository(
+              cards: const [
+                FlashcardEntity(
+                  id: 1,
+                  deckId: 3,
+                  front: 'Flagged term',
+                  back: 'Flagged back',
+                  tags: <String>[flaggedCardTag],
+                ),
+                FlashcardEntity(
+                  id: 2,
+                  deckId: 3,
+                  front: 'Regular term',
+                  back: 'Regular back',
+                ),
+              ],
+            ),
+          ),
+        ],
+        child: buildTestApp(home: const DeckDetailScreen(deckId: 3)),
+      ),
+    );
+    await tester.pumpAndSettle();
+    await tester.drag(find.byType(CustomScrollView), const Offset(0, -400));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Flagged'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Flagged term'), findsOneWidget);
+    expect(find.text('Regular term'), findsNothing);
   });
 }
 

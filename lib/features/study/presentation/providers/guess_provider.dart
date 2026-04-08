@@ -13,6 +13,7 @@ import 'package:memox/features/settings/presentation/providers/settings_provider
 import 'package:memox/features/study/domain/entities/study_session.dart';
 import 'package:memox/features/study/domain/guess/guess_engine.dart';
 import 'package:memox/features/study/domain/srs/srs_engine.dart';
+import 'package:memox/features/study/presentation/providers/active_study_session_store.dart';
 import 'package:memox/features/study/presentation/providers/study_engine_providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -90,7 +91,15 @@ class GuessSession extends _$GuessSession {
   var _interactionSequence = 0;
 
   @override
-  Future<GuessState> build(int deckId) => _startSession(deckId);
+  Future<GuessState> build(int deckId) async {
+    final restored = await _restoreSnapshot();
+
+    if (restored != null) {
+      return restored;
+    }
+
+    return _startSession(deckId);
+  }
 
   Future<void> nextQuestion() async {
     final current = _stateValueOrNull(state);
@@ -113,15 +122,15 @@ class GuessSession extends _$GuessSession {
     final nextQuestion = ref
         .read(guessEngineProvider(deckId))
         .generateQuestion(cards[nextIndex], cards);
-    state = AsyncValue<GuessState>.data(
-      current.copyWith(
-        currentIndex: nextIndex,
-        currentQuestion: nextQuestion,
-        selectedOptionIndex: null,
-        isAnswered: false,
-        isCorrect: null,
-      ),
+    final updated = current.copyWith(
+      currentIndex: nextIndex,
+      currentQuestion: nextQuestion,
+      selectedOptionIndex: null,
+      isAnswered: false,
+      isCorrect: null,
     );
+    state = AsyncValue<GuessState>.data(updated);
+    await _persistSnapshot(updated);
   }
 
   Future<void> selectOption(int index) async {
@@ -156,6 +165,7 @@ class GuessSession extends _$GuessSession {
     );
     final sequence = ++_interactionSequence;
     state = AsyncValue<GuessState>.data(updated);
+    await _persistSnapshot(updated);
     await _persistGuessReview(currentCard, isCorrect);
 
     if (!isCorrect) {
@@ -198,22 +208,20 @@ class GuessSession extends _$GuessSession {
     final nextQuestion = ref
         .read(guessEngineProvider(deckId))
         .generateQuestion(cards[current.currentIndex], cards);
-    state = AsyncValue<GuessState>.data(
-      current.copyWith(
-        cards: cards,
-        currentQuestion: nextQuestion,
-        skipCounts: {
-          ...current.skipCounts,
-          currentCard.id: currentSkipCount + 1,
-        },
-      ),
+    final updated = current.copyWith(
+      cards: cards,
+      currentQuestion: nextQuestion,
+      skipCounts: {...current.skipCounts, currentCard.id: currentSkipCount + 1},
     );
+    state = AsyncValue<GuessState>.data(updated);
+    await _persistSnapshot(updated);
   }
 
   Future<void> startSession() async {
     _interactionSequence++;
     state = const AsyncValue<GuessState>.loading();
-    state = AsyncValue<GuessState>.data(await _startSession(deckId));
+    final nextState = await _startSession(deckId);
+    state = AsyncValue<GuessState>.data(nextState);
   }
 
   Future<void> _completeSession(GuessState current) async {
@@ -234,6 +242,7 @@ class GuessSession extends _$GuessSession {
     _session = await ref
         .read(completeStudySessionUseCaseProvider)
         .call(completedSession);
+    await _clearSnapshot();
   }
 
   Future<void> _markSkippedWrong(
@@ -251,6 +260,7 @@ class GuessSession extends _$GuessSession {
       ],
     );
     state = AsyncValue<GuessState>.data(updated);
+    await _persistSnapshot(updated);
     await _persistGuessReview(card, false);
   }
 
@@ -321,6 +331,7 @@ class GuessSession extends _$GuessSession {
 
     if (cards.isEmpty) {
       _session = null;
+      await _clearSnapshot();
       return GuessState(
         cards: const <FlashcardEntity>[],
         currentIndex: 0,
@@ -331,10 +342,140 @@ class GuessSession extends _$GuessSession {
     _session = await ref
         .read(startStudySessionUseCaseProvider)
         .call(deckId: deckId, mode: StudyMode.guess);
-    return GuessState(
+    final nextState = GuessState(
       cards: cards,
       currentIndex: 0,
       currentQuestion: engine.generateQuestion(cards.first, cards),
     );
+    await _persistSnapshot(nextState);
+    return nextState;
+  }
+
+  Future<void> _clearSnapshot() async {
+    final store = await ref.read(activeStudySessionStoreProvider.future);
+    await store.clearIfMatches(deckId: deckId, mode: StudyMode.guess);
+  }
+
+  Map<String, dynamic> _encodeState(GuessState current) => <String, dynamic>{
+    'cards': current.cards.map((card) => card.toJson()).toList(growable: false),
+    'currentIndex': current.currentIndex,
+    'currentQuestion': <String, dynamic>{
+      'definition': current.currentQuestion.definition,
+      'correctIndex': current.currentQuestion.correctIndex,
+      'options': current.currentQuestion.options
+          .map(
+            (option) => <String, dynamic>{
+              'text': option.text,
+              'cardId': option.cardId,
+              'isCorrect': option.isCorrect,
+            },
+          )
+          .toList(growable: false),
+    },
+    'selectedOptionIndex': current.selectedOptionIndex,
+    'isAnswered': current.isAnswered,
+    'isCorrect': current.isCorrect,
+    'streak': current.streak,
+    'bestStreak': current.bestStreak,
+    'results': current.results
+        .map(
+          (result) => <String, dynamic>{
+            'cardId': result.cardId,
+            'isCorrect': result.isCorrect,
+            'skipped': result.skipped,
+          },
+        )
+        .toList(growable: false),
+    'skipCounts': Map<String, int>.fromEntries(
+      current.skipCounts.entries.map(
+        (entry) => MapEntry<String, int>('${entry.key}', entry.value),
+      ),
+    ),
+  };
+
+  Future<void> _persistSnapshot(GuessState current) async {
+    if (current.cards.isEmpty || current.isComplete) {
+      await _clearSnapshot();
+      return;
+    }
+
+    final store = await ref.read(activeStudySessionStoreProvider.future);
+    await store.save(
+      ActiveStudySessionSnapshot(
+        deckId: deckId,
+        mode: StudyMode.guess,
+        session: _session,
+        payload: _encodeState(current),
+      ),
+    );
+  }
+
+  Future<GuessState?> _restoreSnapshot() async {
+    final store = await ref.read(activeStudySessionStoreProvider.future);
+    final snapshot = store.load();
+
+    if (snapshot == null) {
+      return null;
+    }
+
+    if (snapshot.deckId != deckId || snapshot.mode != StudyMode.guess) {
+      return null;
+    }
+
+    final question = (snapshot.payload['currentQuestion'] as Map?) == null
+        ? _emptyQuestion()
+        : _decodeQuestion(
+            Map<String, dynamic>.from(
+              snapshot.payload['currentQuestion'] as Map,
+            ),
+          );
+    _interactionSequence = 0;
+    _session = snapshot.session;
+    return GuessState(
+      cards: (snapshot.payload['cards'] as List<dynamic>? ?? const <dynamic>[])
+          .map(
+            (card) => FlashcardEntity.fromJson(
+              Map<String, dynamic>.from(card as Map),
+            ),
+          )
+          .toList(growable: false),
+      currentIndex: snapshot.payload['currentIndex'] as int? ?? 0,
+      currentQuestion: question,
+      selectedOptionIndex: snapshot.payload['selectedOptionIndex'] as int?,
+      isAnswered: snapshot.payload['isAnswered'] as bool? ?? false,
+      isCorrect: snapshot.payload['isCorrect'] as bool?,
+      streak: snapshot.payload['streak'] as int? ?? 0,
+      bestStreak: snapshot.payload['bestStreak'] as int? ?? 0,
+      results:
+          (snapshot.payload['results'] as List<dynamic>? ?? const <dynamic>[])
+              .map(
+                (result) => (
+                  cardId: (result as Map)['cardId'] as int,
+                  isCorrect: result['isCorrect'] as bool? ?? false,
+                  skipped: result['skipped'] as bool? ?? false,
+                ),
+              )
+              .toList(growable: false),
+      skipCounts: (snapshot.payload['skipCounts'] as Map?) == null
+          ? const <int, int>{}
+          : (snapshot.payload['skipCounts'] as Map).map(
+              (key, value) =>
+                  MapEntry<int, int>(int.parse(key as String), value as int),
+            ),
+    );
   }
 }
+
+GuessQuestion _decodeQuestion(Map<String, dynamic> json) => (
+  definition: json['definition'] as String? ?? '',
+  options: (json['options'] as List<dynamic>? ?? const <dynamic>[])
+      .map(
+        (option) => (
+          text: (option as Map)['text'] as String? ?? '',
+          cardId: option['cardId'] as String? ?? '',
+          isCorrect: option['isCorrect'] as bool? ?? false,
+        ),
+      )
+      .toList(growable: false),
+  correctIndex: json['correctIndex'] as int? ?? 0,
+);

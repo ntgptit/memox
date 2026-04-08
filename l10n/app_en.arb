@@ -68,6 +68,8 @@
   "decksTitle": "Decks",
   "decksSubtitle": "Deck feature scaffold is ready for implementation.",
   "cardsTitle": "Cards",
+  "cardsAllCardsAction": "All cards",
+  "cardsFlaggedOnlyAction": "Flagged",
   "cardsSubtitle": "Card feature scaffold is ready for implementation.",
   "studyTitle": "Study",
   "studySubtitle": "Study feature scaffold is ready for implementation.",
@@ -114,6 +116,27 @@
     }
   },
   "studyMistakesListAction": "Review difficult cards",
+  "studyResumeTitle": "Resume session?",
+  "studyResumeMessage": "Your {mode} session is still active ({completed}/{total} completed). Resume it or start over?",
+  "@studyResumeMessage": {
+    "placeholders": {
+      "mode": {},
+      "completed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "studyResumeAction": "Resume",
+  "studyStartOverAction": "Start over",
+  "studyNextDeckAction": "Study next: {deckName}",
+  "@studyNextDeckAction": {
+    "placeholders": {
+      "deckName": {}
+    }
+  },
   "guessCompleteTitle": "Guess complete",
   "guessPlayAgainAction": "Play again",
   "guessEmptySubtitle": "Add cards to this deck before starting Guess mode.",
@@ -159,6 +182,7 @@
   "statisticsCardsToFocusTitle": "Cards to focus on",
   "statisticsNoHistoryTitle": "No study history yet",
   "statisticsNoHistorySubtitle": "Complete a study session to start building your progress.",
+  "statisticsRecentSessionsTitle": "Recent sessions",
   "statisticsPracticeTheseAction": "Practice these",
   "statisticsNoDifficultCards": "You have no difficult cards right now.",
   "statisticsPracticeDeckTitle": "Choose a deck to practice",
@@ -482,7 +506,17 @@
   "reviewRatingGoodHint": "Remembered",
   "reviewRatingEasy": "Easy",
   "reviewRatingEasyHint": "Instant",
+  "reviewUndoMessage": "{rating} selected. Undo?",
+  "@reviewUndoMessage": {
+    "placeholders": {
+      "rating": {}
+    }
+  },
+  "reviewFlagAction": "Flag card",
+  "reviewUnflagAction": "Remove flag",
   "reviewEmptySubtitle": "No cards are due in this deck right now.",
+  "cardFlaggedMessage": "Card flagged for later",
+  "cardUnflaggedMessage": "Flag removed",
   "reviewCompleteTitle": "{count} cards reviewed",
   "@reviewCompleteTitle": {
     "placeholders": {
@@ -609,6 +643,7 @@
   "recallRatingPartialHint": "Got the main idea but missed key details",
   "recallRatingGotIt": "Got it",
   "recallRatingGotItHint": "All key points covered",
+  "recallComparisonHint": "Green highlights match. Red highlights show missing or extra details.",
   "recallEmptySubtitle": "Add cards to this deck before starting Recall mode.",
   "recallCompleteTitle": "{count} cards recalled",
   "@recallCompleteTitle": {
@@ -640,7 +675,8 @@
       "count": {}
     }
   },
-  "recallPracticeMissedSummary": "This is a new practice session for the cards you missed earlier.",
+  "recallPracticeMissedHint": "This follow-up practice round will not be counted in your statistics.",
+  "recallPracticeMissedSummary": "This practice round was kept separate from your main statistics.",
   "fillPromptLabel": "Complete the blank",
   "fillShowHintAction": "Show hint",
   "fillExamplesRecommendedWarning": "Fill mode works best with example sentences. {missing} of {total} cards are missing one.",

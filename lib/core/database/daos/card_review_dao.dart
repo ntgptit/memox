@@ -14,6 +14,10 @@ class CardReviewDao extends DatabaseAccessor<AppDatabase>
   Future<int> insertReview(CardReviewsTableCompanion review) =>
       into(cardReviewsTable).insert(review, mode: InsertMode.insertOrReplace);
 
+  Future<int> deleteById(int reviewId) => (delete(
+    cardReviewsTable,
+  )..where((CardReviewsTable tbl) => tbl.id.equals(reviewId))).go();
+
   Future<int> countByCardIds(List<int> cardIds) async {
     if (cardIds.isEmpty) {
       return 0;

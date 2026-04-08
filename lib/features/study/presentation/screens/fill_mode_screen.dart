@@ -2,13 +2,18 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:memox/core/design/study_mode.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
+import 'package:memox/features/cards/presentation/screens/card_edit_screen.dart';
 import 'package:memox/features/study/domain/fill/fill_engine.dart';
+import 'package:memox/features/study/presentation/providers/active_study_session_store.dart';
 import 'package:memox/features/study/presentation/providers/fill_provider.dart';
 import 'package:memox/features/study/presentation/providers/study_engine_providers.dart';
 import 'package:memox/features/study/presentation/widgets/fill_mistakes_panel.dart';
 import 'package:memox/features/study/presentation/widgets/fill_round_view.dart';
+import 'package:memox/features/study/presentation/widgets/study_next_deck_button.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
 import 'package:memox/shared/widgets/feedback/empty_state_view.dart';
 import 'package:memox/shared/widgets/feedback/session_complete_view.dart';
@@ -103,9 +108,18 @@ class _FillModeScreenState extends ConsumerState<FillModeScreen> {
       isDestructive: true,
     );
 
-    if (confirmed == true && context.mounted) {
-      context.pop<void>();
+    if (confirmed != true || !context.mounted) {
+      return;
     }
+
+    final store = await ref.read(activeStudySessionStoreProvider.future);
+    await store.clearIfMatches(deckId: widget.deckId, mode: StudyMode.fill);
+
+    if (!context.mounted) {
+      return;
+    }
+
+    Navigator.of(context).pop();
   }
 
   void _syncController(String value) {
@@ -178,12 +192,20 @@ Widget _buildBody(
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: SpacingTokens.lg),
-          FillMistakesPanel(cards: state.cards, results: state.results),
+          FillMistakesPanel(
+            cards: state.cards,
+            results: state.results,
+            onTapCard: (card) => unawaited(
+              context.push(CardEditScreen.routeLocation(deckId, card.id)),
+            ),
+          ),
+          const SizedBox(height: SpacingTokens.lg),
+          StudyNextDeckButton(currentDeckId: deckId, mode: StudyMode.fill),
         ],
       ),
       primaryAction: SessionAction(
         label: context.l10n.doneAction,
-        onTap: () => context.pop<void>(),
+        onTap: () => Navigator.of(context).pop(),
       ),
       secondaryAction: state.canPracticeMistakes
           ? SessionAction(

@@ -333,6 +333,34 @@ Why this improves downstream screens automatically:
 - `flutter analyze` passed
 - `flutter test` passed
 
+## Follow-up Note: Study UX Checklist Closure
+
+Date: 2026-04-08
+
+The final study-UX closure pass did not require another broad shared-widget
+redesign. The earlier shared contracts were already sufficient; the remaining
+work was to consume them consistently and confirm the branch no longer had open
+study-mode checklist gaps.
+
+What this means for the shared-widget phase:
+
+- the review undo flow now reuses the existing shared
+  [toast.dart](/D:/workspace/memox/lib/shared/widgets/feedback/toast.dart)
+  contract instead of inventing a study-only snackbar pattern
+- swipe-to-rate reuses the shared
+  [app_swipe_region.dart](/D:/workspace/memox/lib/shared/widgets/buttons/app_swipe_region.dart)
+  interaction primitive rather than adding a review-only gesture wrapper
+- completion-time mistake summaries stay feature-scoped in
+  [study_mistakes_panel.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/study_mistakes_panel.dart)
+  and
+  [fill_mistakes_panel.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/fill_mistakes_panel.dart)
+  because the pattern is currently specific to study results, not a general
+  app-wide list primitive
+
+No new shared-widget API expansion was needed in this closure pass. That is a
+good outcome: the shared-layer redesign was already strong enough, and the
+remaining work was usage discipline plus regression coverage.
+
 ## Follow-up: Shared Input Contract for Study UX
 
 Date: 2026-04-08

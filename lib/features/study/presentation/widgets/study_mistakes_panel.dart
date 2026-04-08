@@ -3,13 +3,19 @@ import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/shared/widgets/buttons/text_link_button.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
+import 'package:memox/shared/widgets/lists/app_list_tile.dart';
 
-typedef StudyMistakeItem = ({String front, String back});
+typedef StudyMistakeItem = ({int cardId, String front, String back});
 
 class StudyMistakesPanel extends StatefulWidget {
-  const StudyMistakesPanel({required this.items, super.key});
+  const StudyMistakesPanel({
+    required this.items,
+    this.onTapItem,
+    super.key,
+  });
 
   final List<StudyMistakeItem> items;
+  final ValueChanged<StudyMistakeItem>? onTapItem;
 
   @override
   State<StudyMistakesPanel> createState() => _StudyMistakesPanelState();
@@ -34,13 +40,20 @@ class _StudyMistakesPanelState extends State<StudyMistakesPanel> {
           ),
           if (_expanded) ...[
             const SizedBox(height: SpacingTokens.md),
-            for (final item in widget.items)
-              Padding(
-                padding: const EdgeInsets.only(bottom: SpacingTokens.sm),
-                child: Text(
-                  '${item.front} → ${item.back}',
-                  style: context.textTheme.bodySmall,
-                ),
+            for (var index = 0; index < widget.items.length; index++)
+              AppListTile(
+                title: widget.items[index].front,
+                subtitle: widget.items[index].back,
+                trailing: widget.onTapItem == null
+                    ? null
+                    : Icon(
+                        Icons.open_in_new_outlined,
+                        color: context.colors.onSurfaceVariant,
+                      ),
+                onTap: widget.onTapItem == null
+                    ? null
+                    : () => widget.onTapItem!(widget.items[index]),
+                showDivider: index < widget.items.length - 1,
               ),
           ],
         ],

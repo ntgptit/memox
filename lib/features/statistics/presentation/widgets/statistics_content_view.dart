@@ -9,6 +9,7 @@ import 'package:memox/features/statistics/presentation/providers/study_stats_pro
 import 'package:memox/features/statistics/presentation/widgets/difficult_cards_section.dart';
 import 'package:memox/features/statistics/presentation/widgets/mastery_donut_chart_section.dart';
 import 'package:memox/features/statistics/presentation/widgets/mode_usage_chart.dart';
+import 'package:memox/features/statistics/presentation/widgets/recent_study_sessions_section.dart';
 import 'package:memox/features/statistics/presentation/widgets/statistics_empty_view.dart';
 import 'package:memox/features/statistics/presentation/widgets/statistics_header.dart';
 import 'package:memox/features/statistics/presentation/widgets/statistics_practice_action.dart';
@@ -61,6 +62,8 @@ class StatisticsContentView extends ConsumerWidget {
                 ),
                 const Gap.lg(),
                 StreakHeroCard(stats: data.stats),
+                const Gap.xl(),
+                const RecentStudySessionsSection(),
                 const Gap.xl(),
                 WeeklyBarChartSection(activities: data.stats.weeklyActivity),
                 const Gap.xl(),

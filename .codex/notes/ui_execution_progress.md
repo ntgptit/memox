@@ -2,14 +2,22 @@
 
 ## Current phase
 
-Verified locally on `codex/fill-recall-study-layout` and ready to stage/commit
-the supplemental study-UX coverage pass. This batch extends the earlier study
-content-direction/layout fixes with safer cross-mode affordances, warning
-states, keyboard shortcuts, and completion summaries, while still deferring
-session-persistence or SRS-rollback work that needs deeper data contracts.
+Verified locally on `codex/fill-recall-study-layout` after a full re-check of
+the 5 study-mode UX checklist. The requested study UX coverage is now complete
+on this branch: the remaining work in this continuation was to reconcile notes
+with the real code state, lock the last study regressions, and confirm the
+final repo-wide verification pass stays green.
 
 ## Completed work
 
+- re-checked the full 5-study-mode UX checklist against the live branch state
+  instead of relying on older audit notes
+- confirmed that the requested review, match, guess, recall, fill, and
+  cross-mode items are now covered on this branch, with some items delivered
+  through the chosen alternative from the earlier design options
+- reconciled the progress and redesign summary markdown files with the actual
+  implementation so they no longer report already-shipped study features as
+  deferred
 - loaded the MemoX multi-agent workflow preset and repo execution rules
 - inspected current worktree state to avoid overlapping or unrelated edits
 - started the required progress log for this implementation workflow
@@ -356,6 +364,17 @@ session-persistence or SRS-rollback work that needs deeper data contracts.
 - [match_provider_test.dart](/D:/workspace/memox/test/features/study/presentation/providers/match_provider_test.dart)
 - [guess_mode_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/guess_mode_screen_test.dart)
 - [review_mode_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/review_mode_screen_test.dart)
+- [review_mode_screen.dart](/D:/workspace/memox/lib/features/study/presentation/screens/review_mode_screen.dart)
+- [study_screen.dart](/D:/workspace/memox/lib/features/study/presentation/screens/study_screen.dart)
+- [recall_provider.dart](/D:/workspace/memox/lib/features/study/presentation/providers/recall_provider.dart)
+- [study_mistakes_panel.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/study_mistakes_panel.dart)
+- [fill_mistakes_panel.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/fill_mistakes_panel.dart)
+- [guess_mode_screen.dart](/D:/workspace/memox/lib/features/study/presentation/screens/guess_mode_screen.dart)
+- [match_mode_screen.dart](/D:/workspace/memox/lib/features/study/presentation/screens/match_mode_screen.dart)
+- [recall_mode_screen.dart](/D:/workspace/memox/lib/features/study/presentation/screens/recall_mode_screen.dart)
+- [review_provider.dart](/D:/workspace/memox/lib/features/study/presentation/providers/review_provider.dart)
+- [recall_provider_test.dart](/D:/workspace/memox/test/features/study/presentation/providers/recall_provider_test.dart)
+- [study_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/study_screen_test.dart)
 
 ## Deferred items
 
@@ -377,6 +396,13 @@ session-persistence or SRS-rollback work that needs deeper data contracts.
 - no extra deck-detail sliver bottom padding was added in this pass because the
   shared `AppScaffold` FAB clearance already reserves more than `xxxl` space at
   the bottom edge
+- none of the requested study-mode checklist items remain deferred on this
+  branch; any further follow-up is optional polish rather than missing UX
+  coverage
+- richer statistics drill-down from the new recent-session summary remains a
+  later enhancement if the team wants a full session-history screen
+- smarter guess distractor sourcing from related decks remains optional because
+  the current batch already covers the minimum-deck warning path
 
 ## Risks / regressions to watch
 
@@ -441,24 +467,19 @@ session-persistence or SRS-rollback work that needs deeper data contracts.
 - match-mode deselection is now explicit through re-tapping the selected item,
   so the interaction should be visually smoke-tested to confirm users infer it
   without a separate hint
-- review still has no true undo-after-rating flow, and the current batch keeps
-  SRS persistence eager to avoid opening a rollback window without dedicated
-  DAO/session support
-- card flagging/bookmarking is still absent; the data model has no card-level
-  flag field or existing deck-detail filter contract for it
-- session pause/resume and cross-restart continuation are still absent because
-  study-mode state remains in-memory per provider and
-  [study_session_active_provider.dart](/D:/workspace/memox/lib/features/study/presentation/providers/study_session_active_provider.dart)
-  is still only a stub
-- session history browsing is still missing from the UI; persisted
-  `StudySession` rows are available, but there is still no session-list screen
-  or per-session review query path
-- “study next deck” is still not wired because the repo has no dedicated
-  “next due deck” selection policy or shared navigation contract for it yet
+- review undo now rolls back the persisted review record and restores the prior
+  screen state, so the completion-edge snackbar path should still be
+  spot-checked on-device once before release
+- card flagging now relies on an internal tag contract, so bulk tag editing or
+  future tag cleanup code should avoid stripping
+  [flashcard_flags.dart](/D:/workspace/memox/lib/features/cards/domain/support/flashcard_flags.dart)
+  markers unintentionally
+- active session resume, recent-session summaries, and “study next deck” are
+  now wired, so future routing or statistics refactors should keep those
+  cross-mode helpers in sync instead of regressing them silently
 
 ## Next step
 
-Stage, commit, and push the supplemental study-UX coverage pass on
-`codex/fill-recall-study-layout`, then spot-check the live study flows on
-device with special attention to the new completion summaries, recall edit
-affordance, guess skip-limit copy, and review keyboard shortcuts.
+Do one on-device smoke test pass across review undo, guess skip-limit feedback,
+recall practice-missed copy, fill close-match decisions, and study-session
+resume, then prepare the branch for review.

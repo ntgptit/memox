@@ -10,6 +10,7 @@ import 'package:memox/core/responsive/responsive_padding.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/cards/domain/entities/flashcard_entity.dart';
+import 'package:memox/features/cards/domain/support/flashcard_flags.dart';
 import 'package:memox/features/cards/presentation/providers/cards_by_deck_provider.dart';
 import 'package:memox/features/cards/presentation/screens/card_create_screen.dart';
 import 'package:memox/features/cards/presentation/screens/card_edit_screen.dart';
@@ -55,6 +56,7 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
   static const int _cardsPageSize = 20;
   var _query = '';
   var _sort = DeckCardSort.date;
+  var _showFlaggedOnly = false;
   var _showCollapsedTitle = false;
   var _visibleCardCount = _cardsPageSize;
 
@@ -242,12 +244,17 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
         padding: ResponsivePadding.horizontal(context),
         child: DeckCardsToolbar(
           sort: _sort,
+          showFlaggedOnly: _showFlaggedOnly,
           onQueryChanged: (value) => setState(() {
             _query = value;
             _visibleCardCount = _cardsPageSize;
           }),
           onSortChanged: (value) => setState(() {
             _sort = value;
+            _visibleCardCount = _cardsPageSize;
+          }),
+          onFlagFilterChanged: (value) => setState(() {
+            _showFlaggedOnly = value;
             _visibleCardCount = _cardsPageSize;
           }),
         ),
@@ -323,17 +330,21 @@ class _DeckDetailScreenState extends ConsumerState<DeckDetailScreen> {
   List<FlashcardEntity> _filteredCards(List<FlashcardEntity> cards) {
     final normalized = _query.trim().toLowerCase();
 
-    if (normalized.isEmpty) {
-      return cards;
-    }
-
     return cards.where((card) {
+      if (_showFlaggedOnly && !card.isFlagged) {
+        return false;
+      }
+
+      if (normalized.isEmpty) {
+        return true;
+      }
+
       final haystack = [
         card.front,
         card.back,
         card.hint,
         card.example,
-        ...card.tags,
+        ...card.visibleTags,
       ].join(' ').toLowerCase();
       return haystack.contains(normalized);
     }).toList();

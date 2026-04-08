@@ -14,11 +14,17 @@ import 'package:memox/features/study/domain/repositories/study_repository.dart';
 import 'package:memox/features/study/presentation/providers/guess_provider.dart';
 import 'package:memox/features/study/presentation/screens/guess_mode_screen.dart';
 import 'package:memox/features/study/presentation/widgets/guess_option_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../test_helpers/fakes/fake_card_review_dao.dart';
+import '../../../../test_helpers/fakes/fake_deck_repository.dart';
 import '../../../../test_helpers/fakes/fake_flashcard_repository.dart';
 import '../../../../test_helpers/test_app.dart';
 
 void main() {
+  setUp(() {
+    SharedPreferences.setMockInitialValues(const <String, Object>{});
+  });
+
   testWidgets('GuessModeScreen renders the current question', (tester) async {
     final cardReviewDao = FakeCardReviewDao();
     addTearDown(cardReviewDao.dispose);
@@ -38,6 +44,7 @@ void main() {
               ],
             ),
           ),
+          deckRepositoryProvider.overrideWithValue(FakeDeckRepository()),
           studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
           guessEngineProvider(
             5,
@@ -46,7 +53,7 @@ void main() {
         child: buildTestApp(home: const GuessModeScreen(deckId: 5)),
       ),
     );
-    await tester.pumpAndSettle();
+    await _pumpGuessScreen(tester);
 
     expect(find.text('Guess'), findsOneWidget);
     expect(find.text('Hello'), findsOneWidget);
@@ -82,6 +89,7 @@ void main() {
               ],
             ),
           ),
+          deckRepositoryProvider.overrideWithValue(FakeDeckRepository()),
           studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
           guessEngineProvider(
             5,
@@ -91,7 +99,7 @@ void main() {
         child: buildTestApp(home: const GuessModeScreen(deckId: 5)),
       ),
     );
-    await tester.pumpAndSettle();
+    await _pumpGuessScreen(tester);
 
     final optionButton = find
         .ancestor(
@@ -101,11 +109,15 @@ void main() {
         .first;
     await tester.ensureVisible(optionButton);
     await tester.tap(optionButton);
-    await tester.pumpAndSettle();
+    await _pumpGuessScreen(tester);
 
     expect(find.text('Guess complete'), findsOneWidget);
     expect(find.text('1/1 correct (100%)'), findsOneWidget);
     expect(find.text('Done'), findsOneWidget);
+
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
   });
 
   testWidgets('GuessModeScreen shows continue affordance before auto-advance', (
@@ -129,6 +141,7 @@ void main() {
               ],
             ),
           ),
+          deckRepositoryProvider.overrideWithValue(FakeDeckRepository()),
           studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
           guessEngineProvider(
             5,
@@ -140,7 +153,7 @@ void main() {
         child: buildTestApp(home: const GuessModeScreen(deckId: 5)),
       ),
     );
-    await tester.pumpAndSettle();
+    await _pumpGuessScreen(tester);
 
     final optionButton = find
         .ancestor(
@@ -156,9 +169,9 @@ void main() {
     expect(find.text('Guess complete'), findsNothing);
 
     await tester.tap(find.text('Continue'));
-    await tester.pumpAndSettle();
+    await _pumpGuessScreen(tester);
     await tester.pump(const Duration(milliseconds: 500));
-    await tester.pumpAndSettle();
+    await _pumpGuessScreen(tester);
 
     expect(find.text('Guess complete'), findsOneWidget);
   });
@@ -186,6 +199,7 @@ void main() {
                 ],
               ),
             ),
+            deckRepositoryProvider.overrideWithValue(FakeDeckRepository()),
             studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
             guessEngineProvider(
               5,
@@ -194,7 +208,7 @@ void main() {
           child: buildTestApp(home: const GuessModeScreen(deckId: 5)),
         ),
       );
-      await tester.pumpAndSettle();
+      await _pumpGuessScreen(tester);
 
       final wrongOption = find
           .ancestor(
@@ -204,7 +218,7 @@ void main() {
           .first;
       await tester.ensureVisible(wrongOption);
       await tester.tap(wrongOption);
-      await tester.pumpAndSettle();
+      await _pumpGuessScreen(tester);
 
       expect(find.text('Correct answer'), findsOneWidget);
       expect(find.text('안녕하세요'), findsWidgets);
@@ -237,6 +251,7 @@ void main() {
               ],
             ),
           ),
+          deckRepositoryProvider.overrideWithValue(FakeDeckRepository()),
           studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
           guessEngineProvider(
             5,
@@ -245,7 +260,7 @@ void main() {
         child: buildTestApp(home: const GuessModeScreen(deckId: 5)),
       ),
     );
-    await tester.pumpAndSettle();
+    await _pumpGuessScreen(tester);
 
     final wrongOption = find
         .ancestor(
@@ -255,9 +270,9 @@ void main() {
         .first;
     await tester.ensureVisible(wrongOption);
     await tester.tap(wrongOption);
-    await tester.pumpAndSettle();
+    await _pumpGuessScreen(tester);
     await tester.tap(find.text('Continue'));
-    await tester.pumpAndSettle();
+    await _pumpGuessScreen(tester);
 
     expect(find.text('Review difficult cards'), findsOneWidget);
   });
@@ -282,4 +297,9 @@ final class _FakeStudyRepository implements StudyRepository {
   Stream<List<StudySession>> watchAll() async* {
     yield const <StudySession>[];
   }
+}
+
+Future<void> _pumpGuessScreen(WidgetTester tester) async {
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 400));
 }

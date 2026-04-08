@@ -2,11 +2,16 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:memox/core/design/study_mode.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
+import 'package:memox/features/cards/presentation/screens/card_edit_screen.dart';
+import 'package:memox/features/study/presentation/providers/active_study_session_store.dart';
 import 'package:memox/features/study/presentation/providers/guess_provider.dart';
 import 'package:memox/features/study/presentation/widgets/guess_round_view.dart';
 import 'package:memox/features/study/presentation/widgets/study_mistakes_panel.dart';
+import 'package:memox/features/study/presentation/widgets/study_next_deck_button.dart';
 import 'package:memox/shared/widgets/buttons/secondary_button.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
 import 'package:memox/shared/widgets/feedback/empty_state_view.dart';
@@ -36,7 +41,7 @@ class GuessModeScreen extends ConsumerWidget {
           total: data.totalCards,
           streak: data.streak,
           showProgress: data.cards.isNotEmpty && !data.isComplete,
-          onClose: () => unawaited(_handleClose(context)),
+          onClose: () => unawaited(_handleClose(context, ref)),
         ),
         applyBottomPadding: false,
         applyHorizontalPadding: false,
@@ -45,7 +50,7 @@ class GuessModeScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _handleClose(BuildContext context) async {
+  Future<void> _handleClose(BuildContext context, WidgetRef ref) async {
     final confirmed = await context.showConfirmDialog(
       title: context.l10n.exitSessionTitle,
       message: context.l10n.exitSessionMessage,
@@ -53,9 +58,18 @@ class GuessModeScreen extends ConsumerWidget {
       isDestructive: true,
     );
 
-    if (confirmed == true && context.mounted) {
-      context.pop<void>();
+    if (confirmed != true || !context.mounted) {
+      return;
     }
+
+    final store = await ref.read(activeStudySessionStoreProvider.future);
+    await store.clearIfMatches(deckId: deckId, mode: StudyMode.guess);
+
+    if (!context.mounted) {
+      return;
+    }
+
+    Navigator.of(context).pop();
   }
 }
 
@@ -77,7 +91,7 @@ Widget _buildBody(
     return _buildCompletionView(
       context,
       data,
-      onDone: () => context.pop<void>(),
+      onDone: () => Navigator.of(context).pop(),
       onPlayAgain: () =>
           ref.read(guessSessionProvider(deckId).notifier).startSession(),
     );
@@ -144,9 +158,21 @@ Widget _buildCompletionView(
         ],
         if (difficultCards.isNotEmpty) ...[
           const SizedBox(height: SpacingTokens.lg),
-          StudyMistakesPanel(items: difficultCards),
+          StudyMistakesPanel(
+            items: difficultCards,
+            onTapItem: (item) => unawaited(
+              context.push(
+                CardEditScreen.routeLocation(state.cards.first.deckId, item.cardId),
+              ),
+            ),
+          ),
         ],
         const SizedBox(height: SpacingTokens.lg),
+        StudyNextDeckButton(
+          currentDeckId: state.cards.first.deckId,
+          mode: StudyMode.guess,
+        ),
+        const SizedBox(height: SpacingTokens.sm),
         SecondaryButton(
           label: context.l10n.guessPlayAgainAction,
           onPressed: onPlayAgain,
@@ -164,6 +190,6 @@ List<StudyMistakeItem> _guessMistakes(GuessState state) {
       .toSet();
   return state.cards
       .where((card) => cardIds.contains(card.id))
-      .map((card) => (front: card.front, back: card.back))
+      .map((card) => (cardId: card.id, front: card.front, back: card.back))
       .toList(growable: false);
 }

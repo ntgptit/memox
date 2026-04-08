@@ -22,15 +22,12 @@ extension StudySessionEntityMapper on StudySession {
     final startedAt = this.startedAt == null
         ? Value<DateTime>(DateTime.now())
         : Value<DateTime>(this.startedAt!);
-    final completedAt = this.completedAt == null
-        ? const Value<DateTime?>.absent()
-        : Value<DateTime?>(this.completedAt);
     return StudySessionsTableCompanion(
       id: id,
       deckId: Value<int>(deckId),
       mode: Value(mode),
       startedAt: startedAt,
-      completedAt: completedAt,
+      completedAt: Value<DateTime?>(completedAt),
       totalCards: Value<int>(totalCards),
       correctCount: Value<int>(correctCount),
       wrongCount: Value<int>(wrongCount),

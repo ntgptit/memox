@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/decks/presentation/models/deck_card_sort.dart';
 import 'package:memox/features/decks/presentation/widgets/deck_cards_toolbar.dart';
-import 'package:memox/shared/widgets/buttons/secondary_button.dart';
 import 'package:memox/shared/widgets/inputs/app_search_bar.dart';
 import '../../../../test_helpers/test_app.dart';
 
@@ -18,7 +17,9 @@ void main() {
             height: DeckCardsToolbar.height,
             child: const DeckCardsToolbar(
               sort: DeckCardSort.date,
+              showFlaggedOnly: false,
               onQueryChanged: _noopQuery,
+              onFlagFilterChanged: _noopFlagFilter,
               onSortChanged: _noopSort,
             ),
           ),
@@ -35,7 +36,9 @@ void main() {
         )
         .first;
     final toolbarRect = tester.getRect(surfaceFinder);
-    final sortButtonRect = tester.getRect(find.byType(SecondaryButton));
+    final sortButtonRect = tester.getRect(
+      find.widgetWithText(OutlinedButton, 'Date'),
+    );
     final searchBarRect = tester.getRect(find.byType(AppSearchBar));
     final title = tester.widget<Text>(find.text('Cards'));
     final surface = tester.widget<DecoratedBox>(surfaceFinder);
@@ -60,5 +63,7 @@ void main() {
 }
 
 void _noopQuery(String _) {}
+
+void _noopFlagFilter(bool _) {}
 
 void _noopSort(DeckCardSort _) {}

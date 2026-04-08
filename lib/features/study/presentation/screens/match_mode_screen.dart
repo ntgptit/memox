@@ -2,13 +2,18 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:memox/core/design/study_mode.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
+import 'package:memox/features/cards/presentation/screens/card_edit_screen.dart';
+import 'package:memox/features/study/presentation/providers/active_study_session_store.dart';
 import 'package:memox/features/study/presentation/providers/match_provider.dart';
 import 'package:memox/features/study/presentation/widgets/match_elapsed_timer_text.dart';
 import 'package:memox/features/study/presentation/widgets/match_round_view.dart';
 import 'package:memox/features/study/presentation/widgets/match_star_rating.dart';
 import 'package:memox/features/study/presentation/widgets/study_mistakes_panel.dart';
+import 'package:memox/features/study/presentation/widgets/study_next_deck_button.dart';
 import 'package:memox/shared/widgets/buttons/secondary_button.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
 import 'package:memox/shared/widgets/feedback/session_complete_view.dart';
@@ -43,7 +48,7 @@ class MatchModeScreen extends ConsumerWidget {
                 )
               : MatchElapsedTimerText(startTime: data.startTime),
           showProgress: false,
-          onClose: () => unawaited(_handleClose(context)),
+          onClose: () => unawaited(_handleClose(context, ref)),
         ),
         applyBottomPadding: false,
         applyHorizontalPadding: false,
@@ -51,7 +56,8 @@ class MatchModeScreen extends ConsumerWidget {
             ? _buildCompletionView(
                 context,
                 data,
-                onDone: () => context.pop<void>(),
+                currentDeckId: deckId,
+                onDone: () => Navigator.of(context).pop(),
                 onPlayAgain: () =>
                     ref.read(matchSessionProvider(deckId).notifier).startGame(),
               )
@@ -65,7 +71,7 @@ class MatchModeScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _handleClose(BuildContext context) async {
+  Future<void> _handleClose(BuildContext context, WidgetRef ref) async {
     final confirmed = await context.showConfirmDialog(
       title: context.l10n.exitSessionTitle,
       message: context.l10n.exitSessionMessage,
@@ -73,15 +79,25 @@ class MatchModeScreen extends ConsumerWidget {
       isDestructive: true,
     );
 
-    if (confirmed == true && context.mounted) {
-      context.pop<void>();
+    if (confirmed != true || !context.mounted) {
+      return;
     }
+
+    final store = await ref.read(activeStudySessionStoreProvider.future);
+    await store.clearIfMatches(deckId: deckId, mode: StudyMode.match);
+
+    if (!context.mounted) {
+      return;
+    }
+
+    Navigator.of(context).pop();
   }
 }
 
 Widget _buildCompletionView(
   BuildContext context,
   MatchState state, {
+  required int currentDeckId,
   required VoidCallback onDone,
   required VoidCallback onPlayAgain,
 }) {
@@ -112,9 +128,21 @@ Widget _buildCompletionView(
         MatchStarRating(starCount: starCount),
         if (difficultCards.isNotEmpty) ...[
           const SizedBox(height: SpacingTokens.lg),
-          StudyMistakesPanel(items: difficultCards),
+          StudyMistakesPanel(
+            items: difficultCards,
+            onTapItem: (item) => unawaited(
+              context.push(
+                CardEditScreen.routeLocation(currentDeckId, item.cardId),
+              ),
+            ),
+          ),
         ],
         const SizedBox(height: SpacingTokens.lg),
+        StudyNextDeckButton(
+          currentDeckId: currentDeckId,
+          mode: StudyMode.match,
+        ),
+        const SizedBox(height: SpacingTokens.sm),
         SecondaryButton(
           label: context.l10n.matchPlayAgainAction,
           onPressed: onPlayAgain,
@@ -156,6 +184,7 @@ List<StudyMistakeItem> _matchMistakes(MatchState state) {
   return state.attemptCounts.entries
       .map(
         (entry) => (
+          cardId: int.tryParse(entry.key.replaceFirst('term-', '')) ?? 0,
           front: termsById[entry.key] ?? entry.key,
           back: definitionsById[state.game.correctPairs[entry.key]] ?? '',
         ),

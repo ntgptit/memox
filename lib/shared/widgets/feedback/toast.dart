@@ -9,6 +9,8 @@ mixin Toast {
     BuildContext context,
     String message, {
     ToastType type = ToastType.info,
+    String? actionLabel,
+    VoidCallback? onAction,
   }) {
     final (iconColor, icon) = switch (type) {
       ToastType.success => (
@@ -25,6 +27,9 @@ mixin Toast {
       ..showSnackBar(
         SnackBar(
           backgroundColor: backgroundColor,
+          action: actionLabel == null || onAction == null
+              ? null
+              : SnackBarAction(label: actionLabel, onPressed: onAction),
           content: Row(
             children: [
               Icon(icon, color: iconColor),

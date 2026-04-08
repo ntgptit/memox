@@ -12,11 +12,18 @@ class FakeCardReviewDao extends CardReviewDao {
   final AppDatabase _database;
   final List<CardReviewsTableCompanion> insertedReviews =
       <CardReviewsTableCompanion>[];
+  final List<int> deletedReviewIds = <int>[];
 
   @override
   Future<int> insertReview(CardReviewsTableCompanion review) async {
     insertedReviews.add(review);
     return insertedReviews.length;
+  }
+
+  @override
+  Future<int> deleteById(int reviewId) async {
+    deletedReviewIds.add(reviewId);
+    return 1;
   }
 
   Future<void> dispose() => _database.close();

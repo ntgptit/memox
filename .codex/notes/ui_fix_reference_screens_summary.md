@@ -889,3 +889,103 @@ underlying session-persistence architecture.
   - passed with no issues
 - `flutter test`
   - passed
+
+## Follow-up Batch 10
+
+Date: 2026-04-08
+
+This continuation re-checked the full 5-study-mode UX checklist against the
+actual branch state and closed the last gaps between the implementation notes
+and the code that is already on disk.
+
+### Checklist closure confirmed in the reference study screens
+
+- review mode now has the full requested recovery loop:
+  - undo snackbar in
+    [review_mode_screen.dart](/D:/workspace/memox/lib/features/study/presentation/screens/review_mode_screen.dart)
+  - flag-for-later action on the top bar
+  - flagged-only filtering in
+    [deck_detail_screen.dart](/D:/workspace/memox/lib/features/decks/presentation/screens/deck_detail_screen.dart)
+  - micro-hints in
+    [review_rating_grid.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/review_rating_grid.dart)
+  - swipe and keyboard alternatives in
+    [review_round_view.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/review_round_view.dart)
+    and
+    [review_rating_shortcuts.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/review_rating_shortcuts.dart)
+- match mode now covers the requested interaction fixes through:
+  - tap-again deselection in
+    [match_provider.dart](/D:/workspace/memox/lib/features/study/presentation/providers/match_provider.dart)
+  - a visible correct-state hold in
+    [match_item_card.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/match_item_card.dart)
+  - replay affordance in
+    [match_mode_screen.dart](/D:/workspace/memox/lib/features/study/presentation/screens/match_mode_screen.dart)
+  - attempt-aware SRS persistence in the same provider
+- guess mode now covers explanation, control, and consequence paths through:
+  - [guess_feedback_card.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/guess_feedback_card.dart)
+  - [guess_round_view.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/guess_round_view.dart)
+  - [guess_mode_screen.dart](/D:/workspace/memox/lib/features/study/presentation/screens/guess_mode_screen.dart)
+- recall mode now covers guided comparison, anti-bypass, edit, and missed-card
+  flow clarity through:
+  - [recall_highlighted_text.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/recall_highlighted_text.dart)
+  - [recall_reveal_phase.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/recall_reveal_phase.dart)
+  - [recall_writing_area.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/recall_writing_area.dart)
+  - [recall_provider.dart](/D:/workspace/memox/lib/features/study/presentation/providers/recall_provider.dart)
+  - [recall_mode_screen.dart](/D:/workspace/memox/lib/features/study/presentation/screens/recall_mode_screen.dart)
+- fill mode now covers clearer close-match decisions, a softer retry loop, and
+  better prompt quality through:
+  - [fill_feedback_panel.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/fill_feedback_panel.dart)
+  - [fill_provider.dart](/D:/workspace/memox/lib/features/study/presentation/providers/fill_provider.dart)
+  - [fill_engine.dart](/D:/workspace/memox/lib/features/study/domain/fill/fill_engine.dart)
+  - [fill_answer_input.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/fill_answer_input.dart)
+
+### Cross-mode patterns now covered
+
+- active session pause/resume prompt via
+  [active_study_session_store.dart](/D:/workspace/memox/lib/features/study/presentation/providers/active_study_session_store.dart)
+  and
+  [study_resume_dialog.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/study_resume_dialog.dart)
+- mistakes summary panels across all study completions via
+  [study_mistakes_panel.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/study_mistakes_panel.dart)
+  and
+  [fill_mistakes_panel.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/fill_mistakes_panel.dart)
+- recent study-session history on the statistics tab via
+  [recent_study_sessions_provider.dart](/D:/workspace/memox/lib/features/statistics/presentation/providers/recent_study_sessions_provider.dart)
+  and
+  [recent_study_sessions_section.dart](/D:/workspace/memox/lib/features/statistics/presentation/widgets/recent_study_sessions_section.dart)
+- “study next deck” completion affordance via
+  [study_next_deck_button.dart](/D:/workspace/memox/lib/features/study/presentation/widgets/study_next_deck_button.dart)
+
+### Additional stabilization done in this continuation
+
+- made the review undo snackbar trigger reliable from the built `ReviewState`
+  instead of the earlier listener-only path in
+  [review_mode_screen.dart](/D:/workspace/memox/lib/features/study/presentation/screens/review_mode_screen.dart)
+- tightened study regression coverage around:
+  - [review_mode_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/review_mode_screen_test.dart)
+  - [guess_mode_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/guess_mode_screen_test.dart)
+  - [recall_mode_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/recall_mode_screen_test.dart)
+  - [study_screen_test.dart](/D:/workspace/memox/test/features/study/presentation/screens/study_screen_test.dart)
+  - [recall_provider_test.dart](/D:/workspace/memox/test/features/study/presentation/providers/recall_provider_test.dart)
+
+### Remaining reference-screen defers
+
+- none of the requested study-mode UX checklist items remain open on this
+  branch
+- later optional work is now polish only:
+  - richer per-session drill-down from the recent-session summary
+  - smarter guess distractor sourcing from related decks
+  - deeper visual smoke testing on-device for the new resume and undo flows
+
+### Verification for follow-up batch 10
+
+- `dart run build_runner build --delete-conflicting-outputs`
+  - passed
+- `flutter gen-l10n`
+  - passed
+- `python tools/guard/run.py --scope all`
+  - passed
+  - only the pre-existing `feature_completeness` warnings remain
+- `flutter analyze`
+  - passed with no issues
+- `flutter test`
+  - passed

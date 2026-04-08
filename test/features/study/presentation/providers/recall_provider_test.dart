@@ -164,9 +164,9 @@ void main() {
     expect(state.gotItCount, 1);
     expect(state.partialCount, 1);
     expect(state.missedCount, 1);
-    expect(studyRepository.completedSession?.mode, StudyMode.recall);
-    expect(studyRepository.completedSession?.correctCount, 1);
-    expect(studyRepository.completedSession?.wrongCount, 2);
+    expect(studyRepository.latestCompletedSession?.mode, StudyMode.recall);
+    expect(studyRepository.latestCompletedSession?.correctCount, 1);
+    expect(studyRepository.latestCompletedSession?.wrongCount, 2);
   });
 
   test('reviewMissedCards restarts as a practice-only session', () async {
@@ -188,6 +188,31 @@ void main() {
     expect(state.isMissedPracticeSession, isTrue);
     expect(state.totalCards, 1);
     expect(state.currentCard, isNotNull);
+  });
+
+  test('missed-card practice is not counted as a new statistics session', () async {
+    final cardReviewDao = FakeCardReviewDao();
+    final studyRepository = _FakeStudyRepository();
+    final container = buildContainer(
+      flashcardRepository: FakeFlashcardRepository(cards: _cards(2)),
+      cardReviewDao: cardReviewDao,
+      studyRepository: studyRepository,
+    );
+    addTearDown(cardReviewDao.dispose);
+    addTearDown(container.dispose);
+    final notifier = container.read(recallSessionProvider(1).notifier);
+
+    await container.read(recallSessionProvider(1).future);
+    await _answerAndRate(notifier, 'wrong', SelfRating.missed);
+    await _answerAndRate(notifier, 'right', SelfRating.gotIt);
+    expect(studyRepository.completedSessions, hasLength(1));
+    final reviewCountBeforePractice = cardReviewDao.insertedReviews.length;
+
+    await notifier.reviewMissedCards();
+    await notifier.markMissed();
+
+    expect(studyRepository.completedSessions, hasLength(1));
+    expect(cardReviewDao.insertedReviews, hasLength(reviewCountBeforePractice));
   });
 }
 
@@ -212,11 +237,17 @@ List<FlashcardEntity> _cards(int count) => List<FlashcardEntity>.generate(
 );
 
 final class _FakeStudyRepository implements StudyRepository {
-  StudySession? completedSession;
+  final List<StudySession> completedSessions = <StudySession>[];
+
+  StudySession? get latestCompletedSession => completedSessions.isEmpty
+      ? null
+      : completedSessions.last;
 
   @override
-  Future<StudySession> completeSession(StudySession session) async =>
-      completedSession = session;
+  Future<StudySession> completeSession(StudySession session) async {
+    completedSessions.add(session);
+    return session;
+  }
 
   @override
   Future<StudySession> startSession({
