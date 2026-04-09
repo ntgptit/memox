@@ -93,5 +93,5 @@ abstract final class SizeTokens {
   static const double dividerThickness = 1;
   static const double borderWidth = 1;
   static const double borderWidthThick =
-      3; // left accent border on comparison cards
+      4; // left accent border on comparison cards and focused underline
 }

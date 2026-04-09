@@ -61,6 +61,11 @@ void main() {
       TypographyTokens.sectionSpacing,
     );
     expect(theme, isNotNull);
+    expect(theme!.colorScheme.surface, ColorTokens.lightSurface);
+    expect(
+      theme!.colorScheme.surfaceContainerLowest,
+      ColorTokens.surfaceContainerLowestLight,
+    );
     expect(theme!.scaffoldBackgroundColor, theme!.colorScheme.surface);
     expect(theme!.cardTheme.color, theme!.colorScheme.surfaceContainerLowest);
     expect(
@@ -193,6 +198,10 @@ void main() {
         WidgetState.pressed,
       }),
       theme!.colorScheme.primary.withValues(alpha: OpacityTokens.press),
+    );
+    expect(
+      theme!.switchTheme.trackColor?.resolve({WidgetState.selected}),
+      theme!.colorScheme.primary,
     );
   });
 }

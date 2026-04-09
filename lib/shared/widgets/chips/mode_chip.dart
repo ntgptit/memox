@@ -38,7 +38,11 @@ class ModeChip extends StatelessWidget {
           dimension: SizeTokens.chipHeightSm,
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: context.colors.surfaceContainerLow,
+              color: isSelected
+                  ? context.colors.primary.withValues(
+                      alpha: OpacityTokens.softTint,
+                    )
+                  : context.colors.surfaceContainerLow,
               borderRadius: BorderRadius.circular(RadiusTokens.full),
             ),
             child: Center(child: Text(mode.emoji)),

@@ -4,6 +4,7 @@ import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/duration_tokens.dart';
 import 'package:memox/core/theme/tokens/opacity_tokens.dart';
 import 'package:memox/core/theme/tokens/radius_tokens.dart';
+import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 
 class StreakChip extends StatelessWidget {
@@ -17,28 +18,15 @@ class StreakChip extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final showGlow = count >= 5;
     return DecoratedBox(
           decoration: BoxDecoration(
-            color: context.customColors.streak.withValues(
-              alpha: OpacityTokens.focus,
-            ),
+            color: context.colors.surfaceContainerLowest,
             border: Border.all(
               color: context.customColors.streak.withValues(
                 alpha: OpacityTokens.borderSubtle,
               ),
             ),
             borderRadius: BorderRadius.circular(RadiusTokens.full),
-            boxShadow: showGlow
-                ? [
-                    BoxShadow(
-                      color: context.customColors.streak.withValues(
-                        alpha: OpacityTokens.focus,
-                      ),
-                      blurRadius: SpacingTokens.lg,
-                    ),
-                  ]
-                : null,
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(
@@ -48,9 +36,21 @@ class StreakChip extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  Icons.local_fire_department_outlined,
-                  color: context.customColors.streak,
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: context.customColors.streak.withValues(
+                      alpha: OpacityTokens.softTint,
+                    ),
+                    borderRadius: BorderRadius.circular(RadiusTokens.full),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(SpacingTokens.xs),
+                    child: Icon(
+                      Icons.local_fire_department_outlined,
+                      color: context.customColors.streak,
+                      size: SizeTokens.iconXs,
+                    ),
+                  ),
                 ),
                 const SizedBox(width: SpacingTokens.xs),
                 Text(

@@ -23,7 +23,7 @@ class AppBottomNav extends StatelessWidget {
     child: DecoratedBox(
       decoration: BoxDecoration(
         color: context.colors.surface.withValues(
-          alpha: 1 - OpacityTokens.hover,
+          alpha: OpacityTokens.surfaceGlass,
         ),
         border: Border(
           top: BorderSide(
@@ -82,7 +82,7 @@ class _BottomNavItem extends StatelessWidget {
         ? context.colors.primary
         : context.colors.onSurfaceVariant;
     final backgroundColor = selected
-        ? context.colors.primary.withValues(alpha: OpacityTokens.hover)
+        ? context.colors.primary.withValues(alpha: OpacityTokens.softTint)
         : context.colors.surface.withValues(alpha: 0);
 
     return AppPressable(
@@ -97,6 +97,13 @@ class _BottomNavItem extends StatelessWidget {
         ),
         decoration: BoxDecoration(
           color: backgroundColor,
+          border: selected
+              ? Border.all(
+                  color: context.colors.primary.withValues(
+                    alpha: OpacityTokens.borderSubtle,
+                  ),
+                )
+              : null,
           borderRadius: BorderRadius.circular(RadiusTokens.card),
         ),
         child: Column(

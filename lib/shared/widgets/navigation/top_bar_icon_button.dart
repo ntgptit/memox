@@ -31,7 +31,9 @@ class TopBarIconButton extends StatelessWidget {
       alignment: alignment,
       child: IconButton(
         style: IconButton.styleFrom(
-          backgroundColor: context.colors.surfaceContainerLow,
+          backgroundColor: context.colors.surface.withValues(
+            alpha: OpacityTokens.surfaceGlass,
+          ),
           foregroundColor: context.colors.onSurfaceVariant,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(RadiusTokens.input),

@@ -85,7 +85,7 @@ mixin AppTheme {
       ),
       cardTheme: CardThemeData(
         color: cardSurface,
-        elevation: ElevationTokens.level1,
+        elevation: ElevationTokens.level0,
         margin: EdgeInsets.zero,
         shadowColor: colorScheme.shadow,
         surfaceTintColor: transparentSurface,
@@ -354,6 +354,33 @@ mixin AppTheme {
           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
           visualDensity: VisualDensity.compact,
         ),
+      ),
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith<Color?>((states) {
+          if (states.contains(WidgetState.selected)) {
+            return colorScheme.onPrimary;
+          }
+
+          return colorScheme.surfaceContainerLowest;
+        }),
+        trackColor: WidgetStateProperty.resolveWith<Color?>((states) {
+          if (states.contains(WidgetState.selected)) {
+            return colorScheme.primary;
+          }
+
+          return colorScheme.surfaceContainerHighest;
+        }),
+        trackOutlineColor: WidgetStateProperty.resolveWith<Color?>((states) {
+          if (states.contains(WidgetState.selected)) {
+            return colorScheme.primary.withValues(
+              alpha: OpacityTokens.borderSubtle,
+            );
+          }
+
+          return colorScheme.outlineVariant.withValues(
+            alpha: OpacityTokens.borderSubtle,
+          );
+        }),
       ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: transparentSurface,

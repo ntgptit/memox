@@ -20,18 +20,18 @@ abstract final class ColorTokens {
     seedSage,
   ];
 
-  // ── Surface Overrides (warmer than M3 defaults) ──
+  // ── Surface Overrides (wireframe-aligned light stack) ──
   static const Color lightSurface = surfaceLight;
   static const Color darkSurface = surfaceDark;
   static const Color lightOnSurface = onSurfaceLight;
   static const Color darkOnSurface = onSurfaceDark;
   static const Color lightOnSurfaceVariant = Color(0xFF454652);
   static const Color darkOnSurfaceVariant = Color(0xFFC2C2C8);
-  static const Color surfaceLight = Color(0xFFFFFFFF);
+  static const Color surfaceLight = Color(0xFFF7F9FB);
   static const Color surfaceDark = Color(0xFF1C1C1E); // charcoal
   static const Color surfaceBrightLight = Color(0xFFF7F9FB);
   static const Color surfaceDimLight = Color(0xFFE0E3E5);
-  static const Color surfaceContainerLowestLight = Color(0xFFF7F9FB);
+  static const Color surfaceContainerLowestLight = Color(0xFFFFFFFF);
   static const Color surfaceContainerLowLight = Color(0xFFF2F4F6);
   static const Color surfaceContainerLight = Color(0xFFECEEF0);
   static const Color surfaceContainerHighLight = Color(0xFFE6E8EA);

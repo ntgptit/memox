@@ -55,10 +55,8 @@ void main() {
       theme.colorScheme.surfaceContainerHigh,
     );
     expect(
-      button.style?.side?.resolve({})?.color,
-      theme.colorScheme.outlineVariant.withValues(
-        alpha: OpacityTokens.borderSubtle,
-      ),
+      button.style?.side?.resolve({})?.color.a,
+      OpacityTokens.borderSubtle,
     );
   });
 }

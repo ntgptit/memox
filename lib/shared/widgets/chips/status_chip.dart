@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:memox/core/design/card_status.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
+import 'package:memox/core/theme/tokens/opacity_tokens.dart';
 import 'package:memox/core/theme/tokens/radius_tokens.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
@@ -30,7 +31,11 @@ class StatusChip extends StatelessWidget {
     return DecoratedBox(
       decoration: BoxDecoration(
         color: backgroundColor,
-        border: Border.all(color: context.colors.outlineVariant),
+        border: Border.all(
+          color: context.colors.outlineVariant.withValues(
+            alpha: OpacityTokens.borderSubtle,
+          ),
+        ),
         borderRadius: BorderRadius.circular(RadiusTokens.full),
       ),
       child: Padding(
