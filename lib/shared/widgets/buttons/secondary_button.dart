@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:memox/core/theme/tokens/opacity_tokens.dart';
 import 'package:memox/core/theme/tokens/radius_tokens.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
@@ -27,13 +28,21 @@ class SecondaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final foregroundColor = color ?? theme.colorScheme.onSurfaceVariant;
-    final borderColor = color ?? theme.colorScheme.outlineVariant;
+    final accentColor = color ?? theme.colorScheme.primary;
+    final backgroundColor =
+        color?.withValues(alpha: OpacityTokens.focus) ??
+        theme.colorScheme.surfaceContainerHigh;
+    final borderColor =
+        color?.withValues(alpha: OpacityTokens.focus) ??
+        theme.colorScheme.outlineVariant.withValues(
+          alpha: OpacityTokens.borderSubtle,
+        );
     final child = OutlinedButton(
       onPressed: isLoading ? null : onPressed,
       style: OutlinedButton.styleFrom(
         minimumSize: Size(0, height),
-        foregroundColor: foregroundColor,
+        backgroundColor: backgroundColor,
+        foregroundColor: accentColor,
         side: BorderSide(color: borderColor),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(RadiusTokens.button),
@@ -43,7 +52,7 @@ class SecondaryButton extends StatelessWidget {
         label: label,
         icon: icon,
         isLoading: isLoading,
-        progressColor: foregroundColor,
+        progressColor: accentColor,
       ),
     );
     final wrapped = ScaleTap(

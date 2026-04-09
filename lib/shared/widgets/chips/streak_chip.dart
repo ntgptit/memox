@@ -20,14 +20,19 @@ class StreakChip extends StatelessWidget {
     final showGlow = count >= 5;
     return DecoratedBox(
           decoration: BoxDecoration(
-            color: context.customColors.mastery.withValues(
-              alpha: OpacityTokens.press,
+            color: context.customColors.streak.withValues(
+              alpha: OpacityTokens.focus,
             ),
-            borderRadius: BorderRadius.circular(RadiusTokens.chip),
+            border: Border.all(
+              color: context.customColors.streak.withValues(
+                alpha: OpacityTokens.borderSubtle,
+              ),
+            ),
+            borderRadius: BorderRadius.circular(RadiusTokens.full),
             boxShadow: showGlow
                 ? [
                     BoxShadow(
-                      color: context.customColors.mastery.withValues(
+                      color: context.customColors.streak.withValues(
                         alpha: OpacityTokens.focus,
                       ),
                       blurRadius: SpacingTokens.lg,
@@ -43,9 +48,17 @@ class StreakChip extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.local_fire_department_outlined),
+                Icon(
+                  Icons.local_fire_department_outlined,
+                  color: context.customColors.streak,
+                ),
                 const SizedBox(width: SpacingTokens.xs),
-                Text(count.toString(), style: context.appTextStyles.tagText),
+                Text(
+                  count.toString(),
+                  style: context.appTextStyles.tagText.copyWith(
+                    color: context.customColors.streak,
+                  ),
+                ),
               ],
             ),
           ),

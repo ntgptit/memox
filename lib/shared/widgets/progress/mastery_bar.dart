@@ -20,15 +20,7 @@ class MasteryBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final safePercentage = percentage.clamp(0.0, 1.0);
     final fill = DecoratedBox(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            context.customColors.masteryLow,
-            context.customColors.masteryMid,
-            context.customColors.masteryHigh,
-          ],
-        ),
-      ),
+      decoration: BoxDecoration(color: context.customColors.mastery),
     );
 
     return ClipRRect(
@@ -38,7 +30,7 @@ class MasteryBar extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            ColoredBox(color: context.colors.surfaceContainerHighest),
+            ColoredBox(color: context.customColors.masteryFixed),
             if (animate)
               AnimatedFractionallySizedBox(
                 alignment: Alignment.centerLeft,

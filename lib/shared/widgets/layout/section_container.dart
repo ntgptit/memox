@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
+import 'package:memox/core/theme/tokens/radius_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/shared/widgets/buttons/text_link_button.dart';
 
@@ -24,9 +25,28 @@ class SectionContainer extends StatelessWidget {
       Row(
         children: [
           Expanded(
-            child: Text(
-              title.toUpperCase(),
-              style: context.appTextStyles.sectionLabel,
+            child: Row(
+              children: [
+                DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: context.colors.primary,
+                    borderRadius: const BorderRadius.all(
+                      Radius.circular(RadiusTokens.xs),
+                    ),
+                  ),
+                  child: const SizedBox(
+                    width: SpacingTokens.xs,
+                    height: SpacingTokens.xxl,
+                  ),
+                ),
+                const SizedBox(width: SpacingTokens.sm),
+                Expanded(
+                  child: Text(
+                    title.toUpperCase(),
+                    style: context.appTextStyles.sectionLabel,
+                  ),
+                ),
+              ],
             ),
           ),
           if (actionLabel != null && onAction != null)

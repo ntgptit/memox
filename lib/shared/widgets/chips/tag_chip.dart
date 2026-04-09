@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
-import 'package:memox/core/theme/tokens/radius_tokens.dart';
+import 'package:memox/core/theme/tokens/opacity_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 
 class TagChip extends StatelessWidget {
@@ -15,11 +15,25 @@ class TagChip extends StatelessWidget {
     label: Text(label, style: context.appTextStyles.tagText),
     onPressed: onTap,
     onDeleted: onDelete,
-    side: BorderSide(color: context.colors.outline),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(RadiusTokens.chip),
+    backgroundColor: context.colors.surfaceContainerLowest,
+    side: BorderSide(
+      color: context.colors.outlineVariant.withValues(
+        alpha: OpacityTokens.borderSubtle,
+      ),
     ),
-    padding: const EdgeInsets.symmetric(horizontal: SpacingTokens.xs),
+    deleteIconColor: context.colors.onSurfaceVariant,
+    shape: StadiumBorder(
+      side: BorderSide(
+        color: context.colors.outlineVariant.withValues(
+          alpha: OpacityTokens.borderSubtle,
+        ),
+      ),
+    ),
+    padding: const EdgeInsets.symmetric(
+      horizontal: SpacingTokens.sm,
+      vertical: SpacingTokens.xs,
+    ),
+    labelPadding: const EdgeInsets.symmetric(horizontal: SpacingTokens.xs),
     visualDensity: VisualDensity.compact,
     materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
   );

@@ -10,9 +10,9 @@ abstract final class RadiusTokens {
 
   // ── Named Shortcuts ──
   static const double card = lg;
-  static const double button = xl;
+  static const double button = md;
   static const double input = md;
-  static const double chip = sm;
+  static const double chip = full;
   static const double fab = xxl;
   static const double dialog = lg;
   static const double sheet = lg;

@@ -24,9 +24,10 @@ void main() {
 
     expect(
       field.decoration?.fillColor,
-      Theme.of(context).colorScheme.surfaceContainerHigh,
+      Theme.of(context).colorScheme.surfaceContainerLow,
     );
-    expect(field.decoration?.contentPadding, isNull);
+    expect(field.decoration?.contentPadding, isNotNull);
+    expect(field.decoration?.enabledBorder, isNotNull);
   });
 
   testWidgets(
@@ -49,7 +50,7 @@ void main() {
 
       expect(
         field.decoration?.fillColor,
-        Theme.of(context).colorScheme.surfaceContainerHighest,
+        Theme.of(context).colorScheme.surfaceContainerLowest,
       );
       expect(field.decoration?.contentPadding, isNotNull);
       expect(field.decoration?.enabledBorder, isNotNull);

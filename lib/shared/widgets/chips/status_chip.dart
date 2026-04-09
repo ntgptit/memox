@@ -18,12 +18,20 @@ class StatusChip extends StatelessWidget {
       CardStatus.reviewing => context.customColors.statusReviewing,
       CardStatus.mastered => context.customColors.statusMastered,
     };
+    final backgroundColor = switch (status) {
+      CardStatus.mastered => context.customColors.masteryFixed,
+      _ => context.colors.surfaceContainerLowest,
+    };
+    final textColor = switch (status) {
+      CardStatus.mastered => context.customColors.onMasteryFixed,
+      _ => context.colors.onSurface,
+    };
 
     return DecoratedBox(
       decoration: BoxDecoration(
-        color: context.colors.surfaceContainerLow,
-        border: Border.all(color: context.colors.outline),
-        borderRadius: BorderRadius.circular(RadiusTokens.chip),
+        color: backgroundColor,
+        border: Border.all(color: context.colors.outlineVariant),
+        borderRadius: BorderRadius.circular(RadiusTokens.full),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(
@@ -41,9 +49,7 @@ class StatusChip extends StatelessWidget {
             const SizedBox(width: SpacingTokens.xs),
             Text(
               status.label(context.l10n),
-              style: context.appTextStyles.tagText.copyWith(
-                color: context.colors.onSurfaceVariant,
-              ),
+              style: context.appTextStyles.tagText.copyWith(color: textColor),
             ),
           ],
         ),

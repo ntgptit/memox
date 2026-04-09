@@ -51,18 +51,16 @@ mixin AppTextTheme {
       height: height,
     );
 
-    TextStyle? caption(TextStyle? style, double fontSize) => style?.copyWith(
-      color: colorScheme.onSurfaceVariant,
-      fontSize: fontSize,
-      fontWeight: TypographyTokens.regular,
-      height: TypographyTokens.captionHeight,
-    );
-
     return base.copyWith(
-      displayLarge: heading(base.displayLarge, TypographyTokens.displayLarge),
+      displayLarge: heading(
+        base.displayLarge,
+        TypographyTokens.displayLarge,
+        fontWeight: TypographyTokens.bold,
+      ),
       displayMedium: heading(
         base.displayMedium,
         TypographyTokens.displayMedium,
+        fontWeight: TypographyTokens.bold,
       ),
       displaySmall: heading(base.displaySmall, TypographyTokens.headlineLarge),
       headlineLarge: heading(
@@ -83,12 +81,12 @@ mixin AppTextTheme {
       titleMedium: title(
         base.titleMedium,
         TypographyTokens.titleMedium,
-        fontWeight: TypographyTokens.semiBold,
+        fontWeight: TypographyTokens.medium,
       ),
       titleSmall: title(
         base.titleSmall,
         TypographyTokens.titleSmall,
-        fontWeight: TypographyTokens.medium,
+        fontWeight: TypographyTokens.bold,
       ),
       bodyLarge: body(base.bodyLarge, TypographyTokens.bodyLarge),
       bodyMedium: body(base.bodyMedium, TypographyTokens.bodyMedium),
@@ -113,7 +111,14 @@ mixin AppTextTheme {
         height: TypographyTokens.captionHeight,
         letterSpacing: TypographyTokens.labelSpacing,
       ),
-      labelSmall: caption(base.labelSmall, TypographyTokens.labelSmall),
+      labelSmall: label(
+        base.labelSmall,
+        TypographyTokens.labelSmall,
+        fontWeight: TypographyTokens.bold,
+        color: colorScheme.onSurfaceVariant,
+        height: TypographyTokens.captionHeight,
+        letterSpacing: TypographyTokens.sectionSpacing,
+      ),
     );
   }
 

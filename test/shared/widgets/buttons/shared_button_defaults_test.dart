@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:memox/core/theme/tokens/opacity_tokens.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/shared/widgets/buttons/primary_button.dart';
 import 'package:memox/shared/widgets/buttons/secondary_button.dart';
@@ -32,7 +33,9 @@ void main() {
     },
   );
 
-  testWidgets('SecondaryButton stays neutral by default', (tester) async {
+  testWidgets('SecondaryButton uses the accented tonal default style', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       buildTestApp(
         home: SecondaryButton(label: 'Later', onPressed: () {}),
@@ -45,11 +48,17 @@ void main() {
 
     expect(
       button.style?.foregroundColor?.resolve({}),
-      theme.colorScheme.onSurfaceVariant,
+      theme.colorScheme.primary,
+    );
+    expect(
+      button.style?.backgroundColor?.resolve({}),
+      theme.colorScheme.surfaceContainerHigh,
     );
     expect(
       button.style?.side?.resolve({})?.color,
-      theme.colorScheme.outlineVariant,
+      theme.colorScheme.outlineVariant.withValues(
+        alpha: OpacityTokens.borderSubtle,
+      ),
     );
   });
 }

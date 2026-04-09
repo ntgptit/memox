@@ -6,10 +6,9 @@ part 'app_setting.g.dart';
 
 @freezed
 abstract class AppSettings with _$AppSettings {
-
   const factory AppSettings({
     @Default(ThemeMode.system) ThemeMode themeMode,
-    @Default(0xFF5C6BC0) int seedColorValue,
+    @Default(0xFF24389C) int seedColorValue,
     String? localeCode,
     @Default(false) bool syncEnabled,
     @Default(20) int dailyGoal,

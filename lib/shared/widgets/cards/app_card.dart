@@ -31,13 +31,15 @@ class AppCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cardTheme = theme.cardTheme;
     final radius = borderRadius ?? RadiusTokens.card;
-    final background = backgroundColor ?? Theme.of(context).cardTheme.color;
+    final background = backgroundColor ?? cardTheme.color;
     final outlineColor =
         borderColor ??
-        Theme.of(
-          context,
-        ).colorScheme.outline.withValues(alpha: OpacityTokens.borderSubtle);
+        theme.colorScheme.outlineVariant.withValues(
+          alpha: OpacityTokens.borderSubtle,
+        );
     final shape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(radius),
       side: BorderSide(color: outlineColor),
@@ -56,7 +58,10 @@ class AppCard extends StatelessWidget {
     if (!enabled) {
       return Material(
         color: background,
+        elevation: cardTheme.elevation ?? 0,
         shape: shape,
+        shadowColor: cardTheme.shadowColor,
+        surfaceTintColor: cardTheme.surfaceTintColor,
         clipBehavior: Clip.antiAlias,
         child: content,
       );
@@ -64,7 +69,10 @@ class AppCard extends StatelessWidget {
 
     return Material(
       color: background,
+      elevation: cardTheme.elevation ?? 0,
       shape: shape,
+      shadowColor: cardTheme.shadowColor,
+      surfaceTintColor: cardTheme.surfaceTintColor,
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         customBorder: shape,
@@ -112,7 +120,7 @@ class _AppCardAccentStripe extends StatelessWidget {
     bottom: 0,
     child: DecoratedBox(
       decoration: BoxDecoration(
-        color: color,
+        color: color.withValues(alpha: 1 - OpacityTokens.hover),
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(radius),
           bottomLeft: Radius.circular(radius),

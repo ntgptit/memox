@@ -7,6 +7,9 @@ class CustomColors extends ThemeExtension<CustomColors> {
     required this.success,
     required this.warning,
     required this.mastery,
+    required this.masteryFixed,
+    required this.onMasteryFixed,
+    required this.streak,
     required this.surfaceDim,
     required this.statusNew,
     required this.statusLearning,
@@ -27,6 +30,9 @@ class CustomColors extends ThemeExtension<CustomColors> {
   final Color success;
   final Color warning;
   final Color mastery;
+  final Color masteryFixed;
+  final Color onMasteryFixed;
+  final Color streak;
   final Color surfaceDim;
   final Color statusNew;
   final Color statusLearning;
@@ -47,6 +53,9 @@ class CustomColors extends ThemeExtension<CustomColors> {
     success: ColorTokens.successLight,
     warning: ColorTokens.warningLight,
     mastery: ColorTokens.masteryLight,
+    masteryFixed: ColorTokens.masteryFixedLight,
+    onMasteryFixed: ColorTokens.onMasteryFixedLight,
+    streak: ColorTokens.streakLight,
     surfaceDim: ColorTokens.surfaceDimLight,
     statusNew: ColorTokens.statusNew,
     statusLearning: ColorTokens.statusLearning,
@@ -68,6 +77,9 @@ class CustomColors extends ThemeExtension<CustomColors> {
     success: ColorTokens.successDark,
     warning: ColorTokens.warningDark,
     mastery: ColorTokens.masteryDark,
+    masteryFixed: ColorTokens.masteryFixedDark,
+    onMasteryFixed: ColorTokens.onMasteryFixedDark,
+    streak: ColorTokens.streakDark,
     surfaceDim: ColorTokens.surfaceDimDark,
     statusNew: ColorTokens.statusNew,
     statusLearning: ColorTokens.statusLearning,
@@ -90,6 +102,9 @@ class CustomColors extends ThemeExtension<CustomColors> {
     Color? success,
     Color? warning,
     Color? mastery,
+    Color? masteryFixed,
+    Color? onMasteryFixed,
+    Color? streak,
     Color? surfaceDim,
     Color? statusNew,
     Color? statusLearning,
@@ -109,6 +124,9 @@ class CustomColors extends ThemeExtension<CustomColors> {
     success: success ?? this.success,
     warning: warning ?? this.warning,
     mastery: mastery ?? this.mastery,
+    masteryFixed: masteryFixed ?? this.masteryFixed,
+    onMasteryFixed: onMasteryFixed ?? this.onMasteryFixed,
+    streak: streak ?? this.streak,
     surfaceDim: surfaceDim ?? this.surfaceDim,
     statusNew: statusNew ?? this.statusNew,
     statusLearning: statusLearning ?? this.statusLearning,
@@ -136,6 +154,11 @@ class CustomColors extends ThemeExtension<CustomColors> {
       success: Color.lerp(success, other.success, t) ?? success,
       warning: Color.lerp(warning, other.warning, t) ?? warning,
       mastery: Color.lerp(mastery, other.mastery, t) ?? mastery,
+      masteryFixed:
+          Color.lerp(masteryFixed, other.masteryFixed, t) ?? masteryFixed,
+      onMasteryFixed:
+          Color.lerp(onMasteryFixed, other.onMasteryFixed, t) ?? onMasteryFixed,
+      streak: Color.lerp(streak, other.streak, t) ?? streak,
       surfaceDim: Color.lerp(surfaceDim, other.surfaceDim, t) ?? surfaceDim,
       statusNew: Color.lerp(statusNew, other.statusNew, t) ?? statusNew,
       statusLearning:

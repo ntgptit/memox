@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
+import 'package:memox/core/theme/tokens/opacity_tokens.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/shared/widgets/chips/streak_chip.dart';
@@ -39,29 +40,40 @@ class StudyTopBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-    color: context.colors.surface,
-    child: SafeArea(
-      bottom: false,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _StudyTopBarHeader(
-            title: title,
-            current: current,
-            total: total,
-            streak: streak,
-            streakThreshold: streakThreshold,
-            onClose: onClose,
-            trailing: trailing,
-            showCount: showCount,
+    color: context.colors.surface.withValues(alpha: 1 - OpacityTokens.hover),
+    child: DecoratedBox(
+      decoration: BoxDecoration(
+        border: Border(
+          bottom: BorderSide(
+            color: context.colors.outlineVariant.withValues(
+              alpha: OpacityTokens.borderSubtle,
+            ),
           ),
-          _StudyTopBarMeta(
-            subtitle: subtitle,
-            showProgress: showProgress,
-            current: current,
-            total: total,
-          ),
-        ],
+        ),
+      ),
+      child: SafeArea(
+        bottom: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _StudyTopBarHeader(
+              title: title,
+              current: current,
+              total: total,
+              streak: streak,
+              streakThreshold: streakThreshold,
+              onClose: onClose,
+              trailing: trailing,
+              showCount: showCount,
+            ),
+            _StudyTopBarMeta(
+              subtitle: subtitle,
+              showProgress: showProgress,
+              current: current,
+              total: total,
+            ),
+          ],
+        ),
       ),
     ),
   );

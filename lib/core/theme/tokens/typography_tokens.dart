@@ -9,12 +9,13 @@ abstract final class TypographyTokens {
   static const FontWeight medium = FontWeight.w500;
   static const FontWeight semiBold = FontWeight.w600;
   static const FontWeight bold = FontWeight.w700;
+  static const FontWeight extraBold = FontWeight.w800;
 
   // ── Letter Spacing ──
-  static const double headingSpacing = -0.02;
+  static const double headingSpacing = -0.64;
   static const double bodySpacing = 0;
-  static const double labelSpacing = 0.06;
-  static const double sectionSpacing = 0.08;
+  static const double labelSpacing = 0.72;
+  static const double sectionSpacing = 1.2;
 
   // ── Line Heights ──
   static const double displayHeight = 1.1;

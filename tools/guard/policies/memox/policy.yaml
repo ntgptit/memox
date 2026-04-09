@@ -873,7 +873,7 @@ rules:
   - id: app_theme_surface_contract
     type: content_contract
     name: App theme surface contract
-    description: App theme must preserve the shared neutral surface ladder and input layering.
+    description: App theme must preserve the updated light-surface ladder and shared input layering.
     severity: error
     scope: local
     enabled: true
@@ -883,22 +883,23 @@ rules:
     cases:
       - file: "lib/core/theme/app_theme.dart"
         required_tokens:
-          - "final pageSurface = colorScheme.surfaceContainerLowest;"
-          - "final cardSurface = colorScheme.surface;"
-          - "final utilitySurface = colorScheme.surfaceContainerLow;"
-          - "final interactiveSurface = colorScheme.surfaceContainerHigh;"
+          - "final pageSurface = colorScheme.surface;"
+          - "final cardSurface = colorScheme.surfaceContainerLowest;"
+          - "final utilitySurface = colorScheme.surfaceContainerLowest;"
+          - "final tonalSurface = colorScheme.surfaceContainerLow;"
+          - "final emphasisSurface = colorScheme.surfaceContainerHigh;"
           - "scaffoldBackgroundColor: pageSurface,"
           - "highlightColor: transparentSurface,"
           - "splashFactory: InkSparkle.splashFactory,"
           - "color: cardSurface,"
           - "color: utilitySurface,"
-          - "fillColor: interactiveSurface,"
+          - "fillColor: tonalSurface,"
           - "backgroundColor: utilitySurface,"
 
   - id: shared_action_button_contract
     type: content_contract
     name: Shared action button contract
-    description: Shared button primitives must preserve MemoX height, tap-feedback, and neutral-secondary defaults.
+    description: Shared button primitives must preserve MemoX height, tap-feedback, and the updated tonal-secondary defaults.
     severity: error
     scope: local
     enabled: true
@@ -916,7 +917,8 @@ rules:
       - file: "lib/shared/widgets/buttons/secondary_button.dart"
         required_tokens:
           - "this.height = SizeTokens.buttonHeight,"
-          - "theme.colorScheme.onSurfaceVariant"
+          - "theme.colorScheme.primary"
+          - "theme.colorScheme.surfaceContainerHigh"
           - "theme.colorScheme.outlineVariant"
           - "OutlinedButton("
           - "minimumSize: Size(0, height)"
@@ -932,7 +934,7 @@ rules:
   - id: app_search_bar_contract
     type: content_contract
     name: AppSearchBar contract
-    description: AppSearchBar must preserve variant-specific height, debounce, and neutral fill behavior.
+    description: AppSearchBar must preserve variant-specific height, debounce, and the updated focus-marker treatment.
     severity: error
     scope: local
     enabled: true
@@ -946,8 +948,8 @@ rules:
           - "height: SizeTokens.searchBarHeight,"
           - "Timer(DurationTokens.debounce, () => widget.onChanged(value))"
           - "_focusNode.requestFocus();"
-          - "AppSearchBarVariant.page => context.colors.surfaceContainerHigh,"
-          - "AppSearchBarVariant.toolbar => context.colors.surfaceContainerHighest,"
+          - "AppSearchBarVariant.page => context.colors.surfaceContainerLow,"
+          - "AppSearchBarVariant.toolbar => context.colors.surfaceContainerLowest,"
           - "horizontal: SpacingTokens.lg,"
           - "vertical: SpacingTokens.md,"
 
@@ -1004,7 +1006,7 @@ rules:
   - id: selection_surface_contract
     type: content_contract
     name: Selection surface contract
-    description: Shared selectable surfaces and chips must keep the calmer neutral selection treatment.
+    description: Shared selectable surfaces and chips must keep the updated ghost-border and tonal selection treatment.
     severity: error
     scope: local
     enabled: true
@@ -1018,14 +1020,16 @@ rules:
           - "context.colors.primary.withValues(alpha: OpacityTokens.focus)"
       - file: "lib/shared/widgets/chips/mode_chip.dart"
         required_tokens:
-          - "context.colors.surfaceContainerHighest"
+          - "context.colors.surfaceContainerLowest"
+          - "context.colors.primary.withValues(alpha: OpacityTokens.hover)"
           - "context.colors.primary.withValues(alpha: OpacityTokens.focus)"
-          - "context.colors.outline,"
+          - "context.colors.outlineVariant,"
       - file: "lib/shared/widgets/chips/status_chip.dart"
         required_tokens:
-          - "context.colors.surfaceContainerLow"
-          - "context.colors.outline"
-          - "context.colors.onSurfaceVariant"
+          - "context.colors.surfaceContainerLowest"
+          - "context.colors.outlineVariant"
+          - "context.customColors.masteryFixed"
+          - "context.customColors.onMasteryFixed"
 
   - id: study_top_bar_contract
     type: content_contract

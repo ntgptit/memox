@@ -9,6 +9,7 @@ import 'package:memox/core/theme/tokens/opacity_tokens.dart';
 import 'package:memox/core/theme/tokens/radius_tokens.dart';
 import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
+import 'package:memox/core/theme/tokens/typography_tokens.dart';
 
 mixin AppTheme {
   static ThemeData light({Color seedColor = ColorTokens.seed}) =>
@@ -21,11 +22,16 @@ mixin AppTheme {
     final customColors = AppColorScheme.customColorsFor(colorScheme.brightness);
     final textTheme = AppTextTheme.build(colorScheme);
     final appTextStyles = AppTextStyles.fromTextTheme(textTheme);
-    final pageSurface = colorScheme.surfaceContainerLowest;
-    final cardSurface = colorScheme.surface;
-    final utilitySurface = colorScheme.surfaceContainerLow;
-    final interactiveSurface = colorScheme.surfaceContainerHigh;
-    final border = BorderSide(color: colorScheme.outline);
+    final pageSurface = colorScheme.surface;
+    final cardSurface = colorScheme.surfaceContainerLowest;
+    final utilitySurface = colorScheme.surfaceContainerLowest;
+    final tonalSurface = colorScheme.surfaceContainerLow;
+    final emphasisSurface = colorScheme.surfaceContainerHigh;
+    final border = BorderSide(
+      color: colorScheme.outlineVariant.withValues(
+        alpha: OpacityTokens.borderSubtle,
+      ),
+    );
     final transparentSurface = colorScheme.surface.withValues(alpha: 0);
     final neutralHoverColor = colorScheme.onSurface.withValues(
       alpha: OpacityTokens.hover,
@@ -79,9 +85,9 @@ mixin AppTheme {
       ),
       cardTheme: CardThemeData(
         color: cardSurface,
-        elevation: ElevationTokens.level0,
+        elevation: ElevationTokens.level1,
         margin: EdgeInsets.zero,
-        shadowColor: transparentSurface,
+        shadowColor: colorScheme.shadow,
         surfaceTintColor: transparentSurface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(RadiusTokens.card),
@@ -91,10 +97,8 @@ mixin AppTheme {
       popupMenuTheme: PopupMenuThemeData(
         color: utilitySurface,
         surfaceTintColor: transparentSurface,
-        elevation: ElevationTokens.level3,
-        shadowColor: colorScheme.shadow.withValues(
-          alpha: ElevationTokens.shadowOpacity,
-        ),
+        elevation: ElevationTokens.level1,
+        shadowColor: colorScheme.shadow,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(RadiusTokens.card),
           side: border,
@@ -103,18 +107,28 @@ mixin AppTheme {
       ),
       filledButtonTheme: FilledButtonThemeData(
         style: ButtonStyle(
+          elevation: const WidgetStatePropertyAll<double>(
+            ElevationTokens.level0,
+          ),
+          shadowColor: WidgetStatePropertyAll<Color>(transparentSurface),
+          surfaceTintColor: WidgetStatePropertyAll<Color>(transparentSurface),
           minimumSize: const WidgetStatePropertyAll<Size>(
             Size(0, SizeTokens.touchTarget),
           ),
           shape: WidgetStatePropertyAll<OutlinedBorder>(
             RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(RadiusTokens.full),
+              borderRadius: BorderRadius.circular(RadiusTokens.button),
             ),
           ),
           padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
-            EdgeInsets.symmetric(horizontal: SpacingTokens.xl),
+            EdgeInsets.symmetric(
+              horizontal: SpacingTokens.xl,
+              vertical: SpacingTokens.md,
+            ),
           ),
-          textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.titleSmall),
+          textStyle: WidgetStatePropertyAll<TextStyle?>(
+            textTheme.titleSmall?.copyWith(fontWeight: TypographyTokens.bold),
+          ),
           overlayColor: _stateLayer(
             hovered: onPrimaryHoverColor,
             focused: onPrimaryFocusColor,
@@ -127,15 +141,26 @@ mixin AppTheme {
           minimumSize: const WidgetStatePropertyAll<Size>(
             Size(0, SizeTokens.touchTarget),
           ),
+          backgroundColor: WidgetStatePropertyAll<Color>(emphasisSurface),
           shape: WidgetStatePropertyAll<OutlinedBorder>(
             RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(RadiusTokens.full),
+              borderRadius: BorderRadius.circular(RadiusTokens.button),
             ),
           ),
           padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
-            EdgeInsets.symmetric(horizontal: SpacingTokens.xl),
+            EdgeInsets.symmetric(
+              horizontal: SpacingTokens.xl,
+              vertical: SpacingTokens.md,
+            ),
           ),
-          textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.titleSmall),
+          side: WidgetStatePropertyAll<BorderSide>(
+            border.copyWith(
+              color: colorScheme.outlineVariant.withValues(alpha: 0),
+            ),
+          ),
+          textStyle: WidgetStatePropertyAll<TextStyle?>(
+            textTheme.titleSmall?.copyWith(fontWeight: TypographyTokens.bold),
+          ),
           overlayColor: _stateLayer(
             hovered: accentHoverColor,
             focused: accentFocusColor,
@@ -153,7 +178,7 @@ mixin AppTheme {
           ),
           shape: WidgetStatePropertyAll<OutlinedBorder>(
             RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(RadiusTokens.full),
+              borderRadius: BorderRadius.circular(RadiusTokens.button),
             ),
           ),
           padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
@@ -179,13 +204,18 @@ mixin AppTheme {
           ),
           shape: WidgetStatePropertyAll<OutlinedBorder>(
             RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(RadiusTokens.full),
+              borderRadius: BorderRadius.circular(RadiusTokens.button),
             ),
           ),
           padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
-            EdgeInsets.symmetric(horizontal: SpacingTokens.xl),
+            EdgeInsets.symmetric(
+              horizontal: SpacingTokens.xl,
+              vertical: SpacingTokens.md,
+            ),
           ),
-          textStyle: WidgetStatePropertyAll<TextStyle?>(textTheme.titleSmall),
+          textStyle: WidgetStatePropertyAll<TextStyle?>(
+            textTheme.titleSmall?.copyWith(fontWeight: TypographyTokens.bold),
+          ),
           overlayColor: _stateLayer(
             hovered: onPrimaryHoverColor,
             focused: onPrimaryFocusColor,
@@ -201,7 +231,11 @@ mixin AppTheme {
           padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
             EdgeInsets.zero,
           ),
-          shape: const WidgetStatePropertyAll<OutlinedBorder>(CircleBorder()),
+          shape: WidgetStatePropertyAll<OutlinedBorder>(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(RadiusTokens.input),
+            ),
+          ),
           backgroundColor: _stateLayer(
             hovered: neutralHoverColor,
             focused: accentFocusColor,
@@ -216,13 +250,26 @@ mixin AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: interactiveSurface,
+        fillColor: tonalSurface,
         hoverColor: neutralHoverColor,
         focusColor: accentFocusColor,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: SpacingTokens.lg,
-          vertical: SpacingTokens.lg,
+          vertical: SpacingTokens.md,
         ),
+        hintStyle: textTheme.bodySmall?.copyWith(
+          color: colorScheme.onSurfaceVariant.withValues(
+            alpha: OpacityTokens.hintText,
+          ),
+        ),
+        labelStyle: textTheme.bodySmall?.copyWith(
+          color: colorScheme.onSurfaceVariant,
+        ),
+        floatingLabelStyle: textTheme.bodySmall?.copyWith(
+          color: colorScheme.primary,
+        ),
+        prefixIconColor: colorScheme.onSurfaceVariant,
+        suffixIconColor: colorScheme.onSurfaceVariant,
         border: inputBorder,
         enabledBorder: inputBorder,
         focusedBorder: inputBorder.copyWith(
@@ -238,6 +285,7 @@ mixin AppTheme {
       dialogTheme: DialogThemeData(
         backgroundColor: utilitySurface,
         surfaceTintColor: transparentSurface,
+        shadowColor: colorScheme.shadow,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(RadiusTokens.dialog),
           side: border,
@@ -256,16 +304,23 @@ mixin AppTheme {
         ),
       ),
       chipTheme: ChipThemeData(
-        backgroundColor: utilitySurface,
-        disabledColor: utilitySurface,
-        selectedColor: colorScheme.surfaceContainerHighest,
-        secondarySelectedColor: colorScheme.surfaceContainerHighest,
-        padding: const EdgeInsets.symmetric(horizontal: SpacingTokens.sm),
-        labelStyle: textTheme.labelMedium,
-        secondaryLabelStyle: textTheme.labelMedium,
+        backgroundColor: cardSurface,
+        disabledColor: cardSurface,
+        selectedColor: colorScheme.primary.withValues(
+          alpha: OpacityTokens.focus,
+        ),
+        secondarySelectedColor: colorScheme.primary.withValues(
+          alpha: OpacityTokens.focus,
+        ),
+        padding: const EdgeInsets.symmetric(
+          horizontal: SpacingTokens.sm,
+          vertical: SpacingTokens.xs,
+        ),
+        labelStyle: textTheme.labelSmall,
+        secondaryLabelStyle: textTheme.labelSmall,
         side: border,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(RadiusTokens.chip),
+          borderRadius: BorderRadius.circular(RadiusTokens.full),
           side: border,
         ),
       ),
@@ -277,6 +332,13 @@ mixin AppTheme {
           padding: const WidgetStatePropertyAll<EdgeInsetsGeometry>(
             EdgeInsets.symmetric(horizontal: SpacingTokens.md),
           ),
+          backgroundColor: WidgetStateProperty.resolveWith<Color?>((states) {
+            if (states.contains(WidgetState.selected)) {
+              return colorScheme.primary.withValues(alpha: OpacityTokens.focus);
+            }
+
+            return cardSurface;
+          }),
           side: WidgetStatePropertyAll<BorderSide>(border),
           shape: WidgetStatePropertyAll<OutlinedBorder>(
             RoundedRectangleBorder(
@@ -294,18 +356,18 @@ mixin AppTheme {
         ),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: colorScheme.surface,
+        backgroundColor: transparentSurface,
         elevation: ElevationTokens.level0,
         shadowColor: transparentSurface,
         surfaceTintColor: transparentSurface,
         height: SizeTokens.bottomNavHeight,
         indicatorColor: colorScheme.primary.withValues(
-          alpha: OpacityTokens.focus,
+          alpha: OpacityTokens.hover,
         ),
         labelTextStyle: WidgetStateProperty.resolveWith<TextStyle?>(
           (states) => textTheme.labelSmall?.copyWith(
             color: states.contains(WidgetState.selected)
-                ? colorScheme.onSurface
+                ? colorScheme.primary
                 : colorScheme.onSurfaceVariant,
           ),
         ),
@@ -319,10 +381,12 @@ mixin AppTheme {
         ),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
-        elevation: ElevationTokens.level0,
-        highlightElevation: ElevationTokens.level0,
-        focusElevation: ElevationTokens.level0,
-        hoverElevation: ElevationTokens.level0,
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
+        elevation: ElevationTokens.level2,
+        highlightElevation: ElevationTokens.level2,
+        focusElevation: ElevationTokens.level2,
+        hoverElevation: ElevationTokens.level2,
         splashColor: colorScheme.primary.withValues(alpha: OpacityTokens.drag),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(RadiusTokens.fab),

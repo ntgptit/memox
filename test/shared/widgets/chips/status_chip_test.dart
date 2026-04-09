@@ -22,7 +22,7 @@ void main() {
     final decoration = dot.decoration! as BoxDecoration;
     final customColors = Theme.of(context).extension<CustomColors>()!;
 
-    expect(label.style?.color, Theme.of(context).colorScheme.onSurfaceVariant);
+    expect(label.style?.color, Theme.of(context).colorScheme.onSurface);
     expect(decoration.color, customColors.statusLearning);
   });
 }

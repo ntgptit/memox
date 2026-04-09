@@ -22,14 +22,14 @@ class ModeChip extends StatelessWidget {
     ),
     decoration: BoxDecoration(
       color: isSelected
-          ? context.colors.surfaceContainerHighest
-          : context.colors.surface.withValues(alpha: 0),
+          ? context.colors.primary.withValues(alpha: OpacityTokens.hover)
+          : context.colors.surfaceContainerLowest,
       border: Border.all(
         color: isSelected
             ? context.colors.primary.withValues(alpha: OpacityTokens.focus)
-            : context.colors.outline,
+            : context.colors.outlineVariant,
       ),
-      borderRadius: BorderRadius.circular(RadiusTokens.chip),
+      borderRadius: BorderRadius.circular(RadiusTokens.full),
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
@@ -38,14 +38,21 @@ class ModeChip extends StatelessWidget {
           dimension: SizeTokens.chipHeightSm,
           child: DecoratedBox(
             decoration: BoxDecoration(
-              color: context.colors.surfaceContainerHighest,
+              color: context.colors.surfaceContainerLow,
               borderRadius: BorderRadius.circular(RadiusTokens.full),
             ),
             child: Center(child: Text(mode.emoji)),
           ),
         ),
         const SizedBox(width: SpacingTokens.xs),
-        Text(mode.label(context.l10n), style: context.appTextStyles.tagText),
+        Text(
+          mode.label(context.l10n),
+          style: context.appTextStyles.tagText.copyWith(
+            color: isSelected
+                ? context.colors.primary
+                : context.colors.onSurface,
+          ),
+        ),
       ],
     ),
   );

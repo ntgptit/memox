@@ -35,6 +35,9 @@ void main() {
     expect(customColors!.surfaceDim, ColorTokens.surfaceDimLight);
     expect(customColors!.masteryHigh, ColorTokens.masteryHigh);
     expect(customColors!.ratingAgain, ColorTokens.ratingAgain);
+    expect(customColors!.masteryFixed, ColorTokens.masteryFixedLight);
+    expect(customColors!.onMasteryFixed, ColorTokens.onMasteryFixedLight);
+    expect(customColors!.streak, ColorTokens.streakLight);
 
     expect(appTextStyles, isNotNull);
     expect(
@@ -58,22 +61,19 @@ void main() {
       TypographyTokens.sectionSpacing,
     );
     expect(theme, isNotNull);
-    expect(
-      theme!.scaffoldBackgroundColor,
-      theme!.colorScheme.surfaceContainerLowest,
-    );
-    expect(theme!.cardTheme.color, theme!.colorScheme.surface);
+    expect(theme!.scaffoldBackgroundColor, theme!.colorScheme.surface);
+    expect(theme!.cardTheme.color, theme!.colorScheme.surfaceContainerLowest);
     expect(
       theme!.dialogTheme.backgroundColor,
-      theme!.colorScheme.surfaceContainerLow,
+      theme!.colorScheme.surfaceContainerLowest,
     );
     expect(
       theme!.bottomSheetTheme.backgroundColor,
-      theme!.colorScheme.surfaceContainerLow,
+      theme!.colorScheme.surfaceContainerLowest,
     );
     expect(
       theme!.inputDecorationTheme.fillColor,
-      theme!.colorScheme.surfaceContainerHigh,
+      theme!.colorScheme.surfaceContainerLow,
     );
     expect(
       theme!.textTheme.displayLarge?.fontSize,
@@ -131,6 +131,8 @@ void main() {
     expect(customColors!.success, ColorTokens.successDark);
     expect(customColors!.surfaceDim, ColorTokens.surfaceDimDark);
     expect(customColors!.mastery, ColorTokens.masteryDark);
+    expect(customColors!.masteryFixed, ColorTokens.masteryFixedDark);
+    expect(customColors!.streak, ColorTokens.streakDark);
   });
 
   testWidgets('theme centralizes hover and focus interactions', (tester) async {
