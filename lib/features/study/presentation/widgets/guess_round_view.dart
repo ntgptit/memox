@@ -7,6 +7,7 @@ import 'package:memox/features/study/presentation/widgets/guess_option_button.da
 import 'package:memox/features/study/presentation/widgets/guess_question_card.dart';
 import 'package:memox/shared/widgets/buttons/app_tap_region.dart';
 import 'package:memox/shared/widgets/buttons/text_link_button.dart';
+import 'package:memox/shared/widgets/cards/info_bar.dart';
 
 class GuessRoundView extends StatelessWidget {
   const GuessRoundView({
@@ -35,6 +36,13 @@ class GuessRoundView extends StatelessWidget {
       ),
       child: Column(
         children: [
+          if (state.isCurrentCardPendingRetry) ...[
+            InfoBar(
+              icon: Icons.refresh_outlined,
+              text: context.l10n.studyRetryPhaseHint,
+            ),
+            const SizedBox(height: SpacingTokens.lg),
+          ],
           Expanded(
             flex: 4,
             child: GuessQuestionCard(

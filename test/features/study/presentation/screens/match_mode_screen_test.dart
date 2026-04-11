@@ -13,6 +13,7 @@ import 'package:memox/features/study/domain/match/match_engine.dart';
 import 'package:memox/features/study/domain/repositories/study_repository.dart';
 import 'package:memox/features/study/presentation/providers/match_provider.dart';
 import 'package:memox/features/study/presentation/screens/match_mode_screen.dart';
+import 'package:memox/shared/widgets/buttons/text_link_button.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../test_helpers/fakes/fake_card_review_dao.dart';
@@ -123,7 +124,7 @@ void main() {
     await tester.pump();
   });
 
-  testWidgets('MatchModeScreen shows a deselect hint after choosing one side', (
+  testWidgets('MatchModeScreen keeps one-side selection without a hint', (
     tester,
   ) async {
     final cardReviewDao = FakeCardReviewDao();
@@ -164,11 +165,134 @@ void main() {
     await tester.tap(find.text('안녕하세요'));
     await _pumpMatchScreen(tester);
 
-    expect(
-      find.text('Tap the selected card again to clear it.'),
-      findsOneWidget,
-    );
+    expect(find.text('Tap the selected card again to clear it.'), findsNothing);
   });
+
+  testWidgets(
+    'MatchModeScreen continues to the next board instead of finishing early',
+    (tester) async {
+      final cardReviewDao = FakeCardReviewDao();
+      addTearDown(cardReviewDao.dispose);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            cardReviewDaoProvider.overrideWithValue(cardReviewDao),
+            flashcardRepositoryProvider.overrideWithValue(
+              FakeFlashcardRepository(cards: _cards(6)),
+            ),
+            deckRepositoryProvider.overrideWithValue(FakeDeckRepository()),
+            studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
+            matchEngineProvider(
+              4,
+            ).overrideWithValue(MatchEngine(random: Random(1))),
+          ],
+          child: buildTestApp(home: const MatchModeScreen(deckId: 4)),
+        ),
+      );
+      await _pumpMatchScreen(tester);
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(MatchModeScreen)),
+      );
+
+      expect(find.text('Board 1 of 2'), findsOneWidget);
+
+      await _solveCurrentBoard(tester, container);
+
+      expect(find.text('All matched!'), findsNothing);
+      expect(find.text('Board 2 of 2'), findsOneWidget);
+      expect(find.text('1 pair left'), findsOneWidget);
+    },
+  );
+
+  testWidgets('MatchModeScreen completes after the final grouped board', (
+    tester,
+  ) async {
+    final cardReviewDao = FakeCardReviewDao();
+    addTearDown(cardReviewDao.dispose);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          cardReviewDaoProvider.overrideWithValue(cardReviewDao),
+          flashcardRepositoryProvider.overrideWithValue(
+            FakeFlashcardRepository(cards: _cards(6)),
+          ),
+          deckRepositoryProvider.overrideWithValue(FakeDeckRepository()),
+          studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
+          matchEngineProvider(
+            4,
+          ).overrideWithValue(MatchEngine(random: Random(1))),
+        ],
+        child: buildTestApp(home: const MatchModeScreen(deckId: 4)),
+      ),
+    );
+    await _pumpMatchScreen(tester);
+    final container = ProviderScope.containerOf(
+      tester.element(find.byType(MatchModeScreen)),
+    );
+
+    await _solveCurrentBoard(tester, container);
+    await _solveCurrentBoard(tester, container);
+
+    expect(find.text('All matched!'), findsOneWidget);
+    expect(find.text('Done'), findsOneWidget);
+
+    await tester.pump(const Duration(seconds: 1));
+    await tester.pumpWidget(const SizedBox.shrink());
+    await tester.pump();
+  });
+
+  testWidgets(
+    'MatchModeScreen completion keeps mistake labels from earlier grouped boards',
+    (tester) async {
+      final cardReviewDao = FakeCardReviewDao();
+      addTearDown(cardReviewDao.dispose);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            cardReviewDaoProvider.overrideWithValue(cardReviewDao),
+            flashcardRepositoryProvider.overrideWithValue(
+              FakeFlashcardRepository(cards: _cards(6)),
+            ),
+            deckRepositoryProvider.overrideWithValue(FakeDeckRepository()),
+            studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
+            matchEngineProvider(
+              4,
+            ).overrideWithValue(MatchEngine(random: Random(1))),
+          ],
+          child: buildTestApp(home: const MatchModeScreen(deckId: 4)),
+        ),
+      );
+      await _pumpMatchScreen(tester);
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(MatchModeScreen)),
+      );
+      final firstBoardState = container
+          .read(matchSessionProvider(4))
+          .requireValue;
+      final mistakenTerm = firstBoardState.game.terms.first;
+      final correctDefinitionId =
+          firstBoardState.game.correctPairs[mistakenTerm.id]!;
+      final mistakenDefinition = firstBoardState.game.definitions.firstWhere(
+        (item) => item.id != correctDefinitionId,
+      );
+      final expectedBack = firstBoardState.game.definitions
+          .firstWhere((item) => item.id == correctDefinitionId)
+          .text;
+
+      await tester.tap(find.text(mistakenTerm.text).first);
+      await tester.pump();
+      await tester.tap(find.text(mistakenDefinition.text).first);
+      await _pumpMatchScreen(tester);
+      await _solveCurrentBoard(tester, container);
+      await _solveCurrentBoard(tester, container);
+      await tester.tap(find.byType(TextLinkButton));
+      await tester.pumpAndSettle();
+
+      expect(find.text(mistakenTerm.text), findsOneWidget);
+      expect(find.text(expectedBack), findsOneWidget);
+      expect(find.text(mistakenTerm.id), findsNothing);
+    },
+  );
 
   testWidgets('MatchModeScreen truncates long definitions with ellipsis', (
     tester,
@@ -210,6 +334,48 @@ void main() {
     expect(definitionText.maxLines, 4);
     expect(definitionText.overflow, TextOverflow.ellipsis);
   });
+
+  testWidgets('MatchModeScreen keeps the saved snapshot after exit', (
+    tester,
+  ) async {
+    final cardReviewDao = FakeCardReviewDao();
+    addTearDown(cardReviewDao.dispose);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          cardReviewDaoProvider.overrideWithValue(cardReviewDao),
+          flashcardRepositoryProvider.overrideWithValue(
+            FakeFlashcardRepository(
+              cards: const [
+                FlashcardEntity(
+                  id: 1,
+                  deckId: 4,
+                  front: '안녕하세요',
+                  back: 'Hello',
+                ),
+              ],
+            ),
+          ),
+          deckRepositoryProvider.overrideWithValue(FakeDeckRepository()),
+          studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
+          matchEngineProvider(
+            4,
+          ).overrideWithValue(MatchEngine(random: Random(1))),
+        ],
+        child: buildTestApp(home: const MatchModeScreen(deckId: 4)),
+      ),
+    );
+    await _pumpMatchScreen(tester);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getString('active_study_session_v1'), isNotNull);
+
+    await tester.tap(find.byTooltip('Exit'));
+    await tester.pump();
+    await tester.tap(find.text('Exit').last);
+    await tester.pumpAndSettle();
+
+    expect(preferences.getString('active_study_session_v1'), isNotNull);
+  });
 }
 
 final class _FakeStudyRepository implements StudyRepository {
@@ -230,6 +396,34 @@ final class _FakeStudyRepository implements StudyRepository {
   @override
   Stream<List<StudySession>> watchAll() async* {
     yield const <StudySession>[];
+  }
+}
+
+List<FlashcardEntity> _cards(int count) => List<FlashcardEntity>.generate(
+  count,
+  (index) => FlashcardEntity(
+    id: index + 1,
+    deckId: 4,
+    front: 'Term ${index + 1}',
+    back: 'Definition ${index + 1}',
+  ),
+);
+
+Future<void> _solveCurrentBoard(
+  WidgetTester tester,
+  ProviderContainer container,
+) async {
+  final state = container.read(matchSessionProvider(4)).requireValue;
+
+  for (final term in state.game.terms) {
+    final definitionId = state.game.correctPairs[term.id]!;
+    final definition = state.game.definitions.firstWhere(
+      (item) => item.id == definitionId,
+    );
+    await tester.tap(find.text(term.text).first);
+    await tester.pump();
+    await tester.tap(find.text(definition.text).first);
+    await _pumpMatchScreen(tester);
   }
 }
 

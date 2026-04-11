@@ -22,11 +22,21 @@ mixin AppTheme {
     final customColors = AppColorScheme.customColorsFor(colorScheme.brightness);
     final textTheme = AppTextTheme.build(colorScheme);
     final appTextStyles = AppTextStyles.fromTextTheme(textTheme);
+    final isLight = colorScheme.brightness == Brightness.light;
     final pageSurface = colorScheme.surface;
     final cardSurface = colorScheme.surfaceContainerLowest;
     final utilitySurface = colorScheme.surfaceContainerLowest;
     final tonalSurface = colorScheme.surfaceContainerLow;
     final emphasisSurface = colorScheme.surfaceContainerHigh;
+    final chromeSurface = pageSurface.withValues(
+      alpha: isLight ? OpacityTokens.surfaceGlass : 1 - OpacityTokens.focus,
+    );
+    final cardElevation = isLight
+        ? ElevationTokens.level1
+        : ElevationTokens.level0;
+    final popoverElevation = isLight
+        ? ElevationTokens.level2
+        : ElevationTokens.level1;
     final border = BorderSide(
       color: colorScheme.outlineVariant.withValues(
         alpha: OpacityTokens.borderSubtle,
@@ -74,7 +84,7 @@ mixin AppTheme {
       splashFactory: InkSparkle.splashFactory,
       extensions: <ThemeExtension<dynamic>>[customColors, appTextStyles],
       appBarTheme: AppBarTheme(
-        backgroundColor: transparentSurface,
+        backgroundColor: utilitySurface,
         foregroundColor: colorScheme.onSurface,
         elevation: 0,
         scrolledUnderElevation: 0,
@@ -85,7 +95,7 @@ mixin AppTheme {
       ),
       cardTheme: CardThemeData(
         color: cardSurface,
-        elevation: ElevationTokens.level0,
+        elevation: cardElevation,
         margin: EdgeInsets.zero,
         shadowColor: colorScheme.shadow,
         surfaceTintColor: transparentSurface,
@@ -97,7 +107,7 @@ mixin AppTheme {
       popupMenuTheme: PopupMenuThemeData(
         color: utilitySurface,
         surfaceTintColor: transparentSurface,
-        elevation: ElevationTokens.level1,
+        elevation: popoverElevation,
         shadowColor: colorScheme.shadow,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(RadiusTokens.card),
@@ -142,6 +152,7 @@ mixin AppTheme {
             Size(0, SizeTokens.touchTarget),
           ),
           backgroundColor: WidgetStatePropertyAll<Color>(emphasisSurface),
+          foregroundColor: WidgetStatePropertyAll<Color>(colorScheme.primary),
           shape: WidgetStatePropertyAll<OutlinedBorder>(
             RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(RadiusTokens.button),
@@ -153,11 +164,7 @@ mixin AppTheme {
               vertical: SpacingTokens.md,
             ),
           ),
-          side: WidgetStatePropertyAll<BorderSide>(
-            border.copyWith(
-              color: colorScheme.outlineVariant.withValues(alpha: 0),
-            ),
-          ),
+          side: WidgetStatePropertyAll<BorderSide>(border),
           textStyle: WidgetStatePropertyAll<TextStyle?>(
             textTheme.titleSmall?.copyWith(fontWeight: TypographyTokens.bold),
           ),
@@ -283,8 +290,9 @@ mixin AppTheme {
         ),
       ),
       dialogTheme: DialogThemeData(
-        backgroundColor: utilitySurface,
+        backgroundColor: cardSurface,
         surfaceTintColor: transparentSurface,
+        elevation: popoverElevation,
         shadowColor: colorScheme.shadow,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(RadiusTokens.dialog),
@@ -294,8 +302,9 @@ mixin AppTheme {
         contentTextStyle: textTheme.bodyMedium,
       ),
       bottomSheetTheme: BottomSheetThemeData(
-        backgroundColor: utilitySurface,
+        backgroundColor: cardSurface,
         surfaceTintColor: transparentSurface,
+        elevation: popoverElevation,
         shape: RoundedRectangleBorder(
           borderRadius: const BorderRadius.vertical(
             top: Radius.circular(RadiusTokens.sheet),
@@ -307,10 +316,10 @@ mixin AppTheme {
         backgroundColor: cardSurface,
         disabledColor: cardSurface,
         selectedColor: colorScheme.primary.withValues(
-          alpha: OpacityTokens.focus,
+          alpha: OpacityTokens.softTint,
         ),
         secondarySelectedColor: colorScheme.primary.withValues(
-          alpha: OpacityTokens.focus,
+          alpha: OpacityTokens.softTint,
         ),
         padding: const EdgeInsets.symmetric(
           horizontal: SpacingTokens.sm,
@@ -334,7 +343,9 @@ mixin AppTheme {
           ),
           backgroundColor: WidgetStateProperty.resolveWith<Color?>((states) {
             if (states.contains(WidgetState.selected)) {
-              return colorScheme.primary.withValues(alpha: OpacityTokens.focus);
+              return colorScheme.primary.withValues(
+                alpha: OpacityTokens.softTint,
+              );
             }
 
             return cardSurface;
@@ -383,13 +394,13 @@ mixin AppTheme {
         }),
       ),
       navigationBarTheme: NavigationBarThemeData(
-        backgroundColor: transparentSurface,
+        backgroundColor: chromeSurface,
         elevation: ElevationTokens.level0,
         shadowColor: transparentSurface,
         surfaceTintColor: transparentSurface,
         height: SizeTokens.bottomNavHeight,
         indicatorColor: colorScheme.primary.withValues(
-          alpha: OpacityTokens.hover,
+          alpha: OpacityTokens.softTint,
         ),
         labelTextStyle: WidgetStateProperty.resolveWith<TextStyle?>(
           (states) => textTheme.labelSmall?.copyWith(

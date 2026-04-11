@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,11 +12,17 @@ import 'package:memox/features/study/domain/entities/study_session.dart';
 import 'package:memox/features/study/domain/match/match_engine.dart';
 import 'package:memox/features/study/domain/repositories/study_repository.dart';
 import 'package:memox/features/study/domain/srs/srs_engine.dart';
+import 'package:memox/features/study/presentation/providers/active_study_session_store.dart';
 import 'package:memox/features/study/presentation/providers/match_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../test_helpers/fakes/fake_card_review_dao.dart';
 import '../../../../test_helpers/fakes/fake_flashcard_repository.dart';
 
 void main() {
+  setUp(() {
+    SharedPreferences.setMockInitialValues(const <String, Object>{});
+  });
+
   ProviderContainer buildContainer({
     required FakeFlashcardRepository flashcardRepository,
     required FakeCardReviewDao cardReviewDao,
@@ -50,7 +57,40 @@ void main() {
     expect(updated.selectedDefinitionId, isNull);
   });
 
-  test('tapping the selected term again clears the selection', () async {
+  test(
+    'saved snapshot exposes match mode state, actions, and progress',
+    () async {
+      final cardReviewDao = FakeCardReviewDao();
+      final container = buildContainer(
+        flashcardRepository: FakeFlashcardRepository(cards: _cards(2)),
+        cardReviewDao: cardReviewDao,
+      );
+      addTearDown(cardReviewDao.dispose);
+      addTearDown(container.dispose);
+      final store = await container.read(
+        activeStudySessionStoreProvider.future,
+      );
+
+      final initial = await container.read(matchSessionProvider(1).future);
+      var snapshot = store.load();
+      expect(snapshot?.modePlan, const <StudyMode>[StudyMode.match]);
+      expect(snapshot?.modeState, StudySessionModeState.initialized);
+      expect(snapshot?.allowedActions, isEmpty);
+      expect(snapshot?.currentItem?.position, 1);
+      expect(snapshot?.currentItem?.cardId, isNotNull);
+      expect(snapshot?.progress.completedCount, 0);
+      expect(snapshot?.progress.totalCount, 2);
+
+      final notifier = container.read(matchSessionProvider(1).notifier);
+      await notifier.selectItem(initial.game.terms.first);
+
+      snapshot = store.load();
+      expect(snapshot?.modeState, StudySessionModeState.inProgress);
+      expect(snapshot?.allowedActions, isEmpty);
+    },
+  );
+
+  test('tapping the selected term again keeps the selection', () async {
     final cardReviewDao = FakeCardReviewDao();
     final container = buildContainer(
       flashcardRepository: FakeFlashcardRepository(cards: _cards(2)),
@@ -66,7 +106,7 @@ void main() {
     await notifier.selectItem(selectedTerm);
 
     final updated = container.read(matchSessionProvider(1)).requireValue;
-    expect(updated.selectedTermId, isNull);
+    expect(updated.selectedTermId, selectedTerm.id);
     expect(updated.selectedDefinitionId, isNull);
   });
 
@@ -161,6 +201,167 @@ void main() {
       expect(savedCard?.status, isNot(CardStatus.newCard));
     },
   );
+
+  test(
+    'deck sizes beyond the board cap continue into the next board',
+    () async {
+      final studyRepository = _FakeStudyRepository();
+      final flashcardRepository = FakeFlashcardRepository(cards: _cards(6));
+      final cardReviewDao = FakeCardReviewDao();
+      final container = buildContainer(
+        flashcardRepository: flashcardRepository,
+        cardReviewDao: cardReviewDao,
+        studyRepository: studyRepository,
+      );
+      addTearDown(cardReviewDao.dispose);
+      addTearDown(container.dispose);
+      final initial = await container.read(matchSessionProvider(1).future);
+
+      expect(initial.totalPairs, 6);
+      expect(initial.totalBoards, 2);
+      expect(initial.game.correctPairs.length, 5);
+
+      await _solveCurrentBoard(container);
+
+      final secondBoard = container.read(matchSessionProvider(1)).requireValue;
+      expect(secondBoard.isComplete, isFalse);
+      expect(secondBoard.boardIndex, 1);
+      expect(secondBoard.completedPairCount, 5);
+      expect(secondBoard.matchedCount, 5);
+      expect(secondBoard.game.correctPairs.length, 1);
+
+      await _solveCurrentBoard(container);
+
+      final completed = container.read(matchSessionProvider(1)).requireValue;
+      expect(completed.isComplete, isTrue);
+      expect(completed.matchedCount, 6);
+      expect(studyRepository.completedSession?.totalCards, 6);
+    },
+  );
+
+  test('grouped-board progress survives snapshot restore', () async {
+    final flashcardRepository = FakeFlashcardRepository(cards: _cards(6));
+    final cardReviewDao = FakeCardReviewDao();
+    final container = buildContainer(
+      flashcardRepository: flashcardRepository,
+      cardReviewDao: cardReviewDao,
+    );
+    addTearDown(cardReviewDao.dispose);
+    addTearDown(container.dispose);
+
+    await container.read(matchSessionProvider(1).future);
+    await _solveCurrentBoard(container);
+
+    final restoredContainer = buildContainer(
+      flashcardRepository: flashcardRepository,
+      cardReviewDao: cardReviewDao,
+    );
+    addTearDown(restoredContainer.dispose);
+
+    final restoredState = await restoredContainer.read(
+      matchSessionProvider(1).future,
+    );
+    expect(restoredState.isComplete, isFalse);
+    expect(restoredState.boardIndex, 1);
+    expect(restoredState.completedPairCount, 5);
+    expect(restoredState.matchedCount, 5);
+    expect(restoredState.game.correctPairs.length, 1);
+  });
+
+  test(
+    'restore advances a fully matched board instead of trapping the mode',
+    () async {
+      final engine = MatchEngine(random: Random(1));
+      final cards = engine.shuffleCards(_cards(6));
+      final firstBoardCards = cards
+          .take(MatchEngine.defaultPairsPerRound)
+          .toList(growable: false);
+      final firstBoard = engine.generateGame(
+        firstBoardCards,
+        pairsPerRound: firstBoardCards.length,
+      );
+
+      SharedPreferences.setMockInitialValues({
+        'active_study_session_v1': jsonEncode(
+          ActiveStudySessionSnapshot(
+            deckId: 1,
+            mode: StudyMode.match,
+            session: StudySession(
+              id: 99,
+              deckId: 1,
+              mode: StudyMode.match,
+              startedAt: DateTime(2026, 4, 3, 10),
+            ),
+            payload: <String, dynamic>{
+              'cards': cards.map((card) => card.toJson()).toList(),
+              'game': <String, dynamic>{
+                'terms': firstBoard.terms
+                    .map(
+                      (item) => <String, dynamic>{
+                        'id': item.id,
+                        'text': item.text,
+                        'type': item.type.name,
+                      },
+                    )
+                    .toList(),
+                'definitions': firstBoard.definitions
+                    .map(
+                      (item) => <String, dynamic>{
+                        'id': item.id,
+                        'text': item.text,
+                        'type': item.type.name,
+                      },
+                    )
+                    .toList(),
+                'correctPairs': firstBoard.correctPairs,
+              },
+              'startTime': DateTime(2026, 4, 3, 10).toIso8601String(),
+              'boardIndex': 0,
+              'completedPairCount': 0,
+              'matchedPairIds': firstBoard.correctPairs.keys.toList(),
+              'attemptCounts': const <String, int>{},
+              'mistakes': 0,
+              'comboCount': 5,
+            },
+          ).toJson(),
+        ),
+      });
+
+      final cardReviewDao = FakeCardReviewDao();
+      final container = buildContainer(
+        flashcardRepository: FakeFlashcardRepository(cards: _cards(6)),
+        cardReviewDao: cardReviewDao,
+      );
+      addTearDown(cardReviewDao.dispose);
+      addTearDown(container.dispose);
+
+      final restored = await container.read(matchSessionProvider(1).future);
+
+      expect(restored.isComplete, isFalse);
+      expect(restored.boardIndex, 1);
+      expect(restored.completedPairCount, 5);
+      expect(restored.matchedPairIds, isEmpty);
+      expect(restored.game.correctPairs.length, 1);
+    },
+  );
+}
+
+Future<void> _solveCurrentBoard(ProviderContainer container) async {
+  final notifier = container.read(matchSessionProvider(1).notifier);
+  final state = container.read(matchSessionProvider(1)).requireValue;
+
+  for (final term in state.game.terms) {
+    if (state.matchedPairIds.contains(term.id)) {
+      continue;
+    }
+
+    final definitionId = state.game.correctPairs[term.id]!;
+    final definition = state.game.definitions.firstWhere(
+      (item) => item.id == definitionId,
+    );
+    await notifier.selectItem(term);
+    await notifier.selectItem(definition);
+  }
 }
 
 List<FlashcardEntity> _cards(int count) => List<FlashcardEntity>.generate(

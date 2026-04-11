@@ -5,6 +5,7 @@ import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/study/domain/match/match_engine.dart';
 import 'package:memox/features/study/presentation/providers/match_provider.dart';
 import 'package:memox/features/study/presentation/widgets/match_item_board.dart';
+import 'package:memox/shared/widgets/cards/info_bar.dart';
 import 'package:memox/shared/widgets/feedback/empty_state_view.dart';
 
 class MatchRoundView extends StatelessWidget {
@@ -33,18 +34,16 @@ class MatchRoundView extends StatelessWidget {
       ).add(const EdgeInsets.symmetric(vertical: SpacingTokens.lg)),
       child: Column(
         children: [
-          if (state.selectedTermId != null ||
-              state.selectedDefinitionId != null)
-            Padding(
-              padding: const EdgeInsets.only(bottom: SpacingTokens.sm),
-              child: Text(
-                context.l10n.matchDeselectHint,
-                style: context.textTheme.bodySmall?.copyWith(
-                  color: context.colors.onSurfaceVariant,
-                ),
-                textAlign: TextAlign.center,
+          if (state.totalBoards > 1) ...[
+            InfoBar(
+              icon: Icons.view_module_outlined,
+              text: context.l10n.matchBoardProgressLabel(
+                state.boardIndex + 1,
+                state.totalBoards,
               ),
             ),
+            const SizedBox(height: SpacingTokens.lg),
+          ],
           Expanded(
             child: MatchItemBoard(state: state, onSelect: onSelect),
           ),

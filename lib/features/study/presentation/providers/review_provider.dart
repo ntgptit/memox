@@ -11,6 +11,8 @@ import 'package:memox/features/study/domain/entities/study_session.dart';
 import 'package:memox/features/study/domain/srs/srs_engine.dart';
 import 'package:memox/features/study/presentation/providers/active_study_session_store.dart';
 import 'package:memox/features/study/presentation/providers/study_engine_providers.dart';
+import 'package:memox/features/study/presentation/support/study_restore_utils.dart';
+import 'package:memox/features/study/presentation/support/study_session_result.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'review_provider.freezed.dart';
@@ -19,12 +21,6 @@ part 'review_provider.g.dart';
 const int _reviewSessionCardLimit = 500;
 
 typedef ReviewResult = ({int cardId, ReviewRating rating});
-typedef ReviewUndoAction = ({
-  FlashcardEntity previousCard,
-  ReviewState previousState,
-  StudySession? previousSession,
-  int reviewId,
-});
 
 @freezed
 abstract class ReviewState with _$ReviewState {
@@ -35,8 +31,7 @@ abstract class ReviewState with _$ReviewState {
     @Default(false) bool isFlipped,
     ReviewRating? selectedRating,
     @Default(<ReviewResult>[]) List<ReviewResult> results,
-    @Default(0) int lastActionSequence,
-    ReviewRating? lastRated,
+    @Default(<int>{}) Set<int> retryPendingCardIds,
     @Default(false) bool isComplete,
   }) = _ReviewState;
 }
@@ -52,6 +47,16 @@ extension ReviewStateX on ReviewState {
 
   int get hardCount => _countByRating(ReviewRating.hard);
 
+  bool get isCurrentCardPendingRetry {
+    final card = currentCard;
+
+    if (card == null) {
+      return false;
+    }
+
+    return retryPendingCardIds.contains(card.id);
+  }
+
   FlashcardEntity? get currentCard {
     if (cards.isEmpty || isComplete) {
       return null;
@@ -59,6 +64,67 @@ extension ReviewStateX on ReviewState {
 
     return cards[currentIndex];
   }
+
+  List<StudySessionAllowedAction> get allowedActions {
+    final card = currentCard;
+
+    if (card == null || isComplete) {
+      return const <StudySessionAllowedAction>[];
+    }
+
+    if (!isFlipped) {
+      return const <StudySessionAllowedAction>[
+        StudySessionAllowedAction.revealAnswer,
+      ];
+    }
+
+    if (selectedRating == null) {
+      return const <StudySessionAllowedAction>[
+        StudySessionAllowedAction.markRemembered,
+        StudySessionAllowedAction.retryItem,
+      ];
+    }
+
+    return const <StudySessionAllowedAction>[StudySessionAllowedAction.goNext];
+  }
+
+  ActiveStudySessionCurrentItem? get currentItemSnapshot {
+    final card = currentCard;
+
+    if (card == null) {
+      return null;
+    }
+
+    return ActiveStudySessionCurrentItem(
+      cardId: card.id,
+      position: displayIndex,
+    );
+  }
+
+  StudySessionModeState get modeState {
+    if (isComplete) {
+      return StudySessionModeState.completed;
+    }
+
+    if (isCurrentCardPendingRetry) {
+      return StudySessionModeState.retryPending;
+    }
+
+    if (isFlipped || selectedRating != null) {
+      return StudySessionModeState.waitingFeedback;
+    }
+
+    if (currentIndex == 0 && results.isEmpty) {
+      return StudySessionModeState.initialized;
+    }
+
+    return StudySessionModeState.inProgress;
+  }
+
+  ActiveStudySessionProgress get progressSnapshot => ActiveStudySessionProgress(
+    completedCount: results.length,
+    totalCount: totalCards,
+  );
 
   int get successfulCount => totalCards - againCount;
 
@@ -77,7 +143,6 @@ ReviewState? _stateValueOrNull(AsyncValue<ReviewState> value) =>
 @Riverpod(keepAlive: true)
 class ReviewSession extends _$ReviewSession {
   StudySession? _session;
-  ReviewUndoAction? _pendingUndo;
 
   @override
   Future<ReviewState> build(int deckId) async {
@@ -104,16 +169,8 @@ class ReviewSession extends _$ReviewSession {
 
     final updated = current.copyWith(selectedRating: rating);
     state = AsyncValue<ReviewState>.data(updated);
-    final reviewId = await _persistReview(card, rating);
-    await _advance(
-      updated,
-      card.id,
-      rating,
-      reviewId: reviewId,
-      previousCard: card,
-      previousState: current,
-      previousSession: _session,
-    );
+    await _persistReview(card, rating);
+    await _advance(updated, card.id, rating);
   }
 
   Future<void> toggleFlip() async {
@@ -129,7 +186,6 @@ class ReviewSession extends _$ReviewSession {
   }
 
   Future<void> startSession() async {
-    _pendingUndo = null;
     state = const AsyncValue<ReviewState>.loading();
     final nextState = await _startSession(deckId);
     state = AsyncValue<ReviewState>.data(nextState);
@@ -138,33 +194,51 @@ class ReviewSession extends _$ReviewSession {
   Future<void> _advance(
     ReviewState current,
     int cardId,
-    ReviewRating rating, {
-    required int reviewId,
-    required FlashcardEntity previousCard,
-    required ReviewState previousState,
-    required StudySession? previousSession,
-  }) async {
+    ReviewRating rating,
+  ) async {
+    final shouldQueueRetry =
+        rating == ReviewRating.again &&
+        !current.retryPendingCardIds.contains(cardId);
+
+    if (shouldQueueRetry) {
+      final reorderedCards = [...current.cards];
+      final retryCard = reorderedCards.removeAt(current.currentIndex);
+      reorderedCards.add(retryCard);
+      final nextRetryPendingCardIds = {...current.retryPendingCardIds, cardId};
+      final nextIndex = _nextIndexAfterRetry(
+        currentIndex: current.currentIndex,
+        cards: reorderedCards,
+        retryPendingCardIds: nextRetryPendingCardIds,
+      );
+      final queued = current.copyWith(
+        cards: reorderedCards,
+        currentIndex: nextIndex,
+        nextReviewTimes: _nextReviewTimes(reorderedCards[nextIndex]),
+        isFlipped: false,
+        selectedRating: null,
+        retryPendingCardIds: nextRetryPendingCardIds,
+      );
+      state = AsyncValue<ReviewState>.data(queued);
+      await _persistSnapshot(queued);
+      return;
+    }
+
     final nextResults = <ReviewResult>[
       ...current.results,
       (cardId: cardId, rating: rating),
     ];
-    final nextSequence = current.lastActionSequence + 1;
+    final nextRetryPendingCardIds = current.retryPendingCardIds
+        .where((pendingCardId) => pendingCardId != cardId)
+        .toSet();
 
     if (current.currentIndex == current.cards.length - 1) {
       final completed = current.copyWith(
         results: nextResults,
-        lastActionSequence: nextSequence,
-        lastRated: rating,
+        retryPendingCardIds: nextRetryPendingCardIds,
         isComplete: true,
       );
       state = AsyncValue<ReviewState>.data(completed);
       await _completeSession(completed);
-      _pendingUndo = (
-        previousCard: previousCard,
-        previousState: previousState,
-        previousSession: previousSession,
-        reviewId: reviewId,
-      );
       return;
     }
 
@@ -176,16 +250,9 @@ class ReviewSession extends _$ReviewSession {
       isFlipped: false,
       selectedRating: null,
       results: nextResults,
-      lastActionSequence: nextSequence,
-      lastRated: rating,
+      retryPendingCardIds: nextRetryPendingCardIds,
     );
     state = AsyncValue<ReviewState>.data(updated);
-    _pendingUndo = (
-      previousCard: previousCard,
-      previousState: previousState,
-      previousSession: previousSession,
-      reviewId: reviewId,
-    );
     await _persistSnapshot(updated);
   }
 
@@ -205,9 +272,11 @@ class ReviewSession extends _$ReviewSession {
       wrongCount: current.againCount,
       durationSeconds: now.difference(startedAt).inSeconds,
     );
-    _session = await ref
-        .read(completeStudySessionUseCaseProvider)
-        .call(completedSession);
+    _session = unwrapStudySessionResult(
+      await ref
+          .read(completeStudySessionUseCaseProvider)
+          .call(completedSession),
+    );
     await _clearSnapshot();
   }
 
@@ -268,34 +337,6 @@ class ReviewSession extends _$ReviewSession {
     return nextCard.isFlagged;
   }
 
-  Future<bool> undoLastRating() async {
-    final pendingUndo = _pendingUndo;
-
-    if (pendingUndo == null) {
-      return false;
-    }
-
-    _pendingUndo = null;
-    await ref.read(flashcardRepositoryProvider).save(pendingUndo.previousCard);
-
-    if (pendingUndo.reviewId > 0) {
-      await ref.read(cardReviewDaoProvider).deleteById(pendingUndo.reviewId);
-    }
-
-    final previousSession = pendingUndo.previousSession;
-
-    if (previousSession != null) {
-      _session = await ref
-          .read(completeStudySessionUseCaseProvider)
-          .call(previousSession);
-    }
-
-    final restored = pendingUndo.previousState.copyWith(lastRated: null);
-    state = AsyncValue<ReviewState>.data(restored);
-    await _persistSnapshot(restored);
-    return true;
-  }
-
   Future<ReviewState> _startSession(int deckId) async {
     final cards = await ref
         .read(getDueCardsUseCaseProvider)
@@ -303,7 +344,6 @@ class ReviewSession extends _$ReviewSession {
 
     if (cards.isEmpty) {
       _session = null;
-      _pendingUndo = null;
       await _clearSnapshot();
       return const ReviewState(
         cards: <FlashcardEntity>[],
@@ -312,10 +352,9 @@ class ReviewSession extends _$ReviewSession {
       );
     }
 
-    _pendingUndo = null;
-    _session = await ref
-        .read(startStudySessionUseCaseProvider)
-        .call(deckId: deckId);
+    _session = unwrapStudySessionResult(
+      await ref.read(startStudySessionUseCaseProvider).call(deckId: deckId),
+    );
     final nextState = ReviewState(
       cards: cards,
       currentIndex: 0,
@@ -345,6 +384,7 @@ class ReviewSession extends _$ReviewSession {
           },
         )
         .toList(growable: false),
+    'retryPendingCardIds': current.retryPendingCardIds.toList(growable: false),
   };
 
   Future<void> _persistSnapshot(ReviewState current) async {
@@ -359,6 +399,12 @@ class ReviewSession extends _$ReviewSession {
         deckId: deckId,
         mode: StudyMode.review,
         session: _session,
+        modePlan: const <StudyMode>[StudyMode.review],
+        modeState: current.modeState,
+        allowedActions: current.allowedActions,
+        currentItem: current.currentItemSnapshot,
+        progress: current.progressSnapshot,
+        sessionCompleted: current.isComplete,
         payload: _encodeState(current),
       ),
     );
@@ -366,50 +412,95 @@ class ReviewSession extends _$ReviewSession {
 
   Future<ReviewState?> _restoreSnapshot() async {
     final store = await ref.read(activeStudySessionStoreProvider.future);
-    final snapshot = store.load();
-
-    if (snapshot == null) {
-      return null;
-    }
-
-    if (snapshot.deckId != deckId || snapshot.mode != StudyMode.review) {
-      return null;
-    }
-
-    _pendingUndo = null;
-    _session = snapshot.session;
-    return ReviewState(
-      cards: (snapshot.payload['cards'] as List<dynamic>? ?? const <dynamic>[])
-          .map(
-            (card) => FlashcardEntity.fromJson(
-              Map<String, dynamic>.from(card as Map),
-            ),
-          )
-          .toList(growable: false),
-      currentIndex: snapshot.payload['currentIndex'] as int? ?? 0,
-      nextReviewTimes: (snapshot.payload['nextReviewTimes'] as Map?) == null
-          ? const <ReviewRating, String>{}
-          : (snapshot.payload['nextReviewTimes'] as Map).map(
-              (key, value) => MapEntry<ReviewRating, String>(
-                ReviewRating.values.byName(key as String),
-                value as String,
-              ),
-            ),
-      isFlipped: snapshot.payload['isFlipped'] as bool? ?? false,
-      results:
-          (snapshot.payload['results'] as List<dynamic>? ?? const <dynamic>[])
-              .map((result) {
-                final resultJson = Map<String, dynamic>.from(
-                  result as Map<Object?, Object?>,
-                );
-                return (
-                  cardId: resultJson['cardId'] as int,
-                  rating: ReviewRating.values.byName(
-                    resultJson['rating'] as String,
-                  ),
-                );
-              })
-              .toList(growable: false),
+    return store.restoreMatching(
+      deckId: deckId,
+      mode: StudyMode.review,
+      decode: (snapshot) {
+        final cards = _decodeReviewCards(snapshot.payload['cards']);
+        final requestedIndex = snapshot.payload['currentIndex'] as int? ?? 0;
+        final currentIndex = _restoredReviewIndex(
+          snapshot.payload['currentIndex'],
+          cards.length,
+        );
+        final cardIds = cards.map((card) => card.id).toSet();
+        final results =
+            (snapshot.payload['results'] as List<dynamic>? ?? const <dynamic>[])
+                .map((result) {
+                  final resultJson = Map<String, dynamic>.from(
+                    result as Map<Object?, Object?>,
+                  );
+                  return (
+                    cardId: resultJson['cardId'] as int,
+                    rating: ReviewRating.values.byName(
+                      resultJson['rating'] as String,
+                    ),
+                  );
+                })
+                .where((result) => cardIds.contains(result.cardId))
+                .toList(growable: false);
+        final retryPendingCardIds =
+            (snapshot.payload['retryPendingCardIds'] as List<dynamic>? ??
+                    const <dynamic>[])
+                .map((cardId) => cardId as int)
+                .where(cardIds.contains)
+                .toSet();
+        final restored = ReviewState(
+          cards: cards,
+          currentIndex: currentIndex,
+          nextReviewTimes: _nextReviewTimes(cards[currentIndex]),
+          isFlipped:
+              requestedIndex == currentIndex &&
+              (snapshot.payload['isFlipped'] as bool? ?? false),
+          results: results,
+          retryPendingCardIds: retryPendingCardIds,
+        );
+        _session = snapshot.session;
+        return restored;
+      },
     );
   }
+}
+
+List<FlashcardEntity> _decodeReviewCards(Object? raw) =>
+    (raw as List<dynamic>? ?? const <dynamic>[])
+        .map(
+          (card) =>
+              FlashcardEntity.fromJson(Map<String, dynamic>.from(card as Map)),
+        )
+        .toList(growable: false);
+
+int _restoredReviewIndex(Object? raw, int cardCount) {
+  if (cardCount == 0) {
+    throw StateError('Review snapshot is missing cards.');
+  }
+
+  return clampSnapshotIndex(raw as int? ?? 0, cardCount);
+}
+
+int _nextIndexAfterRetry({
+  required int currentIndex,
+  required List<FlashcardEntity> cards,
+  required Set<int> retryPendingCardIds,
+}) {
+  if (cards.isEmpty) {
+    return 0;
+  }
+
+  if (currentIndex < cards.length) {
+    if (currentIndex < cards.length - 1) {
+      return currentIndex;
+    }
+
+    final retryIndex = cards.indexWhere(
+      (card) => retryPendingCardIds.contains(card.id),
+    );
+
+    if (retryIndex >= 0) {
+      return retryIndex;
+    }
+
+    return currentIndex;
+  }
+
+  return cards.length - 1;
 }

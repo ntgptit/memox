@@ -8,11 +8,7 @@ import 'package:memox/shared/widgets/lists/app_list_tile.dart';
 typedef StudyMistakeItem = ({int cardId, String front, String back});
 
 class StudyMistakesPanel extends StatefulWidget {
-  const StudyMistakesPanel({
-    required this.items,
-    this.onTapItem,
-    super.key,
-  });
+  const StudyMistakesPanel({required this.items, this.onTapItem, super.key});
 
   final List<StudyMistakeItem> items;
   final ValueChanged<StudyMistakeItem>? onTapItem;

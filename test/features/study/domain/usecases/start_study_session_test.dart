@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/core/design/study_mode.dart';
+import 'package:memox/core/types/result.dart';
 import 'package:memox/features/study/domain/entities/study_session.dart';
 import 'package:memox/features/study/domain/repositories/study_repository.dart';
 import 'package:memox/features/study/domain/usecases/start_study_session.dart';
@@ -11,8 +12,9 @@ void main() {
 
     final result = await useCase.call(deckId: 7, mode: StudyMode.match);
 
-    expect(result.mode, StudyMode.match);
-    expect(result.deckId, 7);
+    expect(result, isA<Success<StudySession>>());
+    expect(result.dataOrNull?.mode, StudyMode.match);
+    expect(result.dataOrNull?.deckId, 7);
     expect(repository.lastDeckId, 7);
     expect(repository.lastMode, StudyMode.match);
   });

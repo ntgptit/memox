@@ -8,11 +8,11 @@ import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/cards/presentation/screens/card_edit_screen.dart';
 import 'package:memox/features/study/domain/srs/srs_engine.dart';
-import 'package:memox/features/study/presentation/providers/active_study_session_store.dart';
 import 'package:memox/features/study/presentation/providers/recall_provider.dart';
 import 'package:memox/features/study/presentation/widgets/recall_round_view.dart';
 import 'package:memox/features/study/presentation/widgets/study_mistakes_panel.dart';
 import 'package:memox/features/study/presentation/widgets/study_next_deck_button.dart';
+import 'package:memox/shared/widgets/dialogs/exit_session_dialog.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
 import 'package:memox/shared/widgets/feedback/empty_state_view.dart';
 import 'package:memox/shared/widgets/feedback/session_complete_view.dart';
@@ -73,19 +73,11 @@ class _RecallModeScreenState extends ConsumerState<RecallModeScreen> {
   }
 
   Future<void> _handleClose(BuildContext context) async {
-    final confirmed = await context.showConfirmDialog(
-      title: context.l10n.exitSessionTitle,
-      message: context.l10n.exitSessionMessage,
-      confirmText: context.l10n.exitAction,
-      isDestructive: true,
-    );
+    final confirmed = await showExitSessionDialog(context);
 
     if (confirmed != true || !context.mounted) {
       return;
     }
-
-    final store = await ref.read(activeStudySessionStoreProvider.future);
-    await store.clearIfMatches(deckId: widget.deckId, mode: StudyMode.recall);
 
     if (!context.mounted) {
       return;
@@ -150,14 +142,6 @@ Widget _buildBody(
         label: context.l10n.doneAction,
         onTap: () => Navigator.of(context).pop(),
       ),
-      secondaryAction: state.missedCount == 0 || state.isMissedPracticeSession
-          ? null
-          : SessionAction(
-              label: context.l10n.recallPracticeMissedAction(state.missedCount),
-              onTap: () => ref
-                  .read(recallSessionProvider(deckId).notifier)
-                  .reviewMissedCards(),
-            ),
       extraContent: Column(
         children: [
           Text(
@@ -169,26 +153,6 @@ Widget _buildBody(
             style: context.appTextStyles.statNumberSm,
             textAlign: TextAlign.center,
           ),
-          if (state.missedCount > 0 && !state.isMissedPracticeSession) ...[
-            const SizedBox(height: SpacingTokens.sm),
-            Text(
-              context.l10n.recallPracticeMissedHint,
-              style: context.textTheme.bodySmall?.copyWith(
-                color: context.colors.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
-          if (state.isMissedPracticeSession) ...[
-            const SizedBox(height: SpacingTokens.sm),
-            Text(
-              context.l10n.recallPracticeMissedSummary,
-              style: context.textTheme.bodySmall?.copyWith(
-                color: context.colors.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ],
           if (difficultCards.isNotEmpty) ...[
             const SizedBox(height: SpacingTokens.lg),
             StudyMistakesPanel(

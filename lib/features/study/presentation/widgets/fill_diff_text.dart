@@ -24,7 +24,8 @@ class FillDiffText extends StatelessWidget {
             TextSpan(
               text: answerCharacters[index],
               style: baseStyle?.copyWith(
-                color: index < userCharacters.length &&
+                color:
+                    index < userCharacters.length &&
                         userCharacters[index] == answerCharacters[index]
                     ? context.customColors.ratingGood
                     : context.customColors.ratingAgain,

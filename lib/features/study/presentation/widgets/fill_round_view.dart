@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/duration_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/study/domain/fill/fill_engine.dart';
@@ -95,6 +96,13 @@ class _FillRoundContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Column(
     children: [
+      if (state.isRetrying) ...[
+        InfoBar(
+          icon: Icons.refresh_outlined,
+          text: context.l10n.studyRetryPhaseHint,
+        ),
+        const SizedBox(height: SpacingTokens.lg),
+      ],
       if (warningText != null) ...[
         InfoBar(icon: Icons.lightbulb_outline, text: warningText!),
         const SizedBox(height: SpacingTokens.lg),

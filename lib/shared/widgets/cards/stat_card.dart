@@ -32,7 +32,12 @@ class StatCard extends StatelessWidget {
             DecoratedBox(
               decoration: BoxDecoration(
                 color: accentColor.withValues(alpha: OpacityTokens.softTint),
-                borderRadius: BorderRadius.circular(RadiusTokens.input),
+                border: Border.all(
+                  color: accentColor.withValues(
+                    alpha: OpacityTokens.borderSubtle,
+                  ),
+                ),
+                borderRadius: BorderRadius.circular(RadiusTokens.lg),
               ),
               child: SizedBox.square(
                 dimension: SizeTokens.touchTarget,
@@ -43,7 +48,7 @@ class StatCard extends StatelessWidget {
           ],
           Text(
             value,
-            style: context.appTextStyles.statNumberSm.copyWith(
+            style: context.appTextStyles.statNumberMd.copyWith(
               color: accentColor,
             ),
           ),

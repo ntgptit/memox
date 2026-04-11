@@ -17,7 +17,7 @@ class ModeChip extends StatelessWidget {
   Widget build(BuildContext context) => AnimatedContainer(
     duration: DurationTokens.normal,
     padding: const EdgeInsets.symmetric(
-      horizontal: SpacingTokens.sm,
+      horizontal: SpacingTokens.md,
       vertical: SpacingTokens.xs,
     ),
     decoration: BoxDecoration(

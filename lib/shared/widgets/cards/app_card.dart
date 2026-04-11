@@ -54,17 +54,19 @@ class AppCard extends StatelessWidget {
         child: child,
       ),
     );
+    final hasInteraction = enabled && (onTap != null || onLongPress != null);
+    final material = Material(
+      color: background,
+      elevation: cardTheme.elevation ?? 0,
+      shape: shape,
+      shadowColor: cardTheme.shadowColor,
+      surfaceTintColor: cardTheme.surfaceTintColor,
+      clipBehavior: Clip.antiAlias,
+      child: content,
+    );
 
-    if (!enabled) {
-      return Material(
-        color: background,
-        elevation: cardTheme.elevation ?? 0,
-        shape: shape,
-        shadowColor: cardTheme.shadowColor,
-        surfaceTintColor: cardTheme.surfaceTintColor,
-        clipBehavior: Clip.antiAlias,
-        child: content,
-      );
+    if (!hasInteraction) {
+      return material;
     }
 
     return Material(

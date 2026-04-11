@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/core/design/study_mode.dart';
@@ -8,12 +10,18 @@ import 'package:memox/features/cards/domain/support/flashcard_flags.dart';
 import 'package:memox/features/study/domain/entities/study_session.dart';
 import 'package:memox/features/study/domain/repositories/study_repository.dart';
 import 'package:memox/features/study/domain/srs/srs_engine.dart';
+import 'package:memox/features/study/presentation/providers/active_study_session_store.dart';
 import 'package:memox/features/study/presentation/providers/review_provider.dart';
 import 'package:memox/features/study/presentation/providers/study_engine_providers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../test_helpers/fakes/fake_card_review_dao.dart';
 import '../../../../test_helpers/fakes/fake_flashcard_repository.dart';
 
 void main() {
+  setUp(() {
+    SharedPreferences.setMockInitialValues(const <String, Object>{});
+  });
+
   ProviderContainer buildContainer({
     required FakeFlashcardRepository flashcardRepository,
     required FakeCardReviewDao cardReviewDao,
@@ -48,6 +56,44 @@ void main() {
     final updated = container.read(reviewSessionProvider(1)).requireValue;
     expect(updated.isFlipped, isTrue);
   });
+
+  test(
+    'saved snapshot exposes review mode state, actions, and progress',
+    () async {
+      final cardReviewDao = FakeCardReviewDao();
+      final container = buildContainer(
+        flashcardRepository: FakeFlashcardRepository(cards: _cards(2)),
+        cardReviewDao: cardReviewDao,
+      );
+      addTearDown(cardReviewDao.dispose);
+      addTearDown(container.dispose);
+      final notifier = container.read(reviewSessionProvider(1).notifier);
+      final store = await container.read(
+        activeStudySessionStoreProvider.future,
+      );
+
+      await container.read(reviewSessionProvider(1).future);
+      var snapshot = store.load();
+      expect(snapshot?.modePlan, const <StudyMode>[StudyMode.review]);
+      expect(snapshot?.modeState, StudySessionModeState.initialized);
+      expect(snapshot?.allowedActions, const <StudySessionAllowedAction>[
+        StudySessionAllowedAction.revealAnswer,
+      ]);
+      expect(snapshot?.currentItem?.cardId, 1);
+      expect(snapshot?.currentItem?.position, 1);
+      expect(snapshot?.progress.completedCount, 0);
+      expect(snapshot?.progress.totalCount, 2);
+
+      await notifier.toggleFlip();
+
+      snapshot = store.load();
+      expect(snapshot?.modeState, StudySessionModeState.waitingFeedback);
+      expect(snapshot?.allowedActions, const <StudySessionAllowedAction>[
+        StudySessionAllowedAction.markRemembered,
+        StudySessionAllowedAction.retryItem,
+      ]);
+    },
+  );
 
   test('rate persists SRS data and advances to the next card', () async {
     final fixedNow = DateTime(2026, 4, 5, 10);
@@ -126,7 +172,53 @@ void main() {
     expect(cardReviewDao.insertedReviews, isEmpty);
   });
 
-  test('completion stats reflect review ratings', () async {
+  test(
+    'restore clamps a stale review snapshot index to the last card',
+    () async {
+      SharedPreferences.setMockInitialValues({
+        'active_study_session_v1': jsonEncode(
+          ActiveStudySessionSnapshot(
+            deckId: 1,
+            mode: StudyMode.review,
+            session: StudySession(
+              id: 41,
+              deckId: 1,
+              startedAt: DateTime(2026, 4, 5, 10),
+            ),
+            payload: <String, dynamic>{
+              'cards': _cards(2).map((card) => card.toJson()).toList(),
+              'currentIndex': 99,
+              'nextReviewTimes': const <String, String>{},
+              'isFlipped': true,
+              'results': const <Map<String, dynamic>>[
+                <String, dynamic>{'cardId': 99, 'rating': 'good'},
+              ],
+              'retryPendingCardIds': const <int>[99],
+            },
+          ).toJson(),
+        ),
+      });
+
+      final cardReviewDao = FakeCardReviewDao();
+      final container = buildContainer(
+        flashcardRepository: FakeFlashcardRepository(cards: _cards(2)),
+        cardReviewDao: cardReviewDao,
+      );
+      addTearDown(cardReviewDao.dispose);
+      addTearDown(container.dispose);
+
+      final restored = await container.read(reviewSessionProvider(1).future);
+
+      expect(restored.currentIndex, 1);
+      expect(restored.currentCard?.id, 2);
+      expect(restored.isFlipped, isFalse);
+      expect(restored.results, isEmpty);
+      expect(restored.retryPendingCardIds, isEmpty);
+      expect(restored.nextReviewTimes, isNotEmpty);
+    },
+  );
+
+  test('again rating re-queues the card for one retry round', () async {
     final cardReviewDao = FakeCardReviewDao();
     final studyRepository = _FakeStudyRepository();
     final container = buildContainer(
@@ -143,18 +235,25 @@ void main() {
     await _revealAndRate(notifier, ReviewRating.hard);
     await _revealAndRate(notifier, ReviewRating.again);
 
-    final state = container.read(reviewSessionProvider(1)).requireValue;
+    var state = container.read(reviewSessionProvider(1)).requireValue;
+    expect(state.isComplete, isFalse);
+    expect(state.currentCard?.id, 3);
+    expect(state.retryPendingCardIds, <int>{3});
+    expect(state.results, hasLength(2));
 
+    await _revealAndRate(notifier, ReviewRating.good);
+
+    state = container.read(reviewSessionProvider(1)).requireValue;
     expect(state.isComplete, isTrue);
-    expect(state.goodCount, 1);
+    expect(state.goodCount, 2);
     expect(state.hardCount, 1);
-    expect(state.againCount, 1);
+    expect(state.againCount, 0);
     expect(studyRepository.completedSession?.mode, StudyMode.review);
-    expect(studyRepository.completedSession?.correctCount, 2);
-    expect(studyRepository.completedSession?.wrongCount, 1);
+    expect(studyRepository.completedSession?.correctCount, 3);
+    expect(studyRepository.completedSession?.wrongCount, 0);
   });
 
-  test('undoLastRating restores the previous card state', () async {
+  test('completed review clears the active snapshot after rating', () async {
     final cardReviewDao = FakeCardReviewDao();
     final studyRepository = _FakeStudyRepository();
     final flashcardRepository = FakeFlashcardRepository(cards: _cards(1));
@@ -166,25 +265,21 @@ void main() {
     addTearDown(cardReviewDao.dispose);
     addTearDown(container.dispose);
     final notifier = container.read(reviewSessionProvider(1).notifier);
+    final store = await container.read(activeStudySessionStoreProvider.future);
 
     await container.read(reviewSessionProvider(1).future);
     await _revealAndRate(notifier, ReviewRating.good);
-    expect(
-      container.read(reviewSessionProvider(1)).requireValue.isComplete,
-      isTrue,
-    );
-
-    final undone = await notifier.undoLastRating();
     final state = container.read(reviewSessionProvider(1)).requireValue;
     final savedCard = await flashcardRepository.getById(1);
 
-    expect(undone, isTrue);
-    expect(state.isComplete, isFalse);
-    expect(state.currentIndex, 0);
-    expect(state.results, isEmpty);
-    expect(savedCard?.interval, 0);
-    expect(cardReviewDao.deletedReviewIds, <int>[1]);
-    expect(studyRepository.completedSession?.completedAt, isNull);
+    expect(state.isComplete, isTrue);
+    expect(state.results, hasLength(1));
+    expect(state.results.single.cardId, 1);
+    expect(state.results.single.rating, ReviewRating.good);
+    expect(savedCard?.interval, greaterThan(0));
+    expect(cardReviewDao.deletedReviewIds, isEmpty);
+    expect(studyRepository.completedSession?.completedAt, isNotNull);
+    expect(store.load(), isNull);
   });
 
   test('toggleFlag stores the reserved flag tag on the current card', () async {
@@ -206,6 +301,42 @@ void main() {
     expect(savedCard?.tags, contains(flaggedCardTag));
     expect(savedCard?.visibleTags, isEmpty);
   });
+
+  test(
+    'corrupted saved snapshot is ignored and a fresh session starts',
+    () async {
+      SharedPreferences.setMockInitialValues({
+        'active_study_session_v1': jsonEncode(<String, dynamic>{
+          'deckId': 1,
+          'mode': StudyMode.review.name,
+          'session': const StudySession(id: 77, deckId: 1).toJson(),
+          'payload': <String, dynamic>{
+            'cards': [_cards(1).first.toJson()],
+            'currentIndex': 0,
+            'results': [
+              <String, dynamic>{'cardId': 1, 'rating': 'unsupported-rating'},
+            ],
+            'retryPendingCardIds': const <int>[],
+          },
+        }),
+      });
+      final cardReviewDao = FakeCardReviewDao();
+      final studyRepository = _FakeStudyRepository();
+      final container = buildContainer(
+        flashcardRepository: FakeFlashcardRepository(cards: _cards(1)),
+        cardReviewDao: cardReviewDao,
+        studyRepository: studyRepository,
+      );
+      addTearDown(cardReviewDao.dispose);
+      addTearDown(container.dispose);
+
+      final state = await container.read(reviewSessionProvider(1).future);
+
+      expect(studyRepository.startedSession, isTrue);
+      expect(state.currentCard?.id, 1);
+      expect(state.results, isEmpty);
+    },
+  );
 }
 
 Future<void> _revealAndRate(ReviewSession notifier, ReviewRating rating) async {

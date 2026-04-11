@@ -9,6 +9,8 @@ enum MatchItemType { term, definition }
 final class MatchEngine {
   MatchEngine({Random? random}) : _random = random ?? Random();
 
+  static const int defaultPairsPerRound = 5;
+
   final Random _random;
   ({
     List<({String id, String text, MatchItemType type})> terms,
@@ -22,7 +24,10 @@ final class MatchEngine {
     List<({String id, String text, MatchItemType type})> definitions,
     Map<String, String> correctPairs,
   })
-  generateGame(List<CardEntity> cards, {int pairsPerRound = 5}) {
+  generateGame(
+    List<CardEntity> cards, {
+    int pairsPerRound = defaultPairsPerRound,
+  }) {
     if (cards.isEmpty) {
       const emptyGame = (
         terms: <({String id, String text, MatchItemType type})>[],
@@ -60,6 +65,11 @@ final class MatchEngine {
     );
     _currentGame = game;
     return game;
+  }
+
+  List<CardEntity> shuffleCards(List<CardEntity> cards) {
+    final shuffled = [...cards]..shuffle(_random);
+    return shuffled;
   }
 
   bool checkMatch(String termId, String definitionId) =>

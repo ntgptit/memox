@@ -1,3 +1,4 @@
+import 'package:memox/core/types/result.dart';
 import 'package:memox/features/study/domain/entities/study_session.dart';
 import 'package:memox/features/study/domain/repositories/study_repository.dart';
 
@@ -6,6 +7,8 @@ final class CompleteStudySessionUseCase {
 
   final StudyRepository _repository;
 
-  Future<StudySession> call(StudySession session) =>
-      _repository.completeSession(session);
+  Future<Result<StudySession>> call(StudySession session) async {
+    final completedSession = await _repository.completeSession(session);
+    return Result<StudySession>.success(completedSession);
+  }
 }

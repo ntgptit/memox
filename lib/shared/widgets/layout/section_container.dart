@@ -41,16 +41,18 @@ class SectionContainer extends StatelessWidget {
                 ),
                 const SizedBox(width: SpacingTokens.sm),
                 Expanded(
-                  child: Text(
-                    title.toUpperCase(),
-                    style: context.appTextStyles.sectionLabel,
-                  ),
+                  child: Text(title, style: context.textTheme.headlineLarge),
                 ),
               ],
             ),
           ),
           if (actionLabel != null && onAction != null)
-            TextLinkButton(label: actionLabel!, onTap: onAction),
+            TextLinkButton(
+              label: actionLabel!,
+              onTap: onAction,
+              color: context.colors.primary,
+              showTrailingArrow: true,
+            ),
         ],
       ),
       const SizedBox(height: SpacingTokens.md),

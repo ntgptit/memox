@@ -16,6 +16,8 @@ import 'package:memox/features/study/domain/fill/fill_engine.dart';
 import 'package:memox/features/study/domain/srs/srs_engine.dart';
 import 'package:memox/features/study/presentation/providers/active_study_session_store.dart';
 import 'package:memox/features/study/presentation/providers/study_engine_providers.dart';
+import 'package:memox/features/study/presentation/support/study_restore_utils.dart';
+import 'package:memox/features/study/presentation/support/study_session_result.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'fill_provider.freezed.dart';
@@ -52,9 +54,6 @@ extension FillStateX on FillState {
   int get acceptedCloseCount =>
       results.where((item) => item.acceptedAsClose).length;
 
-  bool get canPracticeMistakes =>
-      results.any((item) => item.firstAttemptResult != FillResult.correct);
-
   bool get canSkip => isRetrying && retryCount >= 1;
 
   bool get canSubmit => userInput.trim().isNotEmpty;
@@ -65,6 +64,51 @@ extension FillStateX on FillState {
     }
 
     return cards[currentIndex];
+  }
+
+  List<StudySessionAllowedAction> get allowedActions {
+    final card = currentCard;
+
+    if (card == null || isComplete) {
+      return const <StudySessionAllowedAction>[];
+    }
+
+    if (result == FillResult.close) {
+      return const <StudySessionAllowedAction>[
+        StudySessionAllowedAction.markRemembered,
+        StudySessionAllowedAction.retryItem,
+      ];
+    }
+
+    if (result == FillResult.correct) {
+      return const <StudySessionAllowedAction>[
+        StudySessionAllowedAction.goNext,
+      ];
+    }
+
+    if (isRetrying && canSkip) {
+      return const <StudySessionAllowedAction>[
+        StudySessionAllowedAction.submitAnswer,
+        StudySessionAllowedAction.goNext,
+      ];
+    }
+
+    return const <StudySessionAllowedAction>[
+      StudySessionAllowedAction.submitAnswer,
+    ];
+  }
+
+  ActiveStudySessionCurrentItem? get currentItemSnapshot {
+    final card = currentCard;
+
+    if (card == null) {
+      return null;
+    }
+
+    return ActiveStudySessionCurrentItem(
+      cardId: card.id,
+      position: displayIndex,
+    );
   }
 
   int get displayIndex => totalCards == 0 ? 0 : currentIndex + 1;
@@ -81,6 +125,31 @@ extension FillStateX on FillState {
       results.where((item) => item.retryCount > 0).length;
 
   int get totalCards => cards.length;
+
+  StudySessionModeState get modeState {
+    if (isComplete) {
+      return StudySessionModeState.completed;
+    }
+
+    if (isRetrying) {
+      return StudySessionModeState.retryPending;
+    }
+
+    if (result != null) {
+      return StudySessionModeState.waitingFeedback;
+    }
+
+    if (currentIndex == 0 && results.isEmpty && userInput.isEmpty) {
+      return StudySessionModeState.initialized;
+    }
+
+    return StudySessionModeState.inProgress;
+  }
+
+  ActiveStudySessionProgress get progressSnapshot => ActiveStudySessionProgress(
+    completedCount: results.length,
+    totalCount: totalCards,
+  );
 }
 
 FillState? _stateValueOrNull(AsyncValue<FillState> value) => switch (value) {
@@ -139,21 +208,6 @@ class FillSession extends _$FillSession {
       acceptedAsClose: true,
       streakAfterCard: current.streak + 1,
     );
-  }
-
-  Future<void> practiceMistakes() async {
-    final current = _stateValueOrNull(state);
-
-    if (current == null ||
-        !current.isComplete ||
-        !current.canPracticeMistakes) {
-      return;
-    }
-
-    _interactionSequence++;
-    state = const AsyncValue<FillState>.loading();
-    final nextState = await _startWithCards(_practiceCards(current));
-    state = AsyncValue<FillState>.data(nextState);
   }
 
   Future<void> rejectClose() async {
@@ -381,9 +435,11 @@ class FillSession extends _$FillSession {
       wrongCount: current.neededRetryCount,
       durationSeconds: now.difference(startedAt).inSeconds,
     );
-    _session = await ref
-        .read(completeStudySessionUseCaseProvider)
-        .call(completedSession);
+    _session = unwrapStudySessionResult(
+      await ref
+          .read(completeStudySessionUseCaseProvider)
+          .call(completedSession),
+    );
     await _clearSnapshot();
   }
 
@@ -489,16 +545,6 @@ class FillSession extends _$FillSession {
         );
   }
 
-  List<FlashcardEntity> _practiceCards(FillState current) {
-    final mistakeIds = current.results
-        .where((item) => item.firstAttemptResult != FillResult.correct)
-        .map((item) => item.cardId)
-        .toSet();
-    return current.cards
-        .where((card) => mistakeIds.contains('${card.id}'))
-        .toList();
-  }
-
   FillPrompt _promptFor(FlashcardEntity card) =>
       ref.read(fillEngineProvider).generatePrompt(card);
 
@@ -529,9 +575,11 @@ class FillSession extends _$FillSession {
       );
     }
 
-    _session = await ref
-        .read(startStudySessionUseCaseProvider)
-        .call(deckId: cards.first.deckId, mode: StudyMode.fill);
+    _session = unwrapStudySessionResult(
+      await ref
+          .read(startStudySessionUseCaseProvider)
+          .call(deckId: cards.first.deckId, mode: StudyMode.fill),
+    );
     final nextState = FillState(
       cards: cards,
       currentIndex: 0,
@@ -589,62 +637,147 @@ class FillSession extends _$FillSession {
         deckId: deckId,
         mode: StudyMode.fill,
         session: _session,
+        modePlan: const <StudyMode>[StudyMode.fill],
+        modeState: current.modeState,
+        allowedActions: current.allowedActions,
+        currentItem: current.currentItemSnapshot,
+        progress: current.progressSnapshot,
+        sessionCompleted: current.isComplete,
         payload: _encodeState(current),
       ),
     );
   }
 
+  Future<FillState> _normalizeRestoredState(FillState current) async {
+    if (current.result != FillResult.correct) {
+      return current;
+    }
+
+    if (current.currentIndex == current.cards.length - 1) {
+      final completed = current.copyWith(isComplete: true);
+      await _completeSession(completed);
+      return completed;
+    }
+
+    final nextIndex = current.currentIndex + 1;
+    final updated = current.copyWith(
+      currentIndex: nextIndex,
+      currentPrompt: _promptFor(current.cards[nextIndex]),
+      userInput: '',
+      result: null,
+      firstAttemptResult: null,
+      submittedAnswer: null,
+      isRetrying: false,
+      retryCount: 0,
+      showHint: false,
+    );
+    await _persistSnapshot(updated);
+    return updated;
+  }
+
   Future<FillState?> _restoreSnapshot() async {
     final store = await ref.read(activeStudySessionStoreProvider.future);
-    final snapshot = store.load();
-
-    if (snapshot == null) {
-      return null;
-    }
-
-    if (snapshot.deckId != deckId || snapshot.mode != StudyMode.fill) {
-      return null;
-    }
-
-    _interactionSequence = 0;
-    _session = snapshot.session;
-    return FillState(
-      cards: (snapshot.payload['cards'] as List<dynamic>? ?? const <dynamic>[])
-          .map(
-            (card) => FlashcardEntity.fromJson(
-              Map<String, dynamic>.from(card as Map),
-            ),
-          )
-          .toList(growable: false),
-      currentIndex: snapshot.payload['currentIndex'] as int? ?? 0,
-      currentPrompt: _decodePrompt(snapshot.payload['currentPrompt']),
-      userInput: snapshot.payload['userInput'] as String? ?? '',
-      result: _fillResultOrNull(snapshot.payload['result']),
-      firstAttemptResult: _fillResultOrNull(
-        snapshot.payload['firstAttemptResult'],
-      ),
-      submittedAnswer: snapshot.payload['submittedAnswer'] as String?,
-      isRetrying: snapshot.payload['isRetrying'] as bool? ?? false,
-      retryCount: snapshot.payload['retryCount'] as int? ?? 0,
-      showHint: snapshot.payload['showHint'] as bool? ?? false,
-      streak: snapshot.payload['streak'] as int? ?? 0,
-      bestStreak: snapshot.payload['bestStreak'] as int? ?? 0,
-      results:
-          (snapshot.payload['results'] as List<dynamic>? ?? const <dynamic>[])
-              .map(
-                (result) => (
-                  cardId: (result as Map)['cardId'] as String? ?? '',
-                  firstAttemptResult: FillResult.values.byName(
-                    result['firstAttemptResult'] as String? ??
-                        FillResult.wrong.name,
-                  ),
-                  acceptedAsClose: result['acceptedAsClose'] as bool? ?? false,
-                  retryCount: result['retryCount'] as int? ?? 0,
-                ),
-              )
-              .toList(growable: false),
+    return store.restoreMatching(
+      deckId: deckId,
+      mode: StudyMode.fill,
+      decode: (snapshot) async {
+        final cards = _decodeFillCards(snapshot.payload['cards']);
+        final requestedIndex = snapshot.payload['currentIndex'] as int? ?? 0;
+        final currentIndex = _restoredFillIndex(
+          snapshot.payload['currentIndex'],
+          cards.length,
+        );
+        final promptNeedsReset = requestedIndex != currentIndex;
+        final keepsCurrentPrompt = !promptNeedsReset;
+        final currentPrompt = promptNeedsReset
+            ? _promptFor(cards[currentIndex])
+            : _decodedPromptOrFallback(
+                raw: snapshot.payload['currentPrompt'],
+                fallbackCard: cards[currentIndex],
+                session: this,
+              );
+        final cardIds = cards.map((card) => '${card.id}').toSet();
+        final restored = FillState(
+          cards: cards,
+          currentIndex: currentIndex,
+          currentPrompt: currentPrompt,
+          userInput: promptNeedsReset
+              ? ''
+              : snapshot.payload['userInput'] as String? ?? '',
+          result: promptNeedsReset
+              ? null
+              : _fillResultOrNull(snapshot.payload['result']),
+          firstAttemptResult: promptNeedsReset
+              ? null
+              : _fillResultOrNull(snapshot.payload['firstAttemptResult']),
+          submittedAnswer: promptNeedsReset
+              ? null
+              : snapshot.payload['submittedAnswer'] as String?,
+          isRetrying:
+              keepsCurrentPrompt &&
+              (snapshot.payload['isRetrying'] as bool? ?? false),
+          retryCount: promptNeedsReset
+              ? 0
+              : snapshot.payload['retryCount'] as int? ?? 0,
+          showHint:
+              keepsCurrentPrompt &&
+              (snapshot.payload['showHint'] as bool? ?? false),
+          streak: snapshot.payload['streak'] as int? ?? 0,
+          bestStreak: snapshot.payload['bestStreak'] as int? ?? 0,
+          results:
+              (snapshot.payload['results'] as List<dynamic>? ??
+                      const <dynamic>[])
+                  .map(
+                    (result) => (
+                      cardId: (result as Map)['cardId'] as String? ?? '',
+                      firstAttemptResult: FillResult.values.byName(
+                        result['firstAttemptResult'] as String? ??
+                            FillResult.wrong.name,
+                      ),
+                      acceptedAsClose:
+                          result['acceptedAsClose'] as bool? ?? false,
+                      retryCount: result['retryCount'] as int? ?? 0,
+                    ),
+                  )
+                  .where((result) => cardIds.contains(result.cardId))
+                  .toList(growable: false),
+        );
+        _interactionSequence = 0;
+        _session = snapshot.session;
+        return _normalizeRestoredState(restored);
+      },
     );
   }
+}
+
+List<FlashcardEntity> _decodeFillCards(Object? raw) =>
+    (raw as List<dynamic>? ?? const <dynamic>[])
+        .map(
+          (card) =>
+              FlashcardEntity.fromJson(Map<String, dynamic>.from(card as Map)),
+        )
+        .toList(growable: false);
+
+int _restoredFillIndex(Object? raw, int cardCount) {
+  if (cardCount == 0) {
+    throw StateError('Fill snapshot is missing cards.');
+  }
+
+  return clampSnapshotIndex(raw as int? ?? 0, cardCount);
+}
+
+FillPrompt _decodedPromptOrFallback({
+  required Object? raw,
+  required FlashcardEntity fallbackCard,
+  required FillSession session,
+}) {
+  final prompt = _decodePrompt(raw);
+
+  if (prompt.correctAnswer.isNotEmpty || prompt.sentenceWithBlank.isNotEmpty) {
+    return prompt;
+  }
+
+  return session._promptFor(fallbackCard);
 }
 
 FillPrompt _decodePrompt(Object? raw) {

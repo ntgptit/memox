@@ -28,6 +28,7 @@ class SecondaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final baseStyle = theme.outlinedButtonTheme.style ?? const ButtonStyle();
     final accentColor = color ?? theme.colorScheme.primary;
     final backgroundColor =
         color?.withValues(alpha: OpacityTokens.focus) ??
@@ -47,7 +48,7 @@ class SecondaryButton extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(RadiusTokens.button),
         ),
-      ),
+      ).merge(baseStyle),
       child: _SecondaryButtonChild(
         label: label,
         icon: icon,

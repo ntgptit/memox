@@ -62,10 +62,8 @@ class _FillAnswerText extends StatelessWidget {
   Widget build(BuildContext context) => TweenAnimationBuilder<double>(
     tween: Tween<double>(begin: 1, end: 1.05),
     duration: DurationTokens.slow,
-    builder: (context, scale, child) => Transform.scale(
-      scale: scale,
-      child: child,
-    ),
+    builder: (context, scale, child) =>
+        Transform.scale(scale: scale, child: child),
     child: Text(
       answer,
       style: context.textTheme.titleMedium?.copyWith(

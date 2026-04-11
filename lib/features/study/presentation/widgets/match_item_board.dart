@@ -79,12 +79,11 @@ class _MatchItemRow extends StatelessWidget {
     ],
   );
 
-  Widget _buildDefinitionCard(BuildContext context) =>
-      _buildCard(
-        context.appTextStyles.questionText,
-        definition,
-        maxLines: _matchDefinitionMaxLines,
-      );
+  Widget _buildDefinitionCard(BuildContext context) => _buildCard(
+    context.appTextStyles.questionText,
+    definition,
+    maxLines: _matchDefinitionMaxLines,
+  );
 
   Widget _buildTermCard(BuildContext context) => _buildCard(
     context.appTextStyles.studyTerm,

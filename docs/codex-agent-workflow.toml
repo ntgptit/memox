@@ -29,6 +29,24 @@ enabled = true
 strategy = "score_terms_and_paths"
 prefer_auto = true
 
+[source_scout]
+enabled = true
+role = "source_scout"
+phase = "preflight"
+transient = true
+commands = [
+  "rg --files lib test tools docs",
+  "rg -n \"<feature terms>|<symbols>|<providers>|<tables>|<routes>\" lib test tools",
+  "git diff --name-only",
+]
+deliverables = [
+  "direct-source path map",
+  "existing-pattern notes",
+  "blast-radius summary for Dart and tests",
+  "candidate tests and guard scope",
+]
+authoritative_for = ["lib/**", "test/**", "docs/**"]
+
 [verification]
 default_guard_scope = "all"
 analyze = "flutter analyze"

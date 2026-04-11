@@ -14,7 +14,7 @@
   "doneAction": "Xong",
   "reorderAction": "Sắp xếp",
   "exitSessionTitle": "Thoát phiên học?",
-  "exitSessionMessage": "Tiến trình sẽ không được lưu.",
+  "exitSessionMessage": "Tiến trình sẽ được lưu để bạn có thể tiếp tục sau.",
   "navHome": "Trang chủ",
   "navLibrary": "Thư viện",
   "navProgress": "Tiến độ",
@@ -72,7 +72,7 @@
   "cardsFlaggedOnlyAction": "Đã đánh dấu",
   "cardsSubtitle": "Khung tính năng thẻ đã sẵn sàng để triển khai.",
   "studyTitle": "Học",
-  "studySubtitle": "Khung tính năng học đã sẵn sàng để triển khai.",
+  "studySubtitle": "Chọn một bộ thẻ và bắt đầu phiên học phù hợp với điều bạn cần ôn ngay lúc này.",
   "matchPairsLeft": "{count, plural, =0{Đã ghép xong toàn bộ} =1{Còn 1 cặp} other{Còn {count} cặp}}",
   "@matchPairsLeft": {
     "placeholders": {
@@ -86,7 +86,6 @@
   "matchMistakesLabel": "Lỗi",
   "matchStarsLabel": "Sao",
   "matchPlayAgainAction": "Chơi lại",
-  "matchDeselectHint": "Chạm lại thẻ đang chọn để bỏ chọn.",
   "matchEmptySubtitle": "Hãy thêm thẻ vào bộ này trước khi bắt đầu chế độ Ghép cặp.",
   "guessPromptLabel": "Đây là gì?",
   "guessSkipAction": "Bỏ qua",
@@ -116,8 +115,8 @@
     }
   },
   "studyMistakesListAction": "Xem lại các thẻ khó",
-  "studyResumeTitle": "Tiếp tục phiên học?",
-  "studyResumeMessage": "Phiên {mode} trước của bạn vẫn đang còn ({completed}/{total} đã xong). Tiếp tục hay bắt đầu lại?",
+  "studyResumeTitle": "Tiếp tục chế độ hiện tại?",
+  "studyResumeMessage": "Tiến độ {mode} của bạn vẫn được lưu ({completed}/{total} đã xong). Tiếp tục chế độ này hay bắt đầu lại?",
   "@studyResumeMessage": {
     "placeholders": {
       "mode": {},
@@ -131,12 +130,56 @@
   },
   "studyResumeAction": "Tiếp tục",
   "studyStartOverAction": "Bắt đầu lại",
+  "studyActiveSessionConflictTitle": "Vẫn còn một phiên học khác đang được lưu",
+  "studyActiveSessionConflictMessage": "Bạn vẫn còn tiến độ đã lưu trong chế độ {mode} của bộ {deckName}. Hãy quay lại trung tâm học để tiếp tục, hoặc bỏ phiên đã lưu và bắt đầu phiên mới này.",
+  "@studyActiveSessionConflictMessage": {
+    "placeholders": {
+      "mode": {},
+      "deckName": {}
+    }
+  },
+  "studyBackToHubAction": "Quay lại trung tâm học",
+  "studyDiscardAndStartAction": "Bỏ và bắt đầu mới",
+  "studyRecommendedModesLabel": "Các chế độ được gợi ý",
+  "studyRetryPhaseHint": "Vòng làm lại: xem lại các thẻ vẫn cần thêm một lượt nữa.",
+  "matchBoardProgressLabel": "Bảng {current} / {total}",
+  "@matchBoardProgressLabel": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "studyContainerMissingTitle": "Không tìm thấy bộ thẻ",
+  "studyContainerMissingSubtitle": "Bộ thẻ này không còn sẵn sàng để học nữa.",
   "studyNextDeckAction": "Học tiếp: {deckName}",
   "@studyNextDeckAction": {
     "placeholders": {
       "deckName": {}
     }
   },
+  "studyStartRecommendedAction": "Bắt đầu với {mode} trong {deckName}",
+  "@studyStartRecommendedAction": {
+    "placeholders": {
+      "mode": {},
+      "deckName": {}
+    }
+  },
+  "studyDeckSessionSummary": "{sessionType} · {mode}",
+  "@studyDeckSessionSummary": {
+    "placeholders": {
+      "sessionType": {},
+      "mode": {}
+    }
+  },
+  "studyDecksSectionTitle": "Chọn một bộ thẻ",
+  "studySessionTypeFirstLearning": "Học lần đầu",
+  "studySessionTypeReview": "Ôn tập",
+  "studySessionTypeReinforcement": "Củng cố",
+  "studySessionTypeQuickDrill": "Luyện nhanh",
   "guessCompleteTitle": "Hoàn thành chế độ đoán",
   "guessPlayAgainAction": "Chơi lại",
   "guessEmptySubtitle": "Hãy thêm thẻ vào bộ này trước khi bắt đầu chế độ Đoán.",

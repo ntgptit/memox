@@ -7,12 +7,12 @@ import 'package:memox/core/design/study_mode.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/cards/presentation/screens/card_edit_screen.dart';
-import 'package:memox/features/study/presentation/providers/active_study_session_store.dart';
 import 'package:memox/features/study/presentation/providers/guess_provider.dart';
 import 'package:memox/features/study/presentation/widgets/guess_round_view.dart';
 import 'package:memox/features/study/presentation/widgets/study_mistakes_panel.dart';
 import 'package:memox/features/study/presentation/widgets/study_next_deck_button.dart';
 import 'package:memox/shared/widgets/buttons/secondary_button.dart';
+import 'package:memox/shared/widgets/dialogs/exit_session_dialog.dart';
 import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
 import 'package:memox/shared/widgets/feedback/empty_state_view.dart';
 import 'package:memox/shared/widgets/feedback/session_complete_view.dart';
@@ -41,7 +41,7 @@ class GuessModeScreen extends ConsumerWidget {
           total: data.totalCards,
           streak: data.streak,
           showProgress: data.cards.isNotEmpty && !data.isComplete,
-          onClose: () => unawaited(_handleClose(context, ref)),
+          onClose: () => unawaited(_handleClose(context)),
         ),
         applyBottomPadding: false,
         applyHorizontalPadding: false,
@@ -50,20 +50,12 @@ class GuessModeScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _handleClose(BuildContext context, WidgetRef ref) async {
-    final confirmed = await context.showConfirmDialog(
-      title: context.l10n.exitSessionTitle,
-      message: context.l10n.exitSessionMessage,
-      confirmText: context.l10n.exitAction,
-      isDestructive: true,
-    );
+  Future<void> _handleClose(BuildContext context) async {
+    final confirmed = await showExitSessionDialog(context);
 
     if (confirmed != true || !context.mounted) {
       return;
     }
-
-    final store = await ref.read(activeStudySessionStoreProvider.future);
-    await store.clearIfMatches(deckId: deckId, mode: StudyMode.guess);
 
     if (!context.mounted) {
       return;
@@ -162,7 +154,10 @@ Widget _buildCompletionView(
             items: difficultCards,
             onTapItem: (item) => unawaited(
               context.push(
-                CardEditScreen.routeLocation(state.cards.first.deckId, item.cardId),
+                CardEditScreen.routeLocation(
+                  state.cards.first.deckId,
+                  item.cardId,
+                ),
               ),
             ),
           ),

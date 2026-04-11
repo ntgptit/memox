@@ -19,7 +19,9 @@ class EditorTopBar extends StatelessWidget implements PreferredSizeWidget {
   Size get preferredSize => const Size.fromHeight(SizeTokens.appBarHeightLg);
   @override
   Widget build(BuildContext context) => Material(
-    color: context.colors.surface.withValues(alpha: 1 - OpacityTokens.hover),
+    color: context.colors.surfaceContainerLowest.withValues(
+      alpha: OpacityTokens.surfaceGlass,
+    ),
     child: DecoratedBox(
       decoration: BoxDecoration(
         border: Border(

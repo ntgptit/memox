@@ -1,8 +1,10 @@
+import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:memox/core/database/app_database.dart';
 
 class FakeCardReviewDao extends CardReviewDao {
   factory FakeCardReviewDao() {
+    driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
     final database = AppDatabase(NativeDatabase.memory());
     return FakeCardReviewDao._(database);
   }

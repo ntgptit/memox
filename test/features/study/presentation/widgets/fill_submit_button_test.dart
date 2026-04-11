@@ -25,22 +25,23 @@ void main() {
     expect(size.width, SizeTokens.touchTarget);
   });
 
-  testWidgets('FillSubmitButton uses the stronger primary contrast in dark mode', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      buildTestApp(
-        theme: AppTheme.dark(),
-        home: Center(child: FillSubmitButton(enabled: true, onTap: () {})),
-      ),
-    );
-    await tester.pumpAndSettle();
+  testWidgets(
+    'FillSubmitButton uses the stronger primary contrast in dark mode',
+    (tester) async {
+      await tester.pumpWidget(
+        buildTestApp(
+          theme: AppTheme.dark(),
+          home: Center(child: FillSubmitButton(enabled: true, onTap: () {})),
+        ),
+      );
+      await tester.pumpAndSettle();
 
-    final context = tester.element(find.byType(FillSubmitButton));
-    final pressable = tester.widget<AppPressable>(find.byType(AppPressable));
-    final icon = tester.widget<Icon>(find.byIcon(Icons.arrow_forward));
+      final context = tester.element(find.byType(FillSubmitButton));
+      final pressable = tester.widget<AppPressable>(find.byType(AppPressable));
+      final icon = tester.widget<Icon>(find.byIcon(Icons.arrow_forward));
 
-    expect(pressable.color, Theme.of(context).colorScheme.primary);
-    expect(icon.color, Theme.of(context).colorScheme.onPrimary);
-  });
+      expect(pressable.color, Theme.of(context).colorScheme.primary);
+      expect(icon.color, Theme.of(context).colorScheme.onPrimary);
+    },
+  );
 }

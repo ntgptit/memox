@@ -14,7 +14,7 @@
   "doneAction": "완료",
   "reorderAction": "정렬",
   "exitSessionTitle": "학습 세션을 종료할까요?",
-  "exitSessionMessage": "진행 상황은 저장되지 않습니다.",
+  "exitSessionMessage": "진행 상황이 저장되며 나중에 이어서 학습할 수 있습니다.",
   "navHome": "홈",
   "navLibrary": "라이브러리",
   "navProgress": "진행도",
@@ -72,7 +72,7 @@
   "cardsFlaggedOnlyAction": "플래그",
   "cardsSubtitle": "카드 기능 스캐폴드가 구현 준비를 마쳤습니다.",
   "studyTitle": "학습",
-  "studySubtitle": "학습 기능 스캐폴드가 구현 준비를 마쳤습니다.",
+  "studySubtitle": "지금 필요한 학습에 맞는 세션을 시작할 덱을 선택하세요.",
   "matchPairsLeft": "{count, plural, =0{모든 쌍을 맞췄어요} =1{남은 쌍 1개} other{남은 쌍 {count}개}}",
   "@matchPairsLeft": {
     "placeholders": {
@@ -86,7 +86,6 @@
   "matchMistakesLabel": "실수",
   "matchStarsLabel": "별점",
   "matchPlayAgainAction": "다시 하기",
-  "matchDeselectHint": "선택한 카드를 다시 탭하면 선택이 해제됩니다.",
   "matchEmptySubtitle": "매치 모드를 시작하기 전에 이 덱에 카드를 추가하세요.",
   "guessPromptLabel": "이것은 무엇일까요?",
   "guessSkipAction": "건너뛰기",
@@ -116,8 +115,8 @@
     }
   },
   "studyMistakesListAction": "어려웠던 카드 다시 보기",
-  "studyResumeTitle": "학습을 이어서 할까요?",
-  "studyResumeMessage": "{mode} 세션이 아직 진행 중입니다 ({completed}/{total} 완료). 이어서 하거나 처음부터 다시 시작할 수 있어요.",
+  "studyResumeTitle": "현재 모드를 이어서 할까요?",
+  "studyResumeMessage": "{mode} 진행 상황이 아직 저장되어 있습니다 ({completed}/{total} 완료). 이 모드를 이어서 하거나 처음부터 다시 시작할 수 있어요.",
   "@studyResumeMessage": {
     "placeholders": {
       "mode": {},
@@ -131,12 +130,56 @@
   },
   "studyResumeAction": "이어 하기",
   "studyStartOverAction": "처음부터",
+  "studyActiveSessionConflictTitle": "다른 학습 세션이 아직 저장되어 있어요",
+  "studyActiveSessionConflictMessage": "{deckName}의 {mode} 진행 상황이 아직 저장되어 있습니다. 학습 허브로 돌아가 이어서 하거나, 저장된 세션을 버리고 이 새 세션을 시작하세요.",
+  "@studyActiveSessionConflictMessage": {
+    "placeholders": {
+      "mode": {},
+      "deckName": {}
+    }
+  },
+  "studyBackToHubAction": "학습 허브로 돌아가기",
+  "studyDiscardAndStartAction": "버리고 새로 시작",
+  "studyRecommendedModesLabel": "추천 모드",
+  "studyRetryPhaseHint": "다시 풀기 라운드입니다. 한 번 더 확인이 필요한 카드를 이어서 학습하세요.",
+  "matchBoardProgressLabel": "보드 {current}/{total}",
+  "@matchBoardProgressLabel": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "studyContainerMissingTitle": "덱을 찾을 수 없어요",
+  "studyContainerMissingSubtitle": "이 덱은 더 이상 학습에 사용할 수 없습니다.",
   "studyNextDeckAction": "다음 학습: {deckName}",
   "@studyNextDeckAction": {
     "placeholders": {
       "deckName": {}
     }
   },
+  "studyStartRecommendedAction": "{deckName}에서 {mode}부터 시작",
+  "@studyStartRecommendedAction": {
+    "placeholders": {
+      "mode": {},
+      "deckName": {}
+    }
+  },
+  "studyDeckSessionSummary": "{sessionType} · {mode}",
+  "@studyDeckSessionSummary": {
+    "placeholders": {
+      "sessionType": {},
+      "mode": {}
+    }
+  },
+  "studyDecksSectionTitle": "덱 선택",
+  "studySessionTypeFirstLearning": "첫 학습",
+  "studySessionTypeReview": "복습",
+  "studySessionTypeReinforcement": "강화 학습",
+  "studySessionTypeQuickDrill": "퀵 드릴",
   "guessCompleteTitle": "추측 모드 완료",
   "guessPlayAgainAction": "다시 하기",
   "guessEmptySubtitle": "추측 모드를 시작하기 전에 이 덱에 카드를 추가하세요.",

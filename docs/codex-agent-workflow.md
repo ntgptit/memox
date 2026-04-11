@@ -31,6 +31,36 @@ Machine-readable preset files:
    - model: `gpt-5.4-mini`
    - owns guard, analyze, codegen confirmation, and test triage
 
+## Transient preflight agent
+
+`Source Scout / Impact mapper`
+   - model: `gpt-5.4-mini`
+   - read-only role
+   - owns direct source inspection with `rg`, existing tests, repo docs, and
+     changed-path review
+   - returns candidate write scopes, existing patterns to reuse, affected
+     symbols, and regression hotspots
+- It runs before the steady-state worker pool and should be closed or idled
+  once the contract is frozen.
+
+## Codex-native execution
+
+MemoX now uses a Codex-native subagent flow on this machine. Default roles run
+only on built-in Codex-supported models:
+
+- `Agent 1 / Coordinator` -> `gpt-5.4`
+- `Agent 2 / Core worker` -> `gpt-5.3-codex`, upgrade to `gpt-5.4` when risk is
+  high
+- `Agent 3 / UI worker` -> `gpt-5.3-codex`
+- `Agent 4 / Data worker` -> `gpt-5.3-codex`, upgrade to `gpt-5.4` when risk is
+  high
+- `Source Scout` -> `gpt-5.4-mini`
+- `Agent 5 / Verifier` -> `gpt-5.4-mini`
+
+Do not route default MemoX discovery or verification through external model
+bridges. Keep second-opinion analysis inside the coordinator unless the user
+asks for a separate external integration later.
+
 ## When to keep work in Agent 1
 
 - `lib/core/theme/**`
@@ -43,25 +73,33 @@ Machine-readable preset files:
 
 ## Control loop
 
-1. `Agent 1` inspects the task, reads local rules, and freezes the contract:
+1. `Agent 1` inspects the task, reads local rules, and spawns the transient
+   `Source Scout` for direct source discovery:
+   - use `rg --files` and `rg -n` across `lib/**`, `test/**`, `tools/**`, and
+     relevant docs
+   - map existing feature flows, providers, tables, shared widgets, and tests
+   - identify candidate owned paths, existing abstractions to reuse, and likely
+     regression hotspots
+2. `Agent 1` freezes the contract using `Source Scout` output:
    - goal
    - owned paths
    - forbidden paths
    - use case or repository API
    - result and error shape
    - verification scope
-2. `Agent 1` spawns bounded workers only after the contract is frozen.
-3. `Agent 2`, `Agent 3`, and `Agent 4` work in parallel only when their write
+3. `Agent 1` spawns bounded workers only after the contract is frozen.
+4. `Agent 2`, `Agent 3`, and `Agent 4` work in parallel only when their write
    scopes do not overlap.
-4. `Agent 1` integrates the results and resolves mismatches.
-5. Run codegen when required:
+5. `Agent 1` integrates the results and resolves mismatches.
+6. Run codegen when required:
    - `dart run build_runner build --delete-conflicting-outputs`
    - `flutter gen-l10n`
-6. `Agent 5` validates in this order:
+7. `Agent 5` validates in this order:
    - `python tools/guard/run.py --scope <derived_scope>`
    - `flutter analyze`
    - relevant `flutter test` commands
-7. If validation fails, `Agent 1` routes the failure back to the owner:
+8. If validation fails, `Agent 1` routes the failure back to the owner:
+   - scope mapping or missed dependency -> `Source Scout`
    - parser, use case, domain contract -> `Agent 2`
    - UI, design tokens, l10n, widget usage -> `Agent 3`
    - DAO, repository, migration, sync semantics, tests -> `Agent 4`
@@ -100,14 +138,14 @@ python C:\Users\ntgpt\.codex\skills\codex-agent-control\scripts\load_preset.py \
 - Use for screen-heavy or interaction-heavy work where design-system
   consistency, empty/loading/error states, and visual hierarchy are the main
   risk.
-- This profile upgrades `Agent 3` to `gpt-5.4` and narrows the active worker
-  set to UI plus minimal core support.
+- This profile upgrades `Agent 3` to `gpt-5.4` and narrows the steady-state
+  writer set to UI plus minimal core support, while still keeping the verifier.
 
 `sync-heavy`
 - Use for import/export, backup, restore, conflict handling, retry behavior,
   or Google sync work.
-- This profile upgrades `Agent 2` and `Agent 4` to `gpt-5.4` and keeps more
-  sync policy decisions in `Agent 1`.
+- This profile upgrades the source scout, `Agent 2`, and `Agent 4` where needed
+  and keeps more sync policy decisions in `Agent 1`.
 - The selector will typically choose this profile when the task mentions
   `sync`, `backup`, `restore`, `import`, `export`, `csv`, `offline`, or
   `conflict`.
@@ -120,6 +158,19 @@ python C:\Users\ntgpt\.codex\skills\codex-agent-control\scripts\load_preset.py \
 - The selector will typically choose this profile when the task mentions
   `migration`, `schema`, `drift`, `database`, `dao`, or when changed paths hit
   tables or DAO folders.
+
+## Source Scout rules
+
+- `Source Scout` is the authoritative discovery role for `lib/**`, `test/**`,
+  and MemoX docs on this machine.
+- It should prefer direct inspection over abstract summaries:
+  - `rg --files lib test tools docs`
+  - targeted `rg -n` against feature terms, provider names, widgets, routes,
+    tables, DAOs, and use cases
+  - relevant existing tests and guard rules
+- It must stay read-only and return a concrete path map for the coordinator.
+- Direct source inspection is authoritative for MemoX path mapping and blast
+  radius decisions.
 
 ## Ownership rules
 
@@ -146,6 +197,10 @@ smallest valid guard scope runs before the task is considered done:
 `flutter analyze` is required for Dart changes, and `flutter test` should be
 targeted unless the task is cross-cutting.
 
+`Agent 5` reports verification status directly to the coordinator. The
+coordinator makes the final decision without an external model bridge in the
+default MemoX flow.
+
 ## Example: bulk import cards from CSV
 
 Use the agent pool like this:
@@ -155,8 +210,10 @@ Use the agent pool like this:
    - CSV validation result model
    - use case and repository signatures
    - whether Drift schema change is actually required
-2. `Agent 2` owns import parsing and validation orchestration.
-3. `Agent 3` owns import screen, preview, mapping, empty, loading, and error
+2. `Source Scout` maps current cards, import-adjacent files, shared widgets, tests,
+   and duplicate-policy hotspots from direct source inspection.
+3. `Agent 2` owns import parsing and validation orchestration.
+4. `Agent 3` owns import screen, preview, mapping, empty, loading, and error
    states.
-4. `Agent 4` owns repository wiring, batch insert semantics, and targeted tests.
-5. `Agent 5` runs codegen if needed, then guard, analyze, and tests.
+5. `Agent 4` owns repository wiring, batch insert semantics, and targeted tests.
+6. `Agent 5` runs codegen if needed, then guard, analyze, and tests.

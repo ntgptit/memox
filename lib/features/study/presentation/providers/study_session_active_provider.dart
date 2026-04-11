@@ -4,7 +4,9 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'study_session_active_provider.g.dart';
 
 @riverpod
-Future<bool> studySessionActive(Ref ref) async {
+Stream<bool> studySessionActive(Ref ref) async* {
   final store = await ref.watch(activeStudySessionStoreProvider.future);
-  return store.load() != null;
+  await for (final snapshot in store.watch()) {
+    yield snapshot != null;
+  }
 }

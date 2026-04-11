@@ -2,21 +2,19 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:memox/core/design/study_mode.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
+import 'package:memox/core/providers/repository_providers.dart';
+import 'package:memox/features/study/presentation/factories/study_mode_flow_factory.dart';
 import 'package:memox/features/study/presentation/providers/active_study_session_store.dart';
-import 'package:memox/features/study/presentation/providers/fill_provider.dart';
-import 'package:memox/features/study/presentation/providers/guess_provider.dart';
-import 'package:memox/features/study/presentation/providers/match_provider.dart';
-import 'package:memox/features/study/presentation/providers/recall_provider.dart';
-import 'package:memox/features/study/presentation/providers/review_provider.dart';
-import 'package:memox/features/study/presentation/screens/fill_mode_screen.dart';
-import 'package:memox/features/study/presentation/screens/guess_mode_screen.dart';
-import 'package:memox/features/study/presentation/screens/match_mode_screen.dart';
-import 'package:memox/features/study/presentation/screens/recall_mode_screen.dart';
-import 'package:memox/features/study/presentation/screens/review_mode_screen.dart';
-import 'package:memox/features/study/presentation/widgets/study_placeholder_view.dart';
+import 'package:memox/features/study/presentation/providers/study_entry_provider.dart';
+import 'package:memox/features/study/presentation/providers/study_hub_provider.dart';
+import 'package:memox/features/study/presentation/widgets/study_entry_conflict_view.dart';
+import 'package:memox/features/study/presentation/widgets/study_hub_content.dart';
 import 'package:memox/features/study/presentation/widgets/study_resume_dialog.dart';
+import 'package:memox/shared/widgets/feedback/app_async_builder.dart';
+import 'package:memox/shared/widgets/feedback/empty_state_view.dart';
 import 'package:memox/shared/widgets/layout/app_scaffold.dart';
 
 class StudyScreen extends ConsumerStatefulWidget {
@@ -46,8 +44,19 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
   }
 
   @override
-  Widget build(BuildContext context) =>
-      _buildStudyBody(widget.deckId, widget.mode, context);
+  void didUpdateWidget(covariant StudyScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.deckId == widget.deckId && oldWidget.mode == widget.mode) {
+      return;
+    }
+
+    _checkedResume = false;
+    _scheduleResumeCheck();
+  }
+
+  @override
+  Widget build(BuildContext context) => _buildStudyBody(context);
 
   void _scheduleResumeCheck() {
     if (_checkedResume || widget.deckId == null || widget.mode == null) {
@@ -68,8 +77,25 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
       return;
     }
 
+    final deckExists = await _requestedDeckExists(deckId);
+
+    if (!deckExists || !mounted) {
+      return;
+    }
+
     final store = await ref.read(activeStudySessionStoreProvider.future);
     final snapshot = store.load();
+
+    if (!isActiveStudySessionResumable(snapshot)) {
+      if (snapshot != null) {
+        await store.clearIfMatches(
+          deckId: snapshot.deckId,
+          mode: snapshot.mode,
+        );
+      }
+
+      return;
+    }
 
     if (!_matchesSnapshot(snapshot, deckId, mode) || !mounted) {
       return;
@@ -95,37 +121,121 @@ class _StudyScreenState extends ConsumerState<StudyScreen> {
       return;
     }
 
-    await _restartModeSession(ref, deckId, mode);
-  }
-}
-
-Widget _buildStudyBody(int? deckId, StudyMode? mode, BuildContext context) {
-  if (mode == StudyMode.review && deckId != null) {
-    return ReviewModeScreen(deckId: deckId);
+    ref.invalidate(studyEntryProvider((deckId: deckId, mode: mode)));
+    await studyModeFlowFactory.resolve(mode).restartSession(ref, deckId);
   }
 
-  if (mode == StudyMode.match && deckId != null) {
-    return MatchModeScreen(deckId: deckId);
+  Future<bool> _requestedDeckExists(int deckId) async {
+    try {
+      final deck = await ref.read(deckRepositoryProvider).getById(deckId);
+      return deck != null;
+    } catch (_) {
+      return false;
+    }
   }
 
-  if (mode == StudyMode.guess && deckId != null) {
-    return GuessModeScreen(deckId: deckId);
+  Widget _buildStudyBody(BuildContext context) {
+    final deckId = widget.deckId;
+    final mode = widget.mode;
+
+    if (mode != null && deckId != null) {
+      final entryAsync = ref.watch(
+        studyEntryProvider((deckId: deckId, mode: mode)),
+      );
+      return AppAsyncBuilder<StudyEntryResolution>(
+        value: entryAsync,
+        onRetry: () =>
+            ref.invalidate(studyEntryProvider((deckId: deckId, mode: mode))),
+        onData: (resolution) => _buildDirectEntryBody(
+          context: context,
+          resolution: resolution,
+          deckId: deckId,
+          mode: mode,
+        ),
+      );
+    }
+
+    final hubAsync = ref.watch(studyHubProvider);
+
+    return AppScaffold(
+      appBar: AppBar(title: Text(context.l10n.studyTitle)),
+      body: AppAsyncBuilder<StudyHubData>(
+        value: hubAsync,
+        onRetry: () => ref.invalidate(studyHubProvider),
+        onData: (data) => StudyHubContent(data: data),
+      ),
+    );
   }
 
-  if (mode == StudyMode.recall && deckId != null) {
-    return RecallModeScreen(deckId: deckId);
-  }
-
-  if (mode == StudyMode.fill && deckId != null) {
-    return FillModeScreen(deckId: deckId);
-  }
-
-  return AppScaffold(
-    appBar: AppBar(
-      title: Text(mode?.label(context.l10n) ?? context.l10n.studyTitle),
+  Widget _buildDirectEntryBody({
+    required BuildContext context,
+    required StudyEntryResolution resolution,
+    required int deckId,
+    required StudyMode mode,
+  }) => switch (resolution.status) {
+    StudyEntryStatus.ready =>
+      studyModeFlowFactory.resolve(mode).buildScreen(deckId),
+    StudyEntryStatus.activeSessionConflict => AppScaffold(
+      appBar: AppBar(title: Text(mode.label(context.l10n))),
+      body: StudyEntryConflictView(
+        modeLabel: resolution.activeSession!.mode.label(context.l10n),
+        deckName: resolution.activeDeckName!,
+        onBackToHub: () => context.go(StudyScreen.routePath),
+        onDiscardAndStart: () => unawaited(
+          _discardConflictingSessionAndContinue(
+            activeSession: resolution.activeSession!,
+            deckId: deckId,
+            mode: mode,
+          ),
+        ),
+      ),
     ),
-    body: const StudyPlaceholderView(),
+    StudyEntryStatus.containerNotFound => _buildEntryRefusal(
+      context: context,
+      mode: mode,
+      status: resolution.status,
+    ),
+    StudyEntryStatus.nothingToStudy => _buildEntryRefusal(
+      context: context,
+      mode: mode,
+      status: resolution.status,
+    ),
+  };
+
+  Widget _buildEntryRefusal({
+    required BuildContext context,
+    required StudyMode mode,
+    required StudyEntryStatus status,
+  }) => AppScaffold(
+    appBar: AppBar(title: Text(mode.label(context.l10n))),
+    body: EmptyStateView(
+      icon: status == StudyEntryStatus.containerNotFound
+          ? Icons.inbox_outlined
+          : Icons.play_circle_outline,
+      title: status == StudyEntryStatus.containerNotFound
+          ? context.l10n.studyContainerMissingTitle
+          : mode.label(context.l10n),
+      subtitle: status == StudyEntryStatus.containerNotFound
+          ? context.l10n.studyContainerMissingSubtitle
+          : studyEntryEmptySubtitle(context, mode),
+    ),
   );
+
+  Future<void> _discardConflictingSessionAndContinue({
+    required ActiveStudySessionSnapshot activeSession,
+    required int deckId,
+    required StudyMode mode,
+  }) async {
+    final store = await ref.read(activeStudySessionStoreProvider.future);
+    await store.clearIfMatches(
+      deckId: activeSession.deckId,
+      mode: activeSession.mode,
+    );
+    ref
+      ..invalidate(activeStudySessionSnapshotProvider)
+      ..invalidate(studyHubProvider)
+      ..invalidate(studyEntryProvider((deckId: deckId, mode: mode)));
+  }
 }
 
 bool _matchesSnapshot(
@@ -134,43 +244,9 @@ bool _matchesSnapshot(
   StudyMode mode,
 ) => snapshot != null && snapshot.deckId == deckId && snapshot.mode == mode;
 
-(int, int) _progressForSnapshot(
-  ActiveStudySessionSnapshot snapshot,
-) => switch (snapshot.mode) {
-  StudyMode.review => (
-    (snapshot.payload['results'] as List?)?.length ?? 0,
-    (snapshot.payload['cards'] as List?)?.length ?? 0,
-  ),
-  StudyMode.guess => (
-    (snapshot.payload['results'] as List?)?.length ?? 0,
-    (snapshot.payload['cards'] as List?)?.length ?? 0,
-  ),
-  StudyMode.recall => (
-    (snapshot.payload['results'] as List?)?.length ?? 0,
-    (snapshot.payload['cards'] as List?)?.length ?? 0,
-  ),
-  StudyMode.fill => (
-    (snapshot.payload['results'] as List?)?.length ?? 0,
-    (snapshot.payload['cards'] as List?)?.length ?? 0,
-  ),
-  StudyMode.match => (
-    (snapshot.payload['matchedPairIds'] as List?)?.length ?? 0,
-    (snapshot.payload['game'] as Map?)?['correctPairs'] is Map
-        ? (((snapshot.payload['game'] as Map)['correctPairs']) as Map).length
-        : 0,
-  ),
-};
-
-Future<void> _restartModeSession(WidgetRef ref, int deckId, StudyMode mode) =>
-    switch (mode) {
-      StudyMode.review =>
-        ref.read(reviewSessionProvider(deckId).notifier).startSession(),
-      StudyMode.match =>
-        ref.read(matchSessionProvider(deckId).notifier).startGame(),
-      StudyMode.guess =>
-        ref.read(guessSessionProvider(deckId).notifier).startSession(),
-      StudyMode.recall =>
-        ref.read(recallSessionProvider(deckId).notifier).startSession(),
-      StudyMode.fill =>
-        ref.read(fillSessionProvider(deckId).notifier).startSession(),
-    };
+(int, int) _progressForSnapshot(ActiveStudySessionSnapshot snapshot) {
+  final progress = studyModeFlowFactory
+      .resolve(snapshot.mode)
+      .progressFromSnapshot(snapshot);
+  return (progress.completedCount, progress.totalCount);
+}

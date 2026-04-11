@@ -152,8 +152,49 @@ void main() {
       await tester.tap(find.byIcon(Icons.arrow_forward));
       await _pumpFillScreen(tester);
 
+      expect(
+        find.text(
+          'Retry round: revisit the cards that still need one more pass.',
+        ),
+        findsOneWidget,
+      );
       expect(find.textContaining('Hint:'), findsOneWidget);
       expect(find.text('Skip for now'), findsOneWidget);
+    },
+  );
+
+  testWidgets(
+    'FillModeScreen completes retry remediation without a practice-only action',
+    (tester) async {
+      final cardReviewDao = FakeCardReviewDao();
+      addTearDown(cardReviewDao.dispose);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            flashcardRepositoryProvider.overrideWithValue(
+              FakeFlashcardRepository(cards: _cards()),
+            ),
+            deckRepositoryProvider.overrideWithValue(FakeDeckRepository()),
+            studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
+            cardReviewDaoProvider.overrideWithValue(cardReviewDao),
+            fillRandomProvider(5).overrideWithValue(Random(1)),
+            fillAutoAdvanceDelayProvider.overrideWith((ref) => Duration.zero),
+            fillWrongClearDelayProvider.overrideWith((ref) => Duration.zero),
+          ],
+          child: buildTestApp(home: const FillModeScreen(deckId: 5)),
+        ),
+      );
+      await _pumpFillScreen(tester);
+
+      await tester.enterText(find.byType(TextField), 'apple');
+      await _pumpFillScreen(tester);
+      await tester.tap(find.byIcon(Icons.arrow_forward));
+      await _pumpFillScreen(tester);
+      await tester.tap(find.text('Skip for now'));
+      await _pumpFillScreen(tester);
+
+      expect(find.text('1 cards completed'), findsOneWidget);
+      expect(find.text('Practice mistakes'), findsNothing);
     },
   );
 
@@ -186,6 +227,39 @@ void main() {
       ),
       findsOneWidget,
     );
+  });
+
+  testWidgets('FillModeScreen keeps the saved snapshot after exit', (
+    tester,
+  ) async {
+    final cardReviewDao = FakeCardReviewDao();
+    addTearDown(cardReviewDao.dispose);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          flashcardRepositoryProvider.overrideWithValue(
+            FakeFlashcardRepository(cards: _cards()),
+          ),
+          deckRepositoryProvider.overrideWithValue(FakeDeckRepository()),
+          studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
+          cardReviewDaoProvider.overrideWithValue(cardReviewDao),
+          fillRandomProvider(5).overrideWithValue(Random(1)),
+          fillAutoAdvanceDelayProvider.overrideWith((ref) => Duration.zero),
+          fillWrongClearDelayProvider.overrideWith((ref) => Duration.zero),
+        ],
+        child: buildTestApp(home: const FillModeScreen(deckId: 5)),
+      ),
+    );
+    await _pumpFillScreen(tester);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getString('active_study_session_v1'), isNotNull);
+
+    await tester.tap(find.byTooltip('Exit'));
+    await tester.pump();
+    await tester.tap(find.text('Exit').last);
+    await tester.pumpAndSettle();
+
+    expect(preferences.getString('active_study_session_v1'), isNotNull);
   });
 }
 

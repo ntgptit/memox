@@ -149,6 +149,14 @@ Do NOT recreate these. Import from `shared/widgets/`:
   - `ui-heavy` for UI-first tasks
   - `sync-heavy` for import, export, backup, restore, and sync work
   - `migration-risk` for Drift schema or persistence migration work
+- Use the `source_scout` role from the MemoX preset as the default discovery
+  worker for `lib/**`, `test/**`, and repo docs. It should map blast radius and
+  existing patterns from direct source inspection before writers start.
+- `source_scout` is a transient preflight role. It does not replace the steady-
+  state `verifier` role in the MemoX subagent architecture.
+- MemoX uses a Codex-native subagent flow on this machine. Keep
+  `source_scout` and `verifier` on built-in Codex-supported models unless the
+  user explicitly requests a separate external-model integration later.
 - Keep architecture decisions, shared widget or theme changes, sync boundaries,
   final integration, and final verification in the coordinator agent.
 - Only delegate bounded write scopes with no overlap across provider graphs,

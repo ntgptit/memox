@@ -12,6 +12,8 @@ import 'package:memox/features/study/domain/match/match_engine.dart';
 import 'package:memox/features/study/domain/srs/srs_engine.dart';
 import 'package:memox/features/study/presentation/providers/active_study_session_store.dart';
 import 'package:memox/features/study/presentation/providers/study_engine_providers.dart';
+import 'package:memox/features/study/presentation/support/study_restore_utils.dart';
+import 'package:memox/features/study/presentation/support/study_session_result.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'match_provider.freezed.dart';
@@ -32,6 +34,7 @@ abstract class MatchAttemptResult with _$MatchAttemptResult {
 @freezed
 abstract class MatchState with _$MatchState {
   const factory MatchState({
+    required List<FlashcardEntity> cards,
     required ({
       List<({String id, String text, MatchItemType type})> terms,
       List<({String id, String text, MatchItemType type})> definitions,
@@ -39,6 +42,8 @@ abstract class MatchState with _$MatchState {
     })
     game,
     required DateTime startTime,
+    @Default(0) int boardIndex,
+    @Default(0) int completedPairCount,
     String? selectedTermId,
     String? selectedDefinitionId,
     @Default(<String>{}) Set<String> matchedPairIds,
@@ -51,11 +56,19 @@ abstract class MatchState with _$MatchState {
 }
 
 extension MatchStateX on MatchState {
-  int get totalPairs => game.correctPairs.length;
+  int get totalPairs => cards.length;
 
-  int get matchedCount => matchedPairIds.length;
+  int get matchedCount => completedPairCount + matchedPairIds.length;
 
   int get pairsLeft => totalPairs - matchedCount;
+
+  int get totalBoards {
+    if (cards.isEmpty) {
+      return 0;
+    }
+
+    return (cards.length / MatchEngine.defaultPairsPerRound).ceil();
+  }
 
   bool isDefinitionMatched(String definitionId) {
     for (final termId in matchedPairIds) {
@@ -65,6 +78,70 @@ extension MatchStateX on MatchState {
     }
 
     return false;
+  }
+
+  List<StudySessionAllowedAction> get allowedActions {
+    if (isComplete) {
+      return const <StudySessionAllowedAction>[];
+    }
+
+    if (lastResult != null) {
+      return const <StudySessionAllowedAction>[];
+    }
+
+    if (selectedTermId != null && selectedDefinitionId != null) {
+      return const <StudySessionAllowedAction>[
+        StudySessionAllowedAction.submitAnswer,
+      ];
+    }
+
+    return const <StudySessionAllowedAction>[];
+  }
+
+  ActiveStudySessionCurrentItem? get currentItemSnapshot {
+    if (cards.isEmpty) {
+      return null;
+    }
+
+    return ActiveStudySessionCurrentItem(
+      position: boardIndex + 1,
+      cardId: _currentBoardCardId,
+    );
+  }
+
+  StudySessionModeState get modeState {
+    if (isComplete) {
+      return StudySessionModeState.completed;
+    }
+
+    if (lastResult != null) {
+      return StudySessionModeState.waitingFeedback;
+    }
+
+    if (boardIndex == 0 &&
+        completedPairCount == 0 &&
+        matchedPairIds.isEmpty &&
+        selectedTermId == null &&
+        selectedDefinitionId == null) {
+      return StudySessionModeState.initialized;
+    }
+
+    return StudySessionModeState.inProgress;
+  }
+
+  ActiveStudySessionProgress get progressSnapshot => ActiveStudySessionProgress(
+    completedCount: matchedCount,
+    totalCount: totalPairs,
+  );
+
+  int? get _currentBoardCardId {
+    if (game.correctPairs.isEmpty) {
+      return null;
+    }
+
+    final firstTermId = game.correctPairs.keys.first;
+    final rawId = firstTermId.replaceFirst('term-', '');
+    return int.tryParse(rawId);
   }
 }
 
@@ -94,21 +171,6 @@ class MatchSession extends _$MatchSession {
     return _startGame(deckId);
   }
 
-  Future<void> deselectItem() async {
-    final current = _stateValueOrNull(state);
-
-    if (current == null || current.lastResult != null || current.isComplete) {
-      return;
-    }
-
-    final updated = current.copyWith(
-      selectedTermId: null,
-      selectedDefinitionId: null,
-    );
-    state = AsyncValue<MatchState>.data(updated);
-    await _persistSnapshot(updated);
-  }
-
   Future<void> selectItem(
     ({String id, String text, MatchItemType type}) item,
   ) async {
@@ -123,24 +185,10 @@ class MatchSession extends _$MatchSession {
     }
 
     if (item.type == MatchItemType.term) {
-      if (current.selectedTermId == item.id) {
-        final updated = current.copyWith(selectedTermId: null);
-        state = AsyncValue<MatchState>.data(updated);
-        await _persistSnapshot(updated);
-        return;
-      }
-
       final updated = current.copyWith(selectedTermId: item.id);
       state = AsyncValue<MatchState>.data(updated);
       await _persistSnapshot(updated);
       await _resolveSelection(updated);
-      return;
-    }
-
-    if (current.selectedDefinitionId == item.id) {
-      final updated = current.copyWith(selectedDefinitionId: null);
-      state = AsyncValue<MatchState>.data(updated);
-      await _persistSnapshot(updated);
       return;
     }
 
@@ -181,9 +229,11 @@ class MatchSession extends _$MatchSession {
       wrongCount: current.mistakes,
       durationSeconds: DateTime.now().difference(current.startTime).inSeconds,
     );
-    _session = await ref
-        .read(completeStudySessionUseCaseProvider)
-        .call(completedSession);
+    _session = unwrapStudySessionResult(
+      await ref
+          .read(completeStudySessionUseCaseProvider)
+          .call(completedSession),
+    );
     await _clearSnapshot();
   }
 
@@ -215,21 +265,43 @@ class MatchSession extends _$MatchSession {
       return;
     }
 
-    final cleared = latest!.copyWith(
+    final boardCompleted =
+        matchedPairIds.length == latest!.game.correctPairs.length;
+    final cleared = latest.copyWith(
       selectedTermId: null,
       selectedDefinitionId: null,
       lastResult: null,
-      isComplete: matchedPairIds.length == latest.totalPairs,
     );
-    state = AsyncValue<MatchState>.data(cleared);
-    await _persistSnapshot(cleared);
 
-    if (!cleared.isComplete) {
+    if (!boardCompleted) {
+      state = AsyncValue<MatchState>.data(cleared);
+      await _persistSnapshot(cleared);
       return;
     }
 
-    await _completeGame(cleared);
+    if (cleared.boardIndex < cleared.totalBoards - 1) {
+      final nextState = _nextBoardState(cleared);
+      state = AsyncValue<MatchState>.data(nextState);
+      await _persistSnapshot(nextState);
+      return;
+    }
+
+    final completed = cleared.copyWith(isComplete: true);
+    state = AsyncValue<MatchState>.data(completed);
+    await _persistSnapshot(completed);
+    await _completeGame(completed);
   }
+
+  MatchState _nextBoardState(MatchState current) => current.copyWith(
+    boardIndex: current.boardIndex + 1,
+    completedPairCount:
+        current.completedPairCount + current.game.correctPairs.length,
+    game: _gameForBoard(current.cards, current.boardIndex + 1),
+    selectedTermId: null,
+    selectedDefinitionId: null,
+    matchedPairIds: const <String>{},
+    lastResult: null,
+  );
 
   Future<void> _handleWrong(
     MatchState current,
@@ -342,30 +414,34 @@ class MatchSession extends _$MatchSession {
   }
 
   Future<MatchState> _startGame(int deckId) async {
-    final cards = await ref
+    final loadedCards = await ref
         .read(getCardsByDeckUseCaseProvider)
         .call(deckId)
         .first;
-    final game = ref.read(matchEngineProvider(deckId)).generateGame(cards);
-    _cardsByTermId
-      ..clear()
-      ..addEntries(
-        cards.map(
-          (card) => MapEntry<String, FlashcardEntity>('term-${card.id}', card),
-        ),
-      );
+    final cards = ref
+        .read(matchEngineProvider(deckId))
+        .shuffleCards(loadedCards);
+    _cacheCards(cards);
     _attemptSequence = 0;
 
-    if (game.correctPairs.isEmpty) {
+    if (cards.isEmpty) {
       _session = null;
       await _clearSnapshot();
-      return MatchState(game: game, startTime: DateTime.now());
+      return MatchState(
+        cards: const <FlashcardEntity>[],
+        game: const (terms: [], definitions: [], correctPairs: {}),
+        startTime: DateTime.now(),
+      );
     }
 
-    _session = await ref
-        .read(startStudySessionUseCaseProvider)
-        .call(deckId: deckId, mode: StudyMode.match);
+    final game = _gameForBoard(cards, 0);
+    _session = unwrapStudySessionResult(
+      await ref
+          .read(startStudySessionUseCaseProvider)
+          .call(deckId: deckId, mode: StudyMode.match),
+    );
     final nextState = MatchState(
+      cards: cards,
       game: game,
       startTime: _session?.startedAt ?? DateTime.now(),
     );
@@ -379,12 +455,15 @@ class MatchSession extends _$MatchSession {
   }
 
   Map<String, dynamic> _encodeState(MatchState current) => <String, dynamic>{
+    'cards': current.cards.map((card) => card.toJson()).toList(growable: false),
     'game': <String, dynamic>{
       'terms': _encodeItems(current.game.terms),
       'definitions': _encodeItems(current.game.definitions),
       'correctPairs': current.game.correctPairs,
     },
     'startTime': current.startTime.toIso8601String(),
+    'boardIndex': current.boardIndex,
+    'completedPairCount': current.completedPairCount,
     'selectedTermId': current.selectedTermId,
     'selectedDefinitionId': current.selectedDefinitionId,
     'matchedPairIds': current.matchedPairIds.toList(growable: false),
@@ -409,27 +488,120 @@ class MatchSession extends _$MatchSession {
         deckId: deckId,
         mode: StudyMode.match,
         session: _session,
+        modePlan: const <StudyMode>[StudyMode.match],
+        modeState: current.modeState,
+        allowedActions: current.allowedActions,
+        currentItem: current.currentItemSnapshot,
+        progress: current.progressSnapshot,
+        sessionCompleted: current.isComplete,
         payload: _encodeState(current),
       ),
     );
   }
 
+  Future<MatchState> _normalizeRestoredState(MatchState current) async {
+    if (current.game.correctPairs.isEmpty) {
+      return current;
+    }
+
+    if (current.matchedPairIds.length != current.game.correctPairs.length) {
+      return current;
+    }
+
+    final cleared = current.copyWith(
+      selectedTermId: null,
+      selectedDefinitionId: null,
+    );
+
+    if (cleared.boardIndex < cleared.totalBoards - 1) {
+      final nextState = _nextBoardState(cleared);
+      await _persistSnapshot(nextState);
+      return nextState;
+    }
+
+    final completed = cleared.copyWith(isComplete: true);
+    await _completeGame(completed);
+    return completed;
+  }
+
   Future<MatchState?> _restoreSnapshot() async {
     final store = await ref.read(activeStudySessionStoreProvider.future);
-    final snapshot = store.load();
+    return store.restoreMatching(
+      deckId: deckId,
+      mode: StudyMode.match,
+      decode: (snapshot) async {
+        final storedCards = _decodeMatchCards(snapshot.payload['cards']);
+        final cards = storedCards.isNotEmpty
+            ? storedCards
+            : await ref.read(getCardsByDeckUseCaseProvider).call(deckId).first;
+        _cacheCards(cards);
+        final boardIndex = _restoredBoardIndex(
+          snapshot.payload['boardIndex'],
+          cards.length,
+        );
+        final fallbackGame = _gameForBoard(cards, boardIndex);
+        final decodedGame = _decodedGameOrFallback(
+          raw: snapshot.payload['game'],
+          fallback: fallbackGame,
+        );
+        final game =
+            _isCompatibleMatchGame(
+              decodedGame,
+              fallbackGame.correctPairs.keys.toSet(),
+            )
+            ? decodedGame
+            : fallbackGame;
+        final validTermIds = game.terms.map((item) => item.id).toSet();
+        final validDefinitionIds = game.definitions
+            .map((item) => item.id)
+            .toSet();
+        final completedPairCount = _restoredCompletedPairCount(
+          raw: snapshot.payload['completedPairCount'],
+          boardIndex: boardIndex,
+        );
+        final restored = MatchState(
+          cards: cards,
+          game: game,
+          startTime:
+              DateTime.tryParse(
+                snapshot.payload['startTime'] as String? ?? '',
+              ) ??
+              DateTime.now(),
+          boardIndex: boardIndex,
+          completedPairCount: completedPairCount,
+          selectedTermId: _restoredSelectedMatchId(
+            raw: snapshot.payload['selectedTermId'],
+            validIds: validTermIds,
+          ),
+          selectedDefinitionId: _restoredSelectedMatchId(
+            raw: snapshot.payload['selectedDefinitionId'],
+            validIds: validDefinitionIds,
+          ),
+          matchedPairIds:
+              (snapshot.payload['matchedPairIds'] as List<dynamic>? ??
+                      const <dynamic>[])
+                  .map((id) => id as String)
+                  .where(validTermIds.contains)
+                  .toSet(),
+          attemptCounts:
+              (snapshot.payload['attemptCounts'] as Map?) == null
+                    ? const <String, int>{}
+                    : (snapshot.payload['attemptCounts'] as Map).map(
+                        (key, value) =>
+                            MapEntry<String, int>(key as String, value as int),
+                      )
+                ..removeWhere((key, value) => !_cardsByTermId.containsKey(key)),
+          mistakes: snapshot.payload['mistakes'] as int? ?? 0,
+          comboCount: snapshot.payload['comboCount'] as int? ?? 0,
+        );
+        _attemptSequence = 0;
+        _session = snapshot.session;
+        return _normalizeRestoredState(restored);
+      },
+    );
+  }
 
-    if (snapshot == null) {
-      return null;
-    }
-
-    if (snapshot.deckId != deckId || snapshot.mode != StudyMode.match) {
-      return null;
-    }
-
-    final cards = await ref
-        .read(getCardsByDeckUseCaseProvider)
-        .call(deckId)
-        .first;
+  void _cacheCards(List<FlashcardEntity> cards) {
     _cardsByTermId
       ..clear()
       ..addEntries(
@@ -437,30 +609,111 @@ class MatchSession extends _$MatchSession {
           (card) => MapEntry<String, FlashcardEntity>('term-${card.id}', card),
         ),
       );
-    _attemptSequence = 0;
-    _session = snapshot.session;
-    return MatchState(
-      game: _decodeGame(snapshot.payload['game']),
-      startTime:
-          DateTime.tryParse(snapshot.payload['startTime'] as String? ?? '') ??
-          DateTime.now(),
-      selectedTermId: snapshot.payload['selectedTermId'] as String?,
-      selectedDefinitionId: snapshot.payload['selectedDefinitionId'] as String?,
-      matchedPairIds:
-          (snapshot.payload['matchedPairIds'] as List<dynamic>? ??
-                  const <dynamic>[])
-              .map((id) => id as String)
-              .toSet(),
-      attemptCounts: (snapshot.payload['attemptCounts'] as Map?) == null
-          ? const <String, int>{}
-          : (snapshot.payload['attemptCounts'] as Map).map(
-              (key, value) =>
-                  MapEntry<String, int>(key as String, value as int),
-            ),
-      mistakes: snapshot.payload['mistakes'] as int? ?? 0,
-      comboCount: snapshot.payload['comboCount'] as int? ?? 0,
-    );
   }
+
+  ({
+    List<({String id, String text, MatchItemType type})> terms,
+    List<({String id, String text, MatchItemType type})> definitions,
+    Map<String, String> correctPairs,
+  })
+  _gameForBoard(List<FlashcardEntity> cards, int boardIndex) {
+    final start = boardIndex * MatchEngine.defaultPairsPerRound;
+    final boardCards = cards
+        .skip(start)
+        .take(MatchEngine.defaultPairsPerRound)
+        .toList(growable: false);
+    return ref
+        .read(matchEngineProvider(deckId))
+        .generateGame(boardCards, pairsPerRound: boardCards.length);
+  }
+}
+
+List<FlashcardEntity> _decodeMatchCards(Object? raw) =>
+    (raw as List<dynamic>? ?? const <dynamic>[])
+        .map(
+          (card) =>
+              FlashcardEntity.fromJson(Map<String, dynamic>.from(card as Map)),
+        )
+        .toList(growable: false);
+
+({
+  List<({String id, String text, MatchItemType type})> terms,
+  List<({String id, String text, MatchItemType type})> definitions,
+  Map<String, String> correctPairs,
+})
+_decodedGameOrFallback({
+  required Object? raw,
+  required ({
+    List<({String id, String text, MatchItemType type})> terms,
+    List<({String id, String text, MatchItemType type})> definitions,
+    Map<String, String> correctPairs,
+  })
+  fallback,
+}) {
+  final decoded = _decodeGame(raw);
+
+  if (decoded.correctPairs.isEmpty) {
+    return fallback;
+  }
+
+  return decoded;
+}
+
+int _restoredBoardIndex(Object? raw, int cardCount) {
+  if (cardCount == 0) {
+    throw StateError('Match snapshot is missing cards.');
+  }
+
+  final boardCount = (cardCount / MatchEngine.defaultPairsPerRound).ceil();
+  return clampSnapshotIndex(raw as int? ?? 0, boardCount);
+}
+
+int _restoredCompletedPairCount({
+  required Object? raw,
+  required int boardIndex,
+}) {
+  final count = raw as int? ?? 0;
+  final maxCompletedPairCount = boardIndex * MatchEngine.defaultPairsPerRound;
+
+  if (count < 0) {
+    return 0;
+  }
+
+  if (count > maxCompletedPairCount) {
+    return maxCompletedPairCount;
+  }
+
+  return count;
+}
+
+String? _restoredSelectedMatchId({
+  required Object? raw,
+  required Set<String> validIds,
+}) {
+  final value = raw as String?;
+
+  if (value == null || validIds.contains(value)) {
+    return value;
+  }
+
+  return null;
+}
+
+bool _isCompatibleMatchGame(
+  ({
+    List<({String id, String text, MatchItemType type})> terms,
+    List<({String id, String text, MatchItemType type})> definitions,
+    Map<String, String> correctPairs,
+  })
+  game,
+  Set<String> validTermIds,
+) {
+  if (game.correctPairs.isEmpty) {
+    return false;
+  }
+
+  return game.correctPairs.keys.toSet().containsAll(validTermIds) &&
+      validTermIds.containsAll(game.correctPairs.keys);
 }
 
 List<Map<String, dynamic>> _encodeItems(

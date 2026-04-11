@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
+import 'package:memox/core/theme/tokens/opacity_tokens.dart';
 import 'package:memox/core/theme/tokens/radius_tokens.dart';
+import 'package:memox/core/theme/tokens/size_tokens.dart';
 import 'package:memox/core/theme/tokens/spacing_tokens.dart';
+import 'package:memox/shared/widgets/cards/app_card.dart';
 
 class InfoBar extends StatelessWidget {
   const InfoBar({
@@ -16,25 +19,38 @@ class InfoBar extends StatelessWidget {
   final VoidCallback? onTap;
 
   @override
-  Widget build(BuildContext context) => Material(
-    color: context.colors.surfaceContainerHighest,
-    borderRadius: BorderRadius.circular(RadiusTokens.sm),
-    child: InkWell(
-      borderRadius: BorderRadius.circular(RadiusTokens.sm),
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: SpacingTokens.lg,
-          vertical: SpacingTokens.md,
+  Widget build(BuildContext context) => AppCard(
+    onTap: onTap,
+    backgroundColor: context.colors.surfaceContainerLow,
+    borderRadius: RadiusTokens.md,
+    leftBorderColor: context.colors.primary,
+    padding: const EdgeInsets.symmetric(
+      horizontal: SpacingTokens.lg,
+      vertical: SpacingTokens.md,
+    ),
+    child: Row(
+      children: [
+        DecoratedBox(
+          decoration: BoxDecoration(
+            color: context.colors.primary.withValues(
+              alpha: OpacityTokens.softTint,
+            ),
+            borderRadius: BorderRadius.circular(RadiusTokens.input),
+          ),
+          child: SizedBox.square(
+            dimension: SizeTokens.touchTarget,
+            child: Center(
+              child: Icon(
+                icon,
+                size: SizeTokens.iconSm,
+                color: context.colors.primary,
+              ),
+            ),
+          ),
         ),
-        child: Row(
-          children: [
-            Icon(icon),
-            const SizedBox(width: SpacingTokens.sm),
-            Expanded(child: Text(text, style: context.textTheme.bodyMedium)),
-          ],
-        ),
-      ),
+        const SizedBox(width: SpacingTokens.lg),
+        Expanded(child: Text(text, style: context.textTheme.bodyMedium)),
+      ],
     ),
   );
 }

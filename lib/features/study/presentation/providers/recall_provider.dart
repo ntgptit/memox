@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 
-import 'package:characters/characters.dart';
 import 'package:drift/drift.dart' show Value;
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:memox/core/database/app_database.dart';
@@ -15,6 +14,8 @@ import 'package:memox/features/study/domain/entities/study_session.dart';
 import 'package:memox/features/study/domain/srs/srs_engine.dart';
 import 'package:memox/features/study/presentation/providers/active_study_session_store.dart';
 import 'package:memox/features/study/presentation/providers/study_engine_providers.dart';
+import 'package:memox/features/study/presentation/support/study_restore_utils.dart';
+import 'package:memox/features/study/presentation/support/study_session_result.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'recall_provider.freezed.dart';
@@ -28,10 +29,11 @@ abstract class RecallState with _$RecallState {
     required List<FlashcardEntity> cards,
     required int currentIndex,
     required String userAnswer,
-    @Default(false) bool isMissedPracticeSession,
     @Default(false) bool isRevealed,
     SelfRating? selfRating,
     @Default(<RecallResult>[]) List<RecallResult> results,
+    @Default(<int>{}) Set<int> retryPendingCardIds,
+    @Default(<int, int>{}) Map<int, int> attemptCounts,
     @Default(false) bool isComplete,
   }) = _RecallState;
 }
@@ -39,13 +41,16 @@ abstract class RecallState with _$RecallState {
 extension RecallStateX on RecallState {
   int get totalCards => cards.length;
 
-  int get displayIndex => totalCards == 0 ? 0 : currentIndex + 1;
+  int get displayIndex {
+    if (totalCards == 0) {
+      return 0;
+    }
 
-  bool get canReveal {
-    final answerLength = currentCard?.front.trim().characters.length ?? 0;
-    final minimumLength = math.max(1, math.min(3, answerLength));
-    return userAnswer.trim().characters.length >= minimumLength;
+    final nextIndex = resolvedCount + 1;
+    return nextIndex > totalCards ? totalCards : nextIndex;
   }
+
+  bool get canReveal => currentCard != null && !isRevealed;
 
   FlashcardEntity? get currentCard {
     if (cards.isEmpty || isComplete) {
@@ -53,6 +58,45 @@ extension RecallStateX on RecallState {
     }
 
     return cards[currentIndex];
+  }
+
+  List<StudySessionAllowedAction> get allowedActions {
+    final card = currentCard;
+
+    if (card == null || isComplete) {
+      return const <StudySessionAllowedAction>[];
+    }
+
+    if (selfRating != null) {
+      return const <StudySessionAllowedAction>[
+        StudySessionAllowedAction.goNext,
+      ];
+    }
+
+    if (isRevealed) {
+      return const <StudySessionAllowedAction>[
+        StudySessionAllowedAction.markRemembered,
+        StudySessionAllowedAction.retryItem,
+      ];
+    }
+
+    return const <StudySessionAllowedAction>[
+      StudySessionAllowedAction.revealAnswer,
+      StudySessionAllowedAction.retryItem,
+    ];
+  }
+
+  ActiveStudySessionCurrentItem? get currentItemSnapshot {
+    final card = currentCard;
+
+    if (card == null) {
+      return null;
+    }
+
+    return ActiveStudySessionCurrentItem(
+      cardId: card.id,
+      position: displayIndex,
+    );
   }
 
   int get gotItCount =>
@@ -63,6 +107,41 @@ extension RecallStateX on RecallState {
 
   int get missedCount =>
       results.where((result) => result.rating == SelfRating.missed).length;
+
+  int get resolvedCount {
+    final completedCount = results.length - retryPendingCardIds.length;
+
+    if (completedCount < 0) {
+      return 0;
+    }
+
+    return completedCount;
+  }
+
+  StudySessionModeState get modeState {
+    if (isComplete) {
+      return StudySessionModeState.completed;
+    }
+
+    if (selfRating != null || isRevealed) {
+      return StudySessionModeState.waitingFeedback;
+    }
+
+    if (currentCard != null && retryPendingCardIds.contains(currentCard!.id)) {
+      return StudySessionModeState.retryPending;
+    }
+
+    if (currentIndex == 0 && results.isEmpty && userAnswer.isEmpty) {
+      return StudySessionModeState.initialized;
+    }
+
+    return StudySessionModeState.inProgress;
+  }
+
+  ActiveStudySessionProgress get progressSnapshot => ActiveStudySessionProgress(
+    completedCount: resolvedCount,
+    totalCount: totalCards,
+  );
 }
 
 RecallState? _stateValueOrNull(AsyncValue<RecallState> value) =>
@@ -113,22 +192,6 @@ class RecallSession extends _$RecallSession {
     await _persistSnapshot(updated);
   }
 
-  Future<void> reviewMissedCards() async {
-    final current = _stateValueOrNull(state);
-
-    if (current == null || !current.isComplete || current.missedCount == 0) {
-      return;
-    }
-
-    _interactionSequence++;
-    state = const AsyncValue<RecallState>.loading();
-    final nextState = await _startWithCards(
-      _missedCards(current),
-      isMissedPracticeSession: true,
-    );
-    state = AsyncValue<RecallState>.data(nextState);
-  }
-
   Future<void> markMissed() async {
     final current = _stateValueOrNull(state);
     final card = current?.currentCard;
@@ -141,16 +204,11 @@ class RecallSession extends _$RecallSession {
       return;
     }
 
-    final updated = current.copyWith(
-      selfRating: SelfRating.missed,
-      results: [
-        ...current.results,
-        (
-          cardId: card.id,
-          userAnswer: current.userAnswer,
-          rating: SelfRating.missed,
-        ),
-      ],
+    final updated = _applyRating(
+      current,
+      cardId: card.id,
+      userAnswer: current.userAnswer,
+      rating: SelfRating.missed,
     );
     final sequence = ++_interactionSequence;
     state = AsyncValue<RecallState>.data(updated);
@@ -178,12 +236,11 @@ class RecallSession extends _$RecallSession {
       return;
     }
 
-    final updated = current.copyWith(
-      selfRating: rating,
-      results: [
-        ...current.results,
-        (cardId: card.id, userAnswer: current.userAnswer, rating: rating),
-      ],
+    final updated = _applyRating(
+      current,
+      cardId: card.id,
+      userAnswer: current.userAnswer,
+      rating: rating,
     );
     final sequence = ++_interactionSequence;
     state = AsyncValue<RecallState>.data(updated);
@@ -223,7 +280,9 @@ class RecallSession extends _$RecallSession {
   }
 
   Future<void> _advance(RecallState current) async {
-    if (current.currentIndex == current.cards.length - 1) {
+    final nextIndex = _nextIndex(current);
+
+    if (nextIndex == null) {
       final completed = current.copyWith(isComplete: true);
       state = AsyncValue<RecallState>.data(completed);
       await _completeSession(completed);
@@ -231,7 +290,7 @@ class RecallSession extends _$RecallSession {
     }
 
     final updated = current.copyWith(
-      currentIndex: current.currentIndex + 1,
+      currentIndex: nextIndex,
       userAnswer: '',
       isRevealed: false,
       selfRating: null,
@@ -257,18 +316,12 @@ class RecallSession extends _$RecallSession {
       wrongCount: current.totalCards - gotItCount,
       durationSeconds: DateTime.now().difference(startedAt).inSeconds,
     );
-    _session = await ref
-        .read(completeStudySessionUseCaseProvider)
-        .call(completedSession);
+    _session = unwrapStudySessionResult(
+      await ref
+          .read(completeStudySessionUseCaseProvider)
+          .call(completedSession),
+    );
     await _clearSnapshot();
-  }
-
-  List<FlashcardEntity> _missedCards(RecallState current) {
-    final missedIds = current.results
-        .where((result) => result.rating == SelfRating.missed)
-        .map((result) => result.cardId)
-        .toSet();
-    return current.cards.where((card) => missedIds.contains(card.id)).toList();
   }
 
   Future<void> _persistRecallReview(
@@ -327,6 +380,83 @@ class RecallSession extends _$RecallSession {
     return shuffled;
   }
 
+  RecallState _applyRating(
+    RecallState current, {
+    required int cardId,
+    required String userAnswer,
+    required SelfRating rating,
+  }) {
+    final nextAttemptCounts = {
+      ...current.attemptCounts,
+      cardId: (current.attemptCounts[cardId] ?? 0) + 1,
+    };
+    final nextRetryPendingCardIds = {...current.retryPendingCardIds};
+    final isRetryRound = current.retryPendingCardIds.contains(cardId);
+
+    if (rating == SelfRating.missed && !isRetryRound) {
+      nextRetryPendingCardIds.add(cardId);
+    }
+
+    if (rating != SelfRating.missed || isRetryRound) {
+      nextRetryPendingCardIds.remove(cardId);
+    }
+
+    return current.copyWith(
+      selfRating: rating,
+      results: _upsertResult(current.results, (
+        cardId: cardId,
+        userAnswer: userAnswer,
+        rating: rating,
+      )),
+      retryPendingCardIds: nextRetryPendingCardIds,
+      attemptCounts: nextAttemptCounts,
+    );
+  }
+
+  int? _nextIndex(RecallState current) {
+    if (current.cards.isEmpty) {
+      return null;
+    }
+
+    final unresolved = _unresolvedCardIds(current);
+
+    if (unresolved.isEmpty) {
+      return null;
+    }
+
+    for (
+      var index = current.currentIndex + 1;
+      index < current.cards.length;
+      index++
+    ) {
+      if (unresolved.contains(current.cards[index].id)) {
+        return index;
+      }
+    }
+
+    for (var index = 0; index < current.cards.length; index++) {
+      if (unresolved.contains(current.cards[index].id)) {
+        return index;
+      }
+    }
+
+    return null;
+  }
+
+  Set<int> _unresolvedCardIds(RecallState current) {
+    final resolvedCardIds = current.results
+        .map((result) => result.cardId)
+        .toSet();
+    return current.cards
+        .where(
+          (card) =>
+              !resolvedCardIds.contains(card.id) ||
+              current.retryPendingCardIds.contains(card.id),
+        )
+        .map((card) => card.id)
+        .toSet();
+  }
+
   bool _shouldAdvance(RecallState? stateValue, int sequence, int cardId) {
     if (stateValue == null || _interactionSequence != sequence) {
       return false;
@@ -346,13 +476,7 @@ class RecallSession extends _$RecallSession {
         .read(getCardsByDeckUseCaseProvider)
         .call(deckId)
         .first;
-    return _startWithCards(_shuffleCards(loadedCards));
-  }
-
-  Future<RecallState> _startWithCards(
-    List<FlashcardEntity> cards, {
-    bool isMissedPracticeSession = false,
-  }) async {
+    final cards = _shuffleCards(loadedCards);
     _interactionSequence = 0;
 
     if (cards.isEmpty) {
@@ -365,15 +489,15 @@ class RecallSession extends _$RecallSession {
       );
     }
 
-    _session = await _startRecallSession(
-      deckId: cards.first.deckId,
-      isMissedPracticeSession: isMissedPracticeSession,
+    _session = unwrapStudySessionResult(
+      await ref
+          .read(startStudySessionUseCaseProvider)
+          .call(deckId: cards.first.deckId, mode: StudyMode.recall),
     );
     final nextState = RecallState(
       cards: cards,
       currentIndex: 0,
       userAnswer: '',
-      isMissedPracticeSession: isMissedPracticeSession,
     );
     await _persistSnapshot(nextState);
     return nextState;
@@ -388,7 +512,6 @@ class RecallSession extends _$RecallSession {
     'cards': current.cards.map((card) => card.toJson()).toList(growable: false),
     'currentIndex': current.currentIndex,
     'userAnswer': current.userAnswer,
-    'isMissedPracticeSession': current.isMissedPracticeSession,
     'isRevealed': current.isRevealed,
     'selfRating': current.selfRating?.name,
     'results': current.results
@@ -400,6 +523,10 @@ class RecallSession extends _$RecallSession {
           },
         )
         .toList(growable: false),
+    'retryPendingCardIds': current.retryPendingCardIds.toList(growable: false),
+    'attemptCounts': current.attemptCounts.map(
+      (key, value) => MapEntry<String, int>('$key', value),
+    ),
   };
 
   Future<void> _persistSnapshot(RecallState current) async {
@@ -414,66 +541,130 @@ class RecallSession extends _$RecallSession {
         deckId: deckId,
         mode: StudyMode.recall,
         session: _session,
+        modePlan: const <StudyMode>[StudyMode.recall],
+        modeState: current.modeState,
+        allowedActions: current.allowedActions,
+        currentItem: current.currentItemSnapshot,
+        progress: current.progressSnapshot,
+        sessionCompleted: current.isComplete,
         payload: _encodeState(current),
       ),
     );
   }
 
+  Future<RecallState> _normalizeRestoredState(RecallState current) async {
+    if (current.selfRating == null) {
+      return current;
+    }
+
+    final nextIndex = _nextIndex(current);
+
+    if (nextIndex == null) {
+      final completed = current.copyWith(isComplete: true);
+      await _completeSession(completed);
+      return completed;
+    }
+
+    final updated = current.copyWith(
+      currentIndex: nextIndex,
+      userAnswer: '',
+      isRevealed: false,
+      selfRating: null,
+    );
+    await _persistSnapshot(updated);
+    return updated;
+  }
+
   Future<RecallState?> _restoreSnapshot() async {
     final store = await ref.read(activeStudySessionStoreProvider.future);
-    final snapshot = store.load();
-
-    if (snapshot == null) {
-      return null;
-    }
-
-    if (snapshot.deckId != deckId || snapshot.mode != StudyMode.recall) {
-      return null;
-    }
-
-    _interactionSequence = 0;
-    _session = snapshot.session;
-    return RecallState(
-      cards: (snapshot.payload['cards'] as List<dynamic>? ?? const <dynamic>[])
-          .map(
-            (card) => FlashcardEntity.fromJson(
-              Map<String, dynamic>.from(card as Map),
-            ),
-          )
-          .toList(growable: false),
-      currentIndex: snapshot.payload['currentIndex'] as int? ?? 0,
-      userAnswer: snapshot.payload['userAnswer'] as String? ?? '',
-      isMissedPracticeSession:
-          snapshot.payload['isMissedPracticeSession'] as bool? ?? false,
-      isRevealed: snapshot.payload['isRevealed'] as bool? ?? false,
-      selfRating: snapshot.payload['selfRating'] == null
-          ? null
-          : SelfRating.values.byName(snapshot.payload['selfRating'] as String),
-      results:
-          (snapshot.payload['results'] as List<dynamic>? ?? const <dynamic>[])
-              .map(
-                (result) => (
-                  cardId: (result as Map)['cardId'] as int,
-                  userAnswer: result['userAnswer'] as String? ?? '',
-                  rating: SelfRating.values.byName(
-                    result['rating'] as String? ?? SelfRating.missed.name,
-                  ),
+    return store.restoreMatching(
+      deckId: deckId,
+      mode: StudyMode.recall,
+      decode: (snapshot) async {
+        final cards = _decodeRecallCards(snapshot.payload['cards']);
+        final requestedIndex = snapshot.payload['currentIndex'] as int? ?? 0;
+        final currentIndex = _restoredRecallIndex(
+          snapshot.payload['currentIndex'],
+          cards.length,
+        );
+        final keepsCurrentCardState = requestedIndex == currentIndex;
+        final cardIds = cards.map((card) => card.id).toSet();
+        final restored = RecallState(
+          cards: cards,
+          currentIndex: currentIndex,
+          userAnswer: keepsCurrentCardState
+              ? snapshot.payload['userAnswer'] as String? ?? ''
+              : '',
+          isRevealed:
+              keepsCurrentCardState &&
+              (snapshot.payload['isRevealed'] as bool? ?? false),
+          selfRating: !keepsCurrentCardState
+              ? null
+              : snapshot.payload['selfRating'] == null
+              ? null
+              : SelfRating.values.byName(
+                  snapshot.payload['selfRating'] as String,
                 ),
-              )
-              .toList(growable: false),
+          results:
+              (snapshot.payload['results'] as List<dynamic>? ??
+                      const <dynamic>[])
+                  .map(
+                    (result) => (
+                      cardId: (result as Map)['cardId'] as int,
+                      userAnswer: result['userAnswer'] as String? ?? '',
+                      rating: SelfRating.values.byName(
+                        result['rating'] as String? ?? SelfRating.missed.name,
+                      ),
+                    ),
+                  )
+                  .where((result) => cardIds.contains(result.cardId))
+                  .toList(growable: false),
+          retryPendingCardIds:
+              (snapshot.payload['retryPendingCardIds'] as List<dynamic>? ??
+                      const <dynamic>[])
+                  .map((cardId) => cardId as int)
+                  .where(cardIds.contains)
+                  .toSet(),
+          attemptCounts:
+              (snapshot.payload['attemptCounts'] as Map?) == null
+                    ? const <int, int>{}
+                    : (snapshot.payload['attemptCounts'] as Map).map(
+                        (key, value) => MapEntry<int, int>(
+                          int.parse(key as String),
+                          value as int,
+                        ),
+                      )
+                ..removeWhere((key, value) => !cardIds.contains(key)),
+        );
+        _interactionSequence = 0;
+        _session = snapshot.session;
+        return _normalizeRestoredState(restored);
+      },
     );
   }
-
-  Future<StudySession?> _startRecallSession({
-    required int deckId,
-    required bool isMissedPracticeSession,
-  }) async {
-    if (isMissedPracticeSession) {
-      return null;
-    }
-
-    return ref
-        .read(startStudySessionUseCaseProvider)
-        .call(deckId: deckId, mode: StudyMode.recall);
-  }
 }
+
+List<FlashcardEntity> _decodeRecallCards(Object? raw) =>
+    (raw as List<dynamic>? ?? const <dynamic>[])
+        .map(
+          (card) =>
+              FlashcardEntity.fromJson(Map<String, dynamic>.from(card as Map)),
+        )
+        .toList(growable: false);
+
+int _restoredRecallIndex(Object? raw, int cardCount) {
+  if (cardCount == 0) {
+    throw StateError('Recall snapshot is missing cards.');
+  }
+
+  return clampSnapshotIndex(raw as int? ?? 0, cardCount);
+}
+
+List<RecallResult> _upsertResult(
+  List<RecallResult> results,
+  RecallResult next,
+) => <RecallResult>[
+  for (final result in results)
+    if (result.cardId != next.cardId) result,
+  next,
+];

@@ -43,7 +43,9 @@ class ReviewCardFace extends StatelessWidget {
                   eyebrow!,
                   style: context.textTheme.titleMedium?.copyWith(
                     letterSpacing: TypographyTokens.labelSpacing,
-                    color: context.colors.onSurfaceVariant.withValues(alpha: OpacityTokens.hintText),
+                    color: context.colors.onSurfaceVariant.withValues(
+                      alpha: OpacityTokens.hintText,
+                    ),
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -55,26 +57,26 @@ class ReviewCardFace extends StatelessWidget {
                 style: context.appTextStyles.flashcardFront,
                 textAlign: TextAlign.center,
               ),
-          if (hint != null) ...[
-            const Gap.md(),
-            Text(
-              hint!,
-              style: context.appTextStyles.flashcardHint,
-              textAlign: TextAlign.center,
-            ),
-          ],
-          if (example != null) ...[
-            const Gap.sm(),
-            Text(
-              example!,
-              style: context.appTextStyles.flashcardExample,
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ],
+              if (hint != null) ...[
+                const Gap.md(),
+                Text(
+                  hint!,
+                  style: context.appTextStyles.flashcardHint,
+                  textAlign: TextAlign.center,
+                ),
+              ],
+              if (example != null) ...[
+                const Gap.sm(),
+                Text(
+                  example!,
+                  style: context.appTextStyles.flashcardExample,
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ],
+          ),
+        ),
       ),
     ),
-   ),
- ),
-);
+  );
 }

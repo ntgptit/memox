@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,12 +11,18 @@ import 'package:memox/features/study/domain/entities/study_session.dart';
 import 'package:memox/features/study/domain/fill/fill_engine.dart';
 import 'package:memox/features/study/domain/repositories/study_repository.dart';
 import 'package:memox/features/study/domain/srs/srs_engine.dart';
+import 'package:memox/features/study/presentation/providers/active_study_session_store.dart';
 import 'package:memox/features/study/presentation/providers/fill_provider.dart';
 import 'package:memox/features/study/presentation/providers/study_engine_providers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../test_helpers/fakes/fake_card_review_dao.dart';
 import '../../../../test_helpers/fakes/fake_flashcard_repository.dart';
 
 void main() {
+  setUp(() {
+    SharedPreferences.setMockInitialValues(const <String, Object>{});
+  });
+
   ProviderContainer buildContainer({
     required FakeFlashcardRepository flashcardRepository,
     required FakeCardReviewDao cardReviewDao,
@@ -77,6 +84,45 @@ void main() {
   });
 
   test(
+    'saved snapshot exposes fill mode state, actions, and progress',
+    () async {
+      final cardReviewDao = FakeCardReviewDao();
+      final container = buildContainer(
+        flashcardRepository: FakeFlashcardRepository(cards: _cards(2)),
+        cardReviewDao: cardReviewDao,
+      );
+      addTearDown(cardReviewDao.dispose);
+      addTearDown(container.dispose);
+      final notifier = container.read(fillSessionProvider(1).notifier);
+      final store = await container.read(
+        activeStudySessionStoreProvider.future,
+      );
+
+      await container.read(fillSessionProvider(1).future);
+      final initialState = container.read(fillSessionProvider(1)).requireValue;
+      var snapshot = store.load();
+      expect(snapshot?.modePlan, const <StudyMode>[StudyMode.fill]);
+      expect(snapshot?.modeState, StudySessionModeState.initialized);
+      expect(snapshot?.allowedActions, const <StudySessionAllowedAction>[
+        StudySessionAllowedAction.submitAnswer,
+      ]);
+      expect(snapshot?.currentItem?.cardId, initialState.currentCard?.id);
+      expect(snapshot?.progress.completedCount, 0);
+      expect(snapshot?.progress.totalCount, 2);
+
+      await notifier.updateInput('wrong');
+      await notifier.submitAnswer();
+
+      snapshot = store.load();
+      expect(snapshot?.modeState, StudySessionModeState.retryPending);
+      expect(snapshot?.allowedActions, const <StudySessionAllowedAction>[
+        StudySessionAllowedAction.submitAnswer,
+        StudySessionAllowedAction.goNext,
+      ]);
+    },
+  );
+
+  test(
     'initial prompt expects the answer side and shows the clue side',
     () async {
       final cardReviewDao = FakeCardReviewDao();
@@ -129,6 +175,63 @@ void main() {
       expect(cardReviewDao.insertedReviews, hasLength(1));
     },
   );
+
+  test('restore advances a completed fill card to the next prompt', () async {
+    SharedPreferences.setMockInitialValues({
+      'active_study_session_v1': jsonEncode(
+        ActiveStudySessionSnapshot(
+          deckId: 1,
+          mode: StudyMode.fill,
+          session: StudySession(
+            id: 88,
+            deckId: 1,
+            mode: StudyMode.fill,
+            startedAt: DateTime(2026, 4, 3, 10),
+          ),
+          payload: <String, dynamic>{
+            'cards': _cards(2).map((card) => card.toJson()).toList(),
+            'currentIndex': 0,
+            'currentPrompt': const <String, dynamic>{
+              'sentenceWithBlank': 'I ate a ________ for breakfast.',
+              'correctAnswer': 'banana',
+              'hint': 'Fruit',
+              'answerLength': 6,
+            },
+            'userInput': 'banana',
+            'result': FillResult.correct.name,
+            'firstAttemptResult': FillResult.correct.name,
+            'submittedAnswer': 'banana',
+            'isRetrying': false,
+            'retryCount': 0,
+            'showHint': false,
+            'results': const <Map<String, dynamic>>[
+              <String, dynamic>{
+                'cardId': '1',
+                'firstAttemptResult': 'correct',
+                'acceptedAsClose': false,
+                'retryCount': 0,
+              },
+            ],
+          },
+        ).toJson(),
+      ),
+    });
+
+    final cardReviewDao = FakeCardReviewDao();
+    final container = buildContainer(
+      flashcardRepository: FakeFlashcardRepository(cards: _cards(2)),
+      cardReviewDao: cardReviewDao,
+    );
+    addTearDown(cardReviewDao.dispose);
+    addTearDown(container.dispose);
+
+    final restored = await container.read(fillSessionProvider(1).future);
+
+    expect(restored.currentIndex, 1);
+    expect(restored.result, isNull);
+    expect(restored.userInput, isEmpty);
+    expect(restored.currentPrompt.correctAnswer, 'Answer 2');
+  });
 
   test(
     'skip becomes available after the first retry and hints open automatically',

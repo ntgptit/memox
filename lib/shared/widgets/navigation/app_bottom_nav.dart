@@ -22,7 +22,7 @@ class AppBottomNav extends StatelessWidget {
     top: false,
     child: DecoratedBox(
       decoration: BoxDecoration(
-        color: context.colors.surface.withValues(
+        color: context.colors.surfaceContainerLowest.withValues(
           alpha: OpacityTokens.surfaceGlass,
         ),
         border: Border(

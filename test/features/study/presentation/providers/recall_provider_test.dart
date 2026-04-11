@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,12 +10,18 @@ import 'package:memox/features/cards/domain/entities/flashcard_entity.dart';
 import 'package:memox/features/study/domain/entities/study_session.dart';
 import 'package:memox/features/study/domain/repositories/study_repository.dart';
 import 'package:memox/features/study/domain/srs/srs_engine.dart';
+import 'package:memox/features/study/presentation/providers/active_study_session_store.dart';
 import 'package:memox/features/study/presentation/providers/recall_provider.dart';
 import 'package:memox/features/study/presentation/providers/study_engine_providers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../test_helpers/fakes/fake_card_review_dao.dart';
 import '../../../../test_helpers/fakes/fake_flashcard_repository.dart';
 
 void main() {
+  setUp(() {
+    SharedPreferences.setMockInitialValues(const <String, Object>{});
+  });
+
   ProviderContainer buildContainer({
     required FakeFlashcardRepository flashcardRepository,
     required FakeCardReviewDao cardReviewDao,
@@ -33,7 +40,7 @@ void main() {
     ],
   );
 
-  test('cannot reveal without typing', () async {
+  test('can reveal immediately without typing', () async {
     final cardReviewDao = FakeCardReviewDao();
     addTearDown(cardReviewDao.dispose);
     final container = buildContainer(
@@ -46,21 +53,50 @@ void main() {
     await container.read(recallSessionProvider(1).future);
     await notifier.revealAnswer();
 
-    var state = container.read(recallSessionProvider(1)).requireValue;
-    expect(state.isRevealed, isFalse);
-
-    await notifier.updateAnswer('안');
-    await notifier.revealAnswer();
-
-    state = container.read(recallSessionProvider(1)).requireValue;
-    expect(state.isRevealed, isFalse);
-
-    await notifier.updateAnswer('안녕하세요');
-    await notifier.revealAnswer();
-
-    state = container.read(recallSessionProvider(1)).requireValue;
+    final state = container.read(recallSessionProvider(1)).requireValue;
     expect(state.isRevealed, isTrue);
   });
+
+  test(
+    'saved snapshot exposes recall mode state, actions, and progress',
+    () async {
+      final cardReviewDao = FakeCardReviewDao();
+      addTearDown(cardReviewDao.dispose);
+      final container = buildContainer(
+        flashcardRepository: FakeFlashcardRepository(cards: _cards(2)),
+        cardReviewDao: cardReviewDao,
+      );
+      addTearDown(container.dispose);
+      final notifier = container.read(recallSessionProvider(1).notifier);
+      final store = await container.read(
+        activeStudySessionStoreProvider.future,
+      );
+
+      await container.read(recallSessionProvider(1).future);
+      final initialState = container
+          .read(recallSessionProvider(1))
+          .requireValue;
+      var snapshot = store.load();
+      expect(snapshot?.modePlan, const <StudyMode>[StudyMode.recall]);
+      expect(snapshot?.modeState, StudySessionModeState.initialized);
+      expect(snapshot?.allowedActions, const <StudySessionAllowedAction>[
+        StudySessionAllowedAction.revealAnswer,
+        StudySessionAllowedAction.retryItem,
+      ]);
+      expect(snapshot?.currentItem?.cardId, initialState.currentCard?.id);
+      expect(snapshot?.progress.completedCount, 0);
+      expect(snapshot?.progress.totalCount, 2);
+
+      await notifier.revealAnswer();
+
+      snapshot = store.load();
+      expect(snapshot?.modeState, StudySessionModeState.waitingFeedback);
+      expect(snapshot?.allowedActions, const <StudySessionAllowedAction>[
+        StudySessionAllowedAction.markRemembered,
+        StudySessionAllowedAction.retryItem,
+      ]);
+    },
+  );
 
   test('markMissed advances without requiring typed input', () async {
     final cardReviewDao = FakeCardReviewDao();
@@ -78,6 +114,7 @@ void main() {
     final state = container.read(recallSessionProvider(1)).requireValue;
     expect(state.currentIndex, 1);
     expect(state.results.single.rating, SelfRating.missed);
+    expect(state.retryPendingCardIds, {state.results.single.cardId});
     expect(
       cardReviewDao.insertedReviews.single.selfRating.value,
       SelfRating.missed.index,
@@ -142,11 +179,11 @@ void main() {
     expect(review.userAnswer.value, 'Some answer');
   });
 
-  test('session stats are calculated from self-ratings', () async {
+  test('missed cards stay in-session until the retry is resolved', () async {
     final cardReviewDao = FakeCardReviewDao();
     final studyRepository = _FakeStudyRepository();
     final container = buildContainer(
-      flashcardRepository: FakeFlashcardRepository(cards: _cards(3)),
+      flashcardRepository: FakeFlashcardRepository(cards: _cards(2)),
       cardReviewDao: cardReviewDao,
       studyRepository: studyRepository,
     );
@@ -155,24 +192,78 @@ void main() {
     final notifier = container.read(recallSessionProvider(1).notifier);
 
     await container.read(recallSessionProvider(1).future);
-    await _answerAndRate(notifier, 'First', SelfRating.gotIt);
-    await _answerAndRate(notifier, 'Second', SelfRating.partial);
-    await _answerAndRate(notifier, 'Third', SelfRating.missed);
+    await notifier.markMissed();
+    await _answerAndRate(notifier, 'Recovered', SelfRating.gotIt);
+
+    final state = container.read(recallSessionProvider(1)).requireValue;
+    expect(state.isComplete, isFalse);
+    expect(state.retryPendingCardIds, {
+      state.results
+          .firstWhere((result) => result.rating == SelfRating.missed)
+          .cardId,
+    });
+    expect(studyRepository.latestCompletedSession, isNull);
+  });
+
+  test('retry success replaces the missed result before completion', () async {
+    final cardReviewDao = FakeCardReviewDao();
+    final studyRepository = _FakeStudyRepository();
+    final container = buildContainer(
+      flashcardRepository: FakeFlashcardRepository(cards: _cards(1)),
+      cardReviewDao: cardReviewDao,
+      studyRepository: studyRepository,
+    );
+    addTearDown(cardReviewDao.dispose);
+    addTearDown(container.dispose);
+    final notifier = container.read(recallSessionProvider(1).notifier);
+
+    await container.read(recallSessionProvider(1).future);
+    await notifier.markMissed();
+    await _answerAndRate(notifier, 'Recovered', SelfRating.gotIt);
 
     final state = container.read(recallSessionProvider(1)).requireValue;
     expect(state.isComplete, isTrue);
     expect(state.gotItCount, 1);
-    expect(state.partialCount, 1);
-    expect(state.missedCount, 1);
+    expect(state.partialCount, 0);
+    expect(state.missedCount, 0);
+    expect(state.results.single.rating, SelfRating.gotIt);
     expect(studyRepository.latestCompletedSession?.mode, StudyMode.recall);
     expect(studyRepository.latestCompletedSession?.correctCount, 1);
-    expect(studyRepository.latestCompletedSession?.wrongCount, 2);
+    expect(studyRepository.latestCompletedSession?.wrongCount, 0);
   });
 
-  test('reviewMissedCards restarts as a practice-only session', () async {
+  test(
+    'second miss finalizes the card as missed and completes the session',
+    () async {
+      final cardReviewDao = FakeCardReviewDao();
+      final studyRepository = _FakeStudyRepository();
+      final container = buildContainer(
+        flashcardRepository: FakeFlashcardRepository(cards: _cards(1)),
+        cardReviewDao: cardReviewDao,
+        studyRepository: studyRepository,
+      );
+      addTearDown(cardReviewDao.dispose);
+      addTearDown(container.dispose);
+      final notifier = container.read(recallSessionProvider(1).notifier);
+
+      await container.read(recallSessionProvider(1).future);
+      await notifier.markMissed();
+      await notifier.markMissed();
+
+      final state = container.read(recallSessionProvider(1)).requireValue;
+      expect(state.isComplete, isTrue);
+      expect(state.retryPendingCardIds, isEmpty);
+      expect(state.missedCount, 1);
+      expect(state.results.single.rating, SelfRating.missed);
+      expect(studyRepository.latestCompletedSession?.wrongCount, 1);
+    },
+  );
+
+  test('retry pending state survives snapshot restore', () async {
     final cardReviewDao = FakeCardReviewDao();
+    final flashcardRepository = FakeFlashcardRepository(cards: _cards(2));
     final container = buildContainer(
-      flashcardRepository: FakeFlashcardRepository(cards: _cards(2)),
+      flashcardRepository: flashcardRepository,
       cardReviewDao: cardReviewDao,
     );
     addTearDown(cardReviewDao.dispose);
@@ -180,40 +271,82 @@ void main() {
     final notifier = container.read(recallSessionProvider(1).notifier);
 
     await container.read(recallSessionProvider(1).future);
-    await _answerAndRate(notifier, 'wrong', SelfRating.missed);
-    await _answerAndRate(notifier, 'right', SelfRating.gotIt);
-    await notifier.reviewMissedCards();
-
-    final state = container.read(recallSessionProvider(1)).requireValue;
-    expect(state.isMissedPracticeSession, isTrue);
-    expect(state.totalCards, 1);
-    expect(state.currentCard, isNotNull);
-  });
-
-  test('missed-card practice is not counted as a new statistics session', () async {
-    final cardReviewDao = FakeCardReviewDao();
-    final studyRepository = _FakeStudyRepository();
-    final container = buildContainer(
-      flashcardRepository: FakeFlashcardRepository(cards: _cards(2)),
-      cardReviewDao: cardReviewDao,
-      studyRepository: studyRepository,
-    );
-    addTearDown(cardReviewDao.dispose);
-    addTearDown(container.dispose);
-    final notifier = container.read(recallSessionProvider(1).notifier);
-
-    await container.read(recallSessionProvider(1).future);
-    await _answerAndRate(notifier, 'wrong', SelfRating.missed);
-    await _answerAndRate(notifier, 'right', SelfRating.gotIt);
-    expect(studyRepository.completedSessions, hasLength(1));
-    final reviewCountBeforePractice = cardReviewDao.insertedReviews.length;
-
-    await notifier.reviewMissedCards();
     await notifier.markMissed();
+    final pendingCardId = container
+        .read(recallSessionProvider(1))
+        .requireValue
+        .retryPendingCardIds
+        .single;
 
-    expect(studyRepository.completedSessions, hasLength(1));
-    expect(cardReviewDao.insertedReviews, hasLength(reviewCountBeforePractice));
+    final restoredContainer = buildContainer(
+      flashcardRepository: flashcardRepository,
+      cardReviewDao: cardReviewDao,
+    );
+    addTearDown(restoredContainer.dispose);
+
+    final restoredState = await restoredContainer.read(
+      recallSessionProvider(1).future,
+    );
+    expect(restoredState.isComplete, isFalse);
+    expect(restoredState.retryPendingCardIds, {pendingCardId});
+    expect(restoredState.results.single.rating, SelfRating.missed);
   });
+
+  test(
+    'restore advances a rated recall card instead of trapping the session',
+    () async {
+      SharedPreferences.setMockInitialValues({
+        'active_study_session_v1': jsonEncode(
+          ActiveStudySessionSnapshot(
+            deckId: 1,
+            mode: StudyMode.recall,
+            session: StudySession(
+              id: 81,
+              deckId: 1,
+              mode: StudyMode.recall,
+              startedAt: DateTime(2026, 4, 3, 10),
+            ),
+            payload: <String, dynamic>{
+              'cards': _cards(2).map((card) => card.toJson()).toList(),
+              'currentIndex': 0,
+              'userAnswer': 'Recovered',
+              'isRevealed': true,
+              'selfRating': SelfRating.gotIt.name,
+              'results': const <Map<String, dynamic>>[
+                <String, dynamic>{
+                  'cardId': 1,
+                  'userAnswer': 'Recovered',
+                  'rating': 'gotIt',
+                },
+              ],
+              'retryPendingCardIds': const <int>[],
+              'attemptCounts': const <String, int>{'1': 1},
+            },
+          ).toJson(),
+        ),
+      });
+
+      final cardReviewDao = FakeCardReviewDao();
+      final studyRepository = _FakeStudyRepository();
+      final container = buildContainer(
+        flashcardRepository: FakeFlashcardRepository(cards: _cards(2)),
+        cardReviewDao: cardReviewDao,
+        studyRepository: studyRepository,
+      );
+      addTearDown(cardReviewDao.dispose);
+      addTearDown(container.dispose);
+
+      final restored = await container.read(recallSessionProvider(1).future);
+
+      expect(restored.isComplete, isFalse);
+      expect(restored.currentIndex, 1);
+      expect(restored.currentCard?.id, 2);
+      expect(restored.userAnswer, isEmpty);
+      expect(restored.isRevealed, isFalse);
+      expect(restored.selfRating, isNull);
+      expect(studyRepository.latestCompletedSession, isNull);
+    },
+  );
 }
 
 Future<void> _answerAndRate(
@@ -239,9 +372,8 @@ List<FlashcardEntity> _cards(int count) => List<FlashcardEntity>.generate(
 final class _FakeStudyRepository implements StudyRepository {
   final List<StudySession> completedSessions = <StudySession>[];
 
-  StudySession? get latestCompletedSession => completedSessions.isEmpty
-      ? null
-      : completedSessions.last;
+  StudySession? get latestCompletedSession =>
+      completedSessions.isEmpty ? null : completedSessions.last;
 
   @override
   Future<StudySession> completeSession(StudySession session) async {

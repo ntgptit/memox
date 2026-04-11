@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:memox/core/design/study_mode.dart';
+import 'package:memox/core/types/result.dart';
 import 'package:memox/features/study/domain/entities/study_session.dart';
 import 'package:memox/features/study/domain/repositories/study_repository.dart';
 import 'package:memox/features/study/domain/usecases/complete_study_session.dart';
@@ -26,7 +27,8 @@ void main() {
         ),
       );
 
-      expect(result.completedAt, completedAt);
+      expect(result, isA<Success<StudySession>>());
+      expect(result.dataOrNull?.completedAt, completedAt);
       expect(repository.lastCompletedSession?.id, 3);
     },
   );

@@ -10,6 +10,7 @@ import 'package:memox/features/study/presentation/widgets/review_rating_shortcut
 import 'package:memox/shared/widgets/buttons/app_swipe_region.dart';
 import 'package:memox/shared/widgets/buttons/primary_button.dart';
 import 'package:memox/shared/widgets/cards/app_card.dart';
+import 'package:memox/shared/widgets/cards/info_bar.dart';
 import 'package:memox/shared/widgets/layout/spacing.dart';
 
 class ReviewRoundView extends StatelessWidget {
@@ -49,6 +50,13 @@ class ReviewRoundView extends StatelessWidget {
           ),
           child: Column(
             children: [
+              if (state.isCurrentCardPendingRetry) ...[
+                InfoBar(
+                  icon: Icons.refresh_outlined,
+                  text: context.l10n.studyRetryPhaseHint,
+                ),
+                const Gap.lg(),
+              ],
               Expanded(
                 child: ReviewFlipPanel(
                   card: card,

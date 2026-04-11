@@ -40,7 +40,9 @@ class StudyTopBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) => Material(
-    color: context.colors.surface.withValues(alpha: 1 - OpacityTokens.hover),
+    color: context.colors.surfaceContainerLowest.withValues(
+      alpha: OpacityTokens.surfaceGlass,
+    ),
     child: DecoratedBox(
       decoration: BoxDecoration(
         border: Border(

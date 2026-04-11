@@ -26,7 +26,7 @@ void main() {
     SharedPreferences.setMockInitialValues(const <String, Object>{});
   });
 
-  testWidgets('RecallModeScreen cannot reveal without typing', (tester) async {
+  testWidgets('RecallModeScreen can reveal without typing', (tester) async {
     await _setCompactSurface(tester);
     final cardReviewDao = FakeCardReviewDao();
     addTearDown(cardReviewDao.dispose);
@@ -65,13 +65,6 @@ void main() {
       closeTo(SpacingTokens.lg, 0.01),
     );
 
-    await tester.tap(find.text('Show answer'), warnIfMissed: false);
-    await _pumpRecallScreen(tester);
-
-    expect(find.text('Complete answer'), findsNothing);
-
-    await tester.enterText(find.byType(TextField), 'I remember this');
-    await _pumpRecallScreen(tester);
     await tester.tap(find.text('Show answer'));
     await _pumpRecallScreen(tester);
 
@@ -114,12 +107,56 @@ void main() {
       await tester.tap(find.text("I don't know"));
       await _pumpRecallScreen(tester);
 
-      expect(find.text('1 cards recalled'), findsOneWidget);
-      expect(find.text('Review difficult cards'), findsOneWidget);
+      expect(find.text('1 cards recalled'), findsNothing);
+      expect(find.text('Review difficult cards'), findsNothing);
+      expect(find.text('Show answer'), findsOneWidget);
 
       await tester.pump(const Duration(seconds: 1));
       await tester.pumpWidget(const SizedBox.shrink());
       await tester.pump(const Duration(seconds: 1));
+    },
+  );
+
+  testWidgets(
+    'RecallModeScreen shows a retry hint before completing after a second miss',
+    (tester) async {
+      final cardReviewDao = FakeCardReviewDao();
+      addTearDown(cardReviewDao.dispose);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            flashcardRepositoryProvider.overrideWithValue(
+              FakeFlashcardRepository(cards: _cards(1)),
+            ),
+            deckRepositoryProvider.overrideWithValue(FakeDeckRepository()),
+            studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
+            cardReviewDaoProvider.overrideWithValue(cardReviewDao),
+            recallRandomProvider(4).overrideWithValue(Random(1)),
+            recallAdvanceDelayProvider.overrideWith((ref) => Duration.zero),
+          ],
+          child: buildTestApp(home: const RecallModeScreen(deckId: 4)),
+        ),
+      );
+      await _pumpRecallScreen(tester);
+
+      await tester.tap(find.text("I don't know"));
+      await _pumpRecallScreen(tester);
+
+      expect(
+        find.text(
+          'Retry round: revisit the cards that still need one more pass.',
+        ),
+        findsOneWidget,
+      );
+      expect(find.text('Done'), findsNothing);
+
+      await tester.tap(find.text("I don't know"));
+      await _pumpRecallScreen(tester);
+
+      expect(find.text('Done'), findsOneWidget);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pumpAndSettle();
     },
   );
 
@@ -159,6 +196,38 @@ void main() {
       lessThanOrEqualTo(800 * 0.4),
     );
     expect(find.widgetWithText(SecondaryButton, 'Show answer'), findsOneWidget);
+  });
+
+  testWidgets('RecallModeScreen keeps the saved snapshot after exit', (
+    tester,
+  ) async {
+    final cardReviewDao = FakeCardReviewDao();
+    addTearDown(cardReviewDao.dispose);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          flashcardRepositoryProvider.overrideWithValue(
+            FakeFlashcardRepository(cards: _cards(1)),
+          ),
+          deckRepositoryProvider.overrideWithValue(FakeDeckRepository()),
+          studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
+          cardReviewDaoProvider.overrideWithValue(cardReviewDao),
+          recallRandomProvider(4).overrideWithValue(Random(1)),
+          recallAdvanceDelayProvider.overrideWith((ref) => Duration.zero),
+        ],
+        child: buildTestApp(home: const RecallModeScreen(deckId: 4)),
+      ),
+    );
+    await _pumpRecallScreen(tester);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getString('active_study_session_v1'), isNotNull);
+
+    await tester.tap(find.byTooltip('Exit'));
+    await tester.pump();
+    await tester.tap(find.text('Exit').last);
+    await tester.pumpAndSettle();
+
+    expect(preferences.getString('active_study_session_v1'), isNotNull);
   });
 }
 

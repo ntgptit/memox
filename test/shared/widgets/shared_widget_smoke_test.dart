@@ -51,12 +51,6 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    await tester.scrollUntilVisible(
-      find.text('12%', skipOffstage: false),
-      200,
-      scrollable: find.byType(Scrollable).first,
-    );
-    await tester.pumpAndSettle();
 
     expect(find.byType(AppScaffold), findsOneWidget);
     expect(find.byType(AppCard, skipOffstage: false), findsWidgets);
@@ -70,6 +64,14 @@ void main() {
       findsOneWidget,
     );
     expect(find.byType(TextLinkButton, skipOffstage: false), findsWidgets);
+
+    await tester.scrollUntilVisible(
+      find.text('12%', skipOffstage: false),
+      200,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
+
     expect(find.byType(SuccessIndicator, skipOffstage: false), findsOneWidget);
     expect(find.byType(OfflineStateView, skipOffstage: false), findsOneWidget);
     expect(

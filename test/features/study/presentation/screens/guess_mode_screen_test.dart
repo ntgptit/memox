@@ -284,7 +284,7 @@ void main() {
     },
   );
 
-  testWidgets('GuessModeScreen lists difficult cards after a wrong answer', (
+  testWidgets('GuessModeScreen shows a retry hint when a card returns', (
     tester,
   ) async {
     final cardReviewDao = FakeCardReviewDao();
@@ -328,7 +328,112 @@ void main() {
     await tester.tap(find.text('Continue'));
     await _pumpGuessScreen(tester);
 
+    expect(
+      find.text(
+        'Retry round: revisit the cards that still need one more pass.',
+      ),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('GuessModeScreen lists difficult cards after a wrong answer', (
+    tester,
+  ) async {
+    final cardReviewDao = FakeCardReviewDao();
+    addTearDown(cardReviewDao.dispose);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          cardReviewDaoProvider.overrideWithValue(cardReviewDao),
+          flashcardRepositoryProvider.overrideWithValue(
+            FakeFlashcardRepository(
+              cards: const [
+                FlashcardEntity(
+                  id: 1,
+                  deckId: 5,
+                  front: '안녕하세요',
+                  back: 'Hello',
+                ),
+              ],
+            ),
+          ),
+          deckRepositoryProvider.overrideWithValue(FakeDeckRepository()),
+          studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
+          guessEngineProvider(
+            5,
+          ).overrideWithValue(GuessEngine(random: Random(1))),
+        ],
+        child: buildTestApp(home: const GuessModeScreen(deckId: 5)),
+      ),
+    );
+    await _pumpGuessScreen(tester);
+
+    final wrongOption = find
+        .ancestor(
+          of: find.text('???').first,
+          matching: find.byType(GuessOptionButton),
+        )
+        .first;
+    await tester.ensureVisible(wrongOption);
+    await tester.tap(wrongOption);
+    await _pumpGuessScreen(tester);
+    await tester.tap(find.text('Continue'));
+    await _pumpGuessScreen(tester);
+    final retryWrongOption = find
+        .ancestor(
+          of: find.text('???').first,
+          matching: find.byType(GuessOptionButton),
+        )
+        .first;
+    await tester.ensureVisible(retryWrongOption);
+    await tester.tap(retryWrongOption);
+    await _pumpGuessScreen(tester);
+    await tester.tap(find.text('Continue'));
+    await _pumpGuessScreen(tester);
+
     expect(find.text('Review difficult cards'), findsOneWidget);
+  });
+
+  testWidgets('GuessModeScreen keeps the saved snapshot after exit', (
+    tester,
+  ) async {
+    final cardReviewDao = FakeCardReviewDao();
+    addTearDown(cardReviewDao.dispose);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          cardReviewDaoProvider.overrideWithValue(cardReviewDao),
+          flashcardRepositoryProvider.overrideWithValue(
+            FakeFlashcardRepository(
+              cards: const [
+                FlashcardEntity(
+                  id: 1,
+                  deckId: 5,
+                  front: '안녕하세요',
+                  back: 'Hello',
+                ),
+              ],
+            ),
+          ),
+          deckRepositoryProvider.overrideWithValue(FakeDeckRepository()),
+          studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
+          guessEngineProvider(
+            5,
+          ).overrideWithValue(GuessEngine(random: Random(1))),
+        ],
+        child: buildTestApp(home: const GuessModeScreen(deckId: 5)),
+      ),
+    );
+    await _pumpGuessScreen(tester);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getString('active_study_session_v1'), isNotNull);
+
+    await tester.tap(find.byTooltip('Exit'));
+    await tester.pump();
+    await tester.tap(find.text('Exit').last);
+    await tester.pumpAndSettle();
+
+    expect(preferences.getString('active_study_session_v1'), isNotNull);
   });
 }
 

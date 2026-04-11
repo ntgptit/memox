@@ -115,6 +115,15 @@ void main() {
 
       await tester.sendKeyEvent(LogicalKeyboardKey.digit1);
       await _pumpReviewScreen(tester);
+
+      expect(find.text('Tap the card to reveal the answer'), findsOneWidget);
+      expect(find.text('Term 1'), findsOneWidget);
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      await _pumpReviewScreen(tester);
+      await tester.sendKeyEvent(LogicalKeyboardKey.digit1);
+      await _pumpReviewScreen(tester);
+
       expect(find.text('1 cards reviewed'), findsOneWidget);
       expect(find.text('Review difficult cards'), findsOneWidget);
     },
@@ -152,7 +161,7 @@ void main() {
     expect(find.text('Again: 0 · Hard: 0 · Good: 1 · Easy: 0'), findsOneWidget);
   });
 
-  testWidgets('ReviewModeScreen shows undo after rating a card', (
+  testWidgets('ReviewModeScreen does not show undo after rating a card', (
     tester,
   ) async {
     final cardReviewDao = FakeCardReviewDao();
@@ -179,15 +188,8 @@ void main() {
     );
     await _pumpReviewScreen(tester);
 
-    expect(find.text('Undo'), findsOneWidget);
+    expect(find.text('Undo'), findsNothing);
     expect(find.text('Term 2'), findsOneWidget);
-
-    await tester.pump(const Duration(milliseconds: 300));
-    await tester.tap(find.text('Undo'));
-    await _pumpReviewScreen(tester);
-
-    expect(find.text('Term 1'), findsOneWidget);
-    expect(find.text('Definition 1'), findsOneWidget);
   });
 
   testWidgets('ReviewModeScreen toggles the flag action for the current card', (
@@ -291,8 +293,96 @@ void main() {
     );
     await _pumpReviewScreen(tester);
 
+    expect(find.text('Term 2'), findsOneWidget);
+
+    await tester.tap(find.byKey(const ValueKey<String>('review-front-2')));
+    await _pumpReviewScreen(tester);
+    await tester.tap(
+      find.byKey(const ValueKey<ReviewRating>(ReviewRating.again)),
+    );
+    await _pumpReviewScreen(tester);
+
     expect(find.text('3 cards reviewed'), findsOneWidget);
     expect(find.text('Again: 1 · Hard: 0 · Good: 1 · Easy: 1'), findsOneWidget);
+  });
+
+  testWidgets(
+    'ReviewModeScreen shows a retry hint when a failed card returns',
+    (tester) async {
+      final cardReviewDao = FakeCardReviewDao();
+      addTearDown(cardReviewDao.dispose);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            flashcardRepositoryProvider.overrideWithValue(
+              FakeFlashcardRepository(cards: _cards(1)),
+            ),
+            deckRepositoryProvider.overrideWithValue(FakeDeckRepository()),
+            studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
+            cardReviewDaoProvider.overrideWithValue(cardReviewDao),
+          ],
+          child: buildTestApp(home: const ReviewModeScreen(deckId: 6)),
+        ),
+      );
+      await _pumpReviewScreen(tester);
+
+      await tester.tap(find.byKey(const ValueKey<String>('review-front-1')));
+      await _pumpReviewScreen(tester);
+      await tester.tap(
+        find.byKey(const ValueKey<ReviewRating>(ReviewRating.again)),
+      );
+      await _pumpReviewScreen(tester);
+
+      expect(
+        find.text(
+          'Retry round: revisit the cards that still need one more pass.',
+        ),
+        findsOneWidget,
+      );
+      expect(find.text('Tap the card to reveal the answer'), findsOneWidget);
+
+      await tester.tap(find.byKey(const ValueKey<String>('review-front-1')));
+      await _pumpReviewScreen(tester);
+      await tester.tap(
+        find.byKey(const ValueKey<ReviewRating>(ReviewRating.good)),
+      );
+      await _pumpReviewScreen(tester);
+
+      expect(find.text('Done'), findsOneWidget);
+
+      await tester.pumpWidget(const SizedBox.shrink());
+      await tester.pump();
+    },
+  );
+
+  testWidgets('ReviewModeScreen keeps the saved snapshot after exit', (
+    tester,
+  ) async {
+    final cardReviewDao = FakeCardReviewDao();
+    addTearDown(cardReviewDao.dispose);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          flashcardRepositoryProvider.overrideWithValue(
+            FakeFlashcardRepository(cards: _cards(1)),
+          ),
+          deckRepositoryProvider.overrideWithValue(FakeDeckRepository()),
+          studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
+          cardReviewDaoProvider.overrideWithValue(cardReviewDao),
+        ],
+        child: buildTestApp(home: const ReviewModeScreen(deckId: 6)),
+      ),
+    );
+    await _pumpReviewScreen(tester);
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getString('active_study_session_v1'), isNotNull);
+
+    await tester.tap(find.byTooltip('Exit'));
+    await tester.pump();
+    await tester.tap(find.text('Exit').last);
+    await tester.pumpAndSettle();
+
+    expect(preferences.getString('active_study_session_v1'), isNotNull);
   });
 }
 

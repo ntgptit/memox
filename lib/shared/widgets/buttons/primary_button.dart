@@ -28,8 +28,9 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final progressColor =
-        foregroundColor ?? Theme.of(context).colorScheme.onPrimary;
+    final theme = Theme.of(context);
+    final baseStyle = theme.filledButtonTheme.style ?? const ButtonStyle();
+    final progressColor = foregroundColor ?? theme.colorScheme.onPrimary;
     final child = FilledButton(
       onPressed: isLoading ? null : onPressed,
       style: FilledButton.styleFrom(
@@ -39,7 +40,7 @@ class PrimaryButton extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(RadiusTokens.button),
         ),
-      ),
+      ).merge(baseStyle),
       child: _ButtonChild(
         label: label,
         icon: icon,
