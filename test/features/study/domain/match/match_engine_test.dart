@@ -38,8 +38,14 @@ void main() {
           .firstWhere((item) => item.id != correctDefinitionId)
           .id;
 
-      expect(engine.checkMatch(term.id, correctDefinitionId), isTrue);
-      expect(engine.checkMatch(term.id, wrongDefinitionId), isFalse);
+      expect(
+        engine.checkMatch(game.correctPairs, term.id, correctDefinitionId),
+        isTrue,
+      );
+      expect(
+        engine.checkMatch(game.correctPairs, term.id, wrongDefinitionId),
+        isFalse,
+      );
     });
   });
 }

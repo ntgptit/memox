@@ -50,11 +50,13 @@
   - Why: the behavior was implementation-only, not grounded in the study docs, and the current user request explicitly asked to remove it from review mode.
 - Match mode should not expose a tap-again deselect affordance or hint once the user explicitly asked to remove it.
   - Why: the current request directly removed that interaction contract, so keeping the toggle behavior or its copy would preserve stale, ungrounded UI drift.
+- Match board rows should keep a stable per-board height after settled pairs disappear.
+  - Why: the board's pair count is fixed when the round is generated, and the user explicitly reported visible row stretching as a UI regression rather than intended adaptive behavior.
 
 ## 3. Iteration count
 
-- Total coordinator iterations executed in this pass: `8`
-- Recursive verification loops executed across the pass: `26`
+- Total coordinator iterations executed in this pass: `10`
+- Recursive verification loops executed across the pass: `36`
   - initial baseline verification before edits
   - verification of the reverted `study_entry_provider` attempt
   - stale-review-doc rescan after docs cleanup
@@ -81,6 +83,16 @@
   - full `test/features/study` verification after the deselect-removal batch
   - guard pass after the deselect-removal batch
   - final match deselect keyword rescan across `lib/features/study/**`, `test/features/study/**`, and `l10n/**`
+  - targeted root-cause inspection for correct-match selections being scored as wrong
+  - targeted provider and engine regression verification for the match-scoring batch
+  - analyzer pass for the match-scoring batch
+  - full `test/features/study` verification after the match-scoring batch
+  - guard pass after the match-scoring batch
+  - targeted layout inspection for remaining match cards stretching after a correct pair disappears
+  - targeted screen regression verification for the match-layout batch
+  - analyzer pass for the match-layout batch
+  - full `test/features/study` verification after the match-layout batch
+  - guard pass after the match-layout batch
 
 ## 4. Iteration details
 
@@ -587,6 +599,127 @@
 
 - No additional safely fixable in-scope issue was exposed after the deselect-removal batch.
 
+### Iteration 9
+
+#### Issues selected
+
+- Match mode could score a correct pair as wrong when the `matchEngineProvider` was recreated after board generation
+- `MatchEngine` kept hidden `_currentGame` state even though the current board mapping already lived in `MatchState.game`
+- Existing provider coverage did not protect the match flow against engine recreation or invalidation between two taps
+
+#### Classification of each issue
+
+- Correct pair being scored as wrong
+  - `regression fix`
+- Hidden engine-state cleanup required by the regression fix
+  - `consistency fix required by an already grounded fix`
+- Missing regression coverage for recreated engine instances
+  - `test-aligned correction`
+
+#### Grounding source for each issue
+
+- direct user report on 2026-04-11 that match mode sometimes marked a correct selection as wrong
+- direct source inspection of:
+  - `lib/features/study/domain/match/match_engine.dart`
+  - `lib/features/study/presentation/providers/match_provider.dart`
+  - `lib/features/study/presentation/widgets/match_item_board.dart`
+  - `lib/features/study/presentation/widgets/match_item_card.dart`
+  - `lib/features/study/presentation/screens/match_mode_screen.dart`
+- generated provider contract proving `matchEngineProvider` is auto-dispose:
+  - `lib/features/study/presentation/providers/match_provider.g.dart`
+- `lib/features/study/docs/04_mode_patterns.md`
+- current review baseline in `lib/features/study/docs/review/study-ui-and-state-flow-review.md`
+
+#### Root cause targeted
+
+- Match validation depended on `MatchEngine._currentGame`, a hidden mutable field inside an auto-dispose provider instance, instead of validating against the persisted board mapping already stored in `MatchState.game.correctPairs`.
+
+#### Files changed
+
+- `lib/features/study/domain/match/match_engine.dart`
+- `lib/features/study/presentation/providers/match_provider.dart`
+- `test/features/study/domain/match/match_engine_test.dart`
+- `test/features/study/presentation/providers/match_provider_test.dart`
+- `lib/features/study/docs/review/study-deep-recursive-fix-summary.md`
+
+#### Tests changed
+
+- Updated the engine test so `checkMatch` validates against the explicit board mapping instead of hidden instance state.
+- Added provider regression coverage proving a correct pair still succeeds after invalidating `matchEngineProvider(1)` between the two taps.
+
+#### Verification result
+
+- `dart format` passed on the changed engine, provider, and test files.
+- Targeted match regression verification passed:
+  - `flutter test test/features/study/domain/match/match_engine_test.dart test/features/study/presentation/providers/match_provider_test.dart`
+- `python tools/guard/run.py --scope features` passed with the same pre-existing `feature_completeness` warnings about empty feature subfolders outside the changed study logic.
+- `flutter analyze lib/features/study test/features/study` passed with no diagnostics.
+- Full study verification passed:
+  - `flutter test test/features/study`
+- Final rescans confirmed:
+  - no remaining `_currentGame` field or hidden engine-state dependency in `lib/features/study/**`
+  - `checkMatch` is now only a pure comparison against the explicit `correctPairs` mapping
+  - the new invalidation regression test covers the user-reported scoring failure path
+
+#### Newly exposed issues found after verification
+
+- No additional safely fixable in-scope issue was exposed after the match-scoring batch.
+
+### Iteration 10
+
+#### Issues selected
+
+- Remaining match cards stretched vertically after a correct pair disappeared from the board
+- Match board row layout re-apportioned the full available height based on the number of visible rows instead of the board's fixed pair count
+- Existing screen coverage did not protect the UI against this post-match height jump
+
+#### Classification of each issue
+
+- Remaining cards stretching after pair removal
+  - `regression fix`
+- Match board layout cleanup required by the regression fix
+  - `consistency fix required by an already grounded fix`
+- Missing UI regression coverage for stable remaining-card height
+  - `test-aligned correction`
+
+#### Grounding source for each issue
+
+- direct user report on 2026-04-11 with screenshot showing the remaining match cards expanding after matched pairs disappeared
+- direct source inspection of:
+  - `lib/features/study/presentation/widgets/match_item_board.dart`
+  - `lib/features/study/presentation/widgets/match_item_card.dart`
+  - `lib/features/study/presentation/screens/match_mode_screen.dart`
+  - `test/features/study/presentation/screens/match_mode_screen_test.dart`
+
+#### Root cause targeted
+
+- `MatchItemBoard` wrapped each visible row in `Expanded`, so once settled pairs were removed the remaining rows redistributed the entire board height and visually stretched the cards.
+
+#### Files changed
+
+- `lib/features/study/presentation/widgets/match_item_board.dart`
+- `test/features/study/presentation/screens/match_mode_screen_test.dart`
+- `lib/features/study/docs/review/study-deep-recursive-fix-summary.md`
+
+#### Tests changed
+
+- Added screen regression coverage asserting that a remaining match card keeps the same height after another correct pair disappears from the board.
+
+#### Verification result
+
+- `dart format` passed on the changed match-board widget and screen test.
+- Targeted screen verification passed:
+  - `flutter test test/features/study/presentation/screens/match_mode_screen_test.dart`
+- `python tools/guard/run.py --scope features` passed with the same pre-existing `feature_completeness` warnings about empty feature subfolders outside the changed study logic.
+- `flutter analyze lib/features/study test/features/study` passed with no diagnostics.
+- Full study verification passed:
+  - `flutter test test/features/study`
+- Final layout rescan confirmed the board height is now derived from the board's fixed pair count rather than redistributed from the number of visible rows.
+
+#### Newly exposed issues found after verification
+
+- No additional safely fixable in-scope issue was exposed after the match-layout batch.
+
 ## 5. Deferred items
 
 - Domain-level generic study-session aggregate beyond the active snapshot contract
@@ -635,6 +768,8 @@
   - `sessionCompleted`
 - Review provider, screen, tests, and review docs now consistently omit the removed undo behavior.
 - Match provider, round view, localized copy, tests, and review docs now consistently omit the removed tap-again deselect behavior.
+- Match engine and provider now both validate pairs against the explicit board mapping instead of hidden engine instance state.
+- Match board layout now keeps a stable per-board row height instead of stretching remaining cards when pairs disappear.
 - Resume surfaces now prefer normalized snapshot progress instead of requiring mode-specific payload parsing when the explicit contract is present.
 - Recall progress and `displayIndex` now use the same resolved-result interpretation as the persisted progress snapshot.
 - Entry, hub, resume prompt, and active-session card surfaces now agree that completed snapshots are not resumable state.
@@ -667,6 +802,8 @@
   - completed or stale snapshots no longer surface as active resumable sessions in the hub or direct-entry resume path
   - review mode no longer exposes the undocumented undo toast or rollback action after rating
   - match mode no longer clears a selected card or shows a deselect hint when the same card is tapped again
+  - match mode now validates a selected pair against the persisted board mapping even if `matchEngineProvider` is recreated between taps
+  - match mode now keeps remaining cards at a stable height after settled pairs collapse out of the board
 - Still intentionally deferred relative to the original study docs:
   - domain-level generic session aggregate
   - `sessionType`
@@ -688,5 +825,7 @@
   - the recall resolved-progress bug fix exposed by the new contract tests
   - removal of the undocumented review-mode undo path requested by the user
   - removal of the undocumented match-mode tap-again deselect path requested by the user
+  - root-cause correction for match-mode pairs being scored against hidden engine state
+  - root-cause correction for match-mode cards stretching after matched pairs disappear
 - The active snapshot `modePlan` was kept to a one-step current-mode list specifically to avoid inventing unsupported multi-mode behavior.
 - No new timeout rule, analytics behavior, authorization behavior, board-failure rule, or broader navigation contract was invented.

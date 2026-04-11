@@ -405,7 +405,7 @@ class MatchSession extends _$MatchSession {
 
     if (ref
         .read(matchEngineProvider(deckId))
-        .checkMatch(termId, definitionId)) {
+        .checkMatch(current.game.correctPairs, termId, definitionId)) {
       await _handleCorrect(current, termId, definitionId);
       return;
     }

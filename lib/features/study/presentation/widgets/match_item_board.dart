@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:memox/core/extensions/context_extensions.dart';
 import 'package:memox/core/theme/tokens/duration_tokens.dart';
+import 'package:memox/core/theme/tokens/size_tokens.dart';
+import 'package:memox/core/theme/tokens/spacing_tokens.dart';
 import 'package:memox/features/study/domain/match/match_engine.dart';
 import 'package:memox/features/study/presentation/providers/match_provider.dart';
 import 'package:memox/features/study/presentation/widgets/match_item_card.dart';
@@ -32,28 +34,57 @@ class MatchItemBoard extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    return AnimatedSize(
-      duration: DurationTokens.normal,
-      alignment: Alignment.topCenter,
-      child: Column(
-        children: [
-          for (var index = 0; index < rowCount; index++) ...[
-            Expanded(
-              child: _MatchItemRow(
-                term: index < terms.length ? terms[index] : null,
-                definition: index < definitions.length
-                    ? definitions[index]
-                    : null,
-                resolver: resolver,
-                onSelect: onSelect,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final stableRowHeight = _stableRowHeight(
+          constraints: constraints,
+          boardPairCount: state.game.correctPairs.length,
+        );
+        return Align(
+          alignment: Alignment.topCenter,
+          child: AnimatedSize(
+            duration: DurationTokens.normal,
+            alignment: Alignment.topCenter,
+            child: SizedBox(
+              width: constraints.maxWidth,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  for (var index = 0; index < rowCount; index++) ...[
+                    SizedBox(
+                      height: stableRowHeight,
+                      child: _MatchItemRow(
+                        term: index < terms.length ? terms[index] : null,
+                        definition: index < definitions.length
+                            ? definitions[index]
+                            : null,
+                        resolver: resolver,
+                        onSelect: onSelect,
+                      ),
+                    ),
+                    if (index != rowCount - 1) const Gap.sm(),
+                  ],
+                ],
               ),
             ),
-            if (index != rowCount - 1) const Gap.sm(),
-          ],
-        ],
-      ),
+          ),
+        );
+      },
     );
   }
+}
+
+double _stableRowHeight({
+  required BoxConstraints constraints,
+  required int boardPairCount,
+}) {
+  final slotCount = boardPairCount <= 0 ? 1 : boardPairCount;
+  final totalGapHeight = SpacingTokens.sm * (slotCount - 1);
+  final availableHeight = constraints.maxHeight.isFinite
+      ? constraints.maxHeight
+      : SizeTokens.flashcardMinHeight * slotCount + totalGapHeight;
+  final rawHeight = (availableHeight - totalGapHeight) / slotCount;
+  return rawHeight.clamp(SizeTokens.touchTarget, SizeTokens.flashcardMinHeight);
 }
 
 class _MatchItemRow extends StatelessWidget {

@@ -12,12 +12,6 @@ final class MatchEngine {
   static const int defaultPairsPerRound = 5;
 
   final Random _random;
-  ({
-    List<({String id, String text, MatchItemType type})> terms,
-    List<({String id, String text, MatchItemType type})> definitions,
-    Map<String, String> correctPairs,
-  })?
-  _currentGame;
 
   ({
     List<({String id, String text, MatchItemType type})> terms,
@@ -29,13 +23,11 @@ final class MatchEngine {
     int pairsPerRound = defaultPairsPerRound,
   }) {
     if (cards.isEmpty) {
-      const emptyGame = (
+      return const (
         terms: <({String id, String text, MatchItemType type})>[],
         definitions: <({String id, String text, MatchItemType type})>[],
         correctPairs: <String, String>{},
       );
-      _currentGame = emptyGame;
-      return emptyGame;
     }
 
     final selectedCards = [...cards]..shuffle(_random);
@@ -58,13 +50,7 @@ final class MatchEngine {
 
     terms.shuffle(_random);
     definitions.shuffle(_random);
-    final game = (
-      terms: terms,
-      definitions: definitions,
-      correctPairs: correctPairs,
-    );
-    _currentGame = game;
-    return game;
+    return (terms: terms, definitions: definitions, correctPairs: correctPairs);
   }
 
   List<CardEntity> shuffleCards(List<CardEntity> cards) {
@@ -72,6 +58,9 @@ final class MatchEngine {
     return shuffled;
   }
 
-  bool checkMatch(String termId, String definitionId) =>
-      _currentGame?.correctPairs[termId] == definitionId;
+  bool checkMatch(
+    Map<String, String> correctPairs,
+    String termId,
+    String definitionId,
+  ) => correctPairs[termId] == definitionId;
 }

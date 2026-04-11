@@ -27,6 +27,7 @@ void main() {
     required FakeFlashcardRepository flashcardRepository,
     required FakeCardReviewDao cardReviewDao,
     _FakeStudyRepository? studyRepository,
+    bool useDeterministicEngine = true,
   }) => ProviderContainer(
     overrides: [
       cardReviewDaoProvider.overrideWithValue(cardReviewDao),
@@ -34,7 +35,10 @@ void main() {
       studyRepositoryProvider.overrideWithValue(
         studyRepository ?? _FakeStudyRepository(),
       ),
-      matchEngineProvider(1).overrideWithValue(MatchEngine(random: Random(1))),
+      if (useDeterministicEngine)
+        matchEngineProvider(
+          1,
+        ).overrideWithValue(MatchEngine(random: Random(1))),
     ],
   );
 
@@ -109,6 +113,38 @@ void main() {
     expect(updated.selectedTermId, selectedTerm.id);
     expect(updated.selectedDefinitionId, isNull);
   });
+
+  test(
+    'correct selection still matches after the match engine provider recreates',
+    () async {
+      final cardReviewDao = FakeCardReviewDao();
+      final studyRepository = _FakeStudyRepository();
+      final flashcardRepository = FakeFlashcardRepository(cards: _cards(1));
+      final container = buildContainer(
+        flashcardRepository: flashcardRepository,
+        cardReviewDao: cardReviewDao,
+        studyRepository: studyRepository,
+        useDeterministicEngine: false,
+      );
+      addTearDown(cardReviewDao.dispose);
+      addTearDown(container.dispose);
+      final initial = await container.read(matchSessionProvider(1).future);
+      final notifier = container.read(matchSessionProvider(1).notifier);
+      final term = initial.game.terms.single;
+      final definition = initial.game.definitions.single;
+
+      container.invalidate(matchEngineProvider(1));
+
+      await notifier.selectItem(term);
+      await notifier.selectItem(definition);
+
+      final updated = container.read(matchSessionProvider(1)).requireValue;
+      expect(updated.isComplete, isTrue);
+      expect(updated.matchedPairIds, <String>{term.id});
+      expect(studyRepository.completedSession?.correctCount, 1);
+      expect(studyRepository.completedSession?.wrongCount, 0);
+    },
+  );
 
   test('wrong selection increments mistakes and clears the pair', () async {
     final cardReviewDao = FakeCardReviewDao();

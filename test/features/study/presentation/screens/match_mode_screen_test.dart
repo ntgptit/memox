@@ -169,6 +169,68 @@ void main() {
   });
 
   testWidgets(
+    'MatchModeScreen keeps remaining card heights stable after a pair disappears',
+    (tester) async {
+      final cardReviewDao = FakeCardReviewDao();
+      addTearDown(cardReviewDao.dispose);
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            cardReviewDaoProvider.overrideWithValue(cardReviewDao),
+            flashcardRepositoryProvider.overrideWithValue(
+              FakeFlashcardRepository(cards: _cards(3)),
+            ),
+            deckRepositoryProvider.overrideWithValue(FakeDeckRepository()),
+            studyRepositoryProvider.overrideWithValue(_FakeStudyRepository()),
+            matchEngineProvider(
+              4,
+            ).overrideWithValue(MatchEngine(random: Random(1))),
+          ],
+          child: buildTestApp(home: const MatchModeScreen(deckId: 4)),
+        ),
+      );
+      await _pumpMatchScreen(tester);
+      final container = ProviderScope.containerOf(
+        tester.element(find.byType(MatchModeScreen)),
+      );
+      final initialState = container.read(matchSessionProvider(4)).requireValue;
+      final matchedTerm = initialState.game.terms.last;
+      final retainedTerm = initialState.game.terms.firstWhere(
+        (item) => item.id != matchedTerm.id,
+      );
+      final matchedDefinitionId =
+          initialState.game.correctPairs[matchedTerm.id]!;
+      final matchedDefinition = initialState.game.definitions.firstWhere(
+        (item) => item.id == matchedDefinitionId,
+      );
+      final initialRect = tester.getRect(
+        find
+            .ancestor(
+              of: find.text(retainedTerm.text),
+              matching: find.byType(AppCard),
+            )
+            .first,
+      );
+
+      await tester.tap(find.text(matchedTerm.text).first);
+      await tester.pump();
+      await tester.tap(find.text(matchedDefinition.text).first);
+      await _pumpMatchScreen(tester);
+
+      final updatedRect = tester.getRect(
+        find
+            .ancestor(
+              of: find.text(retainedTerm.text),
+              matching: find.byType(AppCard),
+            )
+            .first,
+      );
+
+      expect(updatedRect.height, closeTo(initialRect.height, 1));
+    },
+  );
+
+  testWidgets(
     'MatchModeScreen continues to the next board instead of finishing early',
     (tester) async {
       final cardReviewDao = FakeCardReviewDao();
