@@ -18,18 +18,6 @@ subprojects {
 subprojects {
     project.evaluationDependsOn(":app")
 }
-subprojects {
-    plugins.withId("com.android.library") {
-        val androidExtension = extensions.findByName("android")
-
-        if (androidExtension is com.android.build.gradle.LibraryExtension &&
-            androidExtension.namespace == null) {
-            androidExtension.namespace = project.group.toString().takeIf {
-                it != "unspecified"
-            } ?: "com.memox.${project.name.replace('-', '_')}"
-        }
-    }
-}
 
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)

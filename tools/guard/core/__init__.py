@@ -1,1 +1,0 @@
-"""Core guard engine components."""

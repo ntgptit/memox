@@ -28,20 +28,10 @@ migrate_working_dir/
 **/ios/Flutter/.last_build_id
 .dart_tool/
 .flutter-plugins-dependencies
-.metadata
 .pub-cache/
 .pub/
 /build/
-/android/build/
 /coverage/
-*.g.dart
-*.freezed.dart
-*.mocks.dart
-/lib/l10n/generated/
-/web/drift_worker.dart.js
-/web/drift_worker.dart.js.deps
-/web/drift_worker.dart.js.map
-/web/sqlite3.wasm
 
 # Symbolication related
 app.*.symbols
@@ -53,5 +43,3 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
-.codex_analyze.txt
-.codex_analyze_after_fix.txt

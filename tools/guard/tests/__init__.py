@@ -1,1 +1,0 @@
-"""Guard tool tests."""

@@ -1,17 +1,20 @@
-# memox
+# MemoX
 
-A new Flutter project.
+This branch is a clean reset of the previous MemoX codebase.
 
-## Getting Started
+The repository now contains only a fresh Flutter starter baseline so the app can
+be rebuilt from scratch without legacy feature code, docs, or guard rules.
 
-This project is a starting point for a Flutter application.
+## Current status
 
-A few resources to get you started if this is your first Flutter project:
+- Flutter project recreated with package name `memox`
+- Android namespace and application ID set to `com.memox.memox`
+- Default counter demo replaced with a rebuild placeholder screen
+- Widget test updated to verify the new baseline
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+## Verify
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+```bash
+flutter analyze
+flutter test
+```
